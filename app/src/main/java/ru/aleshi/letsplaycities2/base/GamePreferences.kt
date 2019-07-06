@@ -18,6 +18,7 @@ class GamePreferences(context: Context) {
         private const val KEY_UPD_DIC = "dic_upd"
         private const val KEY_NULL = "n"
         private const val KEY_SCR = "scrbkey"
+        private const val KEY_BANNED = "banned"
 
         private val settings_pref_keys =
             arrayOf(
@@ -84,5 +85,13 @@ class GamePreferences(context: Context) {
     fun putScoring(scoring: String) {
         val encoded = Base64.encodeToString(scoring.toByteArray(), Base64.DEFAULT)
         prefs.edit().putString(KEY_SCR, encoded).apply()
+    }
+
+    fun getBanned(): String {
+        return prefs.getString(KEY_BANNED, "")!!
+    }
+
+    fun putBanned(banned: String) {
+        prefs.edit().putString(KEY_BANNED, banned).apply()
     }
 }

@@ -6,6 +6,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.aleshi.letsplaycities2.R
+import ru.aleshi.letsplaycities2.base.ThemeManager
 import ru.aleshi.letsplaycities2.utils.DictionaryUpdater
 
 

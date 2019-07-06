@@ -13,7 +13,7 @@ import ru.aleshi.letsplaycities2.LPSApplication
 import ru.aleshi.letsplaycities2.R
 import ru.aleshi.letsplaycities2.base.GamePreferences
 import ru.aleshi.letsplaycities2.ui.MainActivity
-import ru.aleshi.letsplaycities2.ui.ThemeManager
+import ru.aleshi.letsplaycities2.base.ThemeManager
 
 
 class SettingsFragment : Fragment() {

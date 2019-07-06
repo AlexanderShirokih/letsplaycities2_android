@@ -42,12 +42,24 @@
             android:label="@string/addcity_title"/>
     <fragment android:id="@+id/themeFragment" android:name="ru.aleshi.letsplaycities2.ui.ThemeFragment"
               android:label="ThemeFragment"/>
-    <fragment android:id="@+id/blackListFragment" android:name="ru.aleshi.letsplaycities2.ui.BlackListFragment"
-              android:label="BlackListFragment"/>
+    <fragment
+            android:id="@+id/blackListFragment"
+            android:name="ru.aleshi.letsplaycities2.ui.blacklist.BlackListFragment"
+            android:label="@string/black_list_title"
+            tools:layout="@layout/fragment_blacklist">
+        <action android:id="@+id/showConfimationDialog"
+                app:destination="@id/confirmationDialog"/>
+    </fragment>
     <fragment
             android:id="@+id/scoreFragment"
             android:name="ru.aleshi.letsplaycities2.ui.ScoreFragment"
             android:label="@string/score_title"
             tools:layout="@layout/fragment_score"/>
+    <dialog
+            android:id="@+id/confirmationDialog"
+            android:name="ru.aleshi.letsplaycities2.ui.confirmdialog.ConfirmationDialog"
+            android:label="ConfirmationDialog">
+        <argument android:name="message" app:argType="string"/>
+    </dialog>
 
 </navigation>

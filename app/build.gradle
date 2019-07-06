@@ -1,15 +1,16 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
+
+def lifecycle_version = "2.0.0"
 
 android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "ru.aleshi.letsplaycities2"
-        minSdkVersion 15
+        minSdkVersion 17
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -35,8 +36,11 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navVersion"
     implementation "androidx.navigation:navigation-runtime-ktx:$rootProject.navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$rootProject.navVersion"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+
     implementation 'com.google.android.material:material:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 }

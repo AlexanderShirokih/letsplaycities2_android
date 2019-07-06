@@ -1,10 +1,8 @@
-package ru.aleshi.letsplaycities2.ui
+package ru.aleshi.letsplaycities2.base
 
 import android.content.Context
 import ru.aleshi.letsplaycities2.LPSApplication
 import ru.aleshi.letsplaycities2.R
-import ru.aleshi.letsplaycities2.base.SignatureChecker
-import ru.aleshi.letsplaycities2.base.Theme
 
 
 object ThemeManager {
@@ -24,7 +22,10 @@ object ThemeManager {
 
     fun applyTheme(context: Context) {
         val app = context.applicationContext as LPSApplication
-        val theme: Theme = getThemeById(app.gamePreferences.getThemeId(DEFAULT_THEME.stid), app)
+        val theme: Theme = getThemeById(
+            app.gamePreferences.getThemeId(DEFAULT_THEME.stid),
+            app
+        )
         if (theme.isFreeOrAvailable())
             context.setTheme(theme.themeId)
     }
@@ -48,7 +49,10 @@ object ThemeManager {
 
     fun getCurrentThemeName(context: Context): String {
         val app = context.applicationContext as LPSApplication
-        val theme: Theme = getThemeById(app.gamePreferences.getThemeId(DEFAULT_THEME.stid), app)
+        val theme: Theme = getThemeById(
+            app.gamePreferences.getThemeId(DEFAULT_THEME.stid),
+            app
+        )
         if (theme.isFreeOrAvailable()) {
             val index = themes.indexOf(theme)
             if (index != -1) {

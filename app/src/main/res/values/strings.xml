@@ -115,4 +115,13 @@
     <string name="draw">Ничья!</string>
     <string name="win">%1$s Победил!</string>
 
+    <!-- BlackListFragment -->
+    <string name="black_list_title">Чёрный список</string>
+    <string name="empty_black_list">Здесь будут отображаться игроки,\n которых вы внесли в чёрный список</string>
+    <string name="remove_from_blacklist">Удалить\n игрока %1$s из чёрного списка?</string>
+
+    <!-- ConfirmationDialog -->
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+
 </resources>
