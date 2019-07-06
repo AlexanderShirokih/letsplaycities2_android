@@ -6,6 +6,69 @@
     <string name="pvp">Игрок против Игрока</string>
     <string name="mul">Мультиплеер</string>
     <string name="net">Онлайн</string>
-    <string name="setting">Настройки</string>
+    <string name="settings">Настройки</string>
+
+    <!-- Settings Fragment-->
+    <string-array name="diff_names">
+        <item>Лёгко</item>
+        <item>Нормально</item>
+        <item>Сложно</item>
+    </string-array>
+
+    <string-array name="themes">
+        <item>Стандартная</item>
+        <item>ВК Стиль</item>
+        <item>Зелёная</item>
+        <item>Белая</item>
+        <item>География</item>
+        <item>Москва</item>
+        <item>Киев</item>
+        <item>Париж</item>
+        <item>Нью-Йорк</item>
+        <item>Осень</item>
+    </string-array>
+
+    <string-array name="settings_item">
+        <item>Добавление городов</item>
+        <item>Тема</item>
+        <item>Сложность</item>
+        <item>Подсчёт очков</item>
+        <item>Таймер хода</item>
+        <item>Автоисправление</item>
+        <item>Звук</item>
+        <item>Онлайн чат</item>
+        <item>Статистика</item>
+        <item>Чёрный список</item>
+        <item>Проверка обновлений словаря</item>
+    </string-array>
+
+    <string-array name="scoring">
+        <item>По очкам</item>
+        <item>По времени</item>
+        <item>До сдачи</item>
+    </string-array>
+
+    <string-array name="timing">
+        <item>ВЫКЛ</item>
+        <item>1 мин</item>
+        <item>3 мин</item>
+        <item>5 мин</item>
+        <item>7 мин</item>
+        <item>9 мин</item>
+        <item>11 мин</item>
+        <item>13 мин</item>
+        <item>15 мин</item>
+    </string-array>
+
+    <string-array name="on_off">
+        <item>ВЫКЛ</item>
+        <item>ВКЛ</item>
+    </string-array>
+
+    <string-array name="dic_upd">
+        <item>Каждые 3ч</item>
+        <item>Каждый день</item>
+        <item>ВЫКЛ</item>
+    </string-array>
 
 </resources>

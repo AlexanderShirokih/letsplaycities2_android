@@ -9,7 +9,6 @@
             android:id="@+id/mainMenuFragment"
             android:name="ru.aleshi.letsplaycities2.ui.MainMenuFragment"
             android:label="MainMenu"
-            android:layout="@layout/fragment_main_menu"
             tools:layout="@layout/fragment_main_menu">
         <action android:id="@+id/start_multiplayer_fragment"
                 app:destination="@id/multiplayerFragment"/>
@@ -26,7 +25,23 @@
               android:label="GameFragment">
         <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities2.base.GameMode"/>
     </fragment>
-    <fragment android:id="@+id/settingsFragment" android:name="ru.aleshi.letsplaycities2.ui.SettingsFragment"
-              android:label="SettingsFragment"/>
+    <fragment
+            android:id="@+id/settingsFragment"
+            android:name="ru.aleshi.letsplaycities2.ui.settings.SettingsFragment"
+            android:label="@string/settings"
+            tools:layout="@layout/fragment_settings">
+        <action android:id="@+id/start_addcity_fragment" app:destination="@id/addCityFragment"/>
+        <action android:id="@+id/start_blacklist_fragment" app:destination="@id/blackListFragment"/>
+        <action android:id="@+id/start_theme_fragment" app:destination="@id/themeFragment"/>
+        <action android:id="@+id/start_score_fragment" app:destination="@id/scoreFragment"/>
+    </fragment>
+    <fragment android:id="@+id/addCityFragment" android:name="ru.aleshi.letsplaycities2.ui.AddCityFragment"
+              android:label="AddCityFragment"/>
+    <fragment android:id="@+id/themeFragment" android:name="ru.aleshi.letsplaycities2.ui.ThemeFragment"
+              android:label="ThemeFragment"/>
+    <fragment android:id="@+id/blackListFragment" android:name="ru.aleshi.letsplaycities2.ui.BlackListFragment"
+              android:label="BlackListFragment"/>
+    <fragment android:id="@+id/scoreFragment" android:name="ru.aleshi.letsplaycities2.ui.ScoreFragment"
+              android:label="ScoreFragment"/>
 
 </navigation>

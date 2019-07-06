@@ -79,7 +79,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:text="@string/setting"
+            android:text="@string/settings"
             android:padding="@dimen/btn_pad"
             app:icon="@drawable/ic_settings_black_24"
             app:layout_constraintStart_toStartOf="@+id/btn_pva"

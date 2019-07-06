@@ -46,4 +46,16 @@ object ThemeManager {
         }
     }
 
+    fun getCurrentThemeName(context: Context): String {
+        val app = context.applicationContext as LPSApplication
+        val theme: Theme = getThemeById(app.gamePreferences.getThemeId(DEFAULT_THEME.stid), app)
+        if (theme.isFreeOrAvailable()) {
+            val index = themes.indexOf(theme)
+            if (index != -1) {
+                return app.resources.getStringArray(R.array.themes)[index]
+            }
+        }
+        return app.resources.getStringArray(R.array.themes)[0]
+    }
+
 }
