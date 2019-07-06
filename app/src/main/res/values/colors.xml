@@ -1,8 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <!-- Default theme (Yellow) -->
+    <color name="defColorPrimary">#ffa726</color>
+    <color name="defColorPrimaryDark">#c5a600</color>
+    <color name="defWindowBg">#FFECB3</color>
+
+    <!-- Autumn theme -->
+    <color name="autColorPrimary">#ff7043</color>
+    <color name="autColorPrimaryDark">#c63f17</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="vks_window_bg">#e1f0fd</color>
+    <color name="grn_window_bg">#ccffcc</color>
+    <color name="wht_window_bg">#ffffff</color>
+
+    <color name="def_sep">#FFC107</color>
+    <color name="vks_sep">#608cbb</color>
+    <color name="grn_sep">#1c9311</color>
+    <color name="wht_sep">#a3a3a3</color>
+    <color name="rus_sep">#0011ff</color>
+    <color name="geo_sep">#FF9800</color>
+    <color name="ukr_sep">#5b66ff</color>
+    <color name="fr_sep">#5640f9</color>
+    <color name="aut_sep">#ff8539</color>
+
+    <color name="def_icon">#fca100</color>
+
+    <color name="fg_span_color">#00f</color>
+    <color name="rus_fg_span_color">#fafafa</color>
+    <color name="aut_fg_span_color">#c62929</color>
+
+    <color name="usa_hint">#f2f2f2</color>
+
+    <color name="aut_score">#020021</color>
 </resources>

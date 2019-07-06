@@ -20,92 +20,68 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_pva"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="16dp"
-            android:drawableStart="@drawable/player"
-            android:drawableLeft="@drawable/player"
-            android:drawableEnd="@drawable/android"
-            android:drawableRight="@drawable/android"
-            android:drawablePadding="@dimen/btn_draw_pad"
-            android:padding="@dimen/btn_pad"
             android:text="@string/pva"
-            android:textSize="@dimen/sb_text_size"
+            android:padding="@dimen/btn_pad"
+            app:icon="@drawable/android_24dp"
             app:layout_constraintBottom_toTopOf="@+id/btn_pvp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/logo"
             app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_pvp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:drawableStart="@drawable/player"
-            android:drawableLeft="@drawable/player"
-            android:drawableEnd="@drawable/player"
-            android:drawableRight="@drawable/player"
-            android:drawablePadding="@dimen/btn_draw_pad"
-            android:padding="@dimen/btn_pad"
             android:text="@string/pvp"
-            android:textSize="@dimen/sb_text_size"
+            android:padding="@dimen/btn_pad"
+            app:icon="@drawable/ic_player"
             app:layout_constraintStart_toStartOf="@+id/btn_pva"
             app:layout_constraintEnd_toEndOf="@+id/btn_pva"
             app:layout_constraintTop_toBottomOf="@+id/btn_pva"
             app:layout_constraintBottom_toTopOf="@+id/btn_net"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_net"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:drawableStart="@drawable/player"
-            android:drawableLeft="@drawable/player"
-            android:drawableEnd="@drawable/global"
-            android:drawableRight="@drawable/global"
-            android:drawablePadding="@dimen/btn_draw_pad"
-            android:padding="@dimen/btn_pad"
             android:text="@string/net"
-            android:textSize="@dimen/sb_text_size"
+            android:padding="@dimen/btn_pad"
+            app:icon="@drawable/ic_global"
             app:layout_constraintStart_toStartOf="@+id/btn_pva"
             app:layout_constraintEnd_toEndOf="@+id/btn_pva"
             app:layout_constraintTop_toBottomOf="@+id/btn_pvp"
             app:layout_constraintBottom_toTopOf="@+id/btn_mul"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_mul"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:drawableStart="@drawable/player"
-            android:drawableLeft="@drawable/player"
-            android:drawableEnd="@drawable/net"
-            android:drawableRight="@drawable/net"
-            android:drawablePadding="@dimen/btn_draw_pad"
-            android:padding="@dimen/btn_pad"
             android:text="@string/mul"
-            android:textSize="@dimen/sb_text_size"
+            android:padding="@dimen/btn_pad"
+            app:icon="@drawable/ic_net_24"
             app:layout_constraintStart_toStartOf="@+id/btn_pva"
             app:layout_constraintEnd_toEndOf="@+id/btn_pva"
             app:layout_constraintTop_toBottomOf="@+id/btn_net"
             app:layout_constraintBottom_toTopOf="@+id/btn_set"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_set"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:drawableStart="@drawable/ic_settings"
-            android:drawableLeft="@drawable/ic_settings"
-            android:drawableEnd="@drawable/ic_settings"
-            android:drawableRight="@drawable/ic_settings"
-            android:padding="@dimen/btn_pad"
             android:text="@string/setting"
-            android:textSize="@dimen/sb_text_size"
+            android:padding="@dimen/btn_pad"
+            app:icon="@drawable/ic_settings_black_24"
             app:layout_constraintStart_toStartOf="@+id/btn_pva"
             app:layout_constraintEnd_toEndOf="@+id/btn_pva"
             app:layout_constraintTop_toBottomOf="@+id/btn_mul"
