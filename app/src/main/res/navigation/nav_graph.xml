@@ -3,14 +3,30 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/nav"
-            app:startDestination="@id/noteListFragment">
+            app:startDestination="@id/mainMenuFragment">
 
     <fragment
-            android:id="@+id/noteListFragment"
+            android:id="@+id/mainMenuFragment"
             android:name="ru.aleshi.letsplaycities2.ui.MainMenuFragment"
             android:label="MainMenu"
             android:layout="@layout/fragment_main_menu"
             tools:layout="@layout/fragment_main_menu">
+        <action android:id="@+id/start_multiplayer_fragment"
+                app:destination="@id/multiplayerFragment"/>
+        <action android:id="@+id/start_network_fragment"
+                app:destination="@id/multiplayerFragment2"/>
+        <action android:id="@+id/start_game_fragment" app:destination="@id/gameFragment"/>
+        <action android:id="@+id/start_settings_fragment" app:destination="@id/settingsFragment"/>
     </fragment>
+    <fragment android:id="@+id/multiplayerFragment" android:name="ru.aleshi.letsplaycities2.ui.MultiplayerFragment"
+              android:label="MultiplayerFragment"/>
+    <fragment android:id="@+id/multiplayerFragment2" android:name="ru.aleshi.letsplaycities2.ui.MultiplayerFragment"
+              android:label="MultiplayerFragment"/>
+    <fragment android:id="@+id/gameFragment" android:name="ru.aleshi.letsplaycities2.ui.GameFragment"
+              android:label="GameFragment">
+        <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities2.base.GameMode"/>
+    </fragment>
+    <fragment android:id="@+id/settingsFragment" android:name="ru.aleshi.letsplaycities2.ui.SettingsFragment"
+              android:label="SettingsFragment"/>
 
 </navigation>

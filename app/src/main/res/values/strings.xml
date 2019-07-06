@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">Сыграем в Города</string>
 
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- MainMenuFragment -->
+    <string name="pva">Игрок против Андроида</string>
+    <string name="pvp">Игрок против Игрока</string>
+    <string name="mul">Мультиплеер</string>
+    <string name="net">Онлайн</string>
+    <string name="setting">Настройки</string>
+
 </resources>
