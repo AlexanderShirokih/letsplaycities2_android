@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.fragment_main_menu.*
 import ru.aleshi.letsplaycities2.BadTokenException
 import ru.aleshi.letsplaycities2.R
+import ru.aleshi.letsplaycities2.base.GameMode
 import ru.aleshi.letsplaycities2.utils.IntegrityChecker
 import ru.aleshi.letsplaycities2.utils.Utils
 
@@ -56,8 +57,8 @@ class MainMenuFragment : Fragment() {
                 when (v.id) {
                     R.id.btn_mul -> navController.navigate(R.id.start_multiplayer_fragment)
                     R.id.btn_net -> navController.navigate(R.id.start_network_fragment)
-                    R.id.btn_pva -> navController.navigate(R.id.start_game_fragment)
-                    R.id.btn_pvp -> navController.navigate(R.id.start_game_fragment)
+                    R.id.btn_pva -> navController.navigate(MainMenuFragmentDirections.startGameFragment(GameMode.MODE_PVA))
+                    R.id.btn_pvp -> navController.navigate(MainMenuFragmentDirections.startGameFragment(GameMode.MODE_PVP))
                     R.id.btn_set -> navController.navigate(R.id.start_settings_fragment)
                     else -> throw IllegalStateException("Unknown button clicked!")
                 }
