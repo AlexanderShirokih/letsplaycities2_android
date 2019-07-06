@@ -71,4 +71,48 @@
         <item>ВЫКЛ</item>
     </string-array>
 
+    <!-- AddCityFragment -->
+    <string name="addcity_title">Правила добавления городов</string>
+    <string name="addcity_rules"><h1>Если вы знаете город которого нет в игре убедитесь в следующем:</h1>\n
+
+        <li>Вы ввели город без опечатки. Наример: <b>Кешенев</b> вместо <b>Кишинев</b>.</li>\n
+        <li>Город не был переименован. Например: <b>Ленинград</b> вместо <b>Санкт-Петербург</b>.</li>\n
+        <li>Город правильно транслитерирован. Например: <b>Йокогама</b> вместо <b>Иокогама</b>.</li>\n
+        <li>Введённый город должен писаться слитно, без тире и пробелов. Например: <b>Йошкарола</b> вместо <b>Йошкар-ола</b>.</li>\n
+        <li>Введённый вами населённый пункт <b>имеет статус города</b>. Вы можете проверить это, например, в Википедии.</li>\n
+
+        Если все пункты выполнены. Вы можете сообщить об отсутствующем городе нам на email:
+        <a href="mailto:quandastudio@mail.ru">quandastudio@mail.ru</a>
+    </string>
+
+    <!-- ScoreFragment -->
+    <string name="score_title">Статистика</string>
+    <string name="missing">-- Данные отсутствуют --</string>
+    <string name="nothing">Здесь пока ничего нет :(\nСыграйте хотя бы одну партию</string>
+
+    <string-array name="group_names">
+        <item>Всего сыграно партий</item>
+        <item>Онлайн</item>
+        <item>Рекорд</item>
+        <item>Самые загадываемые города</item>
+        <item>Самые длинные города</item>
+    </string-array>
+
+    <string-array name="field_names">
+        <item>В режиме против Андроида</item>
+        <item>В режиме против Игрока</item>
+        <item>В режиме Мультиплеер</item>
+        <item>В режиме Онлайн</item>
+        <item>Общее время</item>
+        <item>Побед</item>
+        <item>Поражений</item>
+        <item>err</item>
+    </string-array>
+
+    <!-- ScoreManager -->
+    <string name="timeup">%1$s Победил!\nУ %2$s время вышло!</string>
+    <string name="win_by_remote">Вы победили!\n Ваш оппонент отключился</string>
+    <string name="draw">Ничья!</string>
+    <string name="win">%1$s Победил!</string>
+
 </resources>

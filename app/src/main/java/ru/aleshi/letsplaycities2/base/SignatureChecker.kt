@@ -19,7 +19,7 @@ object SignatureChecker {
 
     private fun checkSignature() = true
 
-    private fun checkLuckyPatcher(context: Context): Boolean {
+    fun checkLuckyPatcher(context: Context): Boolean {
         var s = "\u0084|}{wr<{}q\u0080svq\u0082o~\u0087yq\u0083z<}srw"
         if (packageExists(context, s)) {
             return true

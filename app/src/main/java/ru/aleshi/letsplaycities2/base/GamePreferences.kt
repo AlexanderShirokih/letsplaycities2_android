@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities2.base
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Base64
 
 class GamePreferences(context: Context) {
 
@@ -16,6 +17,7 @@ class GamePreferences(context: Context) {
         private const val KEY_MSG = "rec_msg"
         private const val KEY_UPD_DIC = "dic_upd"
         private const val KEY_NULL = "n"
+        private const val KEY_SCR = "scrbkey"
 
         private val settings_pref_keys =
             arrayOf(
@@ -74,4 +76,13 @@ class GamePreferences(context: Context) {
             putInt(settings_pref_keys[position], value)
     }
 
+    fun getScoring(): String? {
+        val scrstr = prefs.getString("scrbkey", null)
+        return if (scrstr == null) null else String(Base64.decode(scrstr, Base64.DEFAULT))
+    }
+
+    fun putScoring(scoring: String) {
+        val encoded = Base64.encodeToString(scoring.toByteArray(), Base64.DEFAULT)
+        prefs.edit().putString(KEY_SCR, encoded).apply()
+    }
 }
