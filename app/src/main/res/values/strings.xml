@@ -124,4 +124,6 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
 
+    <!-- ThemeFragment -->
+    <string name="theme_title">Выберите тему</string>
 </resources>

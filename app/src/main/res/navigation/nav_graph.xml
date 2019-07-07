@@ -7,7 +7,7 @@
 
     <fragment
             android:id="@+id/mainMenuFragment"
-            android:name="ru.aleshi.letsplaycities2.ui.MainMenuFragment"
+            android:name="ru.aleshi.letsplaycities.ui.MainMenuFragment"
             android:label="MainMenu"
             tools:layout="@layout/fragment_main_menu">
         <action android:id="@+id/start_multiplayer_fragment"
@@ -17,17 +17,17 @@
         <action android:id="@+id/start_game_fragment" app:destination="@id/gameFragment"/>
         <action android:id="@+id/start_settings_fragment" app:destination="@id/settingsFragment"/>
     </fragment>
-    <fragment android:id="@+id/multiplayerFragment" android:name="ru.aleshi.letsplaycities2.ui.MultiplayerFragment"
+    <fragment android:id="@+id/multiplayerFragment" android:name="ru.aleshi.letsplaycities.ui.MultiplayerFragment"
               android:label="MultiplayerFragment"/>
-    <fragment android:id="@+id/multiplayerFragment2" android:name="ru.aleshi.letsplaycities2.ui.MultiplayerFragment"
+    <fragment android:id="@+id/multiplayerFragment2" android:name="ru.aleshi.letsplaycities.ui.MultiplayerFragment"
               android:label="MultiplayerFragment"/>
-    <fragment android:id="@+id/gameFragment" android:name="ru.aleshi.letsplaycities2.ui.GameFragment"
+    <fragment android:id="@+id/gameFragment" android:name="ru.aleshi.letsplaycities.ui.GameFragment"
               android:label="GameFragment">
-        <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities2.base.GameMode"/>
+        <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities.base.GameMode"/>
     </fragment>
     <fragment
             android:id="@+id/settingsFragment"
-            android:name="ru.aleshi.letsplaycities2.ui.settings.SettingsFragment"
+            android:name="ru.aleshi.letsplaycities.ui.settings.SettingsFragment"
             android:label="@string/settings"
             tools:layout="@layout/fragment_settings">
         <action android:id="@+id/start_addcity_fragment" app:destination="@id/addCityFragment"/>
@@ -35,31 +35,54 @@
         <action android:id="@+id/start_theme_fragment" app:destination="@id/themeFragment"/>
         <action android:id="@+id/start_score_fragment" app:destination="@id/scoreFragment"/>
     </fragment>
+
     <fragment
             android:id="@+id/addCityFragment"
-            android:name="ru.aleshi.letsplaycities2.ui.AddCityFragment"
+            android:name="ru.aleshi.letsplaycities.ui.AddCityFragment"
             tools:layout="@layout/fragment_addcity"
             android:label="@string/addcity_title"/>
-    <fragment android:id="@+id/themeFragment" android:name="ru.aleshi.letsplaycities2.ui.ThemeFragment"
-              android:label="ThemeFragment"/>
+
+    <fragment
+            android:id="@+id/themeFragment"
+            android:name="ru.aleshi.letsplaycities.ui.theme.ThemeFragment"
+            android:label="@string/theme_title"
+            tools:layout="@layout/fragment_theme">
+        <action android:id="@+id/showPreviewImageDialog" app:destination="@id/previewImageDialog"/>
+        <action android:id="@+id/showConfimationDialog" app:destination="@+id/confirmationDialog"/>
+    </fragment>
+
     <fragment
             android:id="@+id/blackListFragment"
-            android:name="ru.aleshi.letsplaycities2.ui.blacklist.BlackListFragment"
+            android:name="ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment"
             android:label="@string/black_list_title"
             tools:layout="@layout/fragment_blacklist">
         <action android:id="@+id/showConfimationDialog"
                 app:destination="@id/confirmationDialog"/>
     </fragment>
+
     <fragment
             android:id="@+id/scoreFragment"
-            android:name="ru.aleshi.letsplaycities2.ui.ScoreFragment"
+            android:name="ru.aleshi.letsplaycities.ui.ScoreFragment"
             android:label="@string/score_title"
             tools:layout="@layout/fragment_score"/>
     <dialog
             android:id="@+id/confirmationDialog"
-            android:name="ru.aleshi.letsplaycities2.ui.confirmdialog.ConfirmationDialog"
+            android:name="ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmationDialog"
             android:label="ConfirmationDialog">
-        <argument android:name="message" app:argType="string"/>
+
+        <argument android:name="requestCode" app:argType="integer"/>
+        <argument
+                android:name="message"
+                app:argType="string"/>
+        <argument android:name="title" app:argType="string" app:nullable="true"/>
+    </dialog>
+
+    <dialog
+            android:id="@+id/previewImageDialog"
+            android:name="ru.aleshi.letsplaycities.ui.PreviewImageDialog"
+            android:label="PreviewImageDialog">
+        <argument android:name="assetImageName" app:argType="string"/>
+        <argument android:name="title" app:argType="string"/>
     </dialog>
 
 </navigation>

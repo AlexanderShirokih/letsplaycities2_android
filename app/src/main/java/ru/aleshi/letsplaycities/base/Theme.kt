@@ -8,12 +8,7 @@ class Theme(val stid: Int, val themeId: Int, var sku: String?) {
             sku = "ru.aleshi.lps.theme.$sku"
     }
 
-    fun isFree(): Boolean {
-        return FalseTester.NoFalseTester.test(
-            SignatureChecker.getFalseContext(),
-            FalseTester.YesFalseTester.getYes(this)
-        ) is FalseTester.NoFalseTester
-    }
+    fun isFree() = sku == null
 
     fun isFreeOrAvailable() = isFree() || isAvail
 }

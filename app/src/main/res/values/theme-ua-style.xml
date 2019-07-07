@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="UkrStyleTheme" parent="AppTheme">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorHint">@android:color/white</item>
+        <item name="android:windowBackground">@drawable/bg_kiev</item>
+        <item name="android:buttonStyle">@style/UkrButtonStyle</item>
+        <item name="android:imageButtonStyle">@style/UkrButtonStyle</item>
+        <item name="android:seekBarStyle">@style/UkrSeekbarStyle</item>
+        <item name="android:checkboxStyle">@style/UkrChekboxStyle</item>
+        <item name="sepBg">@color/ukr_sep</item>
+        <item name="iconColor">@color/ukr_sep</item>
+        <item name="fgSpanColor">@color/rus_fg_span_color</item>
+
+        <item name="itemBgMe">@drawable/ukr_bg_me</item>
+        <item name="itemBgOther">@drawable/ukr_bg_other</item>
+
+    </style>
+
+    <style name="UkrButtonStyle" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/ukr_button</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="UkrChekboxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="UkrSeekbarStyle" parent="@android:style/Widget.SeekBar">
+        <item name="android:thumb">@drawable/rus_sb_scrubber_control_selector_holo_light</item>
+        <item name="android:progressDrawable">
+            @drawable/rus_sb_scrubber_progress_horizontal_holo_light
+        </item>
+    </style>
+
+</resources>

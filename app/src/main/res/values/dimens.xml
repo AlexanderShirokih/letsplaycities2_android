@@ -38,4 +38,7 @@
     <dimen name="padding_edittext">30dp</dimen>
 
     <dimen name="chb_drawable_pad">4dp</dimen>
+
+    <dimen name="previewImageWidth">400dp</dimen>
+    <dimen name="previewImageHeight">355dp</dimen>
 </resources>

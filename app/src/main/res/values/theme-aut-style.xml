@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AutStyleTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/autColorPrimary</item>
+        <item name="colorPrimaryDark">@color/autColorPrimaryDark</item>
+        <item name="colorAccent">@color/autColorPrimary</item>
+        <item name="android:windowBackground">@drawable/bg_fall</item>
+
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColorHint">@color/aut_score</item>
+        <item name="sepBg">@color/aut_sep</item>
+        <item name="iconColor">@color/aut_sep</item>
+        <item name="fgSpanColor">@color/aut_fg_span_color</item>
+        <item name="scoreColor">@color/aut_score</item>
+
+        <item name="itemBgMe">@drawable/aut_bg_me</item>
+        <item name="itemBgOther">@drawable/aut_bg_other</item>
+    </style>
+
+</resources>

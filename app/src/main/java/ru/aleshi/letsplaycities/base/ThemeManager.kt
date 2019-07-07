@@ -31,10 +31,11 @@ object ThemeManager {
 
     private fun getThemeById(requestedStid: Int, applicationContext: LPSApplication): Theme {
         for (theme in themes) {
-            if (theme.stid == requestedStid)
+            if (theme.stid == requestedStid) {
                 checkAvailableFor(theme, applicationContext)
-            if (theme.isFreeOrAvailable())
-                return theme
+                if (theme.isFreeOrAvailable())
+                    return theme
+            }
         }
         return DEFAULT_THEME
     }
@@ -67,16 +68,36 @@ object ThemeManager {
         return app.resources.getStringArray(R.array.themes)[0]
     }
 
+    fun getThemeBySKU(productId: String): Theme {
+        for (t in themes) {
+            if (productId == t.sku)
+                return t
+        }
+        throw IllegalStateException("Cannot find token by sku $productId")
+    }
+
     fun test2(): Boolean {
         return themes[7].isFree()
     }
 
-    fun test(): Boolean {
-        return themes[5].sku == null
+    fun getSkusList(): List<String> {
+        return themes.mapNotNull { it.sku }.toList()
     }
 
     fun switchTheme(theme: Theme, app: LPSApplication) {
         app.gamePreferences.putThemeId(theme.stid)
+
+        applyTheme(app)
+    }
+
+    fun putTheme(app: LPSApplication, productId: String, purchaseToken: String, signature: String) {
+        getThemeBySKU(productId).run {
+            isAvail = true
+            app.gamePreferences.putThemeWithSignature(
+                this,
+                GamePreferences.ThemeWithSignature(purchaseToken, signature)
+            )
+        }
         applyTheme(app)
     }
 

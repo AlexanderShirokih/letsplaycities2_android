@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Default theme (Yellow) -->
+    <!-- Default token (Yellow) -->
     <color name="defColorPrimary">#ffa726</color>
     <color name="defColorPrimaryDark">#c5a600</color>
     <color name="defWindowBg">#FFECB3</color>
 
-    <!-- Autumn theme -->
+    <!-- Autumn token -->
     <color name="autColorPrimary">#ff7043</color>
     <color name="autColorPrimaryDark">#c63f17</color>
 

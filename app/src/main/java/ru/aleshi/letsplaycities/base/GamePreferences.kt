@@ -8,7 +8,7 @@ class GamePreferences(context: Context) {
 
     companion object {
         const val PREFS_NAME = "letsplaycities"
-        const val KEY_THEME = "theme"
+        const val KEY_THEME = "token"
         const val KEY_DIFF = "gamediff"
         private const val KEY_SCORING = "scoring_sys"
         private const val KEY_TIMER = "timer"
@@ -37,8 +37,8 @@ class GamePreferences(context: Context) {
         private val settings_defaults = intArrayOf(0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0)
     }
 
-    data class ThemeWithSignature(val theme: String?, val sig: String?) {
-        fun isValid() = theme != null && sig != null
+    data class ThemeWithSignature(val token: String?, val sig: String?) {
+        fun isValid() = token != null && sig != null
     }
 
     private val prefs: SharedPreferences
@@ -61,6 +61,14 @@ class GamePreferences(context: Context) {
             prefs.getString("thm:${theme.sku}", null),
             prefs.getString("sig:${theme.sku}", null)
         )
+    }
+
+    fun putThemeWithSignature(theme: Theme, themeWithSignature: ThemeWithSignature) {
+        prefs.edit()
+            .putString("thm:${theme.sku}", themeWithSignature.token)
+            .putString("sig:${theme.sku}", themeWithSignature.sig)
+            .putInt(KEY_THEME, theme.stid)
+            .apply()
     }
 
     private fun putInt(key: String, value: Int) {

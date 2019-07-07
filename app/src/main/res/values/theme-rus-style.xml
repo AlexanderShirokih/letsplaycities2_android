@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="RusStyleTheme" parent="AppTheme">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorHint">@android:color/black</item>
+        <item name="android:windowBackground">@drawable/bg_moscow</item>
+        <item name="android:buttonStyle">@style/RusButtonStyle</item>
+        <item name="android:imageButtonStyle">@style/RusButtonStyle</item>
+        <item name="android:seekBarStyle">@style/RusSeekbarStyle</item>
+        <item name="sepBg">@color/rus_sep</item>
+        <item name="iconColor">@color/rus_sep</item>
+        <item name="fgSpanColor">@color/rus_fg_span_color</item>
+
+        <item name="itemBgMe">@drawable/rus_bg_me</item>
+        <item name="itemBgOther">@drawable/rus_bg_other</item>
+
+    </style>
+
+    <style name="RusButtonStyle" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/rus_button</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- Red Seek bars-->
+    <style name="RusSeekbarStyle" parent="@android:style/Widget.SeekBar">
+        <item name="android:thumb">@drawable/rus_sb_scrubber_control_selector_holo_light</item>
+        <item name="android:progressDrawable">
+            @drawable/rus_sb_scrubber_progress_horizontal_holo_light
+        </item>
+    </style>
+
+</resources>

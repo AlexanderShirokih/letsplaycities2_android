@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="FrStyleTheme" parent="AppTheme">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorHint">@android:color/black</item>
+        <item name="android:windowBackground">@drawable/bg_eiffel</item>
+        <item name="android:buttonStyle">@style/FrButtonStyle</item>
+        <item name="android:imageButtonStyle">@style/FrButtonStyle</item>
+        <item name="android:seekBarStyle">@style/FrSeekbarStyle</item>
+        <item name="sepBg">@color/fr_sep</item>
+        <item name="iconColor">@color/fr_sep</item>
+
+        <item name="itemBgMe">@drawable/fr_bg_me</item>
+        <item name="itemBgOther">@drawable/fr_bg_other</item>
+
+    </style>
+
+    <style name="FrButtonStyle" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/fr_button</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="FrSeekbarStyle" parent="@android:style/Widget.SeekBar">
+        <item name="android:thumb">@drawable/rus_sb_scrubber_control_selector_holo_light</item>
+        <item name="android:progressDrawable">
+            @drawable/rus_sb_scrubber_progress_horizontal_holo_light
+        </item>
+    </style>
+
+</resources>

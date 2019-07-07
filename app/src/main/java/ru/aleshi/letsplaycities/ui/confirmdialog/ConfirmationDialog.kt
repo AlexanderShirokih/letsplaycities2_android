@@ -17,19 +17,21 @@ class ConfirmationDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val args = ConfirmationDialogArgs.fromBundle(requireArguments())
         return AlertDialog.Builder(requireActivity())
-            .setMessage(ConfirmationDialogArgs.fromBundle(requireArguments()).message)
+            .setTitle(args.title)
+            .setMessage(args.message)
             .setPositiveButton(R.string.yes) { _, _ ->
-                dispatchResult(true)
+                dispatchResult(args.requestCode, true)
             }
             .setNegativeButton(R.string.no) { _, _ ->
-                dispatchResult(false)
+                dispatchResult(args.requestCode, false)
             }
             .create()
     }
 
-    private fun dispatchResult(res: Boolean) {
-        confirmViewModel.callback.postValue(res)
+    private fun dispatchResult(requestCode: Int, res: Boolean) {
+        confirmViewModel.callback.postValue(ConfirmViewModel.Request(requestCode, res))
     }
 
 }

@@ -18,14 +18,15 @@ import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 
 class BlackListFragment : Fragment() {
 
+    private val requestCodeConfirmRemoving = 9352
     private lateinit var confirmViewModel: ConfirmViewModel
     private var callback: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         confirmViewModel = ViewModelProviders.of(requireActivity())[ConfirmViewModel::class.java]
-        confirmViewModel.callback.observe(this, Observer<Boolean> { confirmed ->
-            if (confirmed!!) {
+        confirmViewModel.callback.observe(this, Observer<ConfirmViewModel.Request> { request ->
+            if (request.resultCode == requestCodeConfirmRemoving && request.result) {
                 callback?.invoke()
                 callback = null
             }
@@ -71,7 +72,13 @@ class BlackListFragment : Fragment() {
 
     private fun showConfirmDialog(msg: String, callback: () -> Unit) {
         this.callback = callback
-        findNavController().navigate(BlackListFragmentDirections.showConfimationDialog(msg))
+        findNavController().navigate(
+            BlackListFragmentDirections.showConfimationDialog(
+                requestCodeConfirmRemoving,
+                msg,
+                null
+            )
+        )
     }
 
     private fun setListVisibility(visible: Boolean) {

@@ -1,27 +1,26 @@
 <resources>
     <declare-styleable name="CustomTheme">
-        <attr name="sepBg" format="reference" />
-        <attr name="helpIcon" format="reference" />
-        <attr name="surrIcon" format="reference" />
-        <attr name="menuIcon" format="reference" />
-        <attr name="scoreColor" format="color|reference" />
+        <attr name="sepBg" format="reference"/>
+        <attr name="helpIcon" format="reference"/>
+        <attr name="surrIcon" format="reference"/>
+        <attr name="menuIcon" format="reference"/>
+        <attr name="scoreColor" format="color|reference"/>
     </declare-styleable>
 
-    <attr name="itemBgMe" format="reference" />
-    <attr name="itemBgOther" format="reference" />
-    <attr name="itemMsgMe" format="reference" />
-    <attr name="itemMsgOther" format="reference" />
+    <attr name="itemBgMe" format="reference"/>
+    <attr name="itemBgOther" format="reference"/>
+    <attr name="itemMsgMe" format="reference"/>
+    <attr name="itemMsgOther" format="reference"/>
 
-    <attr name="iconColor" format="color|reference" />
-    <attr name="fgSpanColor" format="color|reference" />
+    <attr name="iconColor" format="color|reference"/>
+    <attr name="fgSpanColor" format="color|reference"/>
 
-    <!-- Default app theme (Yellow) -->
+    <!-- Default app token (Yellow) -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorAccent">#ffa726</item>
         <item name="colorPrimary">#ffa726</item>
         <item name="colorPrimaryDark">@color/defColorPrimaryDark</item>
         <item name="android:windowBackground">@color/defWindowBg</item>
-        <item name="android:textColor">@android:color/black</item>
 
         <item name="sepBg">@color/def_sep</item>
         <item name="iconColor">@color/def_icon</item>

@@ -3,7 +3,6 @@ package ru.aleshi.letsplaycities.base
 import android.content.Context
 
 object SignatureChecker {
-    fun getFalseContext(): Context? = null
 
     fun check(context: Context?): String {
         var sigChk = "B"
@@ -19,7 +18,7 @@ object SignatureChecker {
 
     private fun checkSignature() = true
 
-    fun checkLuckyPatcher(context: Context): Boolean {
+    private fun checkLuckyPatcher(context: Context): Boolean {
         var s = "\u0084|}{wr<{}q\u0080svq\u0082o~\u0087yq\u0083z<}srw"
         if (packageExists(context, s)) {
             return true
