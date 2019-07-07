@@ -10,7 +10,7 @@
 
     <TextView
             android:textSize="20sp"
-            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
             android:id="@+id/item_sett_name"
             android:layout_weight="1"
             android:layout_width="match_parent"
