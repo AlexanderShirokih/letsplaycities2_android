@@ -32,6 +32,13 @@
         <item name="scoreColor">?android:textColor</item>
     </style>
 
+    <style name="Social">
+        <item name="android:layout_width">64dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:background">@null</item>
+        <item name="android:layout_marginStart">4dp</item>
+    </style>
+
     <style name="Toolbar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">?attr/actionBarSize</item>

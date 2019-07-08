@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'com.google.gms.google-services'
 
 def lifecycle_version = "2.0.0"
 
@@ -41,6 +42,20 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.android.billingclient:billing:2.0.1'
+
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    implementation 'com.vk:androidsdk:1.6.5'
+    implementation 'com.facebook.android:facebook-login:4.42.0'
+    implementation 'ru.ok:odnoklassniki-android-sdk:2.0.3'
+
+
+    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.0'
+    implementation "io.reactivex.rxjava2:rxkotlin:2.3.0"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

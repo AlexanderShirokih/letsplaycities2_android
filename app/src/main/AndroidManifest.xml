@@ -2,8 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="ru.aleshi.letsplaycities">
 
-    <uses-permission android:name="com.android.vending.BILLING" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+            android:required="true"
+            android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission
+            android:required="true"
+            android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission
+            android:required="true"
+            android:name="android.permission.CHANGE_WIFI_STATE"/>
+
+    <uses-permission android:name="com.android.vending.BILLING"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                     android:maxSdkVersion="18"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+                     android:maxSdkVersion="18"/>
 
     <application
             android:name="ru.aleshi.letsplaycities.LPSApplication"
@@ -13,6 +28,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
+
         <activity
                 android:name="ru.aleshi.letsplaycities.ui.MainActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
@@ -23,6 +39,46 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+                android:name="com.vk.sdk.VKServiceActivity"
+                android:label="ServiceActivity"
+                android:theme="@style/VK.Transparent"/>
+
+        <activity android:name="ru.ok.android.sdk.OkAuthActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="ok1267998976"
+                        android:scheme="okauth"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+                android:name="com.facebook.FacebookActivity"
+                android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+                android:label="@string/app_name"/>
+
+        <activity
+                android:name="com.facebook.CustomTabActivity"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="@string/fb_login_protocol_scheme"/>
+            </intent-filter>
+        </activity>
+
+        <meta-data
+                android:name="com.facebook.sdk.ApplicationId"
+                android:value="@string/facebook_app_id"/>
     </application>
 
 </manifest>

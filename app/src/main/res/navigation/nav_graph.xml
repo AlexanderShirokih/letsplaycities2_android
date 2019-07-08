@@ -13,14 +13,29 @@
         <action android:id="@+id/start_multiplayer_fragment"
                 app:destination="@id/multiplayerFragment"/>
         <action android:id="@+id/start_network_fragment"
-                app:destination="@id/multiplayerFragment2"/>
+                app:destination="@id/networkFragment"/>
         <action android:id="@+id/start_game_fragment" app:destination="@id/gameFragment"/>
         <action android:id="@+id/start_settings_fragment" app:destination="@id/settingsFragment"/>
     </fragment>
-    <fragment android:id="@+id/multiplayerFragment" android:name="ru.aleshi.letsplaycities.ui.MultiplayerFragment"
-              android:label="MultiplayerFragment"/>
-    <fragment android:id="@+id/multiplayerFragment2" android:name="ru.aleshi.letsplaycities.ui.MultiplayerFragment"
-              android:label="MultiplayerFragment"/>
+
+    <fragment
+            android:id="@+id/multiplayerFragment"
+            android:name="ru.aleshi.letsplaycities.ui.MultiplayerFragment"
+            android:label="@string/multiplayer_title"
+            tools:layout="@layout/fragment_multiplayer"/>
+
+    <fragment
+            android:id="@+id/networkFragment"
+            android:name="ru.aleshi.letsplaycities.ui.network.NetworkFragment"
+            android:label="@string/network_title"
+            tools:layout="@layout/fragment_network">
+        <action android:id="@+id/showChangeModeDialog" app:destination="@id/changeModeDialog"/>
+        <action android:id="@+id/showChangeAvatarDialog"
+                app:destination="@id/changeAvatarDialog"/>
+        <action android:id="@+id/showLoginDialog" app:destination="@id/loginDialog"/>
+        <action android:id="@+id/start_friends_fragment" app:destination="@id/friendsFragment"/>
+    </fragment>
+
     <fragment android:id="@+id/gameFragment" android:name="ru.aleshi.letsplaycities.ui.GameFragment"
               android:label="GameFragment">
         <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities.base.GameMode"/>
@@ -48,7 +63,6 @@
             android:label="@string/theme_title"
             tools:layout="@layout/fragment_theme">
         <action android:id="@+id/showPreviewImageDialog" app:destination="@id/previewImageDialog"/>
-        <action android:id="@+id/showConfimationDialog" app:destination="@+id/confirmationDialog"/>
     </fragment>
 
     <fragment
@@ -84,5 +98,25 @@
         <argument android:name="assetImageName" app:argType="string"/>
         <argument android:name="title" app:argType="string"/>
     </dialog>
+
+    <dialog
+            android:id="@+id/changeModeDialog"
+            android:name="ru.aleshi.letsplaycities.ui.network.ChangeModeDialog"
+            android:label="ChangeModeDialog"/>
+
+    <dialog
+            android:id="@+id/changeAvatarDialog"
+            android:name="ru.aleshi.letsplaycities.ui.network.ChangeAvatarDialog"
+            android:label="ChangeAvatarDialog"/>
+    <dialog
+            android:id="@+id/loginDialog"
+            android:name="ru.aleshi.letsplaycities.ui.network.LoginDialog"
+            android:label="LoginDialog"/>
+
+    <fragment
+            android:id="@+id/friendsFragment"
+            android:name="ru.aleshi.letsplaycities.ui.FriendsFragment"
+            android:label="@string/friends_title"
+            tools:layout="@layout/fragment_friends"/>
 
 </navigation>

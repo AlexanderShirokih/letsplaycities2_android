@@ -15,9 +15,11 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GameMode
 import ru.aleshi.letsplaycities.utils.IntegrityChecker
 import ru.aleshi.letsplaycities.utils.Utils
+import kotlin.system.exitProcess
 
 
 class MainMenuFragment : Fragment() {
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main_menu, container, false)
     }
@@ -49,16 +51,16 @@ class MainMenuFragment : Fragment() {
                         throw BadTokenException()
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        System.exit(0)
+                        exitProcess(0)
                     }
                 }
 
                 val navController = findNavController()
                 when (v.id) {
-                    R.id.btn_mul -> navController.navigate(R.id.start_multiplayer_fragment)
-                    R.id.btn_net -> navController.navigate(R.id.start_network_fragment)
                     R.id.btn_pva -> navController.navigate(MainMenuFragmentDirections.startGameFragment(GameMode.MODE_PVA))
                     R.id.btn_pvp -> navController.navigate(MainMenuFragmentDirections.startGameFragment(GameMode.MODE_PVP))
+                    R.id.btn_mul -> navController.navigate(R.id.start_multiplayer_fragment)
+                    R.id.btn_net -> navController.navigate(R.id.start_network_fragment)
                     R.id.btn_set -> navController.navigate(R.id.start_settings_fragment)
                     else -> throw IllegalStateException("Unknown button clicked!")
                 }

@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Сыграем в Города</string>
 
+    <!-- Facebook IDs -->
+    <string name="facebook_app_id">1023004964531266</string>
+    <string name="fb_login_protocol_scheme">fb1023004964531266</string>
+
     <!-- MainMenuFragment -->
     <string name="pva">Игрок против Андроида</string>
     <string name="pvp">Игрок против Игрока</string>
@@ -75,11 +79,22 @@
     <string name="addcity_title">Правила добавления городов</string>
     <string name="addcity_rules"><h1>Если вы знаете город которого нет в игре убедитесь в следующем:</h1>\n
 
-        <li>Вы ввели город без опечатки. Наример: <b>Кешенев</b> вместо <b>Кишинев</b>.</li>\n
-        <li>Город не был переименован. Например: <b>Ленинград</b> вместо <b>Санкт-Петербург</b>.</li>\n
-        <li>Город правильно транслитерирован. Например: <b>Йокогама</b> вместо <b>Иокогама</b>.</li>\n
-        <li>Введённый город должен писаться слитно, без тире и пробелов. Например: <b>Йошкарола</b> вместо <b>Йошкар-ола</b>.</li>\n
-        <li>Введённый вами населённый пункт <b>имеет статус города</b>. Вы можете проверить это, например, в Википедии.</li>\n
+        <li>Вы ввели город без опечатки. Наример: <b>Кешенев</b> вместо <b>Кишинев</b>.
+        </li>
+        \n
+        <li>Город не был переименован. Например: <b>Ленинград</b> вместо <b>Санкт-Петербург</b>.
+        </li>
+        \n
+        <li>Город правильно транслитерирован. Например: <b>Йокогама</b> вместо <b>Иокогама</b>.
+        </li>
+        \n
+        <li>Введённый город должен писаться слитно, без тире и пробелов. Например: <b>Йошкарола</b> вместо <b>
+            Йошкар-ола</b>.
+        </li>
+        \n
+        <li>Введённый вами населённый пункт <b>имеет статус города</b>. Вы можете проверить это, например, в Википедии.
+        </li>
+        \n
 
         Если все пункты выполнены. Вы можете сообщить об отсутствующем городе нам на email:
         <a href="mailto:quandastudio@mail.ru">quandastudio@mail.ru</a>
@@ -126,4 +141,47 @@
 
     <!-- ThemeFragment -->
     <string name="theme_title">Выберите тему</string>
+
+    <!-- MutliplayerFragment -->
+    <string name="multiplayer_title">Мультиплеер</string>
+    <string name="wifi_desc">Для создания соединения вы должны находиться в одной Wi-Fi сети с вашим оппонентом</string>
+    <string name="create">Создать</string>
+    <string name="connect">Присоединиться</string>
+
+    <!-- NetworkFragment -->
+    <string name="network_title">Онлайн</string>
+    <string name="networkmode_desc">Игра начнётся сразу после того, как вам найдётся оппонент. Не забывайте, что на ответ у вас есть полторы минуты</string>
+    <string name="networkmode_auth_desc">Войдите с помощью вашего аккаунта из соц.сетей.</string>
+    <string name="login_no_sn">Войти без соц. сети</string>
+    <string name="connect_net">Подключиться</string>
+    <string name="logout">Выйти</string>
+    <string name="auth_error">Не удалось авторизоваться через соц.сеть</string>
+
+    <!-- ChangeAvatarDialog -->
+    <string name="select_action">Выберите действие</string>
+    <string-array name="avatar_actions">
+        <item>Изменить</item>
+        <item>Удалить</item>
+    </string-array>
+
+    <!-- LoginDialog -->
+    <string name="login_label">Введите логин [4–20 символов]</string>
+    <string name="enter">Войти</string>
+
+    <!-- ChangeModeDialog -->
+    <string name="dialog_change_mode_accept">Выбрать</string>
+    <string name="dialog_change_mode_no">Не нужно</string>
+    <string name="dialog_change_mode_title">Вы можете изменить режим подсчёта очков</string>
+    <array name="dcm_descriptions">
+        <item>В данном режиме победителем будет тот, кто набрал больше очков.\nЧем длиннее город,
+            тем больше очков.
+        </item>
+        <item>В данном режиме победителем будет тот, кто набрал больше очков.\nЧем быстрее даётся
+            ответ, тем больше очков.
+        </item>
+        <item>В данном режиме победителем будет тот, кто последним загадал город</item>
+    </array>
+
+    <!-- FriendsFragment -->
+    <string name="friends_title">Мои друзья</string>
 </resources>

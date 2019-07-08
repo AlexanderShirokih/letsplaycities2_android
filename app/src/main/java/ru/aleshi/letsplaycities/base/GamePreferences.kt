@@ -3,13 +3,16 @@ package ru.aleshi.letsplaycities.base
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
+import java.io.File
 
 class GamePreferences(context: Context) {
 
     companion object {
         const val PREFS_NAME = "letsplaycities"
+
         const val KEY_THEME = "token"
         const val KEY_DIFF = "gamediff"
+        private const val KEY_SHOW_CHANGE_MODE_DIALOG = "_show_chm"
         private const val KEY_SCORING = "scoring_sys"
         private const val KEY_TIMER = "timer"
         private const val KEY_SPELLER = "speller"
@@ -90,8 +93,16 @@ class GamePreferences(context: Context) {
     }
 
     fun getScoring(): String? {
-        val scrstr = prefs.getString("scrbkey", null)
+        val scrstr = prefs.getString(KEY_SCR, null)
         return if (scrstr == null) null else String(Base64.decode(scrstr, Base64.DEFAULT))
+    }
+
+    fun getCurrentScoringType(): Int {
+        return prefs.getInt(KEY_SCORING, 0)
+    }
+
+    fun setCurrentScoringType(id: Int) {
+        putInt(KEY_SCORING, id)
     }
 
     fun putScoring(scoring: String) {
@@ -105,5 +116,63 @@ class GamePreferences(context: Context) {
 
     fun putBanned(banned: String) {
         prefs.edit().putString(KEY_BANNED, banned).apply()
+    }
+
+    fun getString(key: String, def: String?): String? {
+        return prefs.getString(key, def)
+    }
+
+    fun getInt(key: String, def: Int): Int {
+        return prefs.getInt(key, def)
+    }
+
+    fun edit(): SharedPreferences.Editor {
+        return prefs.edit()
+    }
+
+    fun isChangeModeDialogRequested(): Boolean {
+        val shown = prefs.getBoolean(KEY_SHOW_CHANGE_MODE_DIALOG, false)
+        prefs.edit().putBoolean(KEY_SHOW_CHANGE_MODE_DIALOG, true).apply()
+        return !shown
+    }
+
+    fun isLoggedFromAnySN(): Boolean {
+        return prefs.getString("sn_uid", null) != null
+    }
+
+    fun isLoggedFromNative(): Boolean {
+        return "nv" == prefs.getString("sn_name", null)
+    }
+
+    fun logout() {
+        prefs.edit()
+            .remove("avatar_path")
+            .remove("sn_login")
+            .remove("sn_uid")
+            .remove("sn_name")
+            .remove("hash")
+            .remove("user_id")
+            .remove("acc_tkn")
+            .apply()
+    }
+
+    fun getLogin(): String = prefs.getString("sn_login", "Player")!!
+
+    fun removeAvatarPath() {
+        val path = getAvatarPath()
+        if (path != null) {
+            val file = File(path)
+            if (file.exists())
+                file.delete()
+            prefs.edit().remove("avatar_path").apply()
+        }
+    }
+
+    fun setAvatarPath(avatar: String) {
+        prefs.edit().putString("avatar_path", avatar).apply()
+    }
+
+    fun getAvatarPath(): String? {
+        return prefs.getString("avatar_path", null)
     }
 }

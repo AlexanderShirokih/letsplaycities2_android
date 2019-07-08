@@ -29,12 +29,6 @@
     <dimen name="item_text_size">22sp</dimen>
     <dimen name="item_margin">2dp</dimen>
 
-    <dimen name="btn_back_margin">10dp</dimen>
-    <dimen name="mp_margin">17dp</dimen>
-    <dimen name="mp_btn_width">200dp</dimen>
-    <dimen name="mp_btn_ts">20sp</dimen>
-    <dimen name="mp_btn_ts_s">18sp</dimen>
-
     <dimen name="padding_edittext">30dp</dimen>
 
     <dimen name="chb_drawable_pad">4dp</dimen>
