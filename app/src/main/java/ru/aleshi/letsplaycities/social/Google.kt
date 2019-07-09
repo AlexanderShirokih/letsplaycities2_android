@@ -51,7 +51,7 @@ class Google : ISocialNetwork() {
         }
     }
 
-    override fun onLoggedIn(context: Context, access_token: String) {
+    override fun onLoggedIn(activity: Activity, access_token: String) {
 
     }
 

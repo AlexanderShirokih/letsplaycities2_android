@@ -25,7 +25,7 @@ abstract class ISocialNetwork {
 
     protected abstract fun onLogin(activity: Activity)
 
-    abstract fun onLoggedIn(context: Context, access_token: String)
+    abstract fun onLoggedIn(activity: Activity, access_token: String)
 
     fun onError() {
         callback?.onError()

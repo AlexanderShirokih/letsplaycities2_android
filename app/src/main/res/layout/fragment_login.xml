@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:paddingTop="10dp"
+        android:paddingBottom="16dp"
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="start"
+        android:orientation="vertical">
+
+    <ru.aleshi.letsplaycities.ui.view.RoundedImageView
+            android:src="@drawable/ic_player"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/roundedImageView"
+            android:layout_margin="6dp"
+            android:transitionName="transition_avatar"
+            app:layout_constraintEnd_toEndOf="@+id/messageInputField"
+            app:layout_constraintStart_toStartOf="@+id/messageInputField"
+            app:layout_constraintBottom_toTopOf="@+id/textView4"
+            tools:targetApi="lollipop"/>
+
+    <TextView
+            android:text="@string/login_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/messageInputField"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintStart_toStartOf="@+id/messageInputField"
+            android:id="@+id/textView4"/>
+
+    <EditText
+            android:id="@+id/messageInputField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="15"
+            android:maxLines="1"
+            android:maxLength="20"
+            android:inputType="text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.53"/>
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEnter"
+            android:text="@string/enter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnCancel"
+            app:layout_constraintTop_toBottomOf="@+id/messageInputField" app:layout_constraintHorizontal_bias="0.537"/>
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:text="@string/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/btnEnter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/btnEnter"
+            android:layout_marginEnd="8dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

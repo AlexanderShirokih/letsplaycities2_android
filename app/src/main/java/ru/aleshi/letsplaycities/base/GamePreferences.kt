@@ -3,7 +3,7 @@ package ru.aleshi.letsplaycities.base
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
-import java.io.File
+import androidx.core.content.edit
 
 class GamePreferences(context: Context) {
 
@@ -140,32 +140,22 @@ class GamePreferences(context: Context) {
         return prefs.getString("sn_uid", null) != null
     }
 
-    fun isLoggedFromNative(): Boolean {
-        return "nv" == prefs.getString("sn_name", null)
-    }
-
     fun logout() {
-        prefs.edit()
-            .remove("avatar_path")
-            .remove("sn_login")
-            .remove("sn_uid")
-            .remove("sn_name")
-            .remove("hash")
-            .remove("user_id")
-            .remove("acc_tkn")
-            .apply()
+        prefs.edit {
+            remove("avatar_path")
+            remove("sn_login")
+            remove("sn_uid")
+            remove("sn_name")
+            remove("hash")
+            remove("user_id")
+            remove("acc_tkn")
+        }
     }
 
     fun getLogin(): String = prefs.getString("sn_login", "Player")!!
 
     fun removeAvatarPath() {
-        val path = getAvatarPath()
-        if (path != null) {
-            val file = File(path)
-            if (file.exists())
-                file.delete()
-            prefs.edit().remove("avatar_path").apply()
-        }
+        prefs.edit().remove("avatar_path").apply()
     }
 
     fun setAvatarPath(avatar: String) {
@@ -175,4 +165,25 @@ class GamePreferences(context: Context) {
     fun getAvatarPath(): String? {
         return prefs.getString("avatar_path", null)
     }
+
+    fun getLastNativeLogin(): String? {
+        return prefs.getString("last_login", null)
+    }
+
+    fun updateLastNativeLogin(login: String) {
+        prefs.edit {
+            putString("last_login", login)
+        }
+    }
+
+    fun getLastAvatarUri(): String? {
+        return prefs.getString("last_avatar_uri", null)
+    }
+
+    fun updateLastAvatarUri(uri: String) {
+        prefs.edit {
+            putString("last_avatar_uri", uri)
+        }
+    }
+
 }

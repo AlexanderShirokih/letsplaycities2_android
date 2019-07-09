@@ -4,9 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.fragment.app.Fragment
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.LPSApplication
 import java.io.File
@@ -43,14 +44,13 @@ object Utils {
 
         return loadAvatar(data)
             .switchMap { saveAvatar(filesDir, it) }
-            .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun saveAvatar(filesDir: File, bitmap: Bitmap): Observable<String?> {
+    fun saveAvatar(filesDir: File, bitmap: Bitmap, saveFileName: String = "0.png"): Observable<String?> {
         return Observable.just(bitmap)
             .subscribeOn(Schedulers.io())
             .map {
-                saveToLocalStorage(filesDir, it)
+                saveToLocalStorage(filesDir, saveFileName, it)
             }
     }
 
@@ -60,18 +60,20 @@ object Utils {
             .map {
                 Picasso.get()
                     .load(it)
+                    .networkPolicy(NetworkPolicy.NO_CACHE)
+                    .memoryPolicy(MemoryPolicy.NO_CACHE)
                     .resize(128, 128)
                     .get()
             }
     }
 
-    private fun saveToLocalStorage(filesDir: File, bitmap: Bitmap): String? {
+    private fun saveToLocalStorage(filesDir: File, saveFileName: String, bitmap: Bitmap): String? {
         val ava = File(filesDir, "avatars")
         if (!ava.exists()) {
             ava.mkdir()
         }
         return try {
-            val file = File(ava, "0.png")
+            val file = File(ava, saveFileName)
             val fos = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
             file.absolutePath

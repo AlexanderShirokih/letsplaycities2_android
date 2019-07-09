@@ -30,9 +30,7 @@
             android:label="@string/network_title"
             tools:layout="@layout/fragment_network">
         <action android:id="@+id/showChangeModeDialog" app:destination="@id/changeModeDialog"/>
-        <action android:id="@+id/showChangeAvatarDialog"
-                app:destination="@id/changeAvatarDialog"/>
-        <action android:id="@+id/showLoginDialog" app:destination="@id/loginDialog"/>
+        <action android:id="@+id/showLoginDialog" app:destination="@id/loginFragment"/>
         <action android:id="@+id/start_friends_fragment" app:destination="@id/friendsFragment"/>
     </fragment>
 
@@ -108,10 +106,14 @@
             android:id="@+id/changeAvatarDialog"
             android:name="ru.aleshi.letsplaycities.ui.network.ChangeAvatarDialog"
             android:label="ChangeAvatarDialog"/>
-    <dialog
-            android:id="@+id/loginDialog"
-            android:name="ru.aleshi.letsplaycities.ui.network.LoginDialog"
-            android:label="LoginDialog"/>
+
+    <fragment
+            android:id="@+id/loginFragment"
+            android:name="ru.aleshi.letsplaycities.ui.network.LoginFragment"
+            android:label="@string/login_no_sn"
+            tools:layout="@layout/fragment_login">
+        <action android:id="@+id/showChangeAvatarDialog" app:destination="@id/changeAvatarDialog"/>
+    </fragment>
 
     <fragment
             android:id="@+id/friendsFragment"

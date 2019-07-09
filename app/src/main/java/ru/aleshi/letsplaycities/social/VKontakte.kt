@@ -19,7 +19,7 @@ class VKontakte : ISocialNetwork() {
         VKSdk.login(activity)
     }
 
-    override fun onLoggedIn(context: Context, access_token: String) {
+    override fun onLoggedIn(activity: Activity, access_token: String) {
         val request = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_100"))
         request.secure = false
         request.executeWithListener(object : VKRequest.VKRequestListener() {
@@ -27,7 +27,7 @@ class VKontakte : ISocialNetwork() {
                 val user = (response!!.parsedModel as VKList<VKApiUser>)[0]
                 val login = user.first_name + " " + user.last_name
 
-                SocialUtils.saveAvatar(context, user.photo_100.toUri()) {
+                SocialUtils.saveAvatar(activity, user.photo_100.toUri()) {
                     val info = SocialInfo(login, user.id.toString(), "vk")
                     callback?.onLoggedIn(info, access_token)
                 }

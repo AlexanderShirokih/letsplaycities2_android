@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.ui.network
 import android.app.Activity.RESULT_OK
 import android.app.Dialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.AdapterView
@@ -28,20 +29,17 @@ class ChangeAvatarDialog : DialogFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK) {
-            val app = lpsApplication
-            Utils.resizeAndSave(app, data!!.data!!)
-                .doOnNext {
-                    if (it != null) {
-                        app.gamePreferences.setAvatarPath(it)
-                        mAvatarViewModel.avatarPath.postValue(it)
-                    }
-                }
-                .subscribe()
-
+            processData(data!!.data!!)
             requireDialog().dismiss()
         }
     }
 
+    private fun processData(data: Uri) {
+        Utils.loadAvatar(data)
+            .doOnNext {
+                mAvatarViewModel.avatarBitmap.postValue(it)
+            }.subscribe()
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return AlertDialog.Builder(requireActivity())
@@ -55,7 +53,7 @@ class ChangeAvatarDialog : DialogFragment() {
                         //Remove
                         1 -> {
                             lpsApplication.gamePreferences.removeAvatarPath()
-                            mAvatarViewModel.avatarPath.value = null
+                            mAvatarViewModel.avatarBitmap.value = null
                             requireDialog().dismiss()
                         }
                     }

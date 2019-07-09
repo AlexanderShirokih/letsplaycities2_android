@@ -1,24 +1,36 @@
 package ru.aleshi.letsplaycities.social
 
-import android.content.Context
+import android.app.Activity
 import android.net.Uri
-import android.util.Log
+import androidx.lifecycle.ViewModelProviders
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import ru.aleshi.letsplaycities.LPSApplication
+import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.aleshi.letsplaycities.ui.network.AvatarViewModel
 import ru.aleshi.letsplaycities.utils.Utils
 
 object SocialUtils {
 
-    fun saveAvatar(context: Context, src: Uri, listener: () -> Unit) {
-        val app = context.applicationContext as LPSApplication
-        Utils.resizeAndSave(context, src)
-            .observeOn(AndroidSchedulers.mainThread())
+    fun saveAvatar(activity: Activity, src: Uri, listener: () -> Unit) {
+        updateAvatar(activity as MainActivity, src)
             .doOnNext {
-                if (it != null)
-                    app.gamePreferences.setAvatarPath(it)
                 listener()
             }
             .subscribe()
+    }
+
+    fun updateAvatar(activity: MainActivity, src: Uri): Observable<String?> {
+        val app = activity.applicationContext as LPSApplication
+
+        return Utils.resizeAndSave(activity, src)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+                if (it != null) {
+                    app.gamePreferences.setAvatarPath(it)
+                    ViewModelProviders.of(activity)[AvatarViewModel::class.java].avatarPath.value = it
+                }
+            }
     }
 
     fun md5(src: String): String {

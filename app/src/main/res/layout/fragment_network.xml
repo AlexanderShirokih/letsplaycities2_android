@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     <TextView
@@ -19,6 +19,7 @@
             app:layout_constraintHorizontal_bias="0.0"/>
 
     <ru.aleshi.letsplaycities.ui.view.RoundedImageView
+            android:transitionName="transition_avatar"
             android:src="@drawable/ic_player"
             android:layout_width="60dp"
             android:layout_height="60dp"
@@ -27,7 +28,8 @@
             android:layout_marginStart="36dp"
             android:layout_marginTop="36dp"
             app:layout_constraintEnd_toStartOf="@id/sn_desc"
-            app:layout_constraintTop_toBottomOf="@+id/textView3"/>
+            app:layout_constraintTop_toBottomOf="@+id/textView3"
+            tools:targetApi="lollipop"/>
 
     <TextView
             android:id="@+id/sn_desc"
@@ -49,7 +51,8 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintTop_toBottomOf="@id/sn_desc"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnVk" android:layout_marginTop="20dp"/>
+            app:layout_constraintEnd_toStartOf="@id/btnVk"
+            android:layout_marginTop="20dp"/>
 
     <ImageButton
             android:id="@+id/btnVk"

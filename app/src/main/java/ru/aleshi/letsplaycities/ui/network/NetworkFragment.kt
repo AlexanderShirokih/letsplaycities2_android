@@ -9,15 +9,15 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.MemoryPolicy
-import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.vk.sdk.VKAccessToken
 import com.vk.sdk.VKCallback
 import com.vk.sdk.VKSdk
 import com.vk.sdk.api.VKError
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_network.*
 import org.json.JSONObject
 import ru.aleshi.letsplaycities.LPSApplication
@@ -25,6 +25,7 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.social.*
 import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.ok.android.sdk.Odnoklassniki
 import ru.ok.android.sdk.OkListener
@@ -45,6 +46,7 @@ class NetworkFragment : Fragment() {
         mGamePreferences = mApplication.gamePreferences
 
         mAvatarModelView = ViewModelProviders.of(requireActivity())[AvatarViewModel::class.java]
+        mAvatarModelView.avatarPath.value = mApplication.gamePreferences.getAvatarPath()
         mAvatarModelView.avatarPath.observe(this, Observer {
             if (it == null) {
                 Picasso.get()
@@ -52,13 +54,17 @@ class NetworkFragment : Fragment() {
                     .into(roundedImageView)
             } else {
                 Picasso.get().isLoggingEnabled = true
-                Picasso.get()
-                    .load(File(it).toUri())
-                    .memoryPolicy(MemoryPolicy.NO_CACHE)
-                    .networkPolicy(NetworkPolicy.NO_CACHE)
-                    .error(R.drawable.ic_player)
-                    .into(roundedImageView)
+                Utils.loadAvatar(File(it).toUri())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext { bitmap ->
+                        roundedImageView.setImageBitmap(bitmap)
+                    }
+                    .subscribe()
             }
+        })
+        mAvatarModelView.nativeLogin.observe(this, Observer {
+            (ServiceType.NV.network as NativeAccess).userLogin = it
+            SocialNetworkManager.login(ServiceType.NV, requireActivity())
         })
     }
 
@@ -73,11 +79,9 @@ class NetworkFragment : Fragment() {
         if (mGamePreferences.isChangeModeDialogRequested()) {
             findNavController().navigate(R.id.showChangeModeDialog)
         }
-
         if (mGamePreferences.isLoggedFromAnySN()) {
             setupWithSN()
         } else {
-            setup()
 //            checkForRequest()
         }
 
@@ -91,7 +95,10 @@ class NetworkFragment : Fragment() {
         }
 
         btnLoginNoSn.setOnClickListener {
-            findNavController().navigate(R.id.showLoginDialog)
+            val extras = FragmentNavigatorExtras(
+                roundedImageView to "transition_avatar"
+            )
+            findNavController().navigate(R.id.showLoginDialog, null, null, extras)
         }
 
         btnFriends.setOnClickListener {
@@ -114,40 +121,24 @@ class NetworkFragment : Fragment() {
     }
 
     private fun setup() {
-
         sn_desc.setText(R.string.networkmode_auth_desc)
         group_sn.visibility = View.VISIBLE
         group_connect.visibility = View.GONE
 
         mAvatarModelView.avatarPath.value = null
-
-        setAvatarEditable(false)
     }
 
     private fun setupWithSN() {
         group_sn.visibility = View.GONE
         group_connect.visibility = View.VISIBLE
         sn_desc.text = mApplication.gamePreferences.getLogin()
-
-        setAvatarEditable(mApplication.gamePreferences.isLoggedFromNative())
-
-        mAvatarModelView.avatarPath.value = mGamePreferences.getAvatarPath()
 //        checkForRequest()
-    }
-
-    private fun setAvatarEditable(isEditable: Boolean) {
-        roundedImageView.setOnClickListener(
-            if (isEditable)
-                View.OnClickListener { findNavController().navigate(R.id.showChangeAvatarDialog) }
-            else
-                null
-        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (VKSdk.onActivityResult(requestCode, resultCode, data, object : VKCallback<VKAccessToken> {
                 override fun onResult(res: VKAccessToken) {
-                    ServiceType.VK.network.onLoggedIn(requireContext(), res.accessToken)
+                    ServiceType.VK.network.onLoggedIn(requireActivity(), res.accessToken)
                 }
 
                 override fun onError(error: VKError) {
@@ -162,7 +153,7 @@ class NetworkFragment : Fragment() {
 
         if (odnoklassniki.onAuthActivityResult(requestCode, resultCode, data, object : OkListener {
                 override fun onSuccess(json: JSONObject) {
-                    ServiceType.OK.network.onLoggedIn(requireContext(), json.getString("access_token"))
+                    ServiceType.OK.network.onLoggedIn(requireActivity(), json.getString("access_token"))
                 }
 
                 override fun onError(error: String) {

@@ -43,7 +43,7 @@ class Facebook : ISocialNetwork() {
         loginManager.logInWithReadPermissions(activity, listOf("public_profile"))
     }
 
-    override fun onLoggedIn(context: Context, access_token: String) {
+    override fun onLoggedIn(activity: Activity, access_token: String) {
         val accessToken = AccessToken.getCurrentAccessToken()
         val profile = getCurrentProfile()
         if (accessToken != null && !accessToken.isExpired && profile != null) {
@@ -52,7 +52,7 @@ class Facebook : ISocialNetwork() {
 
             val picture = profile.getProfilePictureUri(128, 128)
 
-            SocialUtils.saveAvatar(context, picture) {
+            SocialUtils.saveAvatar(activity, picture) {
                 val info = SocialInfo(login, userID, "fb")
                 callback?.onLoggedIn(info, access_token)
             }

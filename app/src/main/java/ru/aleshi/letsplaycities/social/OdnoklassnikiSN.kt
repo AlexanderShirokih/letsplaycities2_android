@@ -34,7 +34,7 @@ class OdnoklassnikiSN : ISocialNetwork() {
         )
     }
 
-    override fun onLoggedIn(context: Context, access_token: String) {
+    override fun onLoggedIn(activity: Activity, access_token: String) {
         MainScope().launch {
             val ret = withContext(Dispatchers.IO) {
                 try {
@@ -48,7 +48,7 @@ class OdnoklassnikiSN : ISocialNetwork() {
                 try {
                     val json = JSONObject(ret)
 
-                    SocialUtils.saveAvatar(context, json.getString("pic_3").toUri()) {
+                    SocialUtils.saveAvatar(activity, json.getString("pic_3").toUri()) {
                         val info = SocialInfo(json.getString("name"), json.getString("uid"), "ok")
                         callback?.onLoggedIn(info, access_token)
                     }

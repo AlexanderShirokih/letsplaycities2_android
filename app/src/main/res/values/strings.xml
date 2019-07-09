@@ -164,8 +164,9 @@
         <item>Удалить</item>
     </string-array>
 
-    <!-- LoginDialog -->
+    <!-- LoginFragment -->
     <string name="login_label">Введите логин [4–20 символов]</string>
+    <string name="login">Логин</string>
     <string name="enter">Войти</string>
 
     <!-- ChangeModeDialog -->
