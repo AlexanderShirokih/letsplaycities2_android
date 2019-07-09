@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Picasso
 import com.vk.sdk.VKAccessToken
 import com.vk.sdk.VKCallback
 import com.vk.sdk.VKSdk
@@ -49,11 +48,8 @@ class NetworkFragment : Fragment() {
         mAvatarModelView.avatarPath.value = mApplication.gamePreferences.getAvatarPath()
         mAvatarModelView.avatarPath.observe(this, Observer {
             if (it == null) {
-                Picasso.get()
-                    .load(R.drawable.ic_player)
-                    .into(roundedImageView)
+                roundedImageView.setImageResource(R.drawable.ic_player)
             } else {
-                Picasso.get().isLoggingEnabled = true
                 Utils.loadAvatar(File(it).toUri())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext { bitmap ->
