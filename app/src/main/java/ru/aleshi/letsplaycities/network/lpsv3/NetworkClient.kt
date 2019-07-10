@@ -209,9 +209,9 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
 
         if (ad.userID > 0) msgWriter.writeInt(UID, ad.userID)
         if (ad.accessHash != null) msgWriter.writeString(ACC_HASH, ad.accessHash!!)
-        if (ad.accessToken != null) msgWriter.writeString(ACCESS_TOKEN, ad.accessToken!!)
-        msgWriter.writeByte(SN, ad.snType.ordinal.toByte())
-        if (ad.snUID != null) msgWriter.writeString(SN_UID, ad.snUID!!)
+        msgWriter.writeString(ACCESS_TOKEN, ad.accessToken)
+        msgWriter.writeByte(SN, ad.getSnType().ordinal.toByte())
+        msgWriter.writeString(SN_UID, ad.snUID)
 
         msgWriter.writeChar(CLIENT_BUILD, mUserData.clientBuild)
         msgWriter.writeString(CLIENT_VERSION, mUserData.clientVersion)
@@ -241,7 +241,7 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
 
         val reason = msgReader.readString(BAN_REASON)
         val connError = msgReader.readString(CONNECTION_ERROR)
-        mLoginListener.onLoginFailed(reason, connError!!)
+        mLoginListener.onLoginFailed(reason, connError)
         mRunningFlag = false
     }
 
@@ -255,13 +255,13 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
             S_ACTION_WORD -> {
                 val stat = msgReader.readByte(action).toInt()
                 val word = msgReader.readString(WORD)
-                gameListener?.onWord(WordResult.values()[stat], word!!)
+                gameListener?.onWord(WordResult.values()[stat], word)
             }
             S_ACTION_MSG -> {
                 val msg = msgReader.readString(action)
                 gameListener?.run {
                     val userMsg = msgReader.readBoolean(MSG_OWNER)
-                    onMessage(userMsg, msg!!)
+                    onMessage(userMsg, msg)
                 }
             }
             S_ACTION_LEAVE -> if (gameListener != null) {
@@ -276,7 +276,7 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
                 kicked = true
                 val type = msgReader.readByte(action).toInt()
                 val desc = msgReader.readString(S_BAN_REASON)
-                mLoginListener.onKicked(type == 2, desc!!)
+                mLoginListener.onKicked(type == 2, desc)
             }
 
             ACTION_FRIEND_MODE_REQ -> {
@@ -316,21 +316,21 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
         var youStarter = false
         var tag = msg.nextTag()
         while (tag > 0) {
-            when (tag.toByte()) {
-                ACTION_JOIN -> youStarter = msg.readBoolean(tag.toByte())
-                S_CAN_REC_MSG -> opp.canReceiveMessages = msg.readBoolean(tag.toByte())
-                S_AVATAR_PART0 -> opp.avatar = msg.readBytes(tag.toByte())
-                S_OPP_UID -> opp.authData!!.userID = msg.readInt(tag.toByte())
-                S_OPP_SN -> opp.authData!!.snType = AuthType.values()[msg.readByte(tag.toByte()).toInt()]
-                S_OPP_SNUID -> opp.authData!!.snUID = msg.readString(tag.toByte())
-                OPP_LOGIN -> opp.userName = msg.readString(tag.toByte())
-                OPP_CLIENT_VERSION -> opp.clientVersion = msg.readString(tag.toByte())!!
-                OPP_CLIENT_BUILD -> opp.clientBuild = msg.readChar(tag.toByte())
-                OPP_IS_FRIEND -> opp.isFriend = msg.readBoolean(tag.toByte())
+            when (tag) {
+                ACTION_JOIN -> youStarter = msg.readBoolean(tag)
+                S_CAN_REC_MSG -> opp.canReceiveMessages = msg.readBoolean(tag)
+                S_AVATAR_PART0 -> opp.avatar = msg.readBytes(tag)
+                S_OPP_UID -> opp.authData!!.userID = msg.readInt(tag)
+                S_OPP_SN -> opp.authData!!.snName = AuthType.values()[msg.readByte(tag).toInt()].type()
+                S_OPP_SNUID -> opp.authData!!.snUID = msg.readString(tag)
+                OPP_LOGIN -> opp.userName = msg.readString(tag)
+                OPP_CLIENT_VERSION -> opp.clientVersion = msg.readString(tag)
+                OPP_CLIENT_BUILD -> opp.clientBuild = msg.readChar(tag)
+                OPP_IS_FRIEND -> opp.isFriend = msg.readBoolean(tag)
             }
             tag = msg.nextTag()
         }
-        opp.allowSendUID = opp.authData!!.snUID != null
+        opp.allowSendUID = true
         mLoginListener.onPlay(opp, youStarter)
     }
 
@@ -339,13 +339,13 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
             return
         val size = msgReader.readChar(ACTION_QUERY_FRIEND_RES)
         val list = ArrayList<FriendsInfo>(size)
-        val names = msgReader.readString(F_QUERY_NAMES)!!.split("\\|\\|".toRegex()).dropLastWhile { it.isEmpty() }
+        val names = msgReader.readString(F_QUERY_NAMES).split("\\|\\|".toRegex()).dropLastWhile { it.isEmpty() }
             .toTypedArray()
         val accept = msgReader.readBytes(F_QUERY_USER_ACCEPT)
         val userIds = ByteBuffer.wrap(msgReader.readBytes(F_QUERY_USER_IDS)!!)
 
         for (i in 0 until size) {
-            list.add(FriendsInfo(userIds.int, names[i], accept!![i] > 0))
+            list.add(FriendsInfo(userIds.int, names[i], accept[i] > 0))
         }
 
         userIds.clear()

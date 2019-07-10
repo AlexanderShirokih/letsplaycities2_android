@@ -49,8 +49,8 @@ class OdnoklassnikiSN : ISocialNetwork() {
                     val json = JSONObject(ret)
 
                     SocialUtils.saveAvatar(activity, json.getString("pic_3").toUri()) {
-                        val info = SocialInfo(json.getString("name"), json.getString("uid"), "ok")
-                        callback?.onLoggedIn(info, access_token)
+                        val info = AuthData(json.getString("name"), json.getString("uid"), "ok", access_token)
+                        callback?.onLoggedIn(info)
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()

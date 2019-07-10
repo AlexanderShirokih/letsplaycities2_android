@@ -1,8 +1,8 @@
 package ru.aleshi.letsplaycities.network.lpsv3
 
-import ru.aleshi.letsplaycities.network.AuthData
 import ru.aleshi.letsplaycities.network.FriendModeResult
 import ru.aleshi.letsplaycities.network.PlayerData
+import ru.aleshi.letsplaycities.social.AuthData
 
 
 interface ILogInListener {

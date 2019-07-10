@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.network.AuthData
 import ru.aleshi.letsplaycities.network.HeadlessLoginListener
 import ru.aleshi.letsplaycities.network.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
@@ -26,6 +25,7 @@ import ru.aleshi.letsplaycities.network.lpsv3.ILogInListener
 import ru.aleshi.letsplaycities.network.lpsv3.IServiceListener
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient.PlayState
+import ru.aleshi.letsplaycities.social.AuthData
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
@@ -132,7 +132,7 @@ class FriendsFragment : Fragment(), IServiceListener, FriendsItemListener {
 
     private fun logIn(loginListener: ILogInListener) {
         val userData = PlayerData()
-        userData.authData = AuthData.load(mApplication.gamePreferences, null)
+        userData.authData = AuthData.loadFromPreferences(mApplication.gamePreferences)
         userData.userName = "#" + userData.authData!!.userID
 
         mNetworkClient = NetworkClient.createNetworkClient(ToasterErrorListener(this))

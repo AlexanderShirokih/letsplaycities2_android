@@ -1,11 +1,13 @@
 package ru.aleshi.letsplaycities.ui.network
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,12 +25,15 @@ import org.json.JSONObject
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.network.PlayerData
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.social.*
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.ok.android.sdk.Odnoklassniki
 import ru.ok.android.sdk.OkListener
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 
@@ -37,6 +42,7 @@ class NetworkFragment : Fragment() {
     private lateinit var mApplication: LPSApplication
     private lateinit var mGamePreferences: GamePreferences
     private lateinit var mNetworkViewModel: NetworkViewModel
+    private lateinit var mAuthData: AuthData
 
     private val mLoginListener: LogInListener = LogInListener()
 
@@ -65,8 +71,10 @@ class NetworkFragment : Fragment() {
                 SocialNetworkManager.login(ServiceType.NV, requireActivity())
             })
             friendsInfo.observe(this@NetworkFragment, Observer {
-                if(it != null) {
-                    Log.d("TAG", "result=${it.name}")
+                if (it != null) {
+                    createPlayerData {
+                        startGame(it, NetworkClient.PlayState.WAITING)
+                    }
                 }
             })
         }
@@ -109,12 +117,17 @@ class NetworkFragment : Fragment() {
             findNavController().navigate(R.id.start_friends_fragment)
         }
 
+        btnConnect.setOnClickListener {
+            createPlayerData {
+                startGame(it, NetworkClient.PlayState.PLAY)
+            }
+        }
+
         SocialNetworkManager.registerCallback(object : SocialNetworkLoginListener {
 
-            override fun onLoggedIn(info: SocialInfo, accessToken: String) {
-                info.saveToPreferences(mApplication.gamePreferences, accessToken)
+            override fun onLoggedIn(data: AuthData) {
+                mAuthData = data.apply { saveToPreferences(mApplication.gamePreferences) }
                 setupWithSN()
-//                this.accToken = accessToken;
             }
 
             override fun onError() {
@@ -187,6 +200,39 @@ class NetworkFragment : Fragment() {
         if (requestCode == Google.RC_SIGN_IN) {
             (ServiceType.GL.network as Google).onActivityResult(requireActivity(), data)
         }
+    }
+
+    private fun createPlayerData(callback: (playerData: PlayerData) -> Unit) {
+        val context = requireContext()
+        val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        val userData = PlayerData.create(mAuthData.login).apply {
+            setBuildInfo(pInfo.versionName, PackageInfoCompat.getLongVersionCode(pInfo).toInt())
+            authData = mAuthData
+            canReceiveMessages = mApplication.gamePreferences.canReceiveMessages()
+        }
+
+        val path = mApplication.gamePreferences.getAvatarPath()
+        if (path != null) {
+            val file = File(path)
+            if (file.exists()) {
+                Utils.loadAvatar(file.toUri())
+                    .doOnNext { bitmap ->
+                        val stream = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+                        userData.avatar = stream.toByteArray()
+                    }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext {
+                        callback(userData)
+                    }
+                    .subscribe()
+            } else
+                callback(userData)
+        } else callback(userData)
+    }
+
+    private fun startGame(userData: PlayerData, state: NetworkClient.PlayState) {
+        Log.d("TAG", "Start the game! in state $state, data=$userData")
     }
 
 }

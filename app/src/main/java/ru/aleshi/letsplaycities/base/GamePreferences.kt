@@ -186,4 +186,8 @@ class GamePreferences(context: Context) {
         }
     }
 
+    fun canReceiveMessages(): Boolean {
+        return prefs.getInt(KEY_MSG, 1) != 0
+    }
+
 }

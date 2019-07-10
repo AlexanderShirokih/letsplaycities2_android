@@ -46,8 +46,8 @@ class Google : ISocialNetwork() {
         val picture = account.photoUrl
 
         SocialUtils.saveAvatar(activity, picture!!) {
-            val info = SocialInfo(login!!, uid!!, "gl")
-            callback?.onLoggedIn(info, accessToken)
+            val info = AuthData(login!!, uid!!, "gl", accessToken)
+            callback?.onLoggedIn(info)
         }
     }
 

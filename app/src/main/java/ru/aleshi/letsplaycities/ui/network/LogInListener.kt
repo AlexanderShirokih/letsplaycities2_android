@@ -1,10 +1,10 @@
 package ru.aleshi.letsplaycities.ui.network
 
-import ru.aleshi.letsplaycities.network.AuthData
 import ru.aleshi.letsplaycities.network.FriendModeResult
 import ru.aleshi.letsplaycities.network.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.ILogInListener
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
+import ru.aleshi.letsplaycities.social.AuthData
 
 
 class LogInListener : ILogInListener {

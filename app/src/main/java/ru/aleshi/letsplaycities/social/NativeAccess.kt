@@ -14,8 +14,8 @@ class NativeAccess : ISocialNetwork() {
     }
 
     override fun onLoggedIn(activity: Activity, access_token: String) {
-        val info = SocialInfo(userLogin, DeviceId().toString(), "nv")
-        callback?.onLoggedIn(info, access_token)
+        val info = AuthData(userLogin, DeviceId().toString(), "nv", access_token)
+        callback?.onLoggedIn(info)
     }
 
 }

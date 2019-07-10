@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.network
 
 import ru.aleshi.letsplaycities.network.lpsv3.ILogInListener
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
+import ru.aleshi.letsplaycities.social.AuthData
 
 
 abstract class HeadlessLoginListener : ILogInListener {

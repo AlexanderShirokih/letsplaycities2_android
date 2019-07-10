@@ -28,8 +28,8 @@ class VKontakte : ISocialNetwork() {
                 val login = user.first_name + " " + user.last_name
 
                 SocialUtils.saveAvatar(activity, user.photo_100.toUri()) {
-                    val info = SocialInfo(login, user.id.toString(), "vk")
-                    callback?.onLoggedIn(info, access_token)
+                    val info = AuthData(login, user.id.toString(), "vk", access_token)
+                    callback?.onLoggedIn(info)
                 }
             }
         })

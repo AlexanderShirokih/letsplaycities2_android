@@ -53,8 +53,8 @@ class Facebook : ISocialNetwork() {
             val picture = profile.getProfilePictureUri(128, 128)
 
             SocialUtils.saveAvatar(activity, picture) {
-                val info = SocialInfo(login, userID, "fb")
-                callback?.onLoggedIn(info, access_token)
+                val info = AuthData(login, userID, "fb", access_token)
+                callback?.onLoggedIn(info)
             }
         }
     }
