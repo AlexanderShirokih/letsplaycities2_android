@@ -20,11 +20,11 @@ class ChangeAvatarDialog : DialogFragment() {
         private const val SELECT_PICTURE = 142
     }
 
-    private lateinit var mAvatarViewModel: AvatarViewModel
+    private lateinit var mAvatarViewModel: NetworkViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mAvatarViewModel = ViewModelProviders.of(requireActivity())[AvatarViewModel::class.java]
+        mAvatarViewModel = ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java]
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

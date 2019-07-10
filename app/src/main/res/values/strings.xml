@@ -150,7 +150,9 @@
 
     <!-- NetworkFragment -->
     <string name="network_title">Онлайн</string>
-    <string name="networkmode_desc">Игра начнётся сразу после того, как вам найдётся оппонент. Не забывайте, что на ответ у вас есть полторы минуты</string>
+    <string name="networkmode_desc">Игра начнётся сразу после того, как вам найдётся оппонент. Не забывайте, что на
+        ответ у вас есть полторы минуты
+    </string>
     <string name="networkmode_auth_desc">Войдите с помощью вашего аккаунта из соц.сетей.</string>
     <string name="login_no_sn">Войти без соц. сети</string>
     <string name="connect_net">Подключиться</string>
@@ -185,4 +187,14 @@
 
     <!-- FriendsFragment -->
     <string name="friends_title">Мои друзья</string>
+    <string name="no_friends">Список друзей пуст.\nЧтобы добавить игрока в
+        друзья нажмите на его аватарку и выберите пункт Добавить в друзья
+    </string>
+    <string name="service_upd_err">Не удалось подключиться с серверу для получения данных</string>
+    <string name="err_msg_on_exception">Кажется произошла какая-то ошибка&#8230; Попробуйте зайти позже</string>
+    <string name="err_msg_on_invalid">Ужас! В игре что-то пошло не так!</string>
+    <string name="invite_friend">Отправить приглашение игроку \"%1$s\"?\n Игрок получит приглашение если у него есть активное подключение и интернету</string>
+    <string name="remove_from_friends">Вы действительно хотите удалить \"%1$s\" из списка друзей?</string>
+    <string name="request"> [Заявка]</string>
+
 </resources>

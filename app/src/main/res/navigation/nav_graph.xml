@@ -112,13 +112,18 @@
             android:name="ru.aleshi.letsplaycities.ui.network.LoginFragment"
             android:label="@string/login_no_sn"
             tools:layout="@layout/fragment_login">
-        <action android:id="@+id/showChangeAvatarDialog" app:destination="@id/changeAvatarDialog"/>
+        <action
+                android:id="@+id/showChangeAvatarDialog"
+                app:destination="@id/changeAvatarDialog"/>
     </fragment>
 
     <fragment
             android:id="@+id/friendsFragment"
-            android:name="ru.aleshi.letsplaycities.ui.FriendsFragment"
+            android:name="ru.aleshi.letsplaycities.ui.friends.FriendsFragment"
             android:label="@string/friends_title"
-            tools:layout="@layout/fragment_friends"/>
+            tools:layout="@layout/fragment_friends">
+        <action android:id="@+id/showConfimationDialog"
+                app:destination="@id/confirmationDialog"/>
+    </fragment>
 
 </navigation>

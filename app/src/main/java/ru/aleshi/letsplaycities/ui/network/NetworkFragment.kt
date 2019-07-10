@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.ui.network
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +36,7 @@ class NetworkFragment : Fragment() {
 
     private lateinit var mApplication: LPSApplication
     private lateinit var mGamePreferences: GamePreferences
-    private lateinit var mAvatarModelView: AvatarViewModel
+    private lateinit var mNetworkViewModel: NetworkViewModel
 
     private val mLoginListener: LogInListener = LogInListener()
 
@@ -44,24 +45,31 @@ class NetworkFragment : Fragment() {
         mApplication = lpsApplication
         mGamePreferences = mApplication.gamePreferences
 
-        mAvatarModelView = ViewModelProviders.of(requireActivity())[AvatarViewModel::class.java]
-        mAvatarModelView.avatarPath.value = mApplication.gamePreferences.getAvatarPath()
-        mAvatarModelView.avatarPath.observe(this, Observer {
-            if (it == null) {
-                roundedImageView.setImageResource(R.drawable.ic_player)
-            } else {
-                Utils.loadAvatar(File(it).toUri())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext { bitmap ->
-                        roundedImageView.setImageBitmap(bitmap)
-                    }
-                    .subscribe()
-            }
-        })
-        mAvatarModelView.nativeLogin.observe(this, Observer {
-            (ServiceType.NV.network as NativeAccess).userLogin = it
-            SocialNetworkManager.login(ServiceType.NV, requireActivity())
-        })
+        mNetworkViewModel = ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java]
+        mNetworkViewModel.run {
+            avatarPath.value = mApplication.gamePreferences.getAvatarPath()
+            avatarPath.observe(this@NetworkFragment, Observer {
+                if (it == null) {
+                    roundedImageView.setImageResource(R.drawable.ic_player)
+                } else {
+                    Utils.loadAvatar(File(it).toUri())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext { bitmap ->
+                            roundedImageView.setImageBitmap(bitmap)
+                        }
+                        .subscribe()
+                }
+            })
+            nativeLogin.observe(this@NetworkFragment, Observer {
+                (ServiceType.NV.network as NativeAccess).userLogin = it
+                SocialNetworkManager.login(ServiceType.NV, requireActivity())
+            })
+            friendsInfo.observe(this@NetworkFragment, Observer {
+                if(it != null) {
+                    Log.d("TAG", "result=${it.name}")
+                }
+            })
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -121,7 +129,7 @@ class NetworkFragment : Fragment() {
         group_sn.visibility = View.VISIBLE
         group_connect.visibility = View.GONE
 
-        mAvatarModelView.avatarPath.value = null
+        mNetworkViewModel.avatarPath.value = null
     }
 
     private fun setupWithSN() {

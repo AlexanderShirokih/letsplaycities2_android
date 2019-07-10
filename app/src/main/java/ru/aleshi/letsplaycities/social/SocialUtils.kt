@@ -7,7 +7,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.ui.MainActivity
-import ru.aleshi.letsplaycities.ui.network.AvatarViewModel
+import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils
 
 object SocialUtils {
@@ -28,7 +28,7 @@ object SocialUtils {
             .doOnNext {
                 if (it != null) {
                     app.gamePreferences.setAvatarPath(it)
-                    ViewModelProviders.of(activity)[AvatarViewModel::class.java].avatarPath.value = it
+                    ViewModelProviders.of(activity)[NetworkViewModel::class.java].avatarPath.value = it
                 }
             }
     }

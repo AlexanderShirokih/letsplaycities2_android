@@ -1,6 +1,11 @@
 package ru.aleshi.letsplaycities.ui.network
 
-import ru.aleshi.letsplaycities.network.*
+import ru.aleshi.letsplaycities.network.AuthData
+import ru.aleshi.letsplaycities.network.FriendModeResult
+import ru.aleshi.letsplaycities.network.PlayerData
+import ru.aleshi.letsplaycities.network.lpsv3.ILogInListener
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
+
 
 class LogInListener : ILogInListener {
     override fun onLoggedIn(data: AuthData) {
@@ -11,11 +16,7 @@ class LogInListener : ILogInListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun onLoginFailed(banReason: String, connError: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onNewerBuildAvailable() {
+    override fun onLoginFailed(banReason: String?, connError: String) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -23,7 +24,7 @@ class LogInListener : ILogInListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun onFriendModeRequest(result: FriendModeResult, login: String, userId: Int) {
+    override fun onFriendModeRequest(result: FriendModeResult, login: String?, userId: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -35,4 +36,7 @@ class LogInListener : ILogInListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun onNewerBuildAvailable() {
+
+    }
 }

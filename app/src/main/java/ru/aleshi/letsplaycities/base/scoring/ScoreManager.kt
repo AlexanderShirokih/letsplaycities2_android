@@ -212,7 +212,7 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
         if (currentPlayer is Android) {
             points = (points * 0.9f).roundToInt()
         }
-        currentPlayer!!.score += points
+        currentPlayer.score += points
     }
 
     private fun mostChecker(word: String) {

@@ -21,14 +21,14 @@ import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import java.io.File
 
 class LoginFragment : Fragment() {
-    private lateinit var mAvatarModelView: AvatarViewModel
+    private lateinit var mAvatarModelView: NetworkViewModel
     private lateinit var mApplication: LPSApplication
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.move)
         mApplication = lpsApplication
-        mAvatarModelView = ViewModelProviders.of(requireActivity())[AvatarViewModel::class.java]
+        mAvatarModelView = ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java]
         mAvatarModelView.avatarBitmap.observe(this, Observer {
             if (it != null) {
                 roundedImageView.setImageBitmap(it)
