@@ -7,16 +7,16 @@ import ru.aleshi.letsplaycities.social.AuthData
 
 abstract class HeadlessLoginListener : ILogInListener {
 
-    override fun onLoggedIn(data: AuthData) {
-        onSuccess(data)
+    override fun onLoggedIn(updatedData: AuthData) {
+        onSuccess(updatedData)
     }
 
     override fun onPlay(data: PlayerData, youStarter: Boolean) {
 
     }
 
-    override fun onLoginFailed(banReason: String?, connError: String) {
-        onError(banReason ?: connError)
+    override fun onLoginFailed(banReason: String?, connError: String?) {
+        onError(banReason ?: connError ?: "unknown")
     }
 
     override fun onNewerBuildAvailable() {
@@ -27,7 +27,7 @@ abstract class HeadlessLoginListener : ILogInListener {
         onError(desc)
     }
 
-    override fun onFriendModeRequest(result: FriendModeResult, login: String?, userId: Int) {
+    override fun onFriendModeRequest(result: FriendModeResult, fLogin: String?, userId: Int) {
 
     }
 

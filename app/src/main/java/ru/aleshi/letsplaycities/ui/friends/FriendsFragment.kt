@@ -26,6 +26,7 @@ import ru.aleshi.letsplaycities.network.lpsv3.IServiceListener
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient.PlayState
 import ru.aleshi.letsplaycities.social.AuthData
+import ru.aleshi.letsplaycities.ui.UiErrorListener
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
@@ -135,7 +136,7 @@ class FriendsFragment : Fragment(), IServiceListener, FriendsItemListener {
         userData.authData = AuthData.loadFromPreferences(mApplication.gamePreferences)
         userData.userName = "#" + userData.authData!!.userID
 
-        mNetworkClient = NetworkClient.createNetworkClient(ToasterErrorListener(this))
+        mNetworkClient = NetworkClient.createNetworkClient(UiErrorListener(this))
         mNetworkClient.serviceListener = this
         mNetworkClient.connect(loginListener, userData, PlayState.SERVICE, 0)
     }

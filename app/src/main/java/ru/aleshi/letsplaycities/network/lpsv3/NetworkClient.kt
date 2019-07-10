@@ -70,6 +70,7 @@ import ru.aleshi.letsplaycities.network.lpsv3.LPSv3Tags.S_OPP_UID
 import ru.aleshi.letsplaycities.network.lpsv3.LPSv3Tags.S_UID
 import ru.aleshi.letsplaycities.network.lpsv3.LPSv3Tags.UID
 import ru.aleshi.letsplaycities.network.lpsv3.LPSv3Tags.WORD
+import ru.aleshi.letsplaycities.social.AuthData
 import java.io.*
 import java.net.InetAddress
 import java.net.Socket
@@ -147,7 +148,7 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
         mSendingThread = Thread(sendingRunnable, "Sending Thread")
     }
 
-    fun connect(logInListener: ILogInListener, userData: PlayerData, state: PlayState, userId: Int) {
+    fun connect(logInListener: ILogInListener, userData: PlayerData, state: PlayState, userId: Int?) {
         this.mLoginListener = logInListener
         this.mUserData = userData
         logInListener.onConnect(this, userData, state)
@@ -166,8 +167,8 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
 
                 when (state) {
                     PlayState.PLAY -> play(false, 0)
-                    PlayState.WAITING -> play(true, userId)
-                    PlayState.CONNECT -> logInListener.onFriendModeRequest(FriendModeResult.REQUEST, null, userId)
+                    PlayState.WAITING -> play(true, userId!!)
+                    PlayState.CONNECT -> logInListener.onFriendModeRequest(FriendModeResult.REQUEST, null, userId!!)
                     PlayState.SERVICE -> {
                     }
                 }
@@ -315,21 +316,27 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
 
         var youStarter = false
         var tag = msg.nextTag()
+
+        var userID = 0
+        var snUID = "0"
+        var snName = "nv"
+
         while (tag > 0) {
             when (tag) {
                 ACTION_JOIN -> youStarter = msg.readBoolean(tag)
                 S_CAN_REC_MSG -> opp.canReceiveMessages = msg.readBoolean(tag)
                 S_AVATAR_PART0 -> opp.avatar = msg.readBytes(tag)
-                S_OPP_UID -> opp.authData!!.userID = msg.readInt(tag)
-                S_OPP_SN -> opp.authData!!.snName = AuthType.values()[msg.readByte(tag).toInt()].type()
-                S_OPP_SNUID -> opp.authData!!.snUID = msg.readString(tag)
                 OPP_LOGIN -> opp.userName = msg.readString(tag)
                 OPP_CLIENT_VERSION -> opp.clientVersion = msg.readString(tag)
                 OPP_CLIENT_BUILD -> opp.clientBuild = msg.readChar(tag)
                 OPP_IS_FRIEND -> opp.isFriend = msg.readBoolean(tag)
+                S_OPP_UID -> userID = msg.readInt(tag)
+                S_OPP_SN -> snName = AuthType.values()[msg.readByte(tag).toInt()].type()
+                S_OPP_SNUID -> snUID = msg.readString(tag)
             }
             tag = msg.nextTag()
         }
+        opp.authData = AuthData(opp.userName!!, snUID, snName, "").apply { this.userID = userID }
         opp.allowSendUID = true
         mLoginListener.onPlay(opp, youStarter)
     }
@@ -342,7 +349,7 @@ class NetworkClient(private val mErrorListener: IErrorListener) {
         val names = msgReader.readString(F_QUERY_NAMES).split("\\|\\|".toRegex()).dropLastWhile { it.isEmpty() }
             .toTypedArray()
         val accept = msgReader.readBytes(F_QUERY_USER_ACCEPT)
-        val userIds = ByteBuffer.wrap(msgReader.readBytes(F_QUERY_USER_IDS)!!)
+        val userIds = ByteBuffer.wrap(msgReader.readBytes(F_QUERY_USER_IDS))
 
         for (i in 0 until size) {
             list.add(FriendsInfo(userIds.int, names[i], accept[i] > 0))

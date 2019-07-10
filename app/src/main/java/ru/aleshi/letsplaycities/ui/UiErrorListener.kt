@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui.friends
+package ru.aleshi.letsplaycities.ui
 
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.lpsv3.IErrorListener
 
-class ToasterErrorListener(private val mFragment: Fragment, private val cancelCallback: (() -> Unit)? = null) :
+class UiErrorListener(private val mFragment: Fragment, private val cancelCallback: (() -> Unit)? = null) :
     IErrorListener {
 
     private val scope = CoroutineScope(Dispatchers.Main)

@@ -3,10 +3,11 @@ package ru.aleshi.letsplaycities.ui.network
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -14,6 +15,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
+import androidx.transition.ChangeBounds
+import androidx.transition.TransitionManager
 import com.google.android.material.snackbar.Snackbar
 import com.vk.sdk.VKAccessToken
 import com.vk.sdk.VKCallback
@@ -26,10 +29,13 @@ import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.network.PlayerData
+import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.social.*
 import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.aleshi.letsplaycities.ui.UiErrorListener
 import ru.aleshi.letsplaycities.utils.Utils
+import ru.aleshi.letsplaycities.utils.Utils.RECONNECTION_DELAY_MS
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.ok.android.sdk.Odnoklassniki
 import ru.ok.android.sdk.OkListener
@@ -43,13 +49,18 @@ class NetworkFragment : Fragment() {
     private lateinit var mGamePreferences: GamePreferences
     private lateinit var mNetworkViewModel: NetworkViewModel
     private lateinit var mAuthData: AuthData
+    private var mLastConnectionTime: Long = 0
 
-    private val mLoginListener: LogInListener = LogInListener()
+    private lateinit var mLoginListener: LogInListener
+
+    private val mNormalConstraintSet: ConstraintSet = ConstraintSet()
+    private val mLoadingConstraintSet: ConstraintSet = ConstraintSet()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mApplication = lpsApplication
         mGamePreferences = mApplication.gamePreferences
+        mLoginListener = LogInListener(this, mGamePreferences)
 
         mNetworkViewModel = ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java]
         mNetworkViewModel.run {
@@ -70,10 +81,10 @@ class NetworkFragment : Fragment() {
                 (ServiceType.NV.network as NativeAccess).userLogin = it
                 SocialNetworkManager.login(ServiceType.NV, requireActivity())
             })
-            friendsInfo.observe(this@NetworkFragment, Observer {
-                if (it != null) {
-                    createPlayerData {
-                        startGame(it, NetworkClient.PlayState.WAITING)
+            friendsInfo.observe(this@NetworkFragment, Observer { friendsInfo ->
+                if (friendsInfo != null) {
+                    createPlayerData { playerData ->
+                        startGame(playerData, NetworkClient.PlayState.WAITING, friendsInfo)
                     }
                 }
             })
@@ -88,13 +99,17 @@ class NetworkFragment : Fragment() {
         val activity = requireActivity() as MainActivity
         activity.setToolbarVisibility(true)
 
+        mNormalConstraintSet.clone(root)
+        mLoadingConstraintSet.clone(activity, R.layout.fragment_network_connecting)
+
         if (mGamePreferences.isChangeModeDialogRequested()) {
             findNavController().navigate(R.id.showChangeModeDialog)
         }
         if (mGamePreferences.isLoggedFromAnySN()) {
+            mAuthData = AuthData.loadFromPreferences(mGamePreferences)
             setupWithSN()
         } else {
-//            checkForRequest()
+//TODO:            checkForRequest()
         }
 
         btnVk.setOnClickListener(OnSocialButtonClickedListener(activity, ServiceType.VK))
@@ -119,14 +134,17 @@ class NetworkFragment : Fragment() {
 
         btnConnect.setOnClickListener {
             createPlayerData {
-                startGame(it, NetworkClient.PlayState.PLAY)
+                startGame(it, NetworkClient.PlayState.PLAY, null)
             }
+        }
+        btnCancel.setOnClickListener {
+            onCancel()
         }
 
         SocialNetworkManager.registerCallback(object : SocialNetworkLoginListener {
 
             override fun onLoggedIn(data: AuthData) {
-                mAuthData = data.apply { saveToPreferences(mApplication.gamePreferences) }
+                mAuthData = data.apply { saveToPreferences(mGamePreferences) }
                 setupWithSN()
             }
 
@@ -135,6 +153,13 @@ class NetworkFragment : Fragment() {
             }
 
         })
+    }
+
+    internal fun onCancel() {
+        setLoadingLayout(false)
+        NetworkClient.getNetworkClient()?.run {
+            disconnect()
+        }
     }
 
     private fun setup() {
@@ -208,10 +233,10 @@ class NetworkFragment : Fragment() {
         val userData = PlayerData.create(mAuthData.login).apply {
             setBuildInfo(pInfo.versionName, PackageInfoCompat.getLongVersionCode(pInfo).toInt())
             authData = mAuthData
-            canReceiveMessages = mApplication.gamePreferences.canReceiveMessages()
+            canReceiveMessages = mGamePreferences.canReceiveMessages()
         }
 
-        val path = mApplication.gamePreferences.getAvatarPath()
+        val path = mGamePreferences.getAvatarPath()
         if (path != null) {
             val file = File(path)
             if (file.exists()) {
@@ -231,8 +256,48 @@ class NetworkFragment : Fragment() {
         } else callback(userData)
     }
 
-    private fun startGame(userData: PlayerData, state: NetworkClient.PlayState) {
-        Log.d("TAG", "Start the game! in state $state, data=$userData")
+    internal fun startGame(
+        userData: PlayerData,
+        state: NetworkClient.PlayState,
+        friendsInfo: FriendsInfo?
+    ) {
+        setLoadingLayout(true)
+        val networkClient = NetworkClient.createNetworkClient(UiErrorListener(this) {
+            onCancel()
+        })
+        checkForWaiting {
+            networkClient.connect(mLoginListener, userData, state, friendsInfo?.userId)
+        }
+    }
+
+    private fun checkForWaiting(task: () -> Unit) {
+        val now = System.currentTimeMillis()
+
+        if (now - mLastConnectionTime < RECONNECTION_DELAY_MS) {
+            Utils.showWaitingForConnectionDialog(requireActivity(), task) {
+                onCancel()
+            }
+        } else
+            task()
+        mLastConnectionTime = now
+    }
+
+    private fun setLoadingLayout(isLoadingLayout: Boolean) {
+        val constraint = if (isLoadingLayout) {
+            mNormalConstraintSet.clone(root)
+            mLoadingConstraintSet
+        } else mNormalConstraintSet
+
+        constraint.applyTo(root)
+
+        ChangeBounds().run {
+            interpolator = OvershootInterpolator()
+            TransitionManager.beginDelayedTransition(root, this)
+        }
+    }
+
+    fun updateInfo(string: String) {
+        infoTv.text = string
     }
 
 }

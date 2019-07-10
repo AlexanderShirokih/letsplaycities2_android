@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/root"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     <TextView
@@ -16,18 +16,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/textView3"
-            android:layout_marginTop="120dp"
-            app:layout_constraintHorizontal_bias="0.0"/>
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.272"/>
 
     <ru.aleshi.letsplaycities.ui.view.RoundedImageView
             android:transitionName="transition_avatar"
             android:src="@drawable/ic_player"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:id="@+id/roundedImageView"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="36dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="24dp"
             app:layout_constraintEnd_toStartOf="@id/sn_desc"
             app:layout_constraintTop_toBottomOf="@+id/textView3"
             tools:targetApi="lollipop"/>
@@ -37,7 +37,7 @@
             android:text="@string/networkmode_auth_desc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintStart_toEndOf="@+id/roundedImageView"
@@ -120,6 +120,7 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     <androidx.constraintlayout.widget.Group
+            android:visibility="gone"
             android:id="@+id/group_sn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -139,9 +140,9 @@
             android:id="@+id/loadingBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.498"
             android:layout_marginTop="32dp"
-            app:layout_constraintTop_toBottomOf="@+id/btnLoginNoSn"/>
+            app:layout_constraintTop_toBottomOf="@+id/roundedImageView"/>
 
     <TextView
             android:id="@+id/infoTv"
@@ -166,7 +167,6 @@
             app:layout_constraintHorizontal_bias="0.5"/>
 
     <androidx.constraintlayout.widget.Group
-            android:visibility="gone"
             app:constraint_referenced_ids="loadingBar,infoTv,btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

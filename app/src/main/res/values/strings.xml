@@ -196,5 +196,16 @@
     <string name="invite_friend">Отправить приглашение игроку \"%1$s\"?\n Игрок получит приглашение если у него есть активное подключение и интернету</string>
     <string name="remove_from_friends">Вы действительно хотите удалить \"%1$s\" из списка друзей?</string>
     <string name="request"> [Заявка]</string>
+    <string name="waiting_for_connection">Ожидание подключения&#8230; %1$s</string>
+    <string name="waiting_for_opp">Ожидание оппонента&#8230;</string>
+    <string name="connecting_to_friend">Ожидание игрока %1$s</string>
+    <string name="banned_player">Вы подключились к заблокированному вами игроку. Повторный поиск&#8230;</string>
+    <string name="server_auth_error">Ошибка авторизации на сервере: %1$s</string>
+    <string name="new_version_available">Доступная новая версия игры! Рекомендуем установить обновление для использования новых возможностей приложения</string>
+    <string name="friend_offline">Игрок "%1$s" сейчас не в сети.</string>
+    <string name="friend_busy">Игрок "%1$s" занят. Попробуйте позднее</string>
+    <string name="friend_denied">Игрок "%1$s" отклонил Вашу заявку</string>
+    <string name="friend_request">%1$s приглашает Вас сыграть в города.\nПринять заявку?</string>
+    <string name="not_friend">Возможно игрок "%1$s" удалил Вас из своего списка друзей</string>
 
 </resources>
