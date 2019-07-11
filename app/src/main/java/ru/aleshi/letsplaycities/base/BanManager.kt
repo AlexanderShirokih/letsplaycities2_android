@@ -46,7 +46,7 @@ class BanManager(private val prefs: GamePreferences) {
             val itm = mutableMapOf<String, Any>()
             val split = item.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             itm[ATTR_UUID] = split[0]
-            itm[ATTR_LOGIN] = if (split.size > 1) split[1] else "Player ID: " + split[0]
+            itm[ATTR_LOGIN] = if (split.size > 1) split[1] else "User ID: " + split[0]
             bannedPlayers.add(itm)
         }
         return bannedPlayers

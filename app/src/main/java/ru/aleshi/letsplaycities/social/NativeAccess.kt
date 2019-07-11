@@ -5,7 +5,7 @@ import android.content.Context
 import ru.aleshi.letsplaycities.base.DeviceId
 
 class NativeAccess : ISocialNetwork() {
-    var userLogin: String = "Player"
+    var userLogin: String = "User"
 
     override fun onInitialize(context: Context) {}
 

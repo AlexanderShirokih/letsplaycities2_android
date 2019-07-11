@@ -4,6 +4,10 @@ import android.content.Context
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.*
+import ru.aleshi.letsplaycities.base.player.Android
+import ru.aleshi.letsplaycities.base.player.NetworkUser
+import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.base.player.RemoteUser
 import ru.aleshi.letsplaycities.utils.Utils
 import kotlin.math.roundToInt
 
@@ -51,9 +55,9 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
     private val prefs: GamePreferences = (context.applicationContext as LPSApplication).gamePreferences
 
     private var lastTime: Long = 0
-    private lateinit var playerA: Player
-    private lateinit var playerB: Player
-    private lateinit var currentPlayer: Player
+    private lateinit var playerA: User
+    private lateinit var playerB: User
+    private lateinit var currentPlayer: User
 
     init {
         //Load or build stats
@@ -177,12 +181,12 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
     }
 
 
-    fun reset(first: Player, second: Player) {
+    fun reset(first: User, second: User) {
         playerA = first
         playerB = second
     }
 
-    fun moveStarted(current: Player) {
+    fun moveStarted(current: User) {
         //for by_time, save time
         lastTime = System.currentTimeMillis()
         this.currentPlayer = current
@@ -291,7 +295,7 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
         }
     }
 
-    private fun updWinsForNetMode(winner: Player) {
+    private fun updWinsForNetMode(winner: User) {
         if (mode == GameMode.MODE_NET) {
             if (getPlayer() === winner)
                 groupOnline.findField(F_WINS).increase()
@@ -301,7 +305,7 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
         saveStats()
     }
 
-    private fun getPlayer(): Player {
+    private fun getPlayer(): User {
         return when (mode) {
             GameMode.MODE_PVA -> if (playerA is Android) playerB else playerA
             GameMode.MODE_PVP -> if (playerA.score > playerB.score) playerA else playerB
@@ -310,7 +314,7 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
         }
     }
 
-    private fun getOpp(p: Player): Player {
+    private fun getOpp(p: User): User {
         return if (p === playerA) playerB else playerA
     }
 }
