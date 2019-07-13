@@ -1,7 +1,7 @@
-package ru.aleshi.letsplaycities.social
+package ru.aleshi.letsplaycities.base
 
-import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.network.AuthType
+import ru.aleshi.letsplaycities.social.SocialUtils
 import java.io.Serializable
 
 
@@ -40,6 +40,10 @@ class AuthData(var login: String, var snUID: String, var snName: String, var acc
                 accessHash = prefs.getString("acc_hash", null)
                 userID = prefs.getInt("user_id", 0)
             }
+        }
+
+        fun create(name: String) : AuthData{
+            return AuthData(name, "", "", "")
         }
     }
 }

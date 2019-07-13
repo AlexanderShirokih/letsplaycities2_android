@@ -1,18 +1,27 @@
 package ru.aleshi.letsplaycities.base.player
 
+import android.graphics.drawable.Drawable
+import io.reactivex.Maybe
+import ru.aleshi.letsplaycities.base.AuthData
 import ru.aleshi.letsplaycities.base.GameSession
-import ru.aleshi.letsplaycities.social.AuthData
 
-abstract class User(protected val gameSession: GameSession, val authData: AuthData) {
+abstract class User(private val authData: AuthData) {
+
+    lateinit var gameSession: GameSession
+
+    var score: Int = 0
 
     val name: String
         get() = authData.login
 
-    var score: Int = 0
+    val info: String
+        get() = if (score == 0) name else "$name: $score"
 
     abstract fun onBeginMove(firstChar: Char?)
 
     fun sendCity(city: String) {
         gameSession.onCitySended(city, this)
     }
+
+    abstract fun getAvatar(): Maybe<Drawable>
 }

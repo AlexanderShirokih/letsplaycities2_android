@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.social
 
 import android.app.Activity
 import android.content.Context
+import ru.aleshi.letsplaycities.base.AuthData
 import ru.aleshi.letsplaycities.base.DeviceId
 
 class NativeAccess : ISocialNetwork() {

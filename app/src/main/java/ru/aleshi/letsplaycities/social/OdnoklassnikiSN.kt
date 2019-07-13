@@ -6,6 +6,7 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.*
 import org.json.JSONException
 import org.json.JSONObject
+import ru.aleshi.letsplaycities.base.AuthData
 import ru.ok.android.sdk.Odnoklassniki
 import ru.ok.android.sdk.OkRequestMode
 import ru.ok.android.sdk.util.OkAuthType
@@ -49,7 +50,12 @@ class OdnoklassnikiSN : ISocialNetwork() {
                     val json = JSONObject(ret)
 
                     SocialUtils.saveAvatar(activity, json.getString("pic_3").toUri()) {
-                        val info = AuthData(json.getString("name"), json.getString("uid"), "ok", access_token)
+                        val info = AuthData(
+                            json.getString("name"),
+                            json.getString("uid"),
+                            "ok",
+                            access_token
+                        )
                         callback?.onLoggedIn(info)
                     }
                 } catch (e: JSONException) {

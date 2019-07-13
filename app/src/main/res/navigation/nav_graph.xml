@@ -34,7 +34,7 @@
         <action android:id="@+id/start_friends_fragment" app:destination="@id/friendsFragment"/>
     </fragment>
 
-    <fragment android:id="@+id/gameFragment" android:name="ru.aleshi.letsplaycities.ui.GameFragment"
+    <fragment android:id="@+id/gameFragment" android:name="ru.aleshi.letsplaycities.ui.game.GameFragment"
               android:label="GameFragment">
         <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities.base.GameMode"/>
     </fragment>

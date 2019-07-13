@@ -7,6 +7,7 @@ import com.facebook.AccessToken
 import com.facebook.Profile.getCurrentProfile
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
+import ru.aleshi.letsplaycities.base.AuthData
 
 
 class Facebook : ISocialNetwork() {

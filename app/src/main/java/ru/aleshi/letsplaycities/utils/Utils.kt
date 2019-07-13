@@ -3,7 +3,9 @@ package ru.aleshi.letsplaycities.utils
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -131,5 +133,13 @@ object Utils {
                 onResult(false)
             }
             .create().show()
+    }
+
+    fun loadDrawable(context: Context, resId: Int): Drawable {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            context.resources.getDrawable(resId, context.theme)
+        } else {
+            context.resources.getDrawable(resId)
+        }
     }
 }

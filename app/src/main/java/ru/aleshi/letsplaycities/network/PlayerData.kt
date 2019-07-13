@@ -1,21 +1,20 @@
 package ru.aleshi.letsplaycities.network
 
-import ru.aleshi.letsplaycities.social.AuthData
-
+import ru.aleshi.letsplaycities.base.AuthData
 
 class PlayerData {
     var clientVersion: String = "unk"
     var clientBuild: Int = 80
+    var userName: String? = null
     var canReceiveMessages: Boolean = false
     var allowSendUID: Boolean = false
     var isFriend: Boolean = false
-    var userName: String? = null
     var avatar: ByteArray? = null
     var authData: AuthData? = null
 
-    companion object Builder {
-        fun create(name: String): PlayerData {
-            return PlayerData().apply { userName = name }
+    companion object Factory {
+        fun create(login: String): PlayerData {
+            return PlayerData().apply { userName = login }
         }
     }
 

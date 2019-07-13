@@ -7,6 +7,7 @@ import com.vk.sdk.VKSdk
 import com.vk.sdk.api.*
 import com.vk.sdk.api.model.VKApiUser
 import com.vk.sdk.api.model.VKList
+import ru.aleshi.letsplaycities.base.AuthData
 
 
 class VKontakte : ISocialNetwork() {

@@ -8,11 +8,16 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils.makeInAnimation
 import android.view.animation.AnimationUtils.makeOutAnimation
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.fragment_main_menu.*
 import ru.aleshi.letsplaycities.BadTokenException
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GameMode
+import ru.aleshi.letsplaycities.base.player.Android
+import ru.aleshi.letsplaycities.base.player.Player
+import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.IntegrityChecker
 import ru.aleshi.letsplaycities.utils.Utils
 import kotlin.system.exitProcess
@@ -57,8 +62,8 @@ class MainMenuFragment : Fragment() {
 
                 val navController = findNavController()
                 when (v.id) {
-                    R.id.btn_pva -> navController.navigate(MainMenuFragmentDirections.startGameFragment(GameMode.MODE_PVA))
-                    R.id.btn_pvp -> navController.navigate(MainMenuFragmentDirections.startGameFragment(GameMode.MODE_PVP))
+                    R.id.btn_pva -> startGame(navController, false)
+                    R.id.btn_pvp -> startGame(navController, true)
                     R.id.btn_mul -> navController.navigate(R.id.start_multiplayer_fragment)
                     R.id.btn_net -> navController.navigate(R.id.start_network_fragment)
                     R.id.btn_set -> navController.navigate(R.id.start_settings_fragment)
@@ -66,6 +71,21 @@ class MainMenuFragment : Fragment() {
                 }
             })
         }
+    }
+
+    private fun startGame(navController: NavController, hasLocalOpponents: Boolean) {
+        val players = ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].players
+        if (hasLocalOpponents)
+            players.value = arrayOf(
+                Player("${getString(R.string.player)} 1"),
+                Player("${getString(R.string.player)} 2")
+            )
+        else
+            players.value = arrayOf(
+                Player(getString(R.string.player)),
+                Android(getString(R.string.android))
+            )
+        navController.navigate(MainMenuFragmentDirections.startGameFragment(if (hasLocalOpponents) GameMode.MODE_PVP else GameMode.MODE_PVA))
     }
 
     private fun makeInAnimation() {

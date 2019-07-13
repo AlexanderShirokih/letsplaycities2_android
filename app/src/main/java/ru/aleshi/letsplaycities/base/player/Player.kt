@@ -1,15 +1,18 @@
 package ru.aleshi.letsplaycities.base.player
 
+import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.AuthData
 import ru.aleshi.letsplaycities.base.Dictionary
-import ru.aleshi.letsplaycities.base.GameSession
-import ru.aleshi.letsplaycities.social.AuthData
+import ru.aleshi.letsplaycities.utils.Utils
 
-class Player(gameSession: GameSession, authData: AuthData) : User(gameSession, authData) {
+class Player(authData: AuthData) : User(authData) {
+
+    constructor(name: String) : this(AuthData.create(name))
 
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
     private var mPreviousFirstChar: Char? = null
@@ -21,13 +24,14 @@ class Player(gameSession: GameSession, authData: AuthData) : User(gameSession, a
     fun submit(userInput: String, onSuccess: () -> Unit) {
         mCompositeDisposable.add(Maybe.just(userInput)
             .map { it.trim().toLowerCase() }
+            .filter { it.isEmpty() }
             .filter { mPreviousFirstChar == null || it.last() == mPreviousFirstChar }
-            .map { gameSession.exclusions.check(it) }
+            .map { gameSession.mExclusions.check(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { it.second?.run { gameSession.notify(this) } }
             .map { it.first }
             .observeOn(Schedulers.computation())
-            .map { gameSession.dictionary.checkCity(userInput) }
+            .map { gameSession.mDictionary.applyCity(userInput) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ processCityResult(it, onSuccess) }, ::error)
         )
@@ -50,5 +54,9 @@ class Player(gameSession: GameSession, authData: AuthData) : User(gameSession, a
                 sendCity(data.first)
             }
         }
+    }
+
+    override fun getAvatar(): Maybe<Drawable> {
+        return Maybe.fromCallable { Utils.loadDrawable(gameSession.context, R.drawable.ic_player_big) }
     }
 }

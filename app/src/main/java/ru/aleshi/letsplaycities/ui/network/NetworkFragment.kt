@@ -23,17 +23,20 @@ import com.vk.sdk.VKCallback
 import com.vk.sdk.VKSdk
 import com.vk.sdk.api.VKError
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_network.*
 import org.json.JSONObject
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.AuthData
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient2
+import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.network.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.social.*
 import ru.aleshi.letsplaycities.ui.MainActivity
-import ru.aleshi.letsplaycities.ui.UiErrorListener
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.RECONNECTION_DELAY_MS
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
@@ -51,8 +54,6 @@ class NetworkFragment : Fragment() {
     private lateinit var mAuthData: AuthData
     private var mLastConnectionTime: Long = 0
 
-    private lateinit var mLoginListener: LogInListener
-
     private val mNormalConstraintSet: ConstraintSet = ConstraintSet()
     private val mLoadingConstraintSet: ConstraintSet = ConstraintSet()
 
@@ -60,8 +61,6 @@ class NetworkFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mApplication = lpsApplication
         mGamePreferences = mApplication.gamePreferences
-        mLoginListener = LogInListener(this, mGamePreferences)
-
         mNetworkViewModel = ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java]
         mNetworkViewModel.run {
             avatarPath.value = mApplication.gamePreferences.getAvatarPath()
@@ -84,11 +83,13 @@ class NetworkFragment : Fragment() {
             friendsInfo.observe(this@NetworkFragment, Observer { friendsInfo ->
                 if (friendsInfo != null) {
                     createPlayerData { playerData ->
-                        startGame(playerData, NetworkClient.PlayState.WAITING, friendsInfo)
+                        startGame(playerData, friendsInfo)
                     }
                 }
             })
         }
+
+        mNetworkViewModel.networkRepository.value = NetworkRepository(NetworkClient2())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -108,8 +109,6 @@ class NetworkFragment : Fragment() {
         if (mGamePreferences.isLoggedFromAnySN()) {
             mAuthData = AuthData.loadFromPreferences(mGamePreferences)
             setupWithSN()
-        } else {
-//TODO:            checkForRequest()
         }
 
         btnVk.setOnClickListener(OnSocialButtonClickedListener(activity, ServiceType.VK))
@@ -134,7 +133,7 @@ class NetworkFragment : Fragment() {
 
         btnConnect.setOnClickListener {
             createPlayerData {
-                startGame(it, NetworkClient.PlayState.PLAY, null)
+                startGame(it, null)
             }
         }
         btnCancel.setOnClickListener {
@@ -157,9 +156,8 @@ class NetworkFragment : Fragment() {
 
     internal fun onCancel() {
         setLoadingLayout(false)
-        NetworkClient.getNetworkClient()?.run {
-            disconnect()
-        }
+        mNetworkViewModel.networkRepository.value?.run { this.disconnect() }
+        mNetworkViewModel.networkRepository.value = null
     }
 
     private fun setup() {
@@ -256,18 +254,31 @@ class NetworkFragment : Fragment() {
         } else callback(userData)
     }
 
-    internal fun startGame(
-        userData: PlayerData,
-        state: NetworkClient.PlayState,
-        friendsInfo: FriendsInfo?
-    ) {
+    private fun startGame(userData: PlayerData, friendsInfo: FriendsInfo?) {
         setLoadingLayout(true)
-        val networkClient = NetworkClient.createNetworkClient(UiErrorListener(this) {
-            onCancel()
-        })
+
         checkForWaiting {
-            networkClient.connect(mLoginListener, userData, state, friendsInfo?.userId)
+            mNetworkViewModel.networkRepository.value?.run {
+                this.login(userData)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSuccess {
+                        it.authData.saveToPreferences(mGamePreferences)
+                        if (it.newerBuild > userData.clientBuild)
+                            notifyAboutUpdates()
+                    }
+                    .observeOn(Schedulers.io())
+                    .flatMap { play(friendsInfo != null, friendsInfo?.userId) }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({}, {
+                        onCancel()
+                        NetworkUtils.handleError(it, this@NetworkFragment)
+                    })
+            }
         }
+    }
+
+    private fun notifyAboutUpdates() {
+        Snackbar.make(requireView(), R.string.new_version_available, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun checkForWaiting(task: () -> Unit) {

@@ -190,9 +190,7 @@
     <string name="no_friends">Список друзей пуст.\nЧтобы добавить игрока в
         друзья нажмите на его аватарку и выберите пункт Добавить в друзья
     </string>
-    <string name="service_upd_err">Не удалось подключиться с серверу для получения данных</string>
-    <string name="err_msg_on_exception">Кажется произошла какая-то ошибка&#8230; Попробуйте зайти позже</string>
-    <string name="err_msg_on_invalid">Ужас! В игре что-то пошло не так!</string>
+    <string name="err_msg_on_exception">Произошла какая-то ошибка&#8230; Попробуйте зайти снова</string>
     <string name="invite_friend">Отправить приглашение игроку \"%1$s\"?\n Игрок получит приглашение если у него есть активное подключение и интернету</string>
     <string name="remove_from_friends">Вы действительно хотите удалить \"%1$s\" из списка друзей?</string>
     <string name="request"> [Заявка]</string>
@@ -211,4 +209,14 @@
     <!-- GameFragment -->
     <string name="already_used">Город "%1$s" уже был загадан</string>
     <string name="city_not_found">Очень жаль, но нам неизвестен город "%1$s".\nПроверьте правильность написания</string>
+
+    <!--ExclusionList-->
+    <string name="this_is_a_country">%s это страна</string>
+    <string name="this_is_a_state">%s это название штата</string>
+    <string name="this_is_not_a_city">%s не является городом</string>
+    <string name="renamed_city">Город %s ранее был переименован в %s.</string>
+    <string name="uncompleted_city">Возможно вы имели в виду город %s ?</string>
+    <string name="not_city">%s не является городом. Это %s</string>
+    <string name="player">Игрок</string>
+    <string name="android">Андроид</string>
 </resources>

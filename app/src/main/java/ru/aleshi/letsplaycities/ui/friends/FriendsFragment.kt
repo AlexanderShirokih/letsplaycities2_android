@@ -10,28 +10,23 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.network.HeadlessLoginListener
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient2
+import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.network.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.ILogInListener
-import ru.aleshi.letsplaycities.network.lpsv3.IServiceListener
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient.PlayState
-import ru.aleshi.letsplaycities.social.AuthData
-import ru.aleshi.letsplaycities.ui.UiErrorListener
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
+import ru.aleshi.letsplaycities.base.AuthData
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 
-class FriendsFragment : Fragment(), IServiceListener, FriendsItemListener {
+class FriendsFragment : Fragment(), FriendsItemListener {
     companion object {
         private const val REQUEST_CODE_SELECT_ITEM = 1
         private const val REQUEST_CODE_REMOVE_ITEM = 2
@@ -39,9 +34,9 @@ class FriendsFragment : Fragment(), IServiceListener, FriendsItemListener {
 
     private lateinit var mApplication: LPSApplication
     private lateinit var mAdapter: FriendsListAdapter
-    private lateinit var mNetworkClient: NetworkClient
+    private lateinit var mNetworkRepository: NetworkRepository
     private lateinit var mSelectedFriendsInfo: FriendsInfo
-    private var mInitialized = false
+    private val mDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,9 +56,10 @@ class FriendsFragment : Fragment(), IServiceListener, FriendsItemListener {
 
                         }
                         REQUEST_CODE_REMOVE_ITEM -> {
-                            if (mInitialized)
-                                mNetworkClient.sendFriendDeletion(mSelectedFriendsInfo.userId)
-                            mAdapter.removeItem(mSelectedFriendsInfo)
+                            if (::mNetworkRepository.isInitialized)
+                                mNetworkRepository.deleteFriend(mSelectedFriendsInfo.userId)
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe { mAdapter.removeItem(mSelectedFriendsInfo) }
                         }
                     }
                 }
@@ -111,50 +107,45 @@ class FriendsFragment : Fragment(), IServiceListener, FriendsItemListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        logIn(object : HeadlessLoginListener() {
-            override fun onSuccess(ad: AuthData) {
-                requestFriendsList()
-                mInitialized = true
-            }
-
-            override fun onError(msg: String) {
-                CoroutineScope(Dispatchers.Main)
-                    .launch {
-                        Snackbar.make(requireView(), R.string.service_upd_err, Snackbar.LENGTH_LONG).show()
-                    }
-            }
-        })
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mNetworkClient.disconnect()
-    }
-
-    private fun logIn(loginListener: ILogInListener) {
         val userData = PlayerData()
         userData.authData = AuthData.loadFromPreferences(mApplication.gamePreferences)
         userData.userName = "#" + userData.authData!!.userID
 
-        mNetworkClient = NetworkClient.createNetworkClient(UiErrorListener(this))
-        mNetworkClient.serviceListener = this
-        mNetworkClient.connect(loginListener, userData, PlayState.SERVICE, 0)
+        mNetworkRepository = NetworkRepository(NetworkClient2())
+        mDisposable.add(
+            mNetworkRepository.login(userData)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ requestFriendsList() }, ::handleError)
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mDisposable.dispose()
+        mNetworkRepository.disconnect()
     }
 
     private fun requestFriendsList() {
-        mNetworkClient.sendGetFriendsMsg()
+        mDisposable.add(
+            mNetworkRepository.getFriendsList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(::populateList, ::handleError)
+        )
     }
 
-    override fun onFriendsList(list: ArrayList<FriendsInfo>) {
-        requireActivity().runOnUiThread {
-            mAdapter.updateItems(list)
-            if (list.isNotEmpty()) {
-                recyclerView.visibility = View.VISIBLE
-                placeholder.visibility = View.GONE
-            } else {
-                recyclerView.visibility = View.GONE
-                placeholder.visibility = View.VISIBLE
-            }
+    private fun populateList(list: ArrayList<FriendsInfo>) {
+        mAdapter.updateItems(list)
+        if (list.isNotEmpty()) {
+            recyclerView.visibility = View.VISIBLE
+            placeholder.visibility = View.GONE
+        } else {
+            recyclerView.visibility = View.GONE
+            placeholder.visibility = View.VISIBLE
         }
     }
+
+    private fun handleError(t: Throwable) {
+        NetworkUtils.handleError(t, this)
+    }
+
 }
