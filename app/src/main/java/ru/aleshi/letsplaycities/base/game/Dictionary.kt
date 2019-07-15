@@ -101,6 +101,13 @@ class Dictionary private constructor(
         }
     }
 
+    fun getCountryCode(city: String): Short {
+        mDictionary[city]?.run {
+            return countryCode
+        }
+        return 0
+    }
+
     fun getRandomWord(first: Char, help: Boolean): Maybe<String> {
         if (!mSubDictionary.containsKey(first)) {
             return Maybe.empty()

@@ -160,4 +160,10 @@ object Utils {
             context.resources.getDrawable(resId)
         }
     }
+
+    fun findLastSuitableChar(city: String): Char? {
+        return city.reversed().toCharArray()
+            .find { it != 'ь' && it != 'ъ' && it != 'ы' && it != 'ё' }
+    }
+
 }

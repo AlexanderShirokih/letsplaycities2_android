@@ -64,7 +64,7 @@ class Exclusions private constructor(
         return city to checkCity(city)
     }
 
-    //Usage: context.load().putWord(ex.thing)
+    //Usage: content.load().putWord(ex.thing)
     fun isAlternativeName(city: String): String? {
         val ex = exclusionsList[city] ?: return null
         return if (ex.type == 1) ex.thing else null

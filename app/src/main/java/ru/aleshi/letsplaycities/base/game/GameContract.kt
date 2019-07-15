@@ -13,7 +13,7 @@ interface GameContract {
         fun updateAvatar(image: Drawable, left: Boolean)
         fun context(): Context
         fun updateCity(city: String, hasErrors: Boolean)
-        fun putCity(city: String, left: Boolean)
+        fun putCity(city: String, countryCode: Short, left: Boolean)
     }
 
     interface Presenter {

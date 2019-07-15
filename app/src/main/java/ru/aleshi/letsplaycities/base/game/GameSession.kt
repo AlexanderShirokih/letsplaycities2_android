@@ -1,5 +1,7 @@
 package ru.aleshi.letsplaycities.base.game
 
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
@@ -59,10 +61,13 @@ class GameSession(private val players: Array<User>, private val server: BaseServ
 
     fun onCitySended(city: String, player: User) {
         if (player == currentPlayer) {
-            view.putCity(Utils.firstToUpper(city), isLeft(player))
+            Completable.fromAction { view.putCity(city, dictionary.getCountryCode(city), isLeft(player)) }
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+
             disposable.add(
                 server.broadcastResult(city)
-                    .subscribe({ handleWordResult(it, Utils.firstToUpper(city)) }, { view::showError })
+                    .subscribe({ handleWordResult(it, city) }, { view::showError })
             )
         }
     }
@@ -72,20 +77,21 @@ class GameSession(private val players: Array<User>, private val server: BaseServ
     private fun handleWordResult(result: WordResult, city: String) {
         when (result) {
             WordResult.ACCEPTED, WordResult.RECEIVED -> {
-                view.updateCity(city, false)
-                mFirstChar = findLastChar(city)
+                Completable.fromAction { view.updateCity(city, false) }
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe()
+
+                mFirstChar = Utils.findLastSuitableChar(city)
                 runNextPlayer()
             }
             else -> {
-                view.updateCity(city, true)
+                Completable.fromAction { view.updateCity(city, true) }
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe()
             }
         }
     }
 
-    private fun findLastChar(city: String): Char? {
-        return city.reversed().toCharArray()
-            .find { it != 'ь' && it != 'ъ' && it != 'ы' && it != 'ё' }
-    }
 
     private fun runNextPlayer() {
         nextPlayer.onBeginMove(mFirstChar)

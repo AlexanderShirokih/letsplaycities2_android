@@ -3,18 +3,20 @@ package ru.aleshi.letsplaycities.ui.game
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
 import android.widget.TextView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameContract
@@ -23,12 +25,14 @@ import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.MainActivity
 
+
 class GameFragment : Fragment(), GameContract.View {
 
     private lateinit var mBinding: FragmentGameBinding
     private lateinit var mGameViewModel: GameViewModel
     private lateinit var mGameSessionViewModel: GameSessionViewModel
     private lateinit var mGameSession: GameSession
+    private lateinit var mAdapter: GameAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +64,21 @@ class GameFragment : Fragment(), GameContract.View {
                 return true
             }
         })
+
+        mAdapter = GameAdapter(activity)
+        recyclerView.apply {
+            adapter = mAdapter
+            layoutManager = LinearLayoutManager(activity).apply { stackFromEnd = true }
+            addOnLayoutChangeListener { v, _, _,
+                                        _, bottom, _, _, _, oldBottom ->
+                if (bottom < oldBottom) {
+                    this.postDelayed({
+                        scrollRecyclerView()
+                    }, 100)
+                }
+
+            }
+        }
     }
 
     private fun submit() {
@@ -67,6 +86,20 @@ class GameFragment : Fragment(), GameContract.View {
             cityInput.text = null
         }
     }
+
+    private fun scrollRecyclerView() {
+        recyclerView.scrollToPosition(mAdapter.itemCount - 1)
+    }
+
+    private fun hideKeyboard() {
+        val activity = requireActivity()
+        val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        activity.currentFocus?.run {
+            inputManager.hideSoftInputFromWindow(windowToken, HIDE_NOT_ALWAYS)
+        }
+
+    }
+
 
     override fun onStop() {
         super.onStop()
@@ -100,16 +133,18 @@ class GameFragment : Fragment(), GameContract.View {
         field.set(image)
     }
 
-    override fun putCity(city: String, left: Boolean) {
+    override fun putCity(city: String, countryCode: Short, left: Boolean) {
+        //if (clickPlayer != null)
+        //            clickPlayer.start();
         //TODO:
-        Log.d("TAG", "Add city: $city")
+        mAdapter.addCity(city, countryCode, left)
+        hideKeyboard()
+        scrollRecyclerView()
     }
 
     override fun updateCity(city: String, hasErrors: Boolean) {
-        //TODO:
-        Log.d("TAG", "Put city: $city")
+        mAdapter.updateCity(city, hasErrors)
     }
-
 
     override fun context(): Context = requireContext()
 }
