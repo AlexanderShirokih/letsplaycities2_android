@@ -1,6 +1,6 @@
 package ru.aleshi.letsplaycities.social
 
-import ru.aleshi.letsplaycities.base.AuthData
+import ru.aleshi.letsplaycities.base.player.AuthData
 
 interface SocialNetworkLoginListener {
 

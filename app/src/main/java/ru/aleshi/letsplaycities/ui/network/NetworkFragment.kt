@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.fragment_network.*
 import org.json.JSONObject
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.AuthData
+import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient2
 import ru.aleshi.letsplaycities.network.NetworkUtils

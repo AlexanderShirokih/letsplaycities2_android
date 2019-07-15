@@ -6,8 +6,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.AuthData
-import ru.aleshi.letsplaycities.base.Dictionary
+import ru.aleshi.letsplaycities.base.game.Dictionary
 import ru.aleshi.letsplaycities.utils.Utils
 
 class Player(authData: AuthData) : User(authData) {
@@ -15,23 +14,24 @@ class Player(authData: AuthData) : User(authData) {
     constructor(name: String) : this(AuthData.create(name))
 
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
-    private var mPreviousFirstChar: Char? = null
+    private var mFirstChar: Char? = null
 
     override fun onBeginMove(firstChar: Char?) {
-        mPreviousFirstChar = firstChar
+        mFirstChar = firstChar
     }
 
     fun submit(userInput: String, onSuccess: () -> Unit) {
         mCompositeDisposable.add(Maybe.just(userInput)
-            .map { it.trim().toLowerCase() }
-            .filter { it.isEmpty() }
-            .filter { mPreviousFirstChar == null || it.last() == mPreviousFirstChar }
+            .map { Utils.formatCity(it) }
+            .filter { it.isNotEmpty() }
+            .filter { mFirstChar == null || it[0] == mFirstChar }
             .map { gameSession.mExclusions.check(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { it.second?.run { gameSession.notify(this) } }
+            .filter { it.second == null }
             .map { it.first }
             .observeOn(Schedulers.computation())
-            .map { gameSession.mDictionary.applyCity(userInput) }
+            .map { gameSession.dictionary.applyCity(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ processCityResult(it, onSuccess) }, ::error)
         )
@@ -42,9 +42,9 @@ class Player(authData: AuthData) : User(authData) {
         onSuccess: () -> Unit
     ) {
         when (data.second) {
-            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(gameSession.context.getString(R.string.already_used))
+            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(gameSession.view.context().getString(R.string.already_used))
             Dictionary.CityResult.CITY_NOT_FOUND -> gameSession.notify(
-                gameSession.context.getString(
+                gameSession.view.context().getString(
                     R.string.city_not_found,
                     data.first
                 )
@@ -57,6 +57,6 @@ class Player(authData: AuthData) : User(authData) {
     }
 
     override fun getAvatar(): Maybe<Drawable> {
-        return Maybe.fromCallable { Utils.loadDrawable(gameSession.context, R.drawable.ic_player_big) }
+        return Maybe.fromCallable { Utils.loadDrawable(gameSession.view.context(), R.drawable.ic_player_big) }
     }
 }

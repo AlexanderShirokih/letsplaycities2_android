@@ -2,8 +2,7 @@ package ru.aleshi.letsplaycities.base.player
 
 import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
-import ru.aleshi.letsplaycities.base.AuthData
-import ru.aleshi.letsplaycities.base.GameSession
+import ru.aleshi.letsplaycities.base.game.GameSession
 
 abstract class User(private val authData: AuthData) {
 

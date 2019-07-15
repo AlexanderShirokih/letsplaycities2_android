@@ -14,9 +14,12 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.fragment_main_menu.*
 import ru.aleshi.letsplaycities.BadTokenException
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.GameMode
+import ru.aleshi.letsplaycities.base.game.GameMode
+import ru.aleshi.letsplaycities.base.game.GameSession
+import ru.aleshi.letsplaycities.base.game.LocalServer
 import ru.aleshi.letsplaycities.base.player.Android
 import ru.aleshi.letsplaycities.base.player.Player
+import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.IntegrityChecker
 import ru.aleshi.letsplaycities.utils.Utils
@@ -74,17 +77,18 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun startGame(navController: NavController, hasLocalOpponents: Boolean) {
-        val players = ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].players
-        if (hasLocalOpponents)
-            players.value = arrayOf(
+        val players: Array<User> = if (hasLocalOpponents)
+            arrayOf(
                 Player("${getString(R.string.player)} 1"),
                 Player("${getString(R.string.player)} 2")
             )
         else
-            players.value = arrayOf(
+            arrayOf(
                 Player(getString(R.string.player)),
                 Android(getString(R.string.android))
             )
+        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession.value =
+            GameSession(players, LocalServer())
         navController.navigate(MainMenuFragmentDirections.startGameFragment(if (hasLocalOpponents) GameMode.MODE_PVP else GameMode.MODE_PVA))
     }
 

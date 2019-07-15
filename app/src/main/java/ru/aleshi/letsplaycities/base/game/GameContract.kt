@@ -1,0 +1,24 @@
+package ru.aleshi.letsplaycities.base.game
+
+import android.content.Context
+import android.graphics.drawable.Drawable
+
+interface GameContract {
+
+
+    interface View {
+        fun showToast(msg: String)
+        fun showError(err: Throwable)
+        fun updateLabel(info: String, left: Boolean)
+        fun updateAvatar(image: Drawable, left: Boolean)
+        fun context(): Context
+        fun updateCity(city: String, hasErrors: Boolean)
+        fun putCity(city: String, left: Boolean)
+    }
+
+    interface Presenter {
+        fun onAttachView(view: View)
+        fun submit(userInput: String, callback: () -> Unit): Boolean
+    }
+
+}

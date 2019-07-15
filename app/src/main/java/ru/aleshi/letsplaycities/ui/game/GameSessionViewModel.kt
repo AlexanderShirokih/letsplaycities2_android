@@ -2,10 +2,10 @@ package ru.aleshi.letsplaycities.ui.game
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.base.game.GameSession
 
 class GameSessionViewModel : ViewModel() {
 
-    val players : MutableLiveData<Array<User>> = MutableLiveData()
+    val gameSession : MutableLiveData<GameSession> = MutableLiveData()
 
 }

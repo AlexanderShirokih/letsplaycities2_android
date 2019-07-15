@@ -36,7 +36,7 @@
 
     <fragment android:id="@+id/gameFragment" android:name="ru.aleshi.letsplaycities.ui.game.GameFragment"
               android:label="GameFragment">
-        <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities.base.GameMode"/>
+        <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities.base.game.GameMode"/>
     </fragment>
     <fragment
             android:id="@+id/settingsFragment"

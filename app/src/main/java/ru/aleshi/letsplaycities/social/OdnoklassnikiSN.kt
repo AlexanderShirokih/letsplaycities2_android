@@ -6,7 +6,7 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.*
 import org.json.JSONException
 import org.json.JSONObject
-import ru.aleshi.letsplaycities.base.AuthData
+import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.ok.android.sdk.Odnoklassniki
 import ru.ok.android.sdk.OkRequestMode
 import ru.ok.android.sdk.util.OkAuthType

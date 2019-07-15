@@ -3,7 +3,7 @@ package ru.aleshi.letsplaycities.network.lpsv3
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.network.AuthType
 import ru.aleshi.letsplaycities.network.PlayerData
-import ru.aleshi.letsplaycities.base.AuthData
+import ru.aleshi.letsplaycities.base.player.AuthData
 import java.io.*
 import java.net.InetAddress
 import java.net.Socket

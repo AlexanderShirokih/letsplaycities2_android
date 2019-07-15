@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.base
+package ru.aleshi.letsplaycities.base.game
 
 import android.content.Context
 import io.reactivex.Single
@@ -22,7 +22,7 @@ class Exclusions private constructor(
         fun load(context: Context): Single<Exclusions> {
             return Single.just(context)
                 .subscribeOn(Schedulers.io())
-                .map(::loadBlocking)
+                .map(Factory::loadBlocking)
         }
 
         private fun loadBlocking(context: Context): Exclusions {
@@ -32,7 +32,9 @@ class Exclusions private constructor(
                 .lineSequence()
                 .filter { it.isNotEmpty() }
                 .map { it.split("|") }
-                .forEach { exclusionsList[it[0]] = Exclusion(it[1].toInt(), it[2]) }
+                .forEach { exclusionsList[it[0]] =
+                    Exclusion(it[1].toInt(), it[2])
+                }
 
             val countries = BufferedReader(InputStreamReader(context.assets.open("countries.txt")))
                 .readLines()
@@ -53,14 +55,13 @@ class Exclusions private constructor(
     }
 
     fun check(city: String): Pair<String, String?> {
-        val result = city.trim().toLowerCase()
-        if (countries.contains(result))
-            return city to String.format(errMsgs[0], Utils.firstToUpper(result))
+        if (countries.contains(city))
+            return city to String.format(errMsgs[0], Utils.firstToUpper(city))
 
-        if (states.contains(result))
-            return city to String.format(errMsgs[1], Utils.firstToUpper(result))
+        if (states.contains(city))
+            return city to String.format(errMsgs[1], Utils.firstToUpper(city))
 
-        return city to checkCity(result)
+        return city to checkCity(city)
     }
 
     //Usage: context.load().putWord(ex.thing)

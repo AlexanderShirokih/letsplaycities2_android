@@ -4,6 +4,7 @@ import android.content.Context
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.*
+import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.player.Android
 import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.User

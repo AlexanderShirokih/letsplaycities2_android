@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.base
+package ru.aleshi.letsplaycities.base.player
 
 import com.google.firebase.iid.FirebaseInstanceId
 

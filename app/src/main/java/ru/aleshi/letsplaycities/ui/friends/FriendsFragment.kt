@@ -21,7 +21,7 @@ import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.network.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
-import ru.aleshi.letsplaycities.base.AuthData
+import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication

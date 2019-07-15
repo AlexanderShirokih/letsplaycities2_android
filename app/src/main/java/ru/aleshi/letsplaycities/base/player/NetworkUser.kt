@@ -2,7 +2,6 @@ package ru.aleshi.letsplaycities.base.player
 
 import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
-import ru.aleshi.letsplaycities.base.AuthData
 
 class NetworkUser(authData: AuthData): User(authData) {
 

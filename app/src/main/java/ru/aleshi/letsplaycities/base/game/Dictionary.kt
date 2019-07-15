@@ -1,6 +1,7 @@
-package ru.aleshi.letsplaycities.base
+package ru.aleshi.letsplaycities.base.game
 
 import android.content.Context
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.BadTokenException
@@ -30,7 +31,11 @@ class Dictionary private constructor(
         }
 
         private fun parseDictionary(context: Context, exclusions: Exclusions): Dictionary {
-            val inputStream = DataInputStream(openInputStream(context))
+            val inputStream = DataInputStream(
+                openInputStream(
+                    context
+                )
+            )
             val count = inputStream.readInt()
             val version = inputStream.readInt()
             val countTest = inputStream.readInt()
@@ -96,9 +101,9 @@ class Dictionary private constructor(
         }
     }
 
-    fun getRandomWord(first: Char, help: Boolean): String? {
+    fun getRandomWord(first: Char, help: Boolean): Maybe<String> {
         if (!mSubDictionary.containsKey(first)) {
-            return null
+            return Maybe.empty()
         }
         val ready = ArrayList<String>()
         val list = mSubDictionary[first]!!
@@ -109,12 +114,12 @@ class Dictionary private constructor(
                 ready.add(s)
         }
         if (ready.isEmpty()) {
-            return null
+            return Maybe.empty()
         }
         val word = ready[(0 until ready.size).random()]
         mDictionary[word]!!.flipUsageFlag()
         ready.clear()
-        return word
+        return Maybe.just(word)
     }
 
     fun getCorrectionVariants(word: String): List<String> {
