@@ -1,7 +1,7 @@
 package ru.aleshi.letsplaycities.ui.game
 
 import android.content.Context
-import android.util.Log
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +10,6 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_city.view.*
 import ru.aleshi.letsplaycities.R
-import android.util.TypedValue
 
 class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameViewHolder>() {
 
@@ -18,17 +17,16 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
 
         fun bind(item: GameItem) {
             itemView.apply {
-                item_tv.text = item.getSpannableString(context)
-                Log.d("TAG", "Set for status ${item.status}")
+                itemCityName.text = item.getSpannableString(context)
                 when (item.status) {
                     CityStatus.OK ->
-                        FlagDrawablesManager.getDrawableFor(context, item.countryCode)?.run {
-                            item_tv.setCompoundDrawablesRelativeWithIntrinsicBounds(this, null, null, null)
+                        FlagDrawablesManager.getBitmapFor(context, item.countryCode)?.run {
+                            itemCountryImg.setImageBitmap(this)
                         }
                     CityStatus.WAITING ->
-                        item_tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_waiting, 0, 0, 0)
+                        itemCountryImg.setImageResource(R.drawable.ic_waiting)
                     CityStatus.ERROR ->
-                        item_tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_word_error, 0, 0, 0)
+                        itemCountryImg.setImageResource(R.drawable.ic_word_error)
                 }
 
                 (this as LinearLayout).gravity = if (item.isLeft) Gravity.END else Gravity.START
@@ -40,7 +38,7 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
 
                 val out = TypedValue()
                 context.theme.resolveAttribute(resID, out, true)
-                item_tv.setBackgroundResource(out.resourceId)
+                itemCityContainer.setBackgroundResource(out.resourceId)
             }
         }
     }

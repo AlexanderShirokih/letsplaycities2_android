@@ -3,11 +3,7 @@
 
     <dimen name="btn_pad">12dp</dimen>
 
-    <dimen name="seek_block">4dp</dimen>
-    <dimen name="seek_padd_btm">2dp</dimen>
     <dimen name="sb_text_size">14sp</dimen>
-    <dimen name="sb_margin_left">3dp</dimen>
-    <dimen name="sb_margin_right">7dp</dimen>
     <dimen name="btn_width">260dp</dimen>
     <dimen name="btn_height">40dp</dimen>
     <dimen name="btn_draw_pad">4dp</dimen>
@@ -15,24 +11,18 @@
 
     <dimen name="avatar_margin">16dp</dimen>
     <dimen name="avatar_margin_top">15dp</dimen>
-    <dimen name="menu_blk_margin">12dp</dimen>
-    <dimen name="menu_item_magrin">2dp</dimen>
-    <dimen name="info_blk_margin">3dp</dimen>
-    <dimen name="edit_text_height">50dp</dimen>
-    <dimen name="list_pad_lr">3dp</dimen>
-    <dimen name="list_pad_bt">2dp</dimen>
 
     <dimen name="lose_text_size">34sp</dimen>
     <dimen name="lose_btn_width">170dp</dimen>
     <dimen name="lose_btn_margin">5dp</dimen>
 
     <dimen name="item_text_size">22sp</dimen>
-    <dimen name="item_margin">2dp</dimen>
-
-    <dimen name="padding_edittext">30dp</dimen>
 
     <dimen name="chb_drawable_pad">4dp</dimen>
 
     <dimen name="previewImageWidth">400dp</dimen>
     <dimen name="previewImageHeight">355dp</dimen>
+
+    <dimen name="flagImgWidth">36dp</dimen>
+    <dimen name="flagImgHeight">24dp</dimen>
 </resources>
