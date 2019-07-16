@@ -12,10 +12,12 @@ import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
@@ -24,7 +26,7 @@ import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.MainActivity
-
+import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 
 class GameFragment : Fragment(), GameContract.View {
 
@@ -36,11 +38,22 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val activity = requireActivity() as MainActivity
+        ViewModelProviders.of(activity)[ConfirmViewModel::class.java].callback.observe(this, Observer {
+            if (it.checkResultCode(GO_TO_MENU) && it.result) {
+                findNavController().popBackStack(R.id.mainMenuFragment, false)
+            }
+        })
+
         mGameViewModel = ViewModelProviders.of(this)[GameViewModel::class.java]
-        mGameSessionViewModel = ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].apply {
+        mGameSessionViewModel = ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
             gameSession.observe(this@GameFragment, Observer {
                 mGameSession = it.apply { onAttachView(this@GameFragment) }
             })
+        }
+        mAdapter = GameAdapter(activity)
+        activity.onBackPressedDispatcher.addCallback(this) {
+            showGoToMenuDialog()
         }
     }
 
@@ -65,11 +78,14 @@ class GameFragment : Fragment(), GameContract.View {
             }
         })
 
-        mAdapter = GameAdapter(activity)
+        btnMenu.setOnClickListener {
+            showGoToMenuDialog()
+        }
+
         recyclerView.apply {
             adapter = mAdapter
             layoutManager = LinearLayoutManager(activity).apply { stackFromEnd = true }
-            addOnLayoutChangeListener { v, _, _,
+            addOnLayoutChangeListener { _, _, _,
                                         _, bottom, _, _, _, oldBottom ->
                 if (bottom < oldBottom) {
                     this.postDelayed({
@@ -78,6 +94,7 @@ class GameFragment : Fragment(), GameContract.View {
                 }
 
             }
+            setHasFixedSize(true)
         }
     }
 
@@ -97,9 +114,17 @@ class GameFragment : Fragment(), GameContract.View {
         activity.currentFocus?.run {
             inputManager.hideSoftInputFromWindow(windowToken, HIDE_NOT_ALWAYS)
         }
-
     }
 
+    private fun showGoToMenuDialog() {
+        findNavController().navigate(
+            GameFragmentDirections.showConfirmationDialog(
+                GO_TO_MENU,
+                getString(R.string.go_to_menu),
+                null
+            )
+        )
+    }
 
     override fun onStop() {
         super.onStop()
@@ -134,9 +159,7 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun putCity(city: String, countryCode: Short, left: Boolean) {
-        //if (clickPlayer != null)
-        //            clickPlayer.start();
-        //TODO:
+        //TODO: clickPlayer?.start();
         mAdapter.addCity(city, countryCode, left)
         hideKeyboard()
         scrollRecyclerView()
@@ -147,4 +170,8 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun context(): Context = requireContext()
+
+    companion object {
+        private const val GO_TO_MENU = 1
+    }
 }

@@ -219,4 +219,5 @@
     <string name="not_city">%s не является городом. Это %s</string>
     <string name="player">Игрок</string>
     <string name="android">Андроид</string>
+    <string name="go_to_menu">Выйти в меню?</string>
 </resources>
