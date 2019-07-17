@@ -39,7 +39,6 @@
             android:name="ru.aleshi.letsplaycities.ui.game.GameFragment"
             android:label="GameFragment"
             tools:layout="@layout/fragment_game">
-        <argument android:name="gameMode" app:argType="ru.aleshi.letsplaycities.base.game.GameMode"/>
         <action android:id="@+id/showConfirmationDialog" app:destination="@id/confirmationDialog"/>
     </fragment>
     <fragment

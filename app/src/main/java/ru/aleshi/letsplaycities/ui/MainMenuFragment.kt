@@ -14,7 +14,6 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.fragment_main_menu.*
 import ru.aleshi.letsplaycities.BadTokenException
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.game.LocalServer
 import ru.aleshi.letsplaycities.base.player.Android
@@ -89,7 +88,7 @@ class MainMenuFragment : Fragment() {
             )
         ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession.value =
             GameSession(players, LocalServer())
-        navController.navigate(MainMenuFragmentDirections.startGameFragment(if (hasLocalOpponents) GameMode.MODE_PVP else GameMode.MODE_PVA))
+        navController.navigate(R.id.start_game_fragment)
     }
 
     private fun makeInAnimation() {

@@ -209,6 +209,11 @@
     <!-- GameFragment -->
     <string name="already_used">Город "%1$s" уже был загадан</string>
     <string name="city_not_found">Очень жаль, но нам неизвестен город "%1$s".\nПроверьте правильность написания</string>
+    <string name="player">Игрок</string>
+    <string name="android">Андроид</string>
+    <string name="go_to_menu">Завершить игру и выйти в меню?</string>
+    <string name="surrender">Завершить игру?</string>
+    <string name="use_hint">Использовать подсказку?</string>
 
     <!--ExclusionList-->
     <string name="this_is_a_country">%s это страна</string>
@@ -217,7 +222,4 @@
     <string name="renamed_city">Город %s ранее был переименован в %s.</string>
     <string name="uncompleted_city">Возможно вы имели в виду город %s ?</string>
     <string name="not_city">%s не является городом. Это %s</string>
-    <string name="player">Игрок</string>
-    <string name="android">Андроид</string>
-    <string name="go_to_menu">Выйти в меню?</string>
 </resources>

@@ -27,7 +27,7 @@ import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_FRQ_CITIES
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_HISCORE
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_ONLINE
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_PARTS
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.V_EMTPY_S
+import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.V_EMPTY_S
 import ru.aleshi.letsplaycities.base.scoring.ScoringField
 import ru.aleshi.letsplaycities.base.scoring.ScoringSet
 import ru.aleshi.letsplaycities.utils.Utils
@@ -123,7 +123,7 @@ class ScoreFragment : Fragment() {
             setPadding(px2dp(25), 0, 0, 0)
         }
 
-        if (field.hasValue() && field.value() == V_EMTPY_S)
+        if (field.hasValue() && field.value() == V_EMPTY_S)
             return false
 
         val name = TextView(requireContext()).apply {

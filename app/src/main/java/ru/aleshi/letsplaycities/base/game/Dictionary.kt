@@ -109,24 +109,29 @@ class Dictionary private constructor(
     }
 
     fun getRandomWord(first: Char, help: Boolean): Maybe<String> {
-        if (!mSubDictionary.containsKey(first)) {
-            return Maybe.empty()
-        }
-        val ready = ArrayList<String>()
-        val list = mSubDictionary[first]!!
-        for (s in list) {
-            val cp = mDictionary[s]!!
-            val b = cp.diff
-            if (b > 0 && cp.countryCode != 0.toShort() && (help || b == difficulty) && mExclusions.hasNoExclusions(s))
-                ready.add(s)
-        }
-        if (ready.isEmpty()) {
-            return Maybe.empty()
-        }
-        val word = ready[(0 until ready.size).random()]
-        mDictionary[word]!!.flipUsageFlag()
-        ready.clear()
-        return Maybe.just(word)
+        return Maybe.just(first)
+            .subscribeOn(Schedulers.computation())
+            .filter { mSubDictionary.containsKey(it) }
+            .flatMap {
+                val ready = ArrayList<String>()
+                val list = mSubDictionary[it]!!
+                for (s in list) {
+                    val cp = mDictionary[s]!!
+                    val b = cp.diff
+                    if (b > 0 && cp.countryCode != 0.toShort() && (help || b == difficulty) && mExclusions.hasNoExclusions(
+                            s
+                        )
+                    )
+                        ready.add(s)
+                }
+                if (ready.isEmpty()) {
+                    Maybe.empty<String>()
+                }
+                val word = ready[(0 until ready.size).random()]
+                mDictionary[word]!!.flipUsageFlag()
+                ready.clear()
+                Maybe.just(word)
+            }
     }
 
     fun getCorrectionVariants(word: String): List<String> {

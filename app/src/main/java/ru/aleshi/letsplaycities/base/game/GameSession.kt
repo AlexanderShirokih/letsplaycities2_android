@@ -3,14 +3,15 @@ package ru.aleshi.letsplaycities.base.game
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.base.player.*
+import ru.aleshi.letsplaycities.base.scoring.ScoreManager
 import ru.aleshi.letsplaycities.utils.Utils
 
-class GameSession(private val players: Array<User>, private val server: BaseServer) : GameContract.Presenter {
+class GameSession(val players: Array<User>, private val server: BaseServer) : GameContract.Presenter {
 
-    private var mCurrentPlayerIndex: Int = 0
+    private var mCurrentPlayerIndex: Int = -1
     private var mFirstChar: Char? = null
+    private lateinit var mScoreManager: ScoreManager
 
     lateinit var mExclusions: Exclusions
 
@@ -18,13 +19,18 @@ class GameSession(private val players: Array<User>, private val server: BaseServ
     lateinit var view: GameContract.View
     val disposable = CompositeDisposable()
 
-    private val nextPlayer: User
+    private val switchToNext: User
         get() {
             mCurrentPlayerIndex = (++mCurrentPlayerIndex) % players.size
             return players[mCurrentPlayerIndex]
         }
-    private val currentPlayer: User
+
+    val currentPlayer: User
         get() = players[mCurrentPlayerIndex]
+
+
+    val nextPlayer: User
+        get() = players[(++mCurrentPlayerIndex) % players.size]
 
     override fun onAttachView(view: GameContract.View) {
         this.view = view
@@ -32,6 +38,7 @@ class GameSession(private val players: Array<User>, private val server: BaseServ
             user.gameSession = this
         }
         val context = view.context()
+        mScoreManager = ScoreManager(this, findGameMode(), context)
         disposable.add(
             Exclusions.load(context)
                 .doOnSuccess { mExclusions = it }
@@ -40,6 +47,16 @@ class GameSession(private val players: Array<User>, private val server: BaseServ
                 .subscribe())
 
         applyToFragment()
+        beginNextMove(null)
+    }
+
+    private fun findGameMode(): GameMode {
+        return when {
+            players.any { it is Android } -> GameMode.MODE_PVA
+            players.any { it is RemoteUser } -> GameMode.MODE_MUL
+            players.any { it is NetworkUser } -> GameMode.MODE_NET
+            else -> GameMode.MODE_PVP
+        }
     }
 
     private fun applyToFragment() {
@@ -81,8 +98,8 @@ class GameSession(private val players: Array<User>, private val server: BaseServ
                     .subscribeOn(AndroidSchedulers.mainThread())
                     .subscribe()
 
-                mFirstChar = Utils.findLastSuitableChar(city)
-                runNextPlayer()
+                endMove(city)
+                beginNextMove(city)
             }
             else -> {
                 Completable.fromAction { view.updateCity(city, true) }
@@ -90,11 +107,6 @@ class GameSession(private val players: Array<User>, private val server: BaseServ
                     .subscribe()
             }
         }
-    }
-
-
-    private fun runNextPlayer() {
-        nextPlayer.onBeginMove(mFirstChar)
     }
 
     override fun submit(userInput: String, callback: () -> Unit): Boolean {
@@ -105,17 +117,50 @@ class GameSession(private val players: Array<User>, private val server: BaseServ
         return false
     }
 
+    private fun beginNextMove(city: String?) {
+        city?.let { mFirstChar = Utils.findLastSuitableChar(it) }
+        switchToNext.onBeginMove(mFirstChar)
+        mScoreManager.moveStarted()
+    }
+
+    private fun endMove(city: String) {
+        mScoreManager.moveEnded(city)
+        updateLabel(currentPlayer, isLeft(currentPlayer))
+    }
+
     fun onLose(player: User) {
         TODO()
     }
 
     fun notify(msg: String) {
-        view.showToast(msg)
+        view.showInfo(msg)
     }
 
-    fun dispose() {
+    override fun onDetachView() {
+        mScoreManager.updateScore()
         disposable.dispose()
         mExclusions.dispose()
         dictionary.dispose()
+    }
+
+    override fun useHint() {
+        getPlayer()?.let {
+            disposable.add(dictionary.getRandomWord(mFirstChar ?: "абвгдеклмн".random(), true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    getPlayer()?.run { submit(it) {} }
+                })
+        }
+    }
+
+    override fun onSurrender() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+
+    private fun getPlayer(): Player? {
+        return if (currentPlayer is Player)
+            currentPlayer as Player
+        else null
     }
 }

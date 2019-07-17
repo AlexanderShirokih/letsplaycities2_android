@@ -12,7 +12,7 @@ class ScoringField(val name: String, var value: Any? = null) {
 
     fun max(m: Int) {
         if (value is Int)
-            value = Math.max(value as Int, m)
+            value = kotlin.math.max(value as Int, m)
     }
 
     fun add(a: Int) {

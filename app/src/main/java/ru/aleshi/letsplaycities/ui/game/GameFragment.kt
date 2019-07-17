@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameContract
-import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.MainActivity
@@ -33,15 +32,20 @@ class GameFragment : Fragment(), GameContract.View {
     private lateinit var mBinding: FragmentGameBinding
     private lateinit var mGameViewModel: GameViewModel
     private lateinit var mGameSessionViewModel: GameSessionViewModel
-    private lateinit var mGameSession: GameSession
+    private lateinit var mGameSession: GameContract.Presenter
     private lateinit var mAdapter: GameAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val activity = requireActivity() as MainActivity
         ViewModelProviders.of(activity)[ConfirmViewModel::class.java].callback.observe(this, Observer {
-            if (it.checkResultCode(GO_TO_MENU) && it.result) {
-                findNavController().popBackStack(R.id.mainMenuFragment, false)
+            when {
+                it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(R.id.mainMenuFragment, false)
+                it.checkWithResultCode(SURRENDER) -> mGameSession.onSurrender()
+                it.checkWithResultCode(USE_HINT) -> {
+                    //TODO: show ads
+                    mGameSession.useHint()
+                }
             }
         })
 
@@ -78,9 +82,9 @@ class GameFragment : Fragment(), GameContract.View {
             }
         })
 
-        btnMenu.setOnClickListener {
-            showGoToMenuDialog()
-        }
+        btnMenu.setOnClickListener { showGoToMenuDialog() }
+        btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
+        btnHelp.setOnClickListener { showConfirmationDialog(USE_HINT, R.string.use_hint) }
 
         recyclerView.apply {
             adapter = mAdapter
@@ -117,10 +121,14 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     private fun showGoToMenuDialog() {
+        showConfirmationDialog(GO_TO_MENU, R.string.go_to_menu)
+    }
+
+    private fun showConfirmationDialog(code: Int, msg: Int) {
         findNavController().navigate(
             GameFragmentDirections.showConfirmationDialog(
-                GO_TO_MENU,
-                getString(R.string.go_to_menu),
+                code,
+                getString(msg),
                 null
             )
         )
@@ -128,11 +136,10 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun onStop() {
         super.onStop()
-        mGameSession.dispose()
+        mGameSession.onDetachView()
     }
 
-
-    override fun showToast(msg: String) {
+    override fun showInfo(msg: String) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
@@ -172,6 +179,8 @@ class GameFragment : Fragment(), GameContract.View {
     override fun context(): Context = requireContext()
 
     companion object {
-        private const val GO_TO_MENU = 1
+        private const val GO_TO_MENU = 21
+        private const val SURRENDER = 22
+        private const val USE_HINT = 23
     }
 }

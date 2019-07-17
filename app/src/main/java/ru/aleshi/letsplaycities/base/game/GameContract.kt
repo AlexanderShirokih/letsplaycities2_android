@@ -7,18 +7,21 @@ interface GameContract {
 
 
     interface View {
-        fun showToast(msg: String)
+        fun showInfo(msg: String)
         fun showError(err: Throwable)
         fun updateLabel(info: String, left: Boolean)
         fun updateAvatar(image: Drawable, left: Boolean)
         fun context(): Context
-        fun updateCity(city: String, hasErrors: Boolean)
         fun putCity(city: String, countryCode: Short, left: Boolean)
+        fun updateCity(city: String, hasErrors: Boolean)
     }
 
     interface Presenter {
         fun onAttachView(view: View)
+        fun onDetachView()
         fun submit(userInput: String, callback: () -> Unit): Boolean
+        fun useHint()
+        fun onSurrender()
     }
 
 }

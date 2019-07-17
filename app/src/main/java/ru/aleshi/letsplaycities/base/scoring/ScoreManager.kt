@@ -3,17 +3,17 @@ package ru.aleshi.letsplaycities.base.scoring
 import android.content.Context
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.*
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameMode
+import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.Android
-import ru.aleshi.letsplaycities.base.player.NetworkUser
+import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
-import ru.aleshi.letsplaycities.base.player.RemoteUser
 import ru.aleshi.letsplaycities.utils.Utils
 import kotlin.math.roundToInt
 
 
-class ScoreManager(private val scoringType: ScoringType, private val mode: GameMode, val context: Context) {
+class ScoreManager(private val gameSession: GameSession, private val mode: GameMode, val context: Context) {
     companion object {
         const val G_PARTS = "tt_n_pts"
         const val G_ONLINE = "tt_onl"
@@ -30,7 +30,7 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
         const val F_LOSE = "los"
         const val F_P = "pval"
 
-        const val V_EMTPY_S = "--"
+        const val V_EMPTY_S = "--"
     }
 
     enum class ScoringType {
@@ -54,11 +54,8 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
     private val cityStatDatabaseHelper: CityStatDatabaseHelper =
         CityStatDatabaseHelper(context)
     private val prefs: GamePreferences = (context.applicationContext as LPSApplication).gamePreferences
-
+    private val scoringType: ScoringType = ScoringType.values()[prefs.getCurrentScoringType()]
     private var lastTime: Long = 0
-    private lateinit var playerA: User
-    private lateinit var playerB: User
-    private lateinit var currentPlayer: User
 
     init {
         //Load or build stats
@@ -159,7 +156,7 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
             Array(10) { i ->
                 ScoringField(
                     F_P + i,
-                    V_EMTPY_S
+                    V_EMPTY_S
                 )
             }
         )
@@ -170,7 +167,7 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
             Array(10) { i ->
                 ScoringField(
                     F_P + i,
-                    V_EMTPY_S
+                    V_EMPTY_S
                 )
             }
         )
@@ -181,16 +178,9 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
         prefs.putScoring(allGroups.storeStatsGroups())
     }
 
-
-    fun reset(first: User, second: User) {
-        playerA = first
-        playerB = second
-    }
-
-    fun moveStarted(current: User) {
+    fun moveStarted() {
         //for by_time, save time
         lastTime = System.currentTimeMillis()
-        this.currentPlayer = current
     }
 
     fun moveEnded(word: String) {
@@ -202,32 +192,29 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
 
         lastTime += deltaTime
 
-        var points = 0
-
-        when (scoringType) {
-            ScoringType.BY_SCORE -> points = word.length
+        var points = when (scoringType) {
+            ScoringType.BY_SCORE -> word.length
             ScoringType.BY_TIME -> {
                 val dt = ((40000 - deltaTime.toInt()) / 2000)
-                points = 2 + if (dt > 0) dt else 0
+                2 + if (dt > 0) dt else 0
             }
-            ScoringType.LAST_MOVE -> {
-            }
+            ScoringType.LAST_MOVE -> 0
         }
 
-        if (currentPlayer is Android) {
+        if (gameSession.currentPlayer is Android) {
             points = (points * 0.9f).roundToInt()
         }
-        currentPlayer.score += points
+        gameSession.currentPlayer.score += points
     }
 
     private fun mostChecker(word: String) {
-        if (currentPlayer !== getPlayer())
+        if (gameSession.currentPlayer != getPlayer())
             return
         //Most biggest cities
         val wlen = word.length
         for (i in 0 until groupMostBigCities.child.size) {
             val f = groupMostBigCities.child[i]
-            if (f.hasValue() && f.value() != V_EMTPY_S) {
+            if (f.hasValue() && f.value() != V_EMPTY_S) {
                 if (wlen > f.value().length) {
                     //Shift
                     for (j in groupMostBigCities.child.size - 1 downTo i + 1)
@@ -265,31 +252,32 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
         saveStats()
 
         if (timeIsUp) {
-            val opp = getOpp(currentPlayer)
+            val next = gameSession.nextPlayer
             if (mode == GameMode.MODE_NET) {
-                updWinsForNetMode(opp)
-                return context.getString(R.string.timeup, opp.name, currentPlayer.name)
+                updWinsForNetMode(next)
+                return context.getString(R.string.timeup, next.name, gameSession.currentPlayer.name)
             }
-            return context.getString(R.string.timeup, opp.name, Utils.formatName(currentPlayer.name))
+            return context.getString(R.string.timeup, next.name, Utils.formatName(gameSession.currentPlayer.name))
         }
 
-        if (scoringType === ScoringType.LAST_MOVE) {
+        if (scoringType == ScoringType.LAST_MOVE) {
             if (remote) {
                 updWinsForNetMode(getPlayer())
                 return context.getString(R.string.win_by_remote)
             }
 
             //Всегда побеждает тот, кто ожидает ответа
-            val opp = getOpp(currentPlayer)
-            updWinsForNetMode(opp)
-            return context.getString(R.string.win, opp.name)
+            val next = gameSession.nextPlayer
+            updWinsForNetMode(next)
+            return context.getString(R.string.win, next.name)
         } else {
 
-            if (playerA.score == playerB.score) {
+            if (gameSession.players.all { it.score == gameSession.players.first().score }) {
                 return context.getString(R.string.draw)
             }
 
-            val winner = if (playerA.score > playerB.score) playerA else playerB
+
+            val winner = gameSession.players.maxBy { it.score }!!
             updWinsForNetMode(winner)
 
             return context.getString(R.string.win, winner.name)
@@ -298,7 +286,7 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
 
     private fun updWinsForNetMode(winner: User) {
         if (mode == GameMode.MODE_NET) {
-            if (getPlayer() === winner)
+            if (getPlayer() == winner)
                 groupOnline.findField(F_WINS).increase()
             else
                 groupOnline.findField(F_LOSE).increase()
@@ -307,15 +295,6 @@ class ScoreManager(private val scoringType: ScoringType, private val mode: GameM
     }
 
     private fun getPlayer(): User {
-        return when (mode) {
-            GameMode.MODE_PVA -> if (playerA is Android) playerB else playerA
-            GameMode.MODE_PVP -> if (playerA.score > playerB.score) playerA else playerB
-            GameMode.MODE_MUL -> if (playerA is RemoteUser) playerB else playerA
-            GameMode.MODE_NET -> if (playerA is NetworkUser) playerB else playerA
-        }
-    }
-
-    private fun getOpp(p: User): User {
-        return if (p === playerA) playerB else playerA
+        return gameSession.players.first { it is Player }
     }
 }
