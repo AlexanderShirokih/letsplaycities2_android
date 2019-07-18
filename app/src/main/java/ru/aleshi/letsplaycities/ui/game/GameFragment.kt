@@ -19,6 +19,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import io.reactivex.Completable
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameContract
@@ -26,6 +28,7 @@ import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
+import java.util.concurrent.TimeUnit
 
 class GameFragment : Fragment(), GameContract.View {
 
@@ -34,6 +37,8 @@ class GameFragment : Fragment(), GameContract.View {
     private lateinit var mGameSessionViewModel: GameSessionViewModel
     private lateinit var mGameSession: GameContract.Presenter
     private lateinit var mAdapter: GameAdapter
+
+    private val disposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +50,15 @@ class GameFragment : Fragment(), GameContract.View {
                 it.checkWithResultCode(USE_HINT) -> {
                     //TODO: show ads
                     mGameSession.useHint()
+                }
+            }
+        })
+        ViewModelProviders.of(activity)[GameResultViewModel::class.java].result.observe(this, Observer {
+            it.result()?.run {
+                when(this) {
+                    GameResultViewModel.SelectedItem.MENU -> findNavController().popBackStack(R.id.mainMenuFragment, false)
+                    GameResultViewModel.SelectedItem.SHARE -> TODO()
+                    GameResultViewModel.SelectedItem.REPLAY -> TODO()
                 }
             }
         })
@@ -126,7 +140,7 @@ class GameFragment : Fragment(), GameContract.View {
 
     private fun showConfirmationDialog(code: Int, msg: Int) {
         findNavController().navigate(
-            GameFragmentDirections.showConfirmationDialog(
+            GameFragmentDirections.showConfimationDialog(
                 code,
                 getString(msg),
                 null
@@ -134,8 +148,16 @@ class GameFragment : Fragment(), GameContract.View {
         )
     }
 
+    override fun showGameResults(result: String) {
+        val nav = findNavController()
+        disposable.add(Completable.timer(100, TimeUnit.MILLISECONDS)
+            .repeatUntil { nav.currentDestination!!.id == R.id.gameFragment }
+            .subscribe { nav.navigate(GameFragmentDirections.showGameResultDialog(result)) })
+    }
+
     override fun onStop() {
         super.onStop()
+        disposable.dispose()
         mGameSession.onDetachView()
     }
 

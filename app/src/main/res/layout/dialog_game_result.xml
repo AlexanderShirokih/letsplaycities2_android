@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <import type="ru.aleshi.letsplaycities.ui.game.GameResultViewModel.SelectedItem"/>
+        <variable name="result" type="String"/>
+        <variable name="fragment" type="ru.aleshi.letsplaycities.ui.game.GameResultDialog"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp">
+
+        <TextView
+                tools:text="Ничья"
+                android:text="@{result}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/title"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnShare"
+                app:icon="@drawable/ic_share"
+                android:text="@string/share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:padding="12dp"
+                android:onClick="@{()-> fragment.onClick(SelectedItem.SHARE)}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReplay"
+                app:icon="@drawable/ic_replay"
+                android:text="@string/again"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:padding="12dp"
+                android:onClick="@{()-> fragment.onClick(SelectedItem.REPLAY)}"
+                app:layout_constraintStart_toStartOf="@id/btnShare"
+                app:layout_constraintEnd_toEndOf="@id/btnShare"
+                app:layout_constraintTop_toBottomOf="@id/btnShare"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMenu"
+                app:icon="@drawable/ic_menu"
+                android:text="@string/menu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:padding="12dp"
+                android:onClick="@{()-> fragment.onClick(SelectedItem.MENU)}"
+                app:layout_constraintStart_toStartOf="@id/btnShare"
+                app:layout_constraintEnd_toEndOf="@id/btnShare"
+                app:layout_constraintTop_toBottomOf="@id/btnReplay"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

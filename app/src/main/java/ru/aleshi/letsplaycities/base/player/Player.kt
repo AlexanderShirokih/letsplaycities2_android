@@ -42,11 +42,11 @@ class Player(authData: AuthData) : User(authData) {
         onSuccess: () -> Unit
     ) {
         when (data.second) {
-            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(gameSession.view.context().getString(R.string.already_used, data.first))
+            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(gameSession.view.context().getString(R.string.already_used, Utils.firstToUpper(data.first)))
             Dictionary.CityResult.CITY_NOT_FOUND -> gameSession.notify(
                 gameSession.view.context().getString(
                     R.string.city_not_found,
-                    data.first
+                    Utils.firstToUpper(data.first)
                 )
             )
             Dictionary.CityResult.OK -> {

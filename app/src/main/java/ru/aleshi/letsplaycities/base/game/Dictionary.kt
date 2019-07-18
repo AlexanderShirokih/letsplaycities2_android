@@ -128,7 +128,8 @@ class Dictionary private constructor(
                     Maybe.empty<String>()
                 }
                 val word = ready[(0 until ready.size).random()]
-                mDictionary[word]!!.flipUsageFlag()
+                if (!help)// will be flipped later, in Player.submit()
+                    mDictionary[word]!!.flipUsageFlag()
                 ready.clear()
                 Maybe.just(word)
             }

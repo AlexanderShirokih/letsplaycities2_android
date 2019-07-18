@@ -39,7 +39,8 @@
             android:name="ru.aleshi.letsplaycities.ui.game.GameFragment"
             android:label="GameFragment"
             tools:layout="@layout/fragment_game">
-        <action android:id="@+id/showConfirmationDialog" app:destination="@id/confirmationDialog"/>
+        <action android:id="@+id/showGameResultDialog" app:destination="@+id/gameResultDialog"/>
+        <action android:id="@+id/showConfimationDialog" app:destination="@id/confirmationDialog"/>
     </fragment>
     <fragment
             android:id="@+id/settingsFragment"
@@ -128,5 +129,13 @@
         <action android:id="@+id/showConfimationDialog"
                 app:destination="@id/confirmationDialog"/>
     </fragment>
+
+    <dialog
+            android:id="@+id/gameResultDialog"
+            android:name="ru.aleshi.letsplaycities.ui.game.GameResultDialog"
+            android:label="GameResultDialog"
+            tools:layout="@layout/dialog_game_result">
+        <argument android:name="result" app:argType="string"/>
+    </dialog>
 
 </navigation>

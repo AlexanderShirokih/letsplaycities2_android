@@ -154,7 +154,8 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     }
 
     override fun onSurrender() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val res = mScoreManager.getWinner(timeIsUp = false, remote = false)
+        view.showGameResults(res)
     }
 
 
