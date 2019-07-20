@@ -55,8 +55,11 @@ class GameFragment : Fragment(), GameContract.View {
         })
         ViewModelProviders.of(activity)[GameResultViewModel::class.java].result.observe(this, Observer {
             it.result()?.run {
-                when(this) {
-                    GameResultViewModel.SelectedItem.MENU -> findNavController().popBackStack(R.id.mainMenuFragment, false)
+                when (this) {
+                    GameResultViewModel.SelectedItem.MENU -> findNavController().popBackStack(
+                        R.id.mainMenuFragment,
+                        false
+                    )
                     GameResultViewModel.SelectedItem.SHARE -> TODO()
                     GameResultViewModel.SelectedItem.REPLAY -> TODO()
                 }
@@ -67,6 +70,13 @@ class GameFragment : Fragment(), GameContract.View {
         mGameSessionViewModel = ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
             gameSession.observe(this@GameFragment, Observer {
                 mGameSession = it.apply { onAttachView(this@GameFragment) }
+            })
+            correctedWord.observe(this@GameFragment, Observer {
+                if (it != null) {
+                    mGameSession.postCorrectedWord(it.first, it.second)
+                    it.first?.let { cityInput.text = null }
+                    correctedWord.value = null
+                }
             })
         }
         mAdapter = GameAdapter(activity)
@@ -196,6 +206,11 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun updateCity(city: String, hasErrors: Boolean) {
         mAdapter.updateCity(city, hasErrors)
+    }
+
+
+    override fun showCorrectionDialog(word: String, errorMsg: String) {
+        findNavController().navigate(GameFragmentDirections.showCorrectionTipsDialog(word, errorMsg))
     }
 
     override fun context(): Context = requireContext()

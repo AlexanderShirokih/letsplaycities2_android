@@ -7,7 +7,9 @@ class GameResultViewModel : ViewModel() {
 
     enum class SelectedItem { SHARE, REPLAY, MENU }
 
-    class SelectionResult(private val result: SelectedItem, private var used: Boolean) {
+    class SelectionResult(private val result: SelectedItem) {
+
+        private var used: Boolean = false
 
         fun result(): SelectedItem? {
             return if (used) null else {

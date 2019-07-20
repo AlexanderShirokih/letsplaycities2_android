@@ -41,6 +41,8 @@
             tools:layout="@layout/fragment_game">
         <action android:id="@+id/showGameResultDialog" app:destination="@+id/gameResultDialog"/>
         <action android:id="@+id/showConfimationDialog" app:destination="@id/confirmationDialog"/>
+        <action android:id="@+id/showCorrectionTipsDialog"
+                app:destination="@id/correctionTipsDialog"/>
     </fragment>
     <fragment
             android:id="@+id/settingsFragment"
@@ -136,6 +138,15 @@
             android:label="GameResultDialog"
             tools:layout="@layout/dialog_game_result">
         <argument android:name="result" app:argType="string"/>
+    </dialog>
+
+    <dialog
+            android:id="@+id/correctionTipsDialog"
+            android:name="ru.aleshi.letsplaycities.ui.game.CorrectionTipsDialog"
+            android:label="CorrectionTipsDialog"
+            tools:layout="@layout/dialog_correction_tips">
+        <argument android:name="word" app:argType="string"/>
+        <argument android:name="errorMsg" app:argType="string"/>
     </dialog>
 
 </navigation>

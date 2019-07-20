@@ -15,6 +15,7 @@ interface GameContract {
         fun putCity(city: String, countryCode: Short, left: Boolean)
         fun updateCity(city: String, hasErrors: Boolean)
         fun showGameResults(result: String)
+        fun showCorrectionDialog(word: String, errorMsg: String)
     }
 
     interface Presenter {
@@ -23,6 +24,8 @@ interface GameContract {
         fun submit(userInput: String, callback: () -> Unit): Boolean
         fun useHint()
         fun onSurrender()
+        fun postCorrectedWord(word: String?, errorMsg: String?)
+        fun correct(word: String, errorMsg: String)
     }
 
 }

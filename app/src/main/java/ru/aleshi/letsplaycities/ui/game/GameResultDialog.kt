@@ -39,6 +39,6 @@ class GameResultDialog : DialogFragment() {
 
     fun onClick(item: GameResultViewModel.SelectedItem) {
         requireDialog().dismiss()
-        gameResultViewModel.result.value = item
+        gameResultViewModel.result.value = GameResultViewModel.SelectionResult(item)
     }
 }

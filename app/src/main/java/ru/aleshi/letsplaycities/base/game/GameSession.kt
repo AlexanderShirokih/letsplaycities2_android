@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.base.game
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.base.player.*
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
 import ru.aleshi.letsplaycities.utils.Utils
@@ -156,6 +157,23 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     override fun onSurrender() {
         val res = mScoreManager.getWinner(timeIsUp = false, remote = false)
         view.showGameResults(res)
+    }
+
+    override fun postCorrectedWord(word: String?, errorMsg: String?) {
+        if (word != null) {
+            getPlayer()?.run {
+                submit(word) {}
+            }
+        } else
+            notify(errorMsg!!)
+    }
+
+    override fun correct(word: String, errorMsg: String) {
+        val prefs = (view.context().applicationContext as LPSApplication).gamePreferences
+        if (prefs.isCorrectionEnabled())
+            view.showCorrectionDialog(word, errorMsg)
+        else
+            postCorrectedWord(null, errorMsg)
     }
 
 

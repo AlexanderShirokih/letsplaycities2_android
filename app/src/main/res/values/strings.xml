@@ -222,7 +222,13 @@
     <string name="renamed_city">Город %s ранее был переименован в %s.</string>
     <string name="uncompleted_city">Возможно вы имели в виду город %s ?</string>
     <string name="not_city">%s не является городом. Это %s</string>
+
+    <!-- GameResultDialog -->
     <string name="share">Поделиться</string>
     <string name="again">Снова</string>
     <string name="menu">Меню</string>
+
+    <!-- CorrectionTipsDialog -->
+    <string name="searching_words">Поиск исправлений&#8230;</string>
+    <string name="replace_msg">Возможно вы имели в виду:</string>
 </resources>

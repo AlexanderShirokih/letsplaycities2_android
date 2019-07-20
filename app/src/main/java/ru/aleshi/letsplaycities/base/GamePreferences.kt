@@ -190,4 +190,8 @@ class GamePreferences(context: Context) {
         return prefs.getInt(KEY_MSG, 1) != 0
     }
 
+    fun isCorrectionEnabled(): Boolean {
+        return prefs.getInt(KEY_SPELLER, 1) != 0
+    }
+
 }
