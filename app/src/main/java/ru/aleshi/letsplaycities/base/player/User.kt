@@ -23,4 +23,8 @@ abstract class User(private val authData: AuthData) {
     }
 
     abstract fun getAvatar(): Maybe<Drawable>
+
+    fun reset() {
+        score = 0
+    }
 }

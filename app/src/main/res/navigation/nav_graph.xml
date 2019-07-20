@@ -139,6 +139,8 @@
             android:label="GameResultDialog"
             tools:layout="@layout/dialog_game_result">
         <argument android:name="result" app:argType="string"/>
+        <argument android:name="score" app:argType="integer"/>
+        <action android:id="@+id/start_game_fragment" app:destination="@id/gameFragment"/>
     </dialog>
 
     <dialog

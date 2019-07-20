@@ -14,7 +14,7 @@ interface GameContract {
         fun context(): Context
         fun putCity(city: String, countryCode: Short, left: Boolean)
         fun updateCity(city: String, hasErrors: Boolean)
-        fun showGameResults(result: String)
+        fun showGameResults(result: String, score: Int)
         fun showCorrectionDialog(word: String, errorMsg: String)
     }
 

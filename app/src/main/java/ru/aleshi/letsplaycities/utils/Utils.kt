@@ -28,10 +28,6 @@ object Utils {
     val Fragment.lpsApplication
         get() = requireContext().applicationContext as LPSApplication
 
-    fun checkRateDialog(context: Context) {
-        //TODO
-    }
-
     fun firstToUpper(input: String): String {
         val sb = StringBuilder()
         for (i in 0 until input.length) {

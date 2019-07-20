@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base.game
 
+import android.content.Context
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -34,21 +35,35 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
         get() = players[(++mCurrentPlayerIndex) % players.size]
 
     override fun onAttachView(view: GameContract.View) {
+        init()
         this.view = view
-        for (user in players) {
-            user.gameSession = this
-        }
         val context = view.context()
         mScoreManager = ScoreManager(this, findGameMode(), context)
-        disposable.add(
-            Exclusions.load(context)
-                .doOnSuccess { mExclusions = it }
-                .flatMap { Dictionary.load(context, mExclusions) }
-                .doOnSuccess { dictionary = it }
-                .subscribe())
-
+        loadData(context)
         applyToFragment()
         beginNextMove(null)
+    }
+
+    private fun init() {
+        mCurrentPlayerIndex = -1
+        mFirstChar = null
+        if (::dictionary.isInitialized)
+            dictionary.reset()
+
+        for (user in players) {
+            user.gameSession = this
+            user.reset()
+        }
+    }
+
+    private fun loadData(context: Context) {
+        if (!::mExclusions.isInitialized || !::dictionary.isInitialized)
+            disposable.add(
+                Exclusions.load(context)
+                    .doOnSuccess { mExclusions = it }
+                    .flatMap { Dictionary.load(context, mExclusions) }
+                    .doOnSuccess { dictionary = it }
+                    .subscribe())
     }
 
     private fun findGameMode(): GameMode {
@@ -156,7 +171,11 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
 
     override fun onSurrender() {
         val res = mScoreManager.getWinner(timeIsUp = false, remote = false)
-        view.showGameResults(res)
+        val score = if (findGameMode() == GameMode.MODE_PVP)
+            -1
+        else
+            players.first { it is Player }.score
+        view.showGameResults(res, score)
     }
 
     override fun postCorrectedWord(word: String?, errorMsg: String?) {
@@ -182,4 +201,5 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
             currentPlayer as Player
         else null
     }
+
 }

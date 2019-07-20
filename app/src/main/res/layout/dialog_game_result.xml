@@ -2,8 +2,10 @@
 <layout>
 
     <data>
-        <import type="ru.aleshi.letsplaycities.ui.game.GameResultViewModel.SelectedItem"/>
+        <import type="android.view.View"/>
+        <import type="ru.aleshi.letsplaycities.ui.game.GameResultDialog.SelectedItem"/>
         <variable name="result" type="String"/>
+        <variable name="shareButtonVisible" type="Boolean"/>
         <variable name="fragment" type="ru.aleshi.letsplaycities.ui.game.GameResultDialog"/>
     </data>
 
@@ -23,6 +25,7 @@
                 android:id="@+id/title"
                 android:textSize="30sp"
                 android:textStyle="bold"
+                android:layout_marginBottom="20dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
@@ -31,10 +34,10 @@
                 android:id="@+id/btnShare"
                 app:icon="@drawable/ic_share"
                 android:text="@string/share"
-                android:layout_width="wrap_content"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:padding="12dp"
+                android:visibility="@{ safeUnbox(shareButtonVisible) ? View.VISIBLE : View.GONE }"
                 android:onClick="@{()-> fragment.onClick(SelectedItem.SHARE)}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +47,7 @@
                 android:id="@+id/btnReplay"
                 app:icon="@drawable/ic_replay"
                 android:text="@string/again"
-                android:layout_width="0dp"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:padding="12dp"
@@ -57,7 +60,7 @@
                 android:id="@+id/btnMenu"
                 app:icon="@drawable/ic_menu"
                 android:text="@string/menu"
-                android:layout_width="0dp"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:padding="12dp"

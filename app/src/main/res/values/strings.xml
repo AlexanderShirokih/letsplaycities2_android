@@ -227,6 +227,9 @@
     <string name="share">Поделиться</string>
     <string name="again">Снова</string>
     <string name="menu">Меню</string>
+    <string name="share_msg">"Мой счёт %1$d очков в игре %2$s!\n https://play.google.com/store/apps/details?id=ru.aleshi.letsplaycities\n Сможешь набрать больше?</string>
+    <string name="share_with">Поделиться с помощью</string>
+    <string name="your_score">\nВаш счёт: %1$d</string>
 
     <!-- CorrectionTipsDialog -->
     <string name="searching_words">Поиск исправлений&#8230;</string>
@@ -236,4 +239,5 @@
     <string name="rate_dialog">Если Вам понравилась эта игра, пожалуйста, оцените ёё</string>
     <string name="rate">Оценить</string>
     <string name="no_thanks">Нет, спасибо</string>
+
 </resources>

@@ -53,18 +53,6 @@ class GameFragment : Fragment(), GameContract.View {
                 }
             }
         })
-        ViewModelProviders.of(activity)[GameResultViewModel::class.java].result.observe(this, Observer {
-            it.result()?.run {
-                when (this) {
-                    GameResultViewModel.SelectedItem.MENU -> findNavController().popBackStack(
-                        R.id.mainMenuFragment,
-                        false
-                    )
-                    GameResultViewModel.SelectedItem.SHARE -> TODO()
-                    GameResultViewModel.SelectedItem.REPLAY -> TODO()
-                }
-            }
-        })
 
         mGameViewModel = ViewModelProviders.of(this)[GameViewModel::class.java]
         mGameSessionViewModel = ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
@@ -158,16 +146,20 @@ class GameFragment : Fragment(), GameContract.View {
         )
     }
 
-    override fun showGameResults(result: String) {
+    override fun showGameResults(result: String, score: Int) {
         val nav = findNavController()
         disposable.add(Completable.timer(100, TimeUnit.MILLISECONDS)
             .repeatUntil { nav.currentDestination!!.id == R.id.gameFragment }
-            .subscribe { nav.navigate(GameFragmentDirections.showGameResultDialog(result)) })
+            .subscribe { nav.navigate(GameFragmentDirections.showGameResultDialog(result, score)) })
     }
 
     override fun onStop() {
         super.onStop()
         disposable.dispose()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
         mGameSession.onDetachView()
     }
 
