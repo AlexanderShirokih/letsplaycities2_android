@@ -231,4 +231,9 @@
     <!-- CorrectionTipsDialog -->
     <string name="searching_words">Поиск исправлений&#8230;</string>
     <string name="replace_msg">Возможно вы имели в виду:</string>
+
+    <!-- RateDialog -->
+    <string name="rate_dialog">Если Вам понравилась эта игра, пожалуйста, оцените ёё</string>
+    <string name="rate">Оценить</string>
+    <string name="no_thanks">Нет, спасибо</string>
 </resources>

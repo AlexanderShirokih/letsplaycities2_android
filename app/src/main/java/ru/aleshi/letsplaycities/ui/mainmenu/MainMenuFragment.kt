@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui
+package ru.aleshi.letsplaycities.ui.mainmenu
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,9 +19,10 @@ import ru.aleshi.letsplaycities.base.game.LocalServer
 import ru.aleshi.letsplaycities.base.player.Android
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.IntegrityChecker
-import ru.aleshi.letsplaycities.utils.Utils
+import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import kotlin.system.exitProcess
 
 
@@ -32,9 +33,8 @@ class MainMenuFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val activity = requireActivity()
-        (activity as MainActivity).setToolbarVisibility(false)
-        Utils.checkRateDialog(activity)
+        (requireActivity() as MainActivity).setToolbarVisibility(false)
+        checkRateDialog()
         makeInAnimation()
         createViewListener().run {
             btn_pva.setOnClickListener(this)
@@ -42,6 +42,12 @@ class MainMenuFragment : Fragment() {
             btn_mul.setOnClickListener(this)
             btn_net.setOnClickListener(this)
             btn_set.setOnClickListener(this)
+        }
+    }
+
+    private fun checkRateDialog() {
+        lpsApplication.gamePreferences.checkForRateDialogLaunch {
+            findNavController().navigate(R.id.showRateDialog)
         }
     }
 

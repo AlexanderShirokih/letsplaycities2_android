@@ -7,7 +7,7 @@
 
     <fragment
             android:id="@+id/mainMenuFragment"
-            android:name="ru.aleshi.letsplaycities.ui.MainMenuFragment"
+            android:name="ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment"
             android:label="MainMenu"
             tools:layout="@layout/fragment_main_menu">
         <action android:id="@+id/start_multiplayer_fragment"
@@ -16,6 +16,7 @@
                 app:destination="@id/networkFragment"/>
         <action android:id="@+id/start_game_fragment" app:destination="@id/gameFragment"/>
         <action android:id="@+id/start_settings_fragment" app:destination="@id/settingsFragment"/>
+        <action android:id="@+id/showRateDialog" app:destination="@id/rateDialog"/>
     </fragment>
 
     <fragment
@@ -148,5 +149,10 @@
         <argument android:name="word" app:argType="string"/>
         <argument android:name="errorMsg" app:argType="string"/>
     </dialog>
+
+    <dialog
+            android:id="@+id/rateDialog"
+            android:name="ru.aleshi.letsplaycities.ui.mainmenu.RateDialog"
+            android:label="RateDialog"/>
 
 </navigation>

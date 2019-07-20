@@ -12,6 +12,7 @@ class GamePreferences(context: Context) {
 
         const val KEY_THEME = "token"
         const val KEY_DIFF = "gamediff"
+        private const val LAUNCHES_TO_RATE = "l2r2"
         private const val KEY_SHOW_CHANGE_MODE_DIALOG = "_show_chm"
         private const val KEY_SCORING = "scoring_sys"
         private const val KEY_TIMER = "timer"
@@ -194,4 +195,19 @@ class GamePreferences(context: Context) {
         return prefs.getInt(KEY_SPELLER, 1) != 0
     }
 
+    fun checkForRateDialogLaunch(callback: () -> Unit) {
+        var launchesToRate = prefs.getInt(LAUNCHES_TO_RATE, -1)
+        if (launchesToRate == -1) {
+            launchesToRate = (2..5).random()
+        }
+        when {
+            launchesToRate > 0 -> launchesToRate--
+            launchesToRate == 0 -> {
+                launchesToRate = -2
+                callback()
+            }
+            else -> return
+        }
+        edit().putInt(LAUNCHES_TO_RATE, launchesToRate).apply()
+    }
 }
