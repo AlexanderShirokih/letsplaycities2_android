@@ -4,7 +4,7 @@ import android.content.Context
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.utils.Utils
+import ru.aleshi.letsplaycities.utils.StringUtils
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -56,10 +56,10 @@ class Exclusions private constructor(
 
     fun check(city: String): Pair<String, String?> {
         if (countries.contains(city))
-            return city to String.format(errMsgs[0], Utils.firstToUpper(city))
+            return city to String.format(errMsgs[0], StringUtils.firstToUpper(city))
 
         if (states.contains(city))
-            return city to String.format(errMsgs[1], Utils.firstToUpper(city))
+            return city to String.format(errMsgs[1], StringUtils.firstToUpper(city))
 
         return city to checkCity(city)
     }
@@ -85,16 +85,16 @@ class Exclusions private constructor(
 
         when (ex.type) {
             0 -> { // Город был переименован
-                msg = String.format(errMsgs[2], Utils.firstToUpper(city), Utils.firstToUpper(ex.thing))
+                msg = String.format(errMsgs[2], StringUtils.firstToUpper(city), StringUtils.firstToUpper(ex.thing))
             }
             2 -> { // Неполное название
-                msg = String.format(errMsgs[3], Utils.firstToUpper(ex.thing))
+                msg = String.format(errMsgs[3], StringUtils.firstToUpper(ex.thing))
             }
             3 -> { // Географические объекты - не города
-                msg = String.format(errMsgs[4], Utils.firstToUpper(city), ex.thing)
+                msg = String.format(errMsgs[4], StringUtils.firstToUpper(city), ex.thing)
             }
             4 -> { // Исторические название областей
-                msg = String.format(errMsgs[5], Utils.firstToUpper(city))
+                msg = String.format(errMsgs[5], StringUtils.firstToUpper(city))
             }
         }
         return msg

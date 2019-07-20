@@ -7,6 +7,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.Dictionary
+import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.utils.Utils
 
 class Player(authData: AuthData) : User(authData) {
@@ -22,7 +23,7 @@ class Player(authData: AuthData) : User(authData) {
 
     fun submit(userInput: String, onSuccess: () -> Unit) {
         mCompositeDisposable.add(Maybe.just(userInput)
-            .map { Utils.formatCity(it) }
+            .map { StringUtils.formatCity(it) }
             .filter { it.isNotEmpty() }
             .filter { mFirstChar == null || it[0] == mFirstChar }
             .map { gameSession.mExclusions.check(it) }
@@ -31,7 +32,7 @@ class Player(authData: AuthData) : User(authData) {
             .filter { it.second == null }
             .map { it.first }
             .observeOn(Schedulers.computation())
-            .map { gameSession.dictionary.applyCity(it) }
+            .map { gameSession.dictionary().applyCity(it) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ processCityResult(it, onSuccess) }, ::error)
         )
@@ -42,11 +43,11 @@ class Player(authData: AuthData) : User(authData) {
         onSuccess: () -> Unit
     ) {
         when (data.second) {
-            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(gameSession.view.context().getString(R.string.already_used, Utils.firstToUpper(data.first)))
+            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(gameSession.view.context().getString(R.string.already_used, StringUtils.firstToUpper(data.first)))
             Dictionary.CityResult.CITY_NOT_FOUND -> gameSession.correct(data.first,
                 gameSession.view.context().getString(
                     R.string.city_not_found,
-                    Utils.firstToUpper(data.first)
+                    StringUtils.firstToUpper(data.first)
                 )
             )
             Dictionary.CityResult.OK -> {

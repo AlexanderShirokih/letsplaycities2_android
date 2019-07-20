@@ -30,8 +30,7 @@ import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_PARTS
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.V_EMPTY_S
 import ru.aleshi.letsplaycities.base.scoring.ScoringField
 import ru.aleshi.letsplaycities.base.scoring.ScoringSet
-import ru.aleshi.letsplaycities.utils.Utils
-
+import ru.aleshi.letsplaycities.utils.StringUtils
 
 class ScoreFragment : Fragment() {
 
@@ -144,10 +143,10 @@ class ScoreFragment : Fragment() {
                     val indOf = v.indexOf('=')
                     if (indOf > 0) {
                         text = v.substring(indOf + 1)
-                        name.text = Utils.firstToUpper(v.substring(0, indOf))
+                        name.text = StringUtils.firstToUpper(v.substring(0, indOf))
                     } else {
                         text = v.length.toString()
-                        name.text = Utils.firstToUpper(v)
+                        name.text = StringUtils.firstToUpper(v)
                     }
                 } else
                     text = field.value()

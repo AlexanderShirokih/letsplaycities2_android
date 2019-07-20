@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.base.game
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import ru.aleshi.letsplaycities.base.GamePreferences
 
 interface GameContract {
 
@@ -16,6 +17,8 @@ interface GameContract {
         fun updateCity(city: String, hasErrors: Boolean)
         fun showGameResults(result: String, score: Int)
         fun showCorrectionDialog(word: String, errorMsg: String)
+        fun getGamePreferences() : GamePreferences
+        fun onTimerUpdate(time: String)
     }
 
     interface Presenter {
@@ -26,6 +29,7 @@ interface GameContract {
         fun onSurrender()
         fun postCorrectedWord(word: String?, errorMsg: String?)
         fun correct(word: String, errorMsg: String)
+        fun dictionary() : Dictionary
     }
 
 }

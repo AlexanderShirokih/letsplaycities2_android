@@ -2,22 +2,24 @@ package ru.aleshi.letsplaycities.base.game
 
 import android.content.Context
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import ru.aleshi.letsplaycities.LPSApplication
+import io.reactivex.disposables.Disposable
+import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.base.player.*
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
-import ru.aleshi.letsplaycities.utils.Utils
+import java.util.concurrent.TimeUnit
 
 class GameSession(val players: Array<User>, private val server: BaseServer) : GameContract.Presenter {
 
     private var mCurrentPlayerIndex: Int = -1
     private var mFirstChar: Char? = null
+    private lateinit var mGameTimer: Disposable
     private lateinit var mScoreManager: ScoreManager
-
+    private lateinit var mDictionary: Dictionary
     lateinit var mExclusions: Exclusions
 
-    lateinit var dictionary: Dictionary
     lateinit var view: GameContract.View
     val disposable = CompositeDisposable()
 
@@ -35,8 +37,8 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
         get() = players[(++mCurrentPlayerIndex) % players.size]
 
     override fun onAttachView(view: GameContract.View) {
-        init()
         this.view = view
+        init()
         val context = view.context()
         mScoreManager = ScoreManager(this, findGameMode(), context)
         loadData(context)
@@ -47,22 +49,33 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     private fun init() {
         mCurrentPlayerIndex = -1
         mFirstChar = null
-        if (::dictionary.isInitialized)
-            dictionary.reset()
+        if (::mDictionary.isInitialized)
+            mDictionary.reset()
 
         for (user in players) {
             user.gameSession = this
             user.reset()
         }
+
+        val timer = view.getGamePreferences().getTimeLimit()
+        if (timer > 0) {
+            mGameTimer = Observable.interval(1, TimeUnit.SECONDS)
+                .takeUntil { i -> i > timer }
+                .subscribe ({
+                    view.onTimerUpdate(StringUtils.timeFormat(TimeUnit.SECONDS.toMillis(it)))
+                }, ::error, {
+
+                })
+        }
     }
 
     private fun loadData(context: Context) {
-        if (!::mExclusions.isInitialized || !::dictionary.isInitialized)
+        if (!::mExclusions.isInitialized || !::mDictionary.isInitialized)
             disposable.add(
                 Exclusions.load(context)
                     .doOnSuccess { mExclusions = it }
                     .flatMap { Dictionary.load(context, mExclusions) }
-                    .doOnSuccess { dictionary = it }
+                    .doOnSuccess { mDictionary = it }
                     .subscribe())
     }
 
@@ -94,7 +107,7 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
 
     fun onCitySended(city: String, player: User) {
         if (player == currentPlayer) {
-            Completable.fromAction { view.putCity(city, dictionary.getCountryCode(city), isLeft(player)) }
+            Completable.fromAction { view.putCity(city, mDictionary.getCountryCode(city), isLeft(player)) }
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe()
 
@@ -134,7 +147,7 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     }
 
     private fun beginNextMove(city: String?) {
-        city?.let { mFirstChar = Utils.findLastSuitableChar(it) }
+        city?.let { mFirstChar = StringUtils.findLastSuitableChar(it) }
         switchToNext.onBeginMove(mFirstChar)
         mScoreManager.moveStarted()
     }
@@ -155,13 +168,14 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     override fun onDetachView() {
         mScoreManager.updateScore()
         disposable.dispose()
+        mGameTimer.dispose()
         mExclusions.dispose()
-        dictionary.dispose()
+        mDictionary.dispose()
     }
 
     override fun useHint() {
         getPlayer()?.let {
-            disposable.add(dictionary.getRandomWord(mFirstChar ?: "абвгдеклмн".random(), true)
+            disposable.add(mDictionary.getRandomWord(mFirstChar ?: "абвгдеклмн".random(), true)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     getPlayer()?.run { submit(it) {} }
@@ -188,7 +202,7 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     }
 
     override fun correct(word: String, errorMsg: String) {
-        val prefs = (view.context().applicationContext as LPSApplication).gamePreferences
+        val prefs = view.getGamePreferences()
         if (prefs.isCorrectionEnabled())
             view.showCorrectionDialog(word, errorMsg)
         else
@@ -202,4 +216,5 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
         else null
     }
 
+    override fun dictionary(): Dictionary = mDictionary
 }

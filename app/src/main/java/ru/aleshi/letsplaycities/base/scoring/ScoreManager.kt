@@ -9,7 +9,7 @@ import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.Android
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
-import ru.aleshi.letsplaycities.utils.Utils
+import ru.aleshi.letsplaycities.utils.StringUtils
 import kotlin.math.roundToInt
 
 
@@ -257,7 +257,7 @@ class ScoreManager(private val gameSession: GameSession, private val mode: GameM
                 updWinsForNetMode(next)
                 return context.getString(R.string.timeup, next.name, gameSession.currentPlayer.name)
             }
-            return context.getString(R.string.timeup, next.name, Utils.formatName(gameSession.currentPlayer.name))
+            return context.getString(R.string.timeup, next.name, StringUtils.formatName(gameSession.currentPlayer.name))
         }
 
         if (scoringType == ScoringType.LAST_MOVE) {

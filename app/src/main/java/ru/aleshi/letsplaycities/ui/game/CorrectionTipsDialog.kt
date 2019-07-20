@@ -21,7 +21,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.dialog_correction_tips.view.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.databinding.DialogCorrectionTipsBinding
-import ru.aleshi.letsplaycities.utils.Utils
+import ru.aleshi.letsplaycities.utils.StringUtils
 
 class CorrectionTipsDialog : DialogFragment() {
 
@@ -55,7 +55,7 @@ class CorrectionTipsDialog : DialogFragment() {
 
     private fun loadItems(callback: (adapter: CorrectionTipsAdapter) -> Unit) {
         val args = CorrectionTipsDialogArgs.fromBundle(requireArguments())
-        val dictionary = gameSessionViewModel.gameSession.value!!.dictionary
+        val dictionary = gameSessionViewModel.gameSession.value!!.dictionary()
         disposable.add(
             Maybe.just(dictionary)
                 .subscribeOn(Schedulers.computation())
@@ -106,7 +106,7 @@ class CorrectionTipsDialog : DialogFragment() {
 
     class CorrectionItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: String) {
-            itemView.findViewById<TextView>(android.R.id.text1).text = Utils.firstToUpper(item)
+            itemView.findViewById<TextView>(android.R.id.text1).text = StringUtils.firstToUpper(item)
         }
     }
 }

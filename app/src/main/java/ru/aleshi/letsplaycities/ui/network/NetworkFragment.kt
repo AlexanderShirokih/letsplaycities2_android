@@ -154,7 +154,7 @@ class NetworkFragment : Fragment() {
         })
     }
 
-    internal fun onCancel() {
+    private fun onCancel() {
         setLoadingLayout(false)
         mNetworkViewModel.networkRepository.value?.run { this.disconnect() }
         mNetworkViewModel.networkRepository.value = null

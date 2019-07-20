@@ -210,4 +210,9 @@ class GamePreferences(context: Context) {
         }
         edit().putInt(LAUNCHES_TO_RATE, launchesToRate).apply()
     }
+
+    fun getTimeLimit(): Long {
+        val timer = prefs.getInt(KEY_TIMER, 0)
+        return if (timer == 0) 0L else (timer * 2 - 1)  * 60L
+    }
 }

@@ -23,11 +23,13 @@ import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameContract
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
+import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import java.util.concurrent.TimeUnit
 
 class GameFragment : Fragment(), GameContract.View {
@@ -71,6 +73,12 @@ class GameFragment : Fragment(), GameContract.View {
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
         }
+    }
+
+    override fun getGamePreferences(): GamePreferences = lpsApplication.gamePreferences
+
+    override fun onTimerUpdate(time: String) {
+        gameTimer.text = time
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

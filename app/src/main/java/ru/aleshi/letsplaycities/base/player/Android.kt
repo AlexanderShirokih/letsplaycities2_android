@@ -13,7 +13,7 @@ class Android(name: String) : User(AuthData.create(name)) {
         gameSession.disposable.add(Maybe.just(firstChar)
             .subscribeOn(Schedulers.computation())
             .delay(300, TimeUnit.MILLISECONDS)
-            .flatMap { gameSession.dictionary.getRandomWord(it, false) }
+            .flatMap { gameSession.dictionary().getRandomWord(it, false) }
             .subscribe(::sendCity, {}, { gameSession.onLose(this) })
         )
     }

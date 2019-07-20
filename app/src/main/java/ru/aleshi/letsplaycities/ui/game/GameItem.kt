@@ -6,7 +6,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.utils.Utils
+import ru.aleshi.letsplaycities.utils.StringUtils
 
 class GameItem(
     val content: String,
@@ -21,8 +21,8 @@ class GameItem(
             SpannableStringBuilder(content)
         else {
             val foregroundSpanColor: Int = resolveForegroundColor(context)
-            val end = content.lastIndexOf(Utils.findLastSuitableChar(content.toLowerCase()) ?: 0.toChar())
-            SpannableStringBuilder(Utils.firstToUpper(content)).apply {
+            val end = content.lastIndexOf(StringUtils.findLastSuitableChar(content.toLowerCase()) ?: 0.toChar())
+            SpannableStringBuilder(StringUtils.firstToUpper(content)).apply {
                 setSpan(
                     ForegroundColorSpan(foregroundSpanColor),
                     0,
