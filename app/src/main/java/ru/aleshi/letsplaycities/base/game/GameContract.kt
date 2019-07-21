@@ -20,6 +20,7 @@ interface GameContract {
         fun getGamePreferences() : GamePreferences
         fun onTimerUpdate(time: String)
         fun onHighlightUser(left: Boolean)
+        fun setMenuItemsVisibility(help: Boolean, msg: Boolean)
     }
 
     interface Presenter {

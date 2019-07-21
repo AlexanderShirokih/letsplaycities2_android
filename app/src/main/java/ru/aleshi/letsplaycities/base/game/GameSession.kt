@@ -98,6 +98,8 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     }
 
     private fun applyToFragment() {
+        val gameMode = findGameMode()
+        view.setMenuItemsVisibility(help = gameMode == GameMode.MODE_PVA, msg = gameMode == GameMode.MODE_NET)
         // Apply to the left
         applyUserView(players[0], true)
         // Apply to the right

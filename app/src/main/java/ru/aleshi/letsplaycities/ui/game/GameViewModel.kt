@@ -15,4 +15,7 @@ class GameViewModel : ViewModel() {
     val isLeftActive: ObservableBoolean = ObservableBoolean()
 
     var timer: ObservableField<String> = ObservableField()
+
+    val helpBtnVisible : ObservableBoolean = ObservableBoolean()
+    val msgBtnVisible : ObservableBoolean = ObservableBoolean()
 }

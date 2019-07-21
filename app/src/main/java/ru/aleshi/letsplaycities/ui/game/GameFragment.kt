@@ -88,6 +88,11 @@ class GameFragment : Fragment(), GameContract.View {
         }
     }
 
+    override fun setMenuItemsVisibility(help: Boolean, msg: Boolean) {
+        mGameViewModel.helpBtnVisible.set(help)
+        mGameViewModel.msgBtnVisible.set(msg)
+    }
+
     private fun setupAds(activity: Activity) {
         adView.loadAd(AdRequest.Builder().build())
         adView.adListener = object : AdListener() {
