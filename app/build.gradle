@@ -53,12 +53,13 @@ dependencies {
     implementation 'com.android.billingclient:billing:2.0.1'
 
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    implementation 'com.google.android.gms:play-services-ads-lite:18.1.0'
     implementation 'com.vk:androidsdk:1.6.5'
     implementation 'com.facebook.android:facebook-login:4.42.0'
     implementation 'ru.ok:odnoklassniki-android-sdk:2.0.3'
 
 
-    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.google.firebase:firebase-core:17.0.1'
     implementation 'com.google.firebase:firebase-messaging:19.0.1'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'

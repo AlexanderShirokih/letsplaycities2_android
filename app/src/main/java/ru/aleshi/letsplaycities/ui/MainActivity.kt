@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.ThemeManager
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         NavigationUI.setupActionBarWithNavController(this, findNavController(R.id.main_nav_fragment))
+        MobileAds.initialize(this)
         checkForFirebaseNotifications()
     }
 

@@ -188,6 +188,7 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     override fun useHint() {
         getPlayer()?.let {
             disposable.add(mDictionary.getRandomWord(mFirstChar ?: "абвгдеклмн".random(), true)
+                .delay(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     getPlayer()?.run { submit(it) {} }

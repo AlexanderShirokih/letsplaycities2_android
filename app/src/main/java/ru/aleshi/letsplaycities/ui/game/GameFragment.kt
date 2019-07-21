@@ -1,6 +1,8 @@
 package ru.aleshi.letsplaycities.ui.game
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -20,6 +22,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.reward.RewardedVideoAd
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_game.*
@@ -30,6 +36,8 @@ import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
+import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
+import ru.aleshi.letsplaycities.utils.TipsListener
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import java.util.concurrent.TimeUnit
 
@@ -41,6 +49,8 @@ class GameFragment : Fragment(), GameContract.View {
     private lateinit var mGameSession: GameContract.Presenter
     private lateinit var mAdapter: GameAdapter
 
+    private lateinit var mRewardedVideoAd: RewardedVideoAd
+
     private var mClickSound: MediaPlayer? = null
     private val disposable: CompositeDisposable = CompositeDisposable()
 
@@ -51,10 +61,7 @@ class GameFragment : Fragment(), GameContract.View {
             when {
                 it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(R.id.mainMenuFragment, false)
                 it.checkWithResultCode(SURRENDER) -> mGameSession.onSurrender()
-                it.checkWithResultCode(USE_HINT) -> {
-                    //TODO: show ads
-                    mGameSession.useHint()
-                }
+                it.checkWithResultCode(USE_HINT) -> showAd()
             }
         })
 
@@ -62,6 +69,7 @@ class GameFragment : Fragment(), GameContract.View {
         mGameSessionViewModel = ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
             gameSession.observe(this@GameFragment, Observer {
                 mGameSession = it.apply { onAttachView(this@GameFragment) }
+                setupAds(activity)
             })
             correctedWord.observe(this@GameFragment, Observer {
                 if (it != null) {
@@ -78,6 +86,41 @@ class GameFragment : Fragment(), GameContract.View {
         if (getGamePreferences().isSoundEnabled()) {
             mClickSound = MediaPlayer.create(activity, R.raw.click)
         }
+    }
+
+    private fun setupAds(activity: Activity) {
+        adView.loadAd(AdRequest.Builder().build())
+        adView.adListener = object : AdListener() {
+            override fun onAdClosed() {
+                adView.visibility = View.GONE
+            }
+
+            override fun onAdLoaded() {
+                adView.visibility = View.VISIBLE
+            }
+
+            override fun onAdFailedToLoad(error: Int) {
+                adView.visibility = View.GONE
+            }
+        }
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(activity).apply {
+            rewardedVideoAdListener = TipsListener(::loadRewardedVideoAd, mGameSession::useHint)
+        }
+        if (!mRewardedVideoAd.isLoaded)
+            loadRewardedVideoAd()
+    }
+
+    private fun showAd() {
+        if (mRewardedVideoAd.isLoaded) {
+            mRewardedVideoAd.show()
+        } else {
+            loadRewardedVideoAd()
+            Toast.makeText(requireContext(), R.string.internet_unavailable, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun loadRewardedVideoAd() {
+        mRewardedVideoAd.loadAd(requireContext().getString(R.string.rewarded_ad_id), AdRequest.Builder().build())
     }
 
     override fun getGamePreferences(): GamePreferences = lpsApplication.gamePreferences
@@ -100,7 +143,7 @@ class GameFragment : Fragment(), GameContract.View {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val activity = requireActivity()
         (activity as MainActivity).setToolbarVisibility(false)
-
+        textInputLayout.setStartIconOnClickListener { SpeechRecognitionHelper.speech(this, activity) }
         textInputLayout.setEndIconOnClickListener { submit() }
         // Converting to lambda gives an error: event is a nullable type
         cityInput.setOnEditorActionListener(object : TextView.OnEditorActionListener {
@@ -128,6 +171,12 @@ class GameFragment : Fragment(), GameContract.View {
 
             }
             setHasFixedSize(true)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        SpeechRecognitionHelper.onActivityResult(requestCode, resultCode, data) {
+            mGameSession.submit(it) {}
         }
     }
 

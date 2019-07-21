@@ -191,15 +191,19 @@
         друзья нажмите на его аватарку и выберите пункт Добавить в друзья
     </string>
     <string name="err_msg_on_exception">Произошла какая-то ошибка&#8230; Попробуйте зайти снова</string>
-    <string name="invite_friend">Отправить приглашение игроку \"%1$s\"?\n Игрок получит приглашение если у него есть активное подключение и интернету</string>
+    <string name="invite_friend">Отправить приглашение игроку \"%1$s\"?\n Игрок получит приглашение если у него есть
+        активное подключение и интернету
+    </string>
     <string name="remove_from_friends">Вы действительно хотите удалить \"%1$s\" из списка друзей?</string>
-    <string name="request"> [Заявка]</string>
+    <string name="request">[Заявка]</string>
     <string name="waiting_for_connection">Ожидание подключения&#8230; %1$s</string>
     <string name="waiting_for_opp">Ожидание оппонента&#8230;</string>
     <string name="connecting_to_friend">Ожидание игрока %1$s</string>
     <string name="banned_player">Вы подключились к заблокированному вами игроку. Повторный поиск&#8230;</string>
     <string name="server_auth_error">Ошибка авторизации на сервере: %1$s</string>
-    <string name="new_version_available">Доступная новая версия игры! Рекомендуем установить обновление для использования новых возможностей приложения</string>
+    <string name="new_version_available">Доступная новая версия игры! Рекомендуем установить обновление для
+        использования новых возможностей приложения
+    </string>
     <string name="friend_offline">Игрок "%1$s" сейчас не в сети.</string>
     <string name="friend_busy">Игрок "%1$s" занят. Попробуйте позднее</string>
     <string name="friend_denied">Игрок "%1$s" отклонил Вашу заявку</string>
@@ -214,6 +218,11 @@
     <string name="go_to_menu">Завершить игру и выйти в меню?</string>
     <string name="surrender">Завершить игру?</string>
     <string name="use_hint">Использовать подсказку?</string>
+    <string name="internet_unavailable">Подсказка недоступна в данный момент.\nПроверьте подключение к интернету или
+        попробуйте снова.
+    </string>
+    <string name="rewarded_ad_id">ca-app-pub-1936321025389344/2624259268</string>
+    <string name="banner_unit_id">ca-app-pub-1936321025389344/5240856114</string>
 
     <!--ExclusionList-->
     <string name="this_is_a_country">%s это страна</string>
@@ -227,7 +236,9 @@
     <string name="share">Поделиться</string>
     <string name="again">Снова</string>
     <string name="menu">Меню</string>
-    <string name="share_msg">"Мой счёт %1$d очков в игре %2$s!\n https://play.google.com/store/apps/details?id=ru.aleshi.letsplaycities\n Сможешь набрать больше?</string>
+    <string name="share_msg">"Мой счёт %1$d очков в игре %2$s!\n
+        https://play.google.com/store/apps/details?id=ru.aleshi.letsplaycities\n Сможешь набрать больше?
+    </string>
     <string name="share_with">Поделиться с помощью</string>
     <string name="your_score">\nВаш счёт: %1$d</string>
 
@@ -240,4 +251,9 @@
     <string name="rate">Оценить</string>
     <string name="no_thanks">Нет, спасибо</string>
 
+    <!-- SpeechRecognitionHelper -->
+    <string name="no_speech_app">Для использования возможности голосового ввода установите приложение \"Голосовой поиск
+        Google\"
+    </string>
+    <string name="tell_city">Назовите город</string>
 </resources>
