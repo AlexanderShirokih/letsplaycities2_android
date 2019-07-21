@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.social
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import com.facebook.*
 import com.facebook.AccessToken
 import com.facebook.Profile.getCurrentProfile
@@ -58,6 +59,10 @@ class Facebook : ISocialNetwork() {
                 callback?.onLoggedIn(info)
             }
         }
+    }
+
+    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return callbackManager!!.onActivityResult(requestCode, resultCode, data)
     }
 
 }

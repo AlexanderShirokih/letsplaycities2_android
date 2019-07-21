@@ -56,7 +56,9 @@ class Google : ISocialNetwork() {
 
     }
 
-    fun onActivityResult(activity: Activity, data: Intent?) {
+    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        if (requestCode != RC_SIGN_IN)
+            return false
         val task = GoogleSignIn.getSignedInAccountFromIntent(data)
         try {
             val account = task.getResult(ApiException::class.java)
@@ -68,6 +70,6 @@ class Google : ISocialNetwork() {
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("GoogleSignIN", "signInResult:failed code=" + e.statusCode)
         }
-
+        return true
     }
 }

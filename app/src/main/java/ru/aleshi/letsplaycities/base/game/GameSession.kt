@@ -19,7 +19,7 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     private val mGameTimer = Observable.interval(0, 1, TimeUnit.SECONDS)
     private var mGameTimerDisposable: Disposable? = null
     private lateinit var mScoreManager: ScoreManager
-    private lateinit var mDictionary: Dictionary
+    private var mDictionary: Dictionary? = null
     lateinit var mExclusions: Exclusions
 
     lateinit var view: GameContract.View
@@ -51,8 +51,7 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     private fun init() {
         mCurrentPlayerIndex = -1
         mFirstChar = null
-        if (::mDictionary.isInitialized)
-            mDictionary.reset()
+        mDictionary?.reset()
 
         for (user in players) {
             user.gameSession = this
@@ -61,15 +60,18 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     }
 
     private fun loadData(context: Context) {
-        if (!::mExclusions.isInitialized || !::mDictionary.isInitialized)
+        if (!::mExclusions.isInitialized || mDictionary != null) {
+            val prefs = view.getGamePreferences()
             disposable.add(
                 Exclusions.load(context)
                     .doOnSuccess { mExclusions = it }
                     .flatMap { Dictionary.load(context, mExclusions) }
                     .doOnSuccess { mDictionary = it }
                     .subscribe { dic ->
-                        DictionaryUpdater.checkForUpdates(view.getGamePreferences(), dic, view.downloadingListener())
+                        DictionaryUpdater.checkForUpdates(prefs, dic, view.downloadingListener())
+                            ?.run { disposable.add(this) }
                     })
+        }
     }
 
     private fun runTimer() {
@@ -121,7 +123,7 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     fun onCitySended(city: String, player: User) {
         if (player == currentPlayer) {
-            Completable.fromAction { view.putCity(city, mDictionary.getCountryCode(city), isLeft(player)) }
+            Completable.fromAction { view.putCity(city, mDictionary!!.getCountryCode(city), isLeft(player)) }
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe()
 
@@ -182,17 +184,20 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
         view.showInfo(msg)
     }
 
-    override fun onDetachView() {
+    override fun onStop() {
         stopTimer()
-        mScoreManager.updateScore()
         disposable.dispose()
+        mScoreManager.updateScore()
+    }
+
+    override fun onDetachView() {
         mExclusions.dispose()
-        mDictionary.dispose()
+        mDictionary?.dispose()
     }
 
     override fun useHint() {
         getPlayer()?.let {
-            disposable.add(mDictionary.getRandomWord(mFirstChar ?: "абвгдеклмн".random(), true)
+            disposable.add(mDictionary!!.getRandomWord(mFirstChar ?: "абвгдеклмн".random(), true)
                 .delay(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -239,5 +244,5 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
         else null
     }
 
-    override fun dictionary(): Dictionary = mDictionary
+    override fun dictionary(): Dictionary = mDictionary!!
 }

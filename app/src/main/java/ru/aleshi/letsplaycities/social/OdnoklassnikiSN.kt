@@ -2,12 +2,14 @@ package ru.aleshi.letsplaycities.social
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import androidx.core.net.toUri
 import kotlinx.coroutines.*
 import org.json.JSONException
 import org.json.JSONObject
 import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.ok.android.sdk.Odnoklassniki
+import ru.ok.android.sdk.OkListener
 import ru.ok.android.sdk.OkRequestMode
 import ru.ok.android.sdk.util.OkAuthType
 import ru.ok.android.sdk.util.OkScope
@@ -68,6 +70,30 @@ class OdnoklassnikiSN : ISocialNetwork() {
     override fun onLogout() {
         Odnoklassniki.getInstance().clearTokens()
         super.onLogout()
+    }
+
+    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        val odnoklassniki = Odnoklassniki.getInstance()
+
+        if (odnoklassniki.onAuthActivityResult(requestCode, resultCode, data, object : OkListener {
+                override fun onSuccess(json: JSONObject) {
+                    onLoggedIn(activity, json.getString("access_token"))
+                }
+
+                override fun onError(error: String) = onError()
+            })) {
+
+            return true
+        } else if (odnoklassniki.onActivityResultResult(requestCode, resultCode, data, object : OkListener {
+                override fun onSuccess(json: JSONObject) {
+                    //access_token, secret_key
+                }
+
+                override fun onError(error: String) = onError()
+            })) {
+            return true
+        }
+        return false
     }
 
 }

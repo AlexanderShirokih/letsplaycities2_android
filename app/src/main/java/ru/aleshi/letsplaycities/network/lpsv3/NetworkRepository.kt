@@ -46,10 +46,4 @@ class NetworkRepository(private val mNetworkClient: NetworkClient2) {
             mNetworkClient.connect()
         }
     }
-
-    fun sendFirebaseToken(token: String) {
-        networkClient()
-            .doOnSuccess { it.sendFireBaseToken(token) }
-            .subscribe()
-    }
 }

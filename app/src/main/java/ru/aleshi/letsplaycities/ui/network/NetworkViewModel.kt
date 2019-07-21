@@ -3,8 +3,9 @@ package ru.aleshi.letsplaycities.ui.network
 import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ru.aleshi.letsplaycities.network.NetworkContract
+import ru.aleshi.letsplaycities.network.NetworkPresenterImpl
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 
 class NetworkViewModel : ViewModel() {
 
@@ -16,5 +17,5 @@ class NetworkViewModel : ViewModel() {
 
     val friendsInfo: MutableLiveData<FriendsInfo> = MutableLiveData()
 
-    val networkRepository: MutableLiveData<NetworkRepository> = MutableLiveData()
+    val networkPresenter: NetworkContract.Presenter = NetworkPresenterImpl()
 }

@@ -28,6 +28,7 @@ interface GameContract {
     interface Presenter {
         fun onAttachView(view: View)
         fun onDetachView()
+        fun onStop()
         fun submit(userInput: String, callback: () -> Unit): Boolean
         fun useHint()
         fun onSurrender()

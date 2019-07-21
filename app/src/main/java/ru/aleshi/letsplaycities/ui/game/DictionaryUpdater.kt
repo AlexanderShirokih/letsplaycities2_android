@@ -27,17 +27,22 @@ object DictionaryUpdater {
     private const val HOST = "http://${NetworkClient2.HOST}:80"
     private var inProgress = false
 
-    fun checkForUpdates(gamePreferences: GamePreferences, dictionary: Dictionary, listener: DownloadingListener) {
-        if (inProgress) return
+    fun checkForUpdates(
+        gamePreferences: GamePreferences,
+        dictionary: Dictionary,
+        listener: DownloadingListener
+    ): Disposable? {
+        if (inProgress) return null
         val updPeriod = gamePreferences.getDictionaryUpdatePeriod()
         if (updPeriod > 0) {
             val lastTime = gamePreferences.getDictionaryUpdateDate()
             val now = System.currentTimeMillis()
             if (now - lastTime > TimeUnit.HOURS.toMillis(updPeriod)) {
                 gamePreferences.setDictionaryUpdateDate(now)
-                checkForUpdates(dictionary, listener)
+                return checkForUpdates(dictionary, listener)
             }
         }
+        return null
     }
 
     private fun checkForUpdates(dictionary: Dictionary, listener: DownloadingListener): Disposable {

@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.social
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 
 abstract class ISocialNetwork {
 
@@ -34,5 +35,7 @@ abstract class ISocialNetwork {
     open fun onLogout() {
         isInitialized = false
     }
+
+    abstract fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean
 
 }

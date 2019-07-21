@@ -9,6 +9,7 @@ def lifecycle_version = "2.0.0"
 
 android {
     def HOST_LOCAL = "\"192.168.2.244\""
+    def HOST_EMULATOR = "\"10.0.2.2\""
     def HOST_REMOTE = "\"letsplaycities.online\""
 
     compileSdkVersion 29
@@ -19,7 +20,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "HOST", HOST_REMOTE)
+        buildConfigField("String", "HOST", HOST_EMULATOR)
     }
     buildTypes {
         release {

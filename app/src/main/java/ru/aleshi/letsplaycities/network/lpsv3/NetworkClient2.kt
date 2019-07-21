@@ -1,9 +1,14 @@
 package ru.aleshi.letsplaycities.network.lpsv3
 
+import android.util.Log
+import com.google.firebase.iid.FirebaseInstanceId
+import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.BuildConfig
-import ru.aleshi.letsplaycities.network.AuthType
-import ru.aleshi.letsplaycities.network.PlayerData
 import ru.aleshi.letsplaycities.base.player.AuthData
+import ru.aleshi.letsplaycities.network.AuthType
+import ru.aleshi.letsplaycities.network.NetworkUtils
+import ru.aleshi.letsplaycities.network.PlayerData
 import java.io.*
 import java.net.InetAddress
 import java.net.Socket
@@ -95,10 +100,11 @@ class NetworkClient2 {
             .writeInt(LPSv3Tags.OPP_UID, if (isWaiting) userId!! else 0)
             .buildAndFlush()
 
-        val msg = LPSMessageReader(mInputStream)
+        val msg = readAndCheckForFirebaseToken()
+        var tag = msg.nextTag()
+
         val opp = PlayerData()
         var youStarter = false
-        var tag = msg.nextTag()
         var userID = 0
         var snUID = "0"
         var snName = "nv"
@@ -122,6 +128,15 @@ class NetworkClient2 {
             .apply { this.userID = userID }
         opp.allowSendUID = true
         return opp to youStarter
+    }
+
+    private fun readAndCheckForFirebaseToken(): LPSMessageReader {
+        val msg = LPSMessageReader(mInputStream)
+        if (msg.getMasterTag() == LPSv3Tags.ACTION_REQUEST_FIREBASE) {
+            updateToken()
+            return LPSMessageReader(mInputStream)
+        }
+        return msg
     }
 
     fun getFriendsList(): ArrayList<FriendsInfo> {
@@ -155,12 +170,22 @@ class NetworkClient2 {
     }
 
     fun isConnected(): Boolean {
-        return ::mSocket.isInitialized && mSocket.isConnected
+        return ::mSocket.isInitialized && mSocket.isConnected && !mSocket.isClosed
     }
 
-    fun sendFireBaseToken(firebaseToken: String) {
-        LPSMessageWriter(mOutputStream)
-            .writeString(LPSv3Tags.ACTION_FIREBASE_TOKEN, firebaseToken)
-            .buildAndFlush()
+    private fun updateToken() {
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(NetworkUtils::class.java.simpleName, "FirebaseInstanceId.getInstance() failed", task.exception)
+            } else {
+                //174 chars
+                Completable.fromAction {
+                    LPSMessageWriter(mOutputStream)
+                        .writeString(LPSv3Tags.ACTION_FIREBASE_TOKEN, task.result!!.token)
+                        .buildAndFlush()
+                }.subscribeOn(Schedulers.io())
+                    .subscribe()
+            }
+        }
     }
 }

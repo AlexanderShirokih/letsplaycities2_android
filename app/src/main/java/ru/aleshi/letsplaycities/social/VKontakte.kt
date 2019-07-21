@@ -2,7 +2,10 @@ package ru.aleshi.letsplaycities.social
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import androidx.core.net.toUri
+import com.vk.sdk.VKAccessToken
+import com.vk.sdk.VKCallback
 import com.vk.sdk.VKSdk
 import com.vk.sdk.api.*
 import com.vk.sdk.api.model.VKApiUser
@@ -34,6 +37,19 @@ class VKontakte : ISocialNetwork() {
                     callback?.onLoggedIn(info)
                 }
             }
+        })
+    }
+
+    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return VKSdk.onActivityResult(requestCode, resultCode, data, object : VKCallback<VKAccessToken> {
+            override fun onResult(res: VKAccessToken) {
+                onLoggedIn(activity, res.accessToken)
+            }
+
+            override fun onError(error: VKError) {
+                onError()
+            }
+
         })
     }
 }

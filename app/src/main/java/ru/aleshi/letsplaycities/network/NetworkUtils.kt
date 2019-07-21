@@ -1,30 +1,12 @@
 package ru.aleshi.letsplaycities.network
 
-import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.iid.FirebaseInstanceId
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.lpsv3.AuthorizationException
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient2
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 
 object NetworkUtils {
-
-    fun updateToken() {
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w(NetworkUtils::class.java.simpleName, "FirebaseInstanceId.getInstance() failed", task.exception)
-            } else {
-                //174 chars
-                NetworkRepository(NetworkClient2()).apply {
-                    sendFirebaseToken(task.result!!.token)
-                    disconnect()
-                }
-            }
-        }
-    }
 
     fun handleError(exception: Throwable, fragment: Fragment) {
         val context = fragment.activity!!
@@ -42,6 +24,7 @@ object NetworkUtils {
                     .show()
             }
         } else {
+            exception.printStackTrace()
             Snackbar.make(
                 fragment.requireView(),
                 context.getString(R.string.err_msg_on_exception), Snackbar.LENGTH_SHORT

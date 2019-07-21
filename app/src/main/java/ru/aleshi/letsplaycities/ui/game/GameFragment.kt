@@ -231,6 +231,7 @@ class GameFragment : Fragment(), GameContract.View {
     override fun onStop() {
         super.onStop()
         disposable.dispose()
+        mGameSession.onStop()
     }
 
     override fun onDetach() {
