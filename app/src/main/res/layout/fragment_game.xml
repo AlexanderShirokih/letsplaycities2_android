@@ -2,6 +2,7 @@
 <layout>
 
     <data>
+        <import type="ru.aleshi.letsplaycities.R"/>
         <variable name="viewModel" type="ru.aleshi.letsplaycities.ui.game.GameViewModel"/>
     </data>
 
@@ -63,7 +64,8 @@
                 android:layout_marginTop="12dp"
                 android:src="@{viewModel.avatarLeft}"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/view"/>
+                app:layout_constraintTop_toTopOf="@+id/view"
+                app:useBorder="@{viewModel.isLeftActive}"/>
 
         <com.mikhaellopez.circularimageview.CircularImageView
                 style="@style/GameAvatarView"
@@ -72,7 +74,8 @@
                 android:layout_marginTop="12dp"
                 android:src="@{viewModel.avatarRight}"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/view"/>
+                app:layout_constraintTop_toTopOf="@+id/view"
+                app:useBorder="@{!viewModel.isLeftActive}"/>
 
         <TextView
                 android:id="@+id/scoreLeft"

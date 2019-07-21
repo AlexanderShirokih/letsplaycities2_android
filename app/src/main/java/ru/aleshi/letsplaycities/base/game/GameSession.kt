@@ -6,16 +6,17 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.base.player.*
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
+import ru.aleshi.letsplaycities.utils.StringUtils
 import java.util.concurrent.TimeUnit
 
 class GameSession(val players: Array<User>, private val server: BaseServer) : GameContract.Presenter {
 
     private var mCurrentPlayerIndex: Int = -1
     private var mFirstChar: Char? = null
-    private lateinit var mGameTimer: Disposable
+    private val mGameTimer = Observable.interval(0, 1, TimeUnit.SECONDS)
+    private lateinit var mGameTimerDisposable: Disposable
     private lateinit var mScoreManager: ScoreManager
     private lateinit var mDictionary: Dictionary
     lateinit var mExclusions: Exclusions
@@ -34,7 +35,7 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
 
 
     val nextPlayer: User
-        get() = players[(++mCurrentPlayerIndex) % players.size]
+        get() = players[(mCurrentPlayerIndex + 1) % players.size]
 
     override fun onAttachView(view: GameContract.View) {
         this.view = view
@@ -56,17 +57,6 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
             user.gameSession = this
             user.reset()
         }
-
-        val timer = view.getGamePreferences().getTimeLimit()
-        if (timer > 0) {
-            mGameTimer = Observable.interval(1, TimeUnit.SECONDS)
-                .takeUntil { i -> i > timer }
-                .subscribe ({
-                    view.onTimerUpdate(StringUtils.timeFormat(TimeUnit.SECONDS.toMillis(it)))
-                }, ::error, {
-
-                })
-        }
     }
 
     private fun loadData(context: Context) {
@@ -77,6 +67,26 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
                     .flatMap { Dictionary.load(context, mExclusions) }
                     .doOnSuccess { mDictionary = it }
                     .subscribe())
+    }
+
+    private fun runTimer() {
+        val timer = view.getGamePreferences().getTimeLimit()
+        if (timer > 0) {
+            stopTimer()
+            mGameTimerDisposable = mGameTimer
+                .take(timer + 1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    view.onTimerUpdate(StringUtils.timeFormat(TimeUnit.SECONDS.toMillis(timer - it)))
+                }, ::error, {
+                    finishGame(timeIsUp = true, remote = false)
+                })
+        }
+    }
+
+    private fun stopTimer() {
+        if (::mGameTimerDisposable.isInitialized)
+            mGameTimerDisposable.dispose()
     }
 
     private fun findGameMode(): GameMode {
@@ -147,8 +157,11 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     }
 
     private fun beginNextMove(city: String?) {
+        runTimer()
         city?.let { mFirstChar = StringUtils.findLastSuitableChar(it) }
-        switchToNext.onBeginMove(mFirstChar)
+        val next= switchToNext
+        view.onHighlightUser(isLeft(next))
+        next.onBeginMove(mFirstChar)
         mScoreManager.moveStarted()
     }
 
@@ -166,9 +179,9 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     }
 
     override fun onDetachView() {
+        stopTimer()
         mScoreManager.updateScore()
         disposable.dispose()
-        mGameTimer.dispose()
         mExclusions.dispose()
         mDictionary.dispose()
     }
@@ -184,7 +197,12 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     }
 
     override fun onSurrender() {
-        val res = mScoreManager.getWinner(timeIsUp = false, remote = false)
+        finishGame(timeIsUp = false, remote = false)
+    }
+
+    private fun finishGame(timeIsUp: Boolean, remote: Boolean) {
+        stopTimer()
+        val res = mScoreManager.getWinner(timeIsUp, remote)
         val score = if (findGameMode() == GameMode.MODE_PVP)
             -1
         else

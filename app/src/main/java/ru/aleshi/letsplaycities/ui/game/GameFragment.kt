@@ -77,6 +77,10 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun getGamePreferences(): GamePreferences = lpsApplication.gamePreferences
 
+    override fun onHighlightUser(left: Boolean) {
+        mGameViewModel.isLeftActive.set(left)
+    }
+
     override fun onTimerUpdate(time: String) {
         gameTimer.text = time
     }

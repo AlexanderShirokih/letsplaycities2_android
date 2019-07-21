@@ -19,6 +19,7 @@ interface GameContract {
         fun showCorrectionDialog(word: String, errorMsg: String)
         fun getGamePreferences() : GamePreferences
         fun onTimerUpdate(time: String)
+        fun onHighlightUser(left: Boolean)
     }
 
     interface Presenter {

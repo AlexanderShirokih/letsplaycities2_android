@@ -2,7 +2,7 @@
 <resources>
     <!-- Default token (Yellow) -->
     <color name="defColorPrimary">#ffa726</color>
-    <color name="defColorPrimaryDark">#c5a600</color>
+    <color name="defColorPrimaryDark">#F57C00</color>
     <color name="defWindowBg">#FFECB3</color>
 
     <!-- Autumn token -->
