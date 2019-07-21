@@ -88,6 +88,10 @@ class GameFragment : Fragment(), GameContract.View {
         }
     }
 
+    override fun downloadingListener(): DictionaryUpdater.DownloadingListener {
+        return SnackbarDownloadingListener(this)
+    }
+
     override fun setMenuItemsVisibility(help: Boolean, msg: Boolean) {
         mGameViewModel.helpBtnVisible.set(help)
         mGameViewModel.msgBtnVisible.set(msg)

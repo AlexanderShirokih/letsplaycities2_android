@@ -23,6 +23,7 @@ class GamePreferences(context: Context) {
         private const val KEY_NULL = "n"
         private const val KEY_SCR = "scrbkey"
         private const val KEY_BANNED = "banned"
+        private const val KEY_LAST_UPDATE = "last_upd_date"
 
         private val settings_pref_keys =
             arrayOf(
@@ -218,5 +219,21 @@ class GamePreferences(context: Context) {
     fun getTimeLimit(): Long {
         val timer = prefs.getInt(KEY_TIMER, 0)
         return if (timer == 0) 0L else (timer * 2 - 1) * 60L
+    }
+
+    fun getDictionaryUpdatePeriod(): Long {
+        return when (prefs.getInt(KEY_UPD_DIC, 0)) {
+            0 -> 3L
+            1 -> 24L
+            else -> 0L
+        }
+    }
+
+    fun getDictionaryUpdateDate(): Long {
+        return prefs.getLong(KEY_LAST_UPDATE, 0)
+    }
+
+    fun setDictionaryUpdateDate(time: Long) {
+        prefs.edit { putLong(KEY_LAST_UPDATE, time) }
     }
 }

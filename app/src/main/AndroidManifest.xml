@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="ru.aleshi.letsplaycities">
+          xmlns:tools="http://schemas.android.com/tools" package="ru.aleshi.letsplaycities">
 
     <uses-permission
             android:required="true"
@@ -27,7 +27,8 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:usesCleartextTraffic="true" tools:targetApi="m">
 
         <activity
                 android:name="ru.aleshi.letsplaycities.ui.MainActivity"

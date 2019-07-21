@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.base.game
 import android.content.Context
 import android.graphics.drawable.Drawable
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.ui.game.DictionaryUpdater
 
 interface GameContract {
 
@@ -21,6 +22,7 @@ interface GameContract {
         fun onTimerUpdate(time: String)
         fun onHighlightUser(left: Boolean)
         fun setMenuItemsVisibility(help: Boolean, msg: Boolean)
+        fun downloadingListener(): DictionaryUpdater.DownloadingListener
     }
 
     interface Presenter {

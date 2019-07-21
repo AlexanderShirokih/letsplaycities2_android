@@ -8,6 +8,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.base.player.*
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
+import ru.aleshi.letsplaycities.ui.game.DictionaryUpdater
 import ru.aleshi.letsplaycities.utils.StringUtils
 import java.util.concurrent.TimeUnit
 
@@ -66,7 +67,9 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
                     .doOnSuccess { mExclusions = it }
                     .flatMap { Dictionary.load(context, mExclusions) }
                     .doOnSuccess { mDictionary = it }
-                    .subscribe())
+                    .subscribe { dic ->
+                        DictionaryUpdater.checkForUpdates(view.getGamePreferences(), dic, view.downloadingListener())
+                    })
     }
 
     private fun runTimer() {

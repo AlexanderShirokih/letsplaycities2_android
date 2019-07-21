@@ -8,7 +8,6 @@ import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.ThemeManager
-import ru.aleshi.letsplaycities.utils.DictionaryUpdater
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,11 +20,6 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupActionBarWithNavController(this, findNavController(R.id.main_nav_fragment))
         MobileAds.initialize(this)
         checkForFirebaseNotifications()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        DictionaryUpdater.checkForUpdates(this)
     }
 
     override fun onSupportNavigateUp() = findNavController(R.id.main_nav_fragment).navigateUp()

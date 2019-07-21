@@ -256,4 +256,7 @@
         Google\"
     </string>
     <string name="tell_city">Назовите город</string>
+    <string name="loading_dictionary">Загрузка обновления словаря</string>
+    <string name="loading_dictionary_error">Не удалось обновить словарь</string>
+    <string name="loading_dictionary_completed">Обновление словаря загружено!</string>
 </resources>

@@ -15,7 +15,8 @@ class Dictionary private constructor(
     private val mDictionary: HashMap<String, CityProperties>,
     private val mSubDictionary: HashMap<Char, ArrayList<String>>,
     private val mExclusions: Exclusions,
-    val version: Int
+    val version: Int,
+    val savePath: File
 ) {
 
     var difficulty: Byte = 1
@@ -31,11 +32,8 @@ class Dictionary private constructor(
         }
 
         private fun parseDictionary(context: Context, exclusions: Exclusions): Dictionary {
-            val inputStream = DataInputStream(
-                openInputStream(
-                    context
-                )
-            )
+            val internalPath = File(context.filesDir, DOWNLOADED_DATA)
+            val inputStream = DataInputStream(openInputStream(internalPath, context))
             val count = inputStream.readInt()
             val version = inputStream.readInt()
             val countTest = inputStream.readInt()
@@ -75,11 +73,10 @@ class Dictionary private constructor(
                 list.add(name)
             }
             inputStream.close()
-            return Dictionary(dictionary, subDictionary, exclusions, version)
+            return Dictionary(dictionary, subDictionary, exclusions, version, internalPath)
         }
 
-        private fun openInputStream(context: Context): InputStream {
-            val internal = File(context.filesDir, DOWNLOADED_DATA)
+        private fun openInputStream(internal: File, context: Context): InputStream {
             return if (internal.exists())
                 FileInputStream(internal)
             else

@@ -13,7 +13,7 @@ class NetworkClient2 {
 
     companion object {
         private const val PORT = 62964
-        private var HOST = BuildConfig.HOST
+        const val HOST = BuildConfig.HOST
     }
 
     private lateinit var mInputStream: DataInputStream
