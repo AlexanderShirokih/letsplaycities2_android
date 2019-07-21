@@ -11,12 +11,12 @@ import ru.aleshi.letsplaycities.base.scoring.ScoreManager
 import ru.aleshi.letsplaycities.utils.StringUtils
 import java.util.concurrent.TimeUnit
 
-class GameSession(val players: Array<User>, private val server: BaseServer) : GameContract.Presenter {
+class GameSession(val players: Array<User>, private val mServer: BaseServer) : GameContract.Presenter {
 
     private var mCurrentPlayerIndex: Int = -1
     private var mFirstChar: Char? = null
     private val mGameTimer = Observable.interval(0, 1, TimeUnit.SECONDS)
-    private lateinit var mGameTimerDisposable: Disposable
+    private var mGameTimerDisposable: Disposable? = null
     private lateinit var mScoreManager: ScoreManager
     private lateinit var mDictionary: Dictionary
     lateinit var mExclusions: Exclusions
@@ -70,7 +70,7 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     }
 
     private fun runTimer() {
-        val timer = view.getGamePreferences().getTimeLimit()
+        val timer = mServer.getTimeLimit()
         if (timer > 0) {
             stopTimer()
             mGameTimerDisposable = mGameTimer
@@ -85,8 +85,7 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     }
 
     private fun stopTimer() {
-        if (::mGameTimerDisposable.isInitialized)
-            mGameTimerDisposable.dispose()
+        mGameTimerDisposable?.run { dispose() }
     }
 
     private fun findGameMode(): GameMode {
@@ -122,7 +121,7 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
                 .subscribe()
 
             disposable.add(
-                server.broadcastResult(city)
+                mServer.broadcastResult(city)
                     .subscribe({ handleWordResult(it, city) }, { view::showError })
             )
         }
@@ -159,7 +158,7 @@ class GameSession(val players: Array<User>, private val server: BaseServer) : Ga
     private fun beginNextMove(city: String?) {
         runTimer()
         city?.let { mFirstChar = StringUtils.findLastSuitableChar(it) }
-        val next= switchToNext
+        val next = switchToNext
         view.onHighlightUser(isLeft(next))
         next.onBeginMove(mFirstChar)
         mScoreManager.moveStarted()

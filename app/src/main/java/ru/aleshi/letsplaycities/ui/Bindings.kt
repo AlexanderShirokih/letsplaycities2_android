@@ -1,13 +1,14 @@
-package ru.aleshi.letsplaycities
+package ru.aleshi.letsplaycities.ui
 
 import android.content.Context
 import android.util.TypedValue
 import androidx.databinding.BindingAdapter
 import com.mikhaellopez.circularimageview.CircularImageView
+import ru.aleshi.letsplaycities.R
 
 object Bindings {
 
-    @BindingAdapter("app:useBorder")
+    @BindingAdapter("useBorder")
     @JvmStatic
     fun setUseBorder(circularImageView: CircularImageView, useBorder: Boolean) {
         val color = resolveColor(

@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.ui.game
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -40,6 +41,7 @@ class GameFragment : Fragment(), GameContract.View {
     private lateinit var mGameSession: GameContract.Presenter
     private lateinit var mAdapter: GameAdapter
 
+    private var mClickSound: MediaPlayer? = null
     private val disposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +74,9 @@ class GameFragment : Fragment(), GameContract.View {
         mAdapter = GameAdapter(activity)
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
+        }
+        if (getGamePreferences().isSoundEnabled()) {
+            mClickSound = MediaPlayer.create(activity, R.raw.click)
         }
     }
 
@@ -202,7 +207,7 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun putCity(city: String, countryCode: Short, left: Boolean) {
-        //TODO: clickPlayer?.start();
+        mClickSound?.start()
         mAdapter.addCity(city, countryCode, left)
         hideKeyboard()
         scrollRecyclerView()

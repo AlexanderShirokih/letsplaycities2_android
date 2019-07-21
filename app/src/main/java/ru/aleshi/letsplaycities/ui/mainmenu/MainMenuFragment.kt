@@ -93,7 +93,7 @@ class MainMenuFragment : Fragment() {
                 Android(getString(R.string.android))
             )
         ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession.value =
-            GameSession(players, LocalServer())
+            GameSession(players, LocalServer(lpsApplication.gamePreferences))
         navController.navigate(R.id.start_game_fragment)
     }
 

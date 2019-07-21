@@ -195,6 +195,10 @@ class GamePreferences(context: Context) {
         return prefs.getInt(KEY_SPELLER, 1) != 0
     }
 
+    fun isSoundEnabled(): Boolean {
+        return prefs.getInt(KEY_SOUND, 1) != 0
+    }
+
     fun checkForRateDialogLaunch(callback: () -> Unit) {
         var launchesToRate = prefs.getInt(LAUNCHES_TO_RATE, -1)
         if (launchesToRate == -1) {
@@ -213,6 +217,6 @@ class GamePreferences(context: Context) {
 
     fun getTimeLimit(): Long {
         val timer = prefs.getInt(KEY_TIMER, 0)
-        return if (timer == 0) 0L else (timer * 2 - 1)  * 60L
+        return if (timer == 0) 0L else (timer * 2 - 1) * 60L
     }
 }
