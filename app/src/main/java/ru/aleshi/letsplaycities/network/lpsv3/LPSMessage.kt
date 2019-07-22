@@ -73,7 +73,7 @@ sealed class LPSMessage {
 
     class LPSMsgMessage internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {
         val message = msgReader.readString(action)
-        val isUserMsg = msgReader.readBoolean(LPSv3Tags.MSG_OWNER)
+        val isSystemMsg = msgReader.readBoolean(LPSv3Tags.MSG_OWNER)
     }
 
     class LPSLeaveMessage internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {

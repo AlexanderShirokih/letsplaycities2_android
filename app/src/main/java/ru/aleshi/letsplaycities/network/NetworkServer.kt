@@ -11,6 +11,10 @@ class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseSer
         return mNetworkRepository.words.map { it.result to it.word }
     }
 
+    override fun getInputMessages(): Observable<String> {
+        return mNetworkRepository.messages.map { if (it.isSystemMsg) "[СИСТЕМА] " else "" + it.message }
+    }
+
     companion object {
         private const val NETWORK_TIMER = 92L
     }
@@ -20,4 +24,7 @@ class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseSer
     }
 
     override fun getTimeLimit(): Long = NETWORK_TIMER
+
+    override fun broadcastMessage(message: String) =
+        mNetworkRepository.sendMessage(message)
 }

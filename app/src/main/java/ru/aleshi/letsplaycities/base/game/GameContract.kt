@@ -14,6 +14,7 @@ interface GameContract {
         fun updateLabel(info: String, left: Boolean)
         fun updateAvatar(image: Drawable, left: Boolean)
         fun context(): Context
+        fun putMessage(message: String, isLeft: Boolean)
         fun putCity(city: String, countryCode: Short, left: Boolean)
         fun updateCity(city: String, hasErrors: Boolean)
         fun showGameResults(result: String, score: Int)
@@ -33,6 +34,7 @@ interface GameContract {
         fun useHint()
         fun onSurrender()
         fun postCorrectedWord(word: String?, errorMsg: String?)
+        fun sendMessage(message: String)
         fun correct(word: String, errorMsg: String)
         fun dictionary() : Dictionary
     }

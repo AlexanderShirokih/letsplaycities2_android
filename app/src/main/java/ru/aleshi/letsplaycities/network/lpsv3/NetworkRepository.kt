@@ -89,6 +89,11 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
             .subscribe { client -> client.sendWord(city) })
     }
 
+    fun sendMessage(message: String) {
+        disposable.add(networkClient()
+            .subscribe { client-> client.sendMessage(message) })
+    }
+
     fun test() {
         mNetworkClient.readMessage()
     }

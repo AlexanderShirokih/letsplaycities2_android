@@ -34,4 +34,5 @@
     <color name="usa_hint">#f2f2f2</color>
 
     <color name="aut_score">#020021</color>
+    <color name="message_edittext_bg">#B2EBF2</color>
 </resources>

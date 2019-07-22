@@ -22,6 +22,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.TransitionManager
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
@@ -48,7 +49,6 @@ class GameFragment : Fragment(), GameContract.View {
     private lateinit var mGameSessionViewModel: GameSessionViewModel
     private lateinit var mGameSession: GameContract.Presenter
     private lateinit var mAdapter: GameAdapter
-
     private lateinit var mRewardedVideoAd: RewardedVideoAd
 
     private var mClickSound: MediaPlayer? = null
@@ -138,6 +138,7 @@ class GameFragment : Fragment(), GameContract.View {
         mGameViewModel.isLeftActive.set(left)
     }
 
+
     override fun onTimerUpdate(time: String) {
         gameTimer.text = time
     }
@@ -152,20 +153,14 @@ class GameFragment : Fragment(), GameContract.View {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val activity = requireActivity()
         (activity as MainActivity).setToolbarVisibility(false)
-        textInputLayout.setStartIconOnClickListener { SpeechRecognitionHelper.speech(this, activity) }
-        textInputLayout.setEndIconOnClickListener { submit() }
-        // Converting to lambda gives an error: event is a nullable type
-        cityInput.setOnEditorActionListener(object : TextView.OnEditorActionListener {
-            override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
-                if (actionId == EditorInfo.IME_ACTION_DONE)
-                    submit()
-                return true
-            }
-        })
+
+        setupCityListeners(activity)
+        setupMessageListeners()
 
         btnMenu.setOnClickListener { showGoToMenuDialog() }
         btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
         btnHelp.setOnClickListener { showConfirmationDialog(USE_HINT, R.string.use_hint) }
+        btnMsg.setOnClickListener { setMessagingLayout(messageInputLayout.visibility != View.VISIBLE) }
 
         recyclerView.apply {
             adapter = mAdapter
@@ -183,6 +178,31 @@ class GameFragment : Fragment(), GameContract.View {
         }
     }
 
+    private fun setupCityListeners(activity: Activity) {
+        textInputLayout.setStartIconOnClickListener { SpeechRecognitionHelper.speech(this, activity) }
+        textInputLayout.setEndIconOnClickListener { submit() }
+        // Converting to lambda gives an error: event is a nullable type
+        cityInput.setOnEditorActionListener(object : TextView.OnEditorActionListener {
+            override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
+                if (actionId == EditorInfo.IME_ACTION_DONE)
+                    submit()
+                return true
+            }
+        })
+    }
+
+    private fun setupMessageListeners() {
+        messageInputLayout.setStartIconOnClickListener { setMessagingLayout(false) }
+        messageInputLayout.setEndIconOnClickListener { submitMessage() }
+        messageInput.setOnEditorActionListener(object : TextView.OnEditorActionListener {
+            override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
+                if (actionId == EditorInfo.IME_ACTION_DONE)
+                    submitMessage()
+                return true
+            }
+        })
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         SpeechRecognitionHelper.onActivityResult(requestCode, resultCode, data) {
             mGameSession.submit(it) {}
@@ -192,6 +212,16 @@ class GameFragment : Fragment(), GameContract.View {
     private fun submit() {
         mGameSession.submit(cityInput.text.toString()) {
             cityInput.text = null
+        }
+    }
+
+    private fun submitMessage() {
+        val message = messageInput.text!!.toString()
+
+        if (message.isNotBlank()) {
+            mGameSession.sendMessage(message)
+            messageInput.text = null
+            setMessagingLayout(false)
         }
     }
 
@@ -265,6 +295,12 @@ class GameFragment : Fragment(), GameContract.View {
         field.set(image)
     }
 
+    override fun putMessage(message: String, isLeft: Boolean) {
+        mClickSound?.start()
+        mAdapter.addMessage(message, isLeft)
+        scrollRecyclerView()
+    }
+
     override fun putCity(city: String, countryCode: Short, left: Boolean) {
         mClickSound?.start()
         mAdapter.addCity(city, countryCode, left)
@@ -276,9 +312,14 @@ class GameFragment : Fragment(), GameContract.View {
         mAdapter.updateCity(city, hasErrors)
     }
 
-
     override fun showCorrectionDialog(word: String, errorMsg: String) {
         findNavController().navigate(GameFragmentDirections.showCorrectionTipsDialog(word, errorMsg))
+    }
+
+    private fun setMessagingLayout(isMessagingMode: Boolean) {
+        TransitionManager.beginDelayedTransition(root)
+        messageInputLayout.visibility = if (isMessagingMode) View.VISIBLE else View.GONE
+        textInputLayout.visibility = if (isMessagingMode) View.GONE else View.VISIBLE
     }
 
     override fun context(): Context = requireContext()

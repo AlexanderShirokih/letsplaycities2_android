@@ -62,6 +62,13 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
             mServer.getWordsResult()
                 .subscribe({ handleWordResult(it.first, it.second) }, { view::showError })
         )
+
+        disposable.add(
+            mServer.getInputMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(
+                ::postMessage,
+                view::showError
+            )
+        )
     }
 
     private fun loadData(context: Context) {
@@ -241,6 +248,10 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
             notify(errorMsg!!)
     }
 
+    private fun postMessage(message: String) {
+        view.putMessage(message, !isLeft(currentPlayer))
+    }
+
     override fun correct(word: String, errorMsg: String) {
         val prefs = view.getGamePreferences()
         if (prefs.isCorrectionEnabled())
@@ -249,6 +260,10 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
             postCorrectedWord(null, errorMsg)
     }
 
+    override fun sendMessage(message: String) {
+        view.putMessage(message, isLeft(currentPlayer))
+        mServer.broadcastMessage(message)
+    }
 
     private fun getPlayer(): Player? {
         return if (currentPlayer is Player)

@@ -18,16 +18,6 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
         fun bind(item: GameItem) {
             itemView.apply {
                 itemCityName.text = item.getSpannableString(context)
-                when (item.status) {
-                    CityStatus.OK ->
-                        FlagDrawablesManager.getBitmapFor(context, item.countryCode)?.run {
-                            itemCountryImg.setImageBitmap(this)
-                        }
-                    CityStatus.WAITING ->
-                        itemCountryImg.setImageResource(R.drawable.ic_waiting)
-                    CityStatus.ERROR ->
-                        itemCountryImg.setImageResource(R.drawable.ic_word_error)
-                }
 
                 (this as LinearLayout).gravity = if (item.isLeft) Gravity.END else Gravity.START
 
@@ -39,6 +29,19 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
                 val out = TypedValue()
                 context.theme.resolveAttribute(resID, out, true)
                 itemCityContainer.setBackgroundResource(out.resourceId)
+
+                if (!item.isMessage)
+                    when (item.status) {
+                        CityStatus.OK ->
+                            FlagDrawablesManager.getBitmapFor(context, item.countryCode)?.run {
+                                itemCountryImg.setImageBitmap(this)
+                            }
+                        CityStatus.WAITING ->
+                            itemCountryImg.setImageResource(R.drawable.ic_waiting)
+                        CityStatus.ERROR ->
+                            itemCountryImg.setImageResource(R.drawable.ic_word_error)
+                    }
+                itemCountryImg.visibility = if (item.isMessage) View.GONE else View.VISIBLE
             }
         }
     }
@@ -66,6 +69,10 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
             mItems[index].status = if (hasErrors) CityStatus.ERROR else CityStatus.OK
             notifyItemChanged(index)
         }
+    }
+
+    fun addMessage(message: String, left: Boolean) {
+        mItems.add(GameItem(message, left, CityStatus.OK, true))
     }
 
 }

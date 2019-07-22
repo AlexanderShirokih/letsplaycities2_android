@@ -64,10 +64,6 @@ class Player(playerData: PlayerData) : User(playerData) {
         }
     }
 
-    override fun getAvatar(context: Context): Maybe<Drawable> {
-        return if (playerData.avatar == null)
-            Maybe.fromCallable { Utils.loadDrawable(gameSession.view.context(), R.drawable.ic_player_big) }
-        else
-            Utils.loadAvatar(context, playerData.avatar!!)
-    }
+    override fun getAvatar(context: Context): Maybe<Drawable> =
+        Utils.loadAvatar(context, playerData.avatar, R.drawable.ic_player_big)
 }

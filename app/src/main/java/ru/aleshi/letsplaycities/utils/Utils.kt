@@ -46,14 +46,19 @@ object Utils {
             }
     }
 
-    fun loadAvatar(context: Context, byteArray: ByteArray): Maybe<Drawable> {
-        return Maybe.just(byteArray)
-            .subscribeOn(Schedulers.computation())
-            .flatMap {
-                val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
-                if (bitmap == null) Maybe.empty<Bitmap>() else Maybe.just(bitmap)
-            }
-            .map { BitmapDrawable(context.resources, it) }
+    fun loadAvatar(context: Context, byteArray: ByteArray?, placeholder: Int): Maybe<Drawable> {
+        return if (byteArray == null)
+            Maybe.just(loadDrawable(context, placeholder))
+        else
+            Maybe.just(byteArray)
+                .subscribeOn(Schedulers.computation())
+                .map {
+                    val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                    if (bitmap == null)
+                        loadDrawable(context, placeholder)
+                    else
+                        BitmapDrawable(context.resources, bitmap)
+                }
     }
 
     fun loadAvatar(src: Uri): Observable<Bitmap> {
@@ -67,6 +72,15 @@ object Utils {
                     .resize(128, 128)
                     .get()
             }
+    }
+
+
+    fun loadDrawable(context: Context, resId: Int): Drawable {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            context.resources.getDrawable(resId, context.theme)
+        } else {
+            context.resources.getDrawable(resId)
+        }
     }
 
     private fun saveToLocalStorage(filesDir: File, saveFileName: String, bitmap: Bitmap): String? {
@@ -126,14 +140,6 @@ object Utils {
                 onResult(false)
             }
             .create().show()
-    }
-
-    fun loadDrawable(context: Context, resId: Int): Drawable {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            context.resources.getDrawable(resId, context.theme)
-        } else {
-            context.resources.getDrawable(resId)
-        }
     }
 
 }
