@@ -31,6 +31,13 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
     val messages: Observable<LPSMessage.LPSMsgMessage> =
         inputMessage.filter { it is LPSMessage.LPSMsgMessage }.cast(LPSMessage.LPSMsgMessage::class.java)
 
+    val leave: Single<LPSMessage.LPSLeaveMessage> =
+        inputMessage.filter { it is LPSMessage.LPSLeaveMessage }.cast(LPSMessage.LPSLeaveMessage::class.java)
+            .firstOrError()
+
+    val timeout: Completable =
+        inputMessage.filter { it is LPSMessage.LPSTimeoutMessage }.firstOrError().ignoreElement()
+
     private fun networkClient(): Single<NetworkClient> =
         Single.just(mNetworkClient)
             .subscribeOn(Schedulers.io())
@@ -91,10 +98,14 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
 
     fun sendMessage(message: String) {
         disposable.add(networkClient()
-            .subscribe { client-> client.sendMessage(message) })
+            .subscribe { client -> client.sendMessage(message) })
     }
 
     fun test() {
         mNetworkClient.readMessage()
+    }
+
+    fun sendFriendRequest() {
+        disposable.add(networkClient().subscribe { client -> client.sendFriendRequest() })
     }
 }

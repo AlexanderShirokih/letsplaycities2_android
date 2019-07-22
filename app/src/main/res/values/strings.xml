@@ -224,6 +224,20 @@
     <string name="rewarded_ad_id">ca-app-pub-1936321025389344/2624259268</string>
     <string name="banner_unit_id">ca-app-pub-1936321025389344/5240856114</string>
 
+    <string name="player_leaved">Ваш оппонент сдался!</string>
+    <string name="opp_disconnect">Оппонент отключился</string>
+    <string name="time_out">Время вышло!</string>
+    <string name="connecting_to_server">Подключение к серверу&#8230;</string>
+    <string name="player_banned">Игрок Заблокирован!</string>
+
+    <!-- UserContextMenuDialog -->
+    <string name="user_banned">Пользователь %1$s заблокирован</string>
+    <string name="new_friend_request">Заявка в друзья отправлена!</string>
+    <string-array name="player_menu">
+        <item>Заблокировать</item>
+        <item>В Друзья</item>
+    </string-array>
+
     <!--ExclusionList-->
     <string name="this_is_a_country">%s это страна</string>
     <string name="this_is_a_state">%s это название штата</string>

@@ -138,7 +138,6 @@ class GameFragment : Fragment(), GameContract.View {
         mGameViewModel.isLeftActive.set(left)
     }
 
-
     override fun onTimerUpdate(time: String) {
         gameTimer.text = time
     }
@@ -161,6 +160,8 @@ class GameFragment : Fragment(), GameContract.View {
         btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
         btnHelp.setOnClickListener { showConfirmationDialog(USE_HINT, R.string.use_hint) }
         btnMsg.setOnClickListener { setMessagingLayout(messageInputLayout.visibility != View.VISIBLE) }
+        avatarLeft.setOnClickListener { mGameSession.needsShowMenu(true) }
+        avatarRight.setOnClickListener { mGameSession.needsShowMenu(false) }
 
         recyclerView.apply {
             adapter = mAdapter
@@ -271,6 +272,10 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun showInfo(msg: String) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showUserMenu(isFriend: Boolean, name: String, userId: Int) {
+        findNavController().navigate(GameFragmentDirections.showUserContextDialog(isFriend, name, userId))
     }
 
     override fun showError(err: Throwable) {

@@ -195,8 +195,8 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         }
     }
 
-    fun updateInfo(string: String) {
-        infoTv.text = string
+    override fun updateInfo(infoMsgId: Int) {
+        infoTv.text = getString(infoMsgId)
     }
 
 }

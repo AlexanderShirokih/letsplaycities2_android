@@ -15,4 +15,6 @@ class NetworkUser(playerData: PlayerData) : User(playerData) {
     override fun onBeginMove(firstChar: Char?) {
         // Word broadcasts by NetworkServer
     }
+
+    override fun needsShowMenu(): Boolean = true
 }

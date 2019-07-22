@@ -20,6 +20,7 @@ interface NetworkContract {
         fun onResult(requestCode: Int, key: String, value: String)
         fun getBanManager() : BanManager
         fun onStartGame(session: GameSession)
+        fun updateInfo(infoMsgId: Int)
     }
 
     interface Presenter {

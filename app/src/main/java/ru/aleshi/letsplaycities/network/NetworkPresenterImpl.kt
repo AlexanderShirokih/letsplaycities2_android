@@ -122,8 +122,12 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
         mView?.checkForWaiting {
             mDisposable.add(mNetworkRepository.login(userData)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    mView!!.updateInfo(R.string.connecting_to_server)
+                }
                 .doOnSuccess {
                     mView?.let { view ->
+                        view.updateInfo(R.string.waiting_for_opp)
                         it.authData.saveToPreferences(view.getGamePreferences())
                         if (it.newerBuild > userData.clientBuild)
                             view.notifyAboutUpdates()

@@ -39,12 +39,14 @@
     <fragment
             android:id="@+id/gameFragment"
             android:name="ru.aleshi.letsplaycities.ui.game.GameFragment"
-            android:label="GameFragment"
+            android:label="@string/app_name"
             tools:layout="@layout/fragment_game">
         <action android:id="@+id/showGameResultDialog" app:destination="@+id/gameResultDialog"/>
         <action android:id="@+id/showConfimationDialog" app:destination="@id/confirmationDialog"/>
         <action android:id="@+id/showCorrectionTipsDialog"
                 app:destination="@id/correctionTipsDialog"/>
+        <action android:id="@+id/showUserContextDialog"
+                app:destination="@id/userContextMenuDialog"/>
     </fragment>
     <fragment
             android:id="@+id/settingsFragment"
@@ -157,5 +159,15 @@
             android:id="@+id/rateDialog"
             android:name="ru.aleshi.letsplaycities.ui.mainmenu.RateDialog"
             android:label="RateDialog"/>
+    <dialog
+            android:id="@+id/userContextMenuDialog"
+            android:name="ru.aleshi.letsplaycities.ui.game.UserContextMenuDialog"
+            android:label="UserContextMenuDialog">
+        <argument android:name="isFriend" app:argType="boolean"/>
+        <argument android:name="name" app:argType="string"/>
+        <argument android:name="userId" app:argType="integer"/>
+        <action android:id="@+id/showConfimationDialog"
+                app:destination="@id/confirmationDialog"/>
+    </dialog>
 
 </navigation>

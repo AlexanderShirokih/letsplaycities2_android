@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.player.*
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
 import ru.aleshi.letsplaycities.ui.game.DictionaryUpdater
@@ -69,6 +70,25 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
                 view::showError
             )
         )
+
+        disposable.add(
+            mServer.leave.observeOn(AndroidSchedulers.mainThread()).subscribe({ leaved ->
+                if (leaved) showToastAndDisconnect(R.string.player_leaved, false)
+                else showToastAndDisconnect(R.string.opp_disconnect, false)
+            }, view::showError)
+        )
+
+        disposable.add(
+            mServer.timeout.observeOn(AndroidSchedulers.mainThread()).subscribe({
+                showToastAndDisconnect(R.string.time_out, true)
+            }, view::showError)
+        )
+    }
+
+
+    private fun showToastAndDisconnect(stringID: Int, timeUp: Boolean) {
+        view.showInfo(view.context().getString(stringID))
+        finishGame(timeUp, true)
     }
 
     private fun loadData(context: Context) {
@@ -269,6 +289,17 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
         return if (currentPlayer is Player)
             currentPlayer as Player
         else null
+    }
+
+    override fun needsShowMenu(isLeft: Boolean) {
+        players.firstOrNull { !isLeft(it) == isLeft }?.run {
+            if (needsShowMenu())
+                view.showUserMenu(playerData.isFriend, playerData.userName!!, playerData.authData!!.userID)
+        }
+    }
+
+    override fun sendFriendRequest() {
+        mServer.sendFriendRequest()
     }
 
     override fun dictionary(): Dictionary = mDictionary!!

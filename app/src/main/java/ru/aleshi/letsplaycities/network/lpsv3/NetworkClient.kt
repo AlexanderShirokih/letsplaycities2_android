@@ -150,4 +150,9 @@ class NetworkClient {
         LPSMessageWriter(mOutputStream).writeString(LPSv3Tags.ACTION_MSG, message)
             .buildAndFlush()
     }
+
+    fun sendFriendRequest() {
+        LPSMessageWriter(mOutputStream).writeByte(LPSv3Tags.ACTION_FRIEND, LPSv3Tags.E_SEND_REQUEST)
+            .buildAndFlush()
+    }
 }

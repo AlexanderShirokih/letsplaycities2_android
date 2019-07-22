@@ -1,8 +1,11 @@
 package ru.aleshi.letsplaycities.network
 
+import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import ru.aleshi.letsplaycities.base.game.BaseServer
 import ru.aleshi.letsplaycities.base.game.WordResult
+import ru.aleshi.letsplaycities.network.lpsv3.LPSMessage
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 
 class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseServer() {
@@ -27,4 +30,12 @@ class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseSer
 
     override fun broadcastMessage(message: String) =
         mNetworkRepository.sendMessage(message)
+
+    override val leave: Single<Boolean> = mNetworkRepository.leave.map { it.leaved }
+
+    override val timeout: Completable = mNetworkRepository.timeout
+
+    override fun sendFriendRequest() {
+        mNetworkRepository.sendFriendRequest()
+    }
 }

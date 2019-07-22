@@ -30,4 +30,6 @@ abstract class User(internal val playerData: PlayerData) {
     }
 
     fun isMessagesAllowed() = playerData.canReceiveMessages
+
+    open fun needsShowMenu() = false
 }

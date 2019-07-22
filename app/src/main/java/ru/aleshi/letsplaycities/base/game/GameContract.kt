@@ -9,6 +9,7 @@ interface GameContract {
 
 
     interface View {
+        fun showUserMenu(isFriend:Boolean, name: String, userId: Int)
         fun showInfo(msg: String)
         fun showError(err: Throwable)
         fun updateLabel(info: String, left: Boolean)
@@ -37,6 +38,8 @@ interface GameContract {
         fun sendMessage(message: String)
         fun correct(word: String, errorMsg: String)
         fun dictionary() : Dictionary
+        fun needsShowMenu(isLeft: Boolean)
+        fun sendFriendRequest()
     }
 
 }
