@@ -57,6 +57,11 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
             user.gameSession = this
             user.reset()
         }
+
+        disposable.add(
+            mServer.getWordsResult()
+                .subscribe({ handleWordResult(it.first, it.second) }, { view::showError })
+        )
     }
 
     private fun loadData(context: Context) {
@@ -104,16 +109,23 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     private fun applyToFragment() {
         val gameMode = findGameMode()
-        view.setMenuItemsVisibility(help = gameMode == GameMode.MODE_PVA, msg = gameMode == GameMode.MODE_NET)
+        view.setMenuItemsVisibility(
+            help = gameMode == GameMode.MODE_PVA,
+            msg = gameMode == GameMode.MODE_NET && isMessagesAllowed()
+        )
         // Apply to the left
-        applyUserView(players[0], true)
+        applyUserView(players[0], false)
         // Apply to the right
-        applyUserView(players[1], false)
+        applyUserView(players[1], true)
+    }
+
+    private fun isMessagesAllowed(): Boolean {
+        return players.all { it.isMessagesAllowed() }
     }
 
     private fun applyUserView(users: User, isLeft: Boolean) {
         updateLabel(users, isLeft)
-        disposable.add(users.getAvatar()
+        disposable.add(users.getAvatar(view.context())
             .subscribe { view.updateAvatar(it, isLeft) })
     }
 
@@ -123,14 +135,8 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     fun onCitySended(city: String, player: User) {
         if (player == currentPlayer) {
-            Completable.fromAction { view.putCity(city, mDictionary!!.getCountryCode(city), isLeft(player)) }
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe()
-
-            disposable.add(
-                mServer.broadcastResult(city)
-                    .subscribe({ handleWordResult(it, city) }, { view::showError })
-            )
+            dispatchCityResult(city, player, false)
+            mServer.broadcastResult(city)
         }
     }
 
@@ -138,20 +144,30 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     private fun handleWordResult(result: WordResult, city: String) {
         when (result) {
-            WordResult.ACCEPTED, WordResult.RECEIVED -> {
-                Completable.fromAction { view.updateCity(city, false) }
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribe()
-
+            WordResult.ACCEPTED -> {
+                dispatchCityResult(city, null, false)
                 endMove(city)
                 beginNextMove(city)
             }
-            else -> {
-                Completable.fromAction { view.updateCity(city, true) }
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    .subscribe()
+            WordResult.RECEIVED -> {
+                dispatchCityResult(city, currentPlayer, false)
+                dispatchCityResult(city, null, false)
+                endMove(city)
+                beginNextMove(city)
             }
+            else -> dispatchCityResult(city, null, true)
         }
+    }
+
+    private fun dispatchCityResult(city: String, player: User?, hasErrors: Boolean) {
+        Completable.fromAction {
+            if (player != null)
+                view.putCity(city, mDictionary!!.getCountryCode(city), isLeft(player))
+            else
+                view.updateCity(city, hasErrors)
+        }
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribe()
     }
 
     override fun submit(userInput: String, callback: () -> Unit): Boolean {
@@ -166,18 +182,14 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
         runTimer()
         city?.let { mFirstChar = StringUtils.findLastSuitableChar(it) }
         val next = switchToNext
-        view.onHighlightUser(isLeft(next))
+        view.onHighlightUser(!isLeft(currentPlayer))
         next.onBeginMove(mFirstChar)
         mScoreManager.moveStarted()
     }
 
     private fun endMove(city: String) {
         mScoreManager.moveEnded(city)
-        updateLabel(currentPlayer, isLeft(currentPlayer))
-    }
-
-    fun onLose(player: User) {
-        TODO()
+        updateLabel(currentPlayer, !isLeft(currentPlayer))
     }
 
     fun notify(msg: String) {

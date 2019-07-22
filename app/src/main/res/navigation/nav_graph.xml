@@ -33,6 +33,7 @@
         <action android:id="@+id/showChangeModeDialog" app:destination="@id/changeModeDialog"/>
         <action android:id="@+id/showLoginDialog" app:destination="@id/loginFragment"/>
         <action android:id="@+id/start_friends_fragment" app:destination="@id/friendsFragment"/>
+        <action android:id="@+id/start_game_fragment" app:destination="@id/gameFragment"/>
     </fragment>
 
     <fragment

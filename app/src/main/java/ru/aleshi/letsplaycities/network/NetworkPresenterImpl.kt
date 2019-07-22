@@ -4,11 +4,17 @@ import android.graphics.Bitmap
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.AuthData
+import ru.aleshi.letsplaycities.base.player.NetworkUser
+import ru.aleshi.letsplaycities.base.player.Player
+import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient2
+import ru.aleshi.letsplaycities.network.lpsv3.LPSException
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.social.NativeAccess
 import ru.aleshi.letsplaycities.social.SocialNetworkLoginListener
@@ -17,9 +23,11 @@ import ru.aleshi.letsplaycities.utils.Utils
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+
 class NetworkPresenterImpl : NetworkContract.Presenter {
 
-    private val mNetworkRepository: NetworkRepository = NetworkRepository(NetworkClient2())
+    private val mDisposable: CompositeDisposable = CompositeDisposable()
+    private val mNetworkRepository: NetworkRepository = NetworkRepository(NetworkClient())
     private var mView: NetworkContract.View? = null
     private lateinit var mAuthData: AuthData
 
@@ -112,7 +120,7 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
 
     private fun startGame(userData: PlayerData, friendsInfo: FriendsInfo?) {
         mView?.checkForWaiting {
-            mNetworkRepository.login(userData)
+            mDisposable.add(mNetworkRepository.login(userData)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess {
                     mView?.let { view ->
@@ -124,11 +132,33 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
                 .observeOn(Schedulers.io())
                 .flatMap { mNetworkRepository.play(friendsInfo != null, friendsInfo?.userId) }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({}, { err ->
+                .doOnSuccess {
+                    mView?.run {
+                        if (getBanManager().checkInBanList(it.first.authData!!)) {
+                            mView?.showMessage(R.string.banned_player)
+                            mNetworkRepository.disconnect()
+                            throw LPSException("banned")
+                        }
+                    }
+                }
+                .retry { t -> "banned" == t.message }
+                .subscribe({ play(userData, it.first, it.second) }) {
                     onCancel()
-                    mView?.handleError(err)
+                    mView?.handleError(it)
                 })
         }
+    }
+
+    private fun play(playerData: PlayerData, oppData: PlayerData, youStarter: Boolean) {
+        val users = arrayOf(
+            NetworkUser(oppData),
+            Player(playerData)
+        ).apply {
+            if (youStarter)
+                reverse()
+        }
+
+        mView?.onStartGame(GameSession(users, NetworkServer(mNetworkRepository)))
     }
 
 }

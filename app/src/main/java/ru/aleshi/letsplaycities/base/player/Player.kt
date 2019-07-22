@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base.player
 
+import android.content.Context
 import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -10,9 +11,9 @@ import ru.aleshi.letsplaycities.base.game.Dictionary
 import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.utils.Utils
 
-class Player(authData: AuthData) : User(authData) {
+class Player(playerData: PlayerData) : User(playerData) {
 
-    constructor(name: String) : this(AuthData.create(name))
+    constructor(name: String) : this(PlayerData.create(name))
 
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
     private var mFirstChar: Char? = null
@@ -43,8 +44,14 @@ class Player(authData: AuthData) : User(authData) {
         onSuccess: () -> Unit
     ) {
         when (data.second) {
-            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(gameSession.view.context().getString(R.string.already_used, StringUtils.firstToUpper(data.first)))
-            Dictionary.CityResult.CITY_NOT_FOUND -> gameSession.correct(data.first,
+            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(
+                gameSession.view.context().getString(
+                    R.string.already_used,
+                    StringUtils.firstToUpper(data.first)
+                )
+            )
+            Dictionary.CityResult.CITY_NOT_FOUND -> gameSession.correct(
+                data.first,
                 gameSession.view.context().getString(
                     R.string.city_not_found,
                     StringUtils.firstToUpper(data.first)
@@ -57,7 +64,10 @@ class Player(authData: AuthData) : User(authData) {
         }
     }
 
-    override fun getAvatar(): Maybe<Drawable> {
-        return Maybe.fromCallable { Utils.loadDrawable(gameSession.view.context(), R.drawable.ic_player_big) }
+    override fun getAvatar(context: Context): Maybe<Drawable> {
+        return if (playerData.avatar == null)
+            Maybe.fromCallable { Utils.loadDrawable(gameSession.view.context(), R.drawable.ic_player_big) }
+        else
+            Utils.loadAvatar(context, playerData.avatar!!)
     }
 }

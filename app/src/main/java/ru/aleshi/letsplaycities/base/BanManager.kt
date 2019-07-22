@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base
 
+import ru.aleshi.letsplaycities.base.player.AuthData
 
 class BanManager(private val prefs: GamePreferences) {
 
@@ -24,8 +25,8 @@ class BanManager(private val prefs: GamePreferences) {
         prefs.putBanned(string)
     }
 
-    fun checkInBanList(userId: Int): Boolean {
-        val userIdAsString = userId.toString()
+    fun checkInBanList(authData: AuthData): Boolean {
+        val userIdAsString = authData.userID.toString()
         for (ln in getBanList()) {
             if (ln.contains(userIdAsString)) {
                 return true

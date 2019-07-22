@@ -3,6 +3,8 @@ package ru.aleshi.letsplaycities.utils
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment
 import com.squareup.picasso.MemoryPolicy
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.dialog_waiting.view.*
@@ -41,6 +44,16 @@ object Utils {
             .map {
                 saveToLocalStorage(filesDir, saveFileName, it)
             }
+    }
+
+    fun loadAvatar(context: Context, byteArray: ByteArray): Maybe<Drawable> {
+        return Maybe.just(byteArray)
+            .subscribeOn(Schedulers.computation())
+            .flatMap {
+                val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                if (bitmap == null) Maybe.empty<Bitmap>() else Maybe.just(bitmap)
+            }
+            .map { BitmapDrawable(context.resources, it) }
     }
 
     fun loadAvatar(src: Uri): Observable<Bitmap> {

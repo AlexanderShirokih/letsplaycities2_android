@@ -8,7 +8,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.Dictionary
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient2
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -24,7 +24,7 @@ object DictionaryUpdater {
         fun onError()
     }
 
-    private const val HOST = "http://${NetworkClient2.HOST}:80"
+    private const val HOST = "http://${NetworkClient.HOST}:80"
     private var inProgress = false
 
     fun checkForUpdates(

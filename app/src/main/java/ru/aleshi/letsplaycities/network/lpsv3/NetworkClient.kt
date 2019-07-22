@@ -2,19 +2,16 @@ package ru.aleshi.letsplaycities.network.lpsv3
 
 import android.util.Log
 import com.google.firebase.iid.FirebaseInstanceId
-import io.reactivex.Completable
-import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.base.player.AuthData
-import ru.aleshi.letsplaycities.network.AuthType
 import ru.aleshi.letsplaycities.network.NetworkUtils
-import ru.aleshi.letsplaycities.network.PlayerData
+import ru.aleshi.letsplaycities.base.player.PlayerData
 import java.io.*
 import java.net.InetAddress
 import java.net.Socket
-import java.nio.ByteBuffer
 
-class NetworkClient2 {
+
+class NetworkClient {
 
     companion object {
         private const val PORT = 62964
@@ -57,7 +54,7 @@ class NetworkClient2 {
         }
     }
 
-    @Throws(AuthorizationException::class)
+    @Throws(AuthorizationException::class, LPSException::class)
     fun login(userData: PlayerData): AuthResult {
         val ad = userData.authData!!
 
@@ -81,6 +78,9 @@ class NetworkClient2 {
 
         val msgReader = LPSMessageReader(mInputStream)
 
+        if (msgReader.getMasterTag() != LPSv3Tags.ACTION_LOGIN_RESULT)
+            throw LPSException("Waiting for LOGIN_RESULT action, but action=${msgReader.getMasterTag()} received")
+
         if (msgReader.readBoolean(LPSv3Tags.ACTION_LOGIN_RESULT)) {
             ad.userID = msgReader.readInt(LPSv3Tags.S_UID)
             ad.accessHash = msgReader.readString(LPSv3Tags.S_ACC_HASH)
@@ -94,72 +94,21 @@ class NetworkClient2 {
     }
 
     @Throws(IOException::class)
-    fun play(isWaiting: Boolean, userId: Int?): Pair<PlayerData, Boolean> {
+    fun play(isWaiting: Boolean, userId: Int?) {
         LPSMessageWriter(mOutputStream)
             .writeByte(LPSv3Tags.ACTION_PLAY, if (isWaiting) LPSv3Tags.E_FRIEND_MODE else LPSv3Tags.E_RANDOM_PAIR_MODE)
             .writeInt(LPSv3Tags.OPP_UID, if (isWaiting) userId!! else 0)
             .buildAndFlush()
-
-        val msg = readAndCheckForFirebaseToken()
-        var tag = msg.nextTag()
-
-        val opp = PlayerData()
-        var youStarter = false
-        var userID = 0
-        var snUID = "0"
-        var snName = "nv"
-
-        while (tag > 0) {
-            when (tag) {
-                LPSv3Tags.ACTION_JOIN -> youStarter = msg.readBoolean(tag)
-                LPSv3Tags.S_CAN_REC_MSG -> opp.canReceiveMessages = msg.readBoolean(tag)
-                LPSv3Tags.S_AVATAR_PART0 -> opp.avatar = msg.readBytes(tag)
-                LPSv3Tags.OPP_LOGIN -> opp.userName = msg.readString(tag)
-                LPSv3Tags.OPP_CLIENT_VERSION -> opp.clientVersion = msg.readString(tag)
-                LPSv3Tags.OPP_CLIENT_BUILD -> opp.clientBuild = msg.readChar(tag)
-                LPSv3Tags.OPP_IS_FRIEND -> opp.isFriend = msg.readBoolean(tag)
-                LPSv3Tags.S_OPP_UID -> userID = msg.readInt(tag)
-                LPSv3Tags.S_OPP_SN -> snName = AuthType.values()[msg.readByte(tag).toInt()].type()
-                LPSv3Tags.S_OPP_SNUID -> snUID = msg.readString(tag)
-            }
-            tag = msg.nextTag()
-        }
-        opp.authData = AuthData(opp.userName!!, snUID, snName, "")
-            .apply { this.userID = userID }
-        opp.allowSendUID = true
-        return opp to youStarter
     }
 
-    private fun readAndCheckForFirebaseToken(): LPSMessageReader {
-        val msg = LPSMessageReader(mInputStream)
-        if (msg.getMasterTag() == LPSv3Tags.ACTION_REQUEST_FIREBASE) {
-            updateToken()
-            return LPSMessageReader(mInputStream)
-        }
-        return msg
+    fun readMessage(): LPSMessage {
+        return LPSMessage.from(LPSMessageReader(mInputStream))
     }
 
-    fun getFriendsList(): ArrayList<FriendsInfo> {
+    fun requestFriendsList() {
         LPSMessageWriter(mOutputStream)
             .writeByte(LPSv3Tags.ACTION_QUERY_FRIEND_INFO, 1)
             .buildAndFlush()
-
-        val msgReader = LPSMessageReader(mInputStream)
-
-        val size = msgReader.readChar(LPSv3Tags.ACTION_QUERY_FRIEND_RES)
-        val list = ArrayList<FriendsInfo>(size)
-        val names =
-            msgReader.readString(LPSv3Tags.F_QUERY_NAMES).split("\\|\\|".toRegex()).dropLastWhile { it.isEmpty() }
-                .toTypedArray()
-        val accept = msgReader.readBytes(LPSv3Tags.F_QUERY_USER_ACCEPT)
-        val userIds = ByteBuffer.wrap(msgReader.readBytes(LPSv3Tags.F_QUERY_USER_IDS))
-
-        for (i in 0 until size) {
-            list.add(FriendsInfo(userIds.int, names[i], accept[i] > 0))
-        }
-
-        userIds.clear()
-        return list
     }
 
     fun deleteFriend(userId: Int) {
@@ -169,23 +118,31 @@ class NetworkClient2 {
             .buildAndFlush()
     }
 
+    fun kick() {
+        LPSMessageWriter(mOutputStream)
+            .writeByte(LPSv3Tags.ACTION_BAN, 0)
+            .writeString(LPSv3Tags.BAN_REASON, "unimpl")
+            .writeString(LPSv3Tags.ROOM_CONTENT, "unimpl")
+            .buildAndFlush()
+    }
+
     fun isConnected(): Boolean {
         return ::mSocket.isInitialized && mSocket.isConnected && !mSocket.isClosed
     }
 
-    private fun updateToken() {
+    private fun updateToken(callback: (token: String) -> Unit) {
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(NetworkUtils::class.java.simpleName, "FirebaseInstanceId.getInstance() failed", task.exception)
             } else {
                 //174 chars
-                Completable.fromAction {
-                    LPSMessageWriter(mOutputStream)
-                        .writeString(LPSv3Tags.ACTION_FIREBASE_TOKEN, task.result!!.token)
-                        .buildAndFlush()
-                }.subscribeOn(Schedulers.io())
-                    .subscribe()
+                callback(task.result!!.token)
             }
         }
+    }
+
+    fun sendWord(word: String) {
+        LPSMessageWriter(mOutputStream).writeString(LPSv3Tags.ACTION_WORD, word)
+            .buildAndFlush()
     }
 }

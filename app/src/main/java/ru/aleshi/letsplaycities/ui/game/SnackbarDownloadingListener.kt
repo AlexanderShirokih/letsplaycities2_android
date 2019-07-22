@@ -6,15 +6,17 @@ import ru.aleshi.letsplaycities.R
 
 class SnackbarDownloadingListener(private val fragment: Fragment) : DictionaryUpdater.DownloadingListener {
 
-    lateinit var snackbar: Snackbar
+    private var snackbar: Snackbar? = null
 
     override fun onStart() {
-        snackbar = Snackbar.make(fragment.requireView(), R.string.loading_dictionary, Snackbar.LENGTH_INDEFINITE)
-        snackbar.show()
+        fragment.view?.let {
+            snackbar = Snackbar.make(it, R.string.loading_dictionary, Snackbar.LENGTH_INDEFINITE)
+            snackbar!!.show()
+        }
     }
 
     override fun onProgress(res: Int) {
-        snackbar.setText(fragment.getString(R.string.loading_dictionary) + " $res%")
+        snackbar?.setText(fragment.getString(R.string.loading_dictionary) + " $res%")
     }
 
     override fun onEnd() = showShortSnackbar(R.string.loading_dictionary_completed)
@@ -23,8 +25,10 @@ class SnackbarDownloadingListener(private val fragment: Fragment) : DictionaryUp
 
 
     private fun showShortSnackbar(msg: Int) {
-        snackbar.duration = Snackbar.LENGTH_SHORT
-        snackbar.setText(msg)
-        snackbar.show()
+        snackbar?.run {
+            duration = Snackbar.LENGTH_SHORT
+            setText(msg)
+            show()
+        }
     }
 }

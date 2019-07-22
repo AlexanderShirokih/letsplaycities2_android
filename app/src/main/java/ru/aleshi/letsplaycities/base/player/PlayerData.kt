@@ -1,6 +1,4 @@
-package ru.aleshi.letsplaycities.network
-
-import ru.aleshi.letsplaycities.base.player.AuthData
+package ru.aleshi.letsplaycities.base.player
 
 class PlayerData {
     var clientVersion: String = "unk"

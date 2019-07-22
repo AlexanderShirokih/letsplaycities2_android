@@ -16,9 +16,9 @@ import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient2
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.network.NetworkUtils
-import ru.aleshi.letsplaycities.network.PlayerData
+import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.base.player.AuthData
@@ -111,7 +111,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
         userData.authData = AuthData.loadFromPreferences(mApplication.gamePreferences)
         userData.userName = "#" + userData.authData!!.userID
 
-        mNetworkRepository = NetworkRepository(NetworkClient2())
+        mNetworkRepository = NetworkRepository(NetworkClient())
         mDisposable.add(
             mNetworkRepository.login(userData)
                 .observeOn(AndroidSchedulers.mainThread())

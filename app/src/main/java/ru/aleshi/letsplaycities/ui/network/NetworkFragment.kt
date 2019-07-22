@@ -21,11 +21,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_network.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.BanManager
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.network.NetworkContract
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.RECONNECTION_DELAY_MS
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
@@ -117,9 +120,16 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         return pInfo.versionName to PackageInfoCompat.getLongVersionCode(pInfo).toInt()
     }
 
+    override fun onStartGame(session: GameSession) {
+        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession.value = session
+        findNavController().navigate(R.id.start_game_fragment)
+    }
+
     override fun handleError(throwable: Throwable) = NetworkUtils.handleError(throwable, this@NetworkFragment)
 
     override fun showMessage(msgResId: Int) = Snackbar.make(requireView(), msgResId, Snackbar.LENGTH_LONG).show()
+
+    override fun getBanManager(): BanManager = mApplication.banManager
 
     override fun getGamePreferences(): GamePreferences = mGamePreferences
 
