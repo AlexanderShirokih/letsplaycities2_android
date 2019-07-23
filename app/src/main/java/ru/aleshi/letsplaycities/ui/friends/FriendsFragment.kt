@@ -16,12 +16,12 @@ import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
-import ru.aleshi.letsplaycities.network.NetworkUtils
-import ru.aleshi.letsplaycities.base.player.PlayerData
-import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.base.player.AuthData
+import ru.aleshi.letsplaycities.base.player.PlayerData
+import ru.aleshi.letsplaycities.network.NetworkUtils
+import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
+import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
@@ -49,11 +49,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
                             ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java].friendsInfo.postValue(
                                 mSelectedFriendsInfo
                             )
-                            //ConfirmationDialog -> FriendsFragment
-                            findNavController().navigateUp()
-                            //FriendsFragment -> NetworkFragment
-                            findNavController().navigateUp()
-
+                            findNavController().popBackStack(R.id.networkFragment, false)
                         }
                         REQUEST_CODE_REMOVE_ITEM -> {
                             if (::mNetworkRepository.isInitialized)
@@ -112,7 +108,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
         userData.userName = "#" + userData.authData!!.userID
 
         mNetworkRepository = NetworkRepository(NetworkClient())
-        mDisposable.add(
+        mDisposable.addAll(
             mNetworkRepository.login(userData)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ requestFriendsList() }, ::handleError)
@@ -126,7 +122,8 @@ class FriendsFragment : Fragment(), FriendsItemListener {
     }
 
     private fun requestFriendsList() {
-        mDisposable.add(
+        mDisposable.addAll(
+            mNetworkRepository.firebaseToken.subscribe(),
             mNetworkRepository.getFriendsList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(::populateList, ::handleError)

@@ -229,6 +229,9 @@
     <string name="time_out">Время вышло!</string>
     <string name="connecting_to_server">Подключение к серверу&#8230;</string>
     <string name="player_banned">Игрок Заблокирован!</string>
+    <string name="confirm_friend_request">Игрок %1$s хочет добавить Вас в друзья.\nПринять заявку?</string>
+    <string name="friends_request_accepted">Игрок %1$s добавлен в друзья</string>
+    <string name="friends_request_denied">Заявка отклонена!</string>
 
     <!-- UserContextMenuDialog -->
     <string name="user_banned">Пользователь %1$s заблокирован</string>
@@ -273,4 +276,5 @@
     <string name="loading_dictionary">Загрузка обновления словаря</string>
     <string name="loading_dictionary_error">Не удалось обновить словарь</string>
     <string name="loading_dictionary_completed">Обновление словаря загружено!</string>
+    <string name="already_friend">Игрок уже у Вас в друзьях</string>
 </resources>

@@ -28,7 +28,11 @@ class UserContextMenuDialog : DialogFragment() {
                     // Ban
                     0 -> banPlayer(args.name, args.userId)
                     // Friends
-                    1 -> if (!args.isFriend) sendFriendRequest()
+                    1 -> if (!args.isFriend) sendFriendRequest() else Toast.makeText(
+                        requireContext(),
+                        R.string.already_friend,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
             .create()

@@ -13,7 +13,7 @@ import ru.aleshi.letsplaycities.databinding.DialogGameResultBinding
 
 class GameResultDialog : DialogFragment() {
 
-    enum class SelectedItem {  SHARE, REPLAY, MENU }
+    enum class SelectedItem { SHARE, REPLAY, MENU }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
@@ -21,21 +21,23 @@ class GameResultDialog : DialogFragment() {
 
         return AlertDialog.Builder(activity)
             .setCancelable(false)
-            .setView(DataBindingUtil.inflate<DialogGameResultBinding>(
-                LayoutInflater.from(activity),
-                R.layout.dialog_game_result,
-                null,
-                false
-            ).apply {
-                result = GameResultDialogArgs.fromBundle(requireArguments()).result +
-                        if (score > 0) activity.getString(R.string.your_score, score) else ""
-                shareButtonVisible = score != -1
-                fragment = this@GameResultDialog
-            }.root)
+            .setView(
+                DataBindingUtil.inflate<DialogGameResultBinding>(
+                    LayoutInflater.from(activity),
+                    R.layout.dialog_game_result,
+                    null,
+                    false
+                ).apply {
+                    result = GameResultDialogArgs.fromBundle(requireArguments()).result +
+                            if (score > 0) activity.getString(R.string.your_score, score) else ""
+                    shareButtonVisible = score != -1
+                    fragment = this@GameResultDialog
+                }.root
+            )
             .create()
     }
 
-    fun onClick(item:SelectedItem) {
+    fun onClick(item: SelectedItem) {
         requireDialog().dismiss()
         when (item) {
             SelectedItem.MENU -> findNavController().popBackStack(
@@ -44,8 +46,9 @@ class GameResultDialog : DialogFragment() {
             )
             SelectedItem.SHARE -> startShareIntent(GameResultDialogArgs.fromBundle(requireArguments()).score)
             SelectedItem.REPLAY -> {
-                //TODO: handle network replay
-                findNavController().navigate(R.id.start_game_fragment)
+                val nav = findNavController()
+                if (!nav.popBackStack(R.id.networkFragment, false))
+                    nav.navigate(R.id.start_game_fragment)
             }
         }
     }

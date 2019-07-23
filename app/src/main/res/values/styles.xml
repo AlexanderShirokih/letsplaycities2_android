@@ -20,6 +20,7 @@
         <item name="colorAccent">@color/defColorPrimary</item>
         <item name="colorPrimary">@color/defColorPrimary</item>
         <item name="colorPrimaryDark">@color/defColorPrimaryDark</item>
+        <item name="colorSecondary">@color/defColorPrimary</item>
         <item name="colorOnBackground">@android:color/black</item>
         <item name="android:windowBackground">@color/defWindowBg</item>
 

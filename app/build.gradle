@@ -17,10 +17,10 @@ android {
         applicationId "ru.aleshi.letsplaycities"
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 190
+        versionName "2.0alpha1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "HOST", HOST_EMULATOR)
+        buildConfigField("String", "HOST", HOST_REMOTE)
     }
     buildTypes {
         release {

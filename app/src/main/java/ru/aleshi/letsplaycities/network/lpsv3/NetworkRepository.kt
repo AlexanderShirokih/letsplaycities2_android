@@ -1,12 +1,15 @@
 package ru.aleshi.letsplaycities.network.lpsv3
 
 import android.util.Log
+import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.base.player.PlayerData
+import ru.aleshi.letsplaycities.network.NetworkUtils
 import java.util.concurrent.TimeUnit
 
 class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandler: (t: Throwable) -> Unit */) {
@@ -38,6 +41,24 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
     val timeout: Completable =
         inputMessage.filter { it is LPSMessage.LPSTimeoutMessage }.firstOrError().ignoreElement()
 
+    val friendsRequest: Observable<LPSMessage.FriendRequest> =
+        inputMessage.filter { it is LPSMessage.LPSFriendRequest }.cast(LPSMessage.LPSFriendRequest::class.java)
+            .map { it.requestResult }
+
+    val firebaseToken: Observable<Unit> =
+        inputMessage.filter { it is LPSMessage.LPSRequestFirebaseToken }
+            .switchMap {
+                networkClient().toObservable().zipWith(
+                    Observable.create<String> {
+                        updateToken { token -> it.onNext(token); it.onComplete() }
+                    },
+                    BiFunction<NetworkClient, String, Pair<NetworkClient, String>> { client, token -> client to token })
+
+            }
+            .observeOn(Schedulers.io())
+            .doOnNext { it.first.sendFirebaseToken(it.second) }
+            .map { Unit }
+
     private fun networkClient(): Single<NetworkClient> =
         Single.just(mNetworkClient)
             .subscribeOn(Schedulers.io())
@@ -65,10 +86,9 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
     }
 
     fun deleteFriend(userId: Int): Completable {
-        return Completable.fromRunnable {
-            mNetworkClient.deleteFriend(userId)
-        }
-            .subscribeOn(Schedulers.io())
+        return networkClient()
+            .doOnSuccess { mNetworkClient.deleteFriend(userId) }
+            .ignoreElement()
     }
 
     fun kick(): Completable {
@@ -101,11 +121,22 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
             .subscribe { client -> client.sendMessage(message) })
     }
 
-    fun test() {
-        mNetworkClient.readMessage()
-    }
-
     fun sendFriendRequest() {
         disposable.add(networkClient().subscribe { client -> client.sendFriendRequest() })
+    }
+
+    fun sendFriendAcceptance(accepted: Boolean) {
+        disposable.add(networkClient().subscribe { client -> client.sendFriendAcceptance(accepted) })
+    }
+
+    private fun updateToken(callback: (token: String) -> Unit) {
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(NetworkUtils::class.java.simpleName, "FirebaseInstanceId.getInstance() failed", task.exception)
+            } else {
+                //174 chars
+                callback(task.result!!.token)
+            }
+        }
     }
 }

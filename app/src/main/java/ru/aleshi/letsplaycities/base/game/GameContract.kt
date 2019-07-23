@@ -25,6 +25,7 @@ interface GameContract {
         fun onHighlightUser(left: Boolean)
         fun setMenuItemsVisibility(help: Boolean, msg: Boolean)
         fun downloadingListener(): DictionaryUpdater.DownloadingListener
+        fun showFriendRequestDialog(name: String)
     }
 
     interface Presenter {
@@ -40,6 +41,7 @@ interface GameContract {
         fun dictionary() : Dictionary
         fun needsShowMenu(isLeft: Boolean)
         fun sendFriendRequest()
+        fun onFriendRequestResult(isAccepted: Boolean)
     }
 
 }

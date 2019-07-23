@@ -62,6 +62,7 @@ class GameFragment : Fragment(), GameContract.View {
                 it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(R.id.mainMenuFragment, false)
                 it.checkWithResultCode(SURRENDER) -> mGameSession.onSurrender()
                 it.checkWithResultCode(USE_HINT) -> showAd()
+                it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) ->mGameSession.onFriendRequestResult(it.result)
             }
         })
 
@@ -230,6 +231,11 @@ class GameFragment : Fragment(), GameContract.View {
         recyclerView.scrollToPosition(mAdapter.itemCount - 1)
     }
 
+    override fun showFriendRequestDialog(name: String) {
+        val msg = getString(R.string.confirm_friend_request, name)
+        findNavController().navigate(GameFragmentDirections.showConfimationDialog(NEW_FRIEND_REQUEST, msg, null))
+    }
+
     private fun hideKeyboard() {
         val activity = requireActivity()
         val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -333,5 +339,6 @@ class GameFragment : Fragment(), GameContract.View {
         private const val GO_TO_MENU = 21
         private const val SURRENDER = 22
         private const val USE_HINT = 23
+        private const val NEW_FRIEND_REQUEST = 24
     }
 }

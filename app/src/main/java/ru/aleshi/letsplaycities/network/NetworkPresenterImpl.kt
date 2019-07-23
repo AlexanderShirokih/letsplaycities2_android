@@ -121,6 +121,7 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
     private fun startGame(userData: PlayerData, friendsInfo: FriendsInfo?) {
         mView?.checkForWaiting {
             mDisposable.add(mNetworkRepository.login(userData)
+                .doOnSuccess { mDisposable.add(mNetworkRepository.firebaseToken.subscribe()) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     mView!!.updateInfo(R.string.connecting_to_server)
@@ -149,7 +150,8 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
                 .subscribe({ play(userData, it.first, it.second) }) {
                     onCancel()
                     mView?.handleError(it)
-                })
+                }
+            )
         }
     }
 

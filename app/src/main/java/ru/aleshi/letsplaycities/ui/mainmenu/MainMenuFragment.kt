@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.fragment_main_menu.*
-import ru.aleshi.letsplaycities.BadTokenException
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.game.LocalServer
@@ -21,9 +20,7 @@ import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
-import ru.aleshi.letsplaycities.utils.IntegrityChecker
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
-import kotlin.system.exitProcess
 
 
 class MainMenuFragment : Fragment() {
@@ -59,14 +56,6 @@ class MainMenuFragment : Fragment() {
     private fun createViewListener(): View.OnClickListener {
         return View.OnClickListener { v ->
             makeOutAnimation(Runnable {
-                if (IntegrityChecker().test()) {
-                    try {
-                        throw BadTokenException()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        exitProcess(0)
-                    }
-                }
 
                 val navController = findNavController()
                 when (v.id) {

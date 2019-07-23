@@ -1,15 +1,11 @@
 package ru.aleshi.letsplaycities.network.lpsv3
 
-import android.util.Log
-import com.google.firebase.iid.FirebaseInstanceId
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.base.player.PlayerData
-import ru.aleshi.letsplaycities.network.NetworkUtils
 import java.io.*
 import java.net.InetAddress
 import java.net.Socket
-
 
 class NetworkClient {
 
@@ -130,17 +126,6 @@ class NetworkClient {
         return ::mSocket.isInitialized && mSocket.isConnected && !mSocket.isClosed
     }
 
-    private fun updateToken(callback: (token: String) -> Unit) {
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w(NetworkUtils::class.java.simpleName, "FirebaseInstanceId.getInstance() failed", task.exception)
-            } else {
-                //174 chars
-                callback(task.result!!.token)
-            }
-        }
-    }
-
     fun sendWord(word: String) {
         LPSMessageWriter(mOutputStream).writeString(LPSv3Tags.ACTION_WORD, word)
             .buildAndFlush()
@@ -153,6 +138,19 @@ class NetworkClient {
 
     fun sendFriendRequest() {
         LPSMessageWriter(mOutputStream).writeByte(LPSv3Tags.ACTION_FRIEND, LPSv3Tags.E_SEND_REQUEST)
+            .buildAndFlush()
+    }
+
+    fun sendFriendAcceptance(accepted: Boolean) {
+        LPSMessageWriter(mOutputStream).writeByte(
+            LPSv3Tags.ACTION_FRIEND,
+            if (accepted) LPSv3Tags.E_ACCEPT_REQUSET else LPSv3Tags.E_DENY_REQUSET
+        )
+            .buildAndFlush()
+    }
+
+    fun sendFirebaseToken(token: String) {
+        LPSMessageWriter(mOutputStream).writeString(LPSv3Tags.ACTION_FIREBASE_TOKEN, token)
             .buildAndFlush()
     }
 }

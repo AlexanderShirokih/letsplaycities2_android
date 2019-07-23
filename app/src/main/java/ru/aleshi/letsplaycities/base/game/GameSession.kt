@@ -9,6 +9,7 @@ import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.player.*
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
+import ru.aleshi.letsplaycities.network.lpsv3.LPSMessage
 import ru.aleshi.letsplaycities.ui.game.DictionaryUpdater
 import ru.aleshi.letsplaycities.utils.StringUtils
 import java.util.concurrent.TimeUnit
@@ -83,6 +84,25 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
                 showToastAndDisconnect(R.string.time_out, true)
             }, view::showError)
         )
+
+        disposable.add(
+            mServer.friendsRequest.observeOn(AndroidSchedulers.mainThread()).subscribe({
+                when (it) {
+                    LPSMessage.FriendRequest.NEW_REQUEST -> view.showFriendRequestDialog(getOpp().name)
+                    LPSMessage.FriendRequest.ACCEPTED -> view.showInfo(
+                        view.context().getString(
+                            R.string.friends_request_accepted,
+                            getOpp().name
+                        )
+                    )
+                    LPSMessage.FriendRequest.DENIED -> view.showInfo(view.context().getString(R.string.friends_request_denied))
+                }
+            }, view::showError)
+        )
+    }
+
+    override fun onFriendRequestResult(isAccepted: Boolean) {
+        mServer.sendFriendAcceptance(isAccepted)
     }
 
 
@@ -289,6 +309,10 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
         return if (currentPlayer is Player)
             currentPlayer as Player
         else null
+    }
+
+    private fun getOpp(): User {
+        return players.first { it !is Player }
     }
 
     override fun needsShowMenu(isLeft: Boolean) {

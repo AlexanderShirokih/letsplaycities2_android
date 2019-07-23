@@ -2,9 +2,9 @@ package ru.aleshi.letsplaycities.network.lpsv3
 
 import ru.aleshi.letsplaycities.base.game.WordResult
 import ru.aleshi.letsplaycities.base.player.AuthData
+import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.AuthType
 import ru.aleshi.letsplaycities.network.FriendModeResult
-import ru.aleshi.letsplaycities.base.player.PlayerData
 import java.nio.ByteBuffer
 
 sealed class LPSMessage {
@@ -63,7 +63,10 @@ sealed class LPSMessage {
     }
 
     class LPSSyncMessage internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {
-        val timeInSeconds: Int = msgReader.readChar(action)
+        init {
+            //Skip: time in seconds
+            msgReader.readChar(action)
+        }
     }
 
     class LPSWordMessage internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {
@@ -91,11 +94,14 @@ sealed class LPSMessage {
         val result = FriendModeResult.values()[msgReader.readByte(action).toInt()]
     }
 
+    enum class FriendRequest { NEW_REQUEST, ACCEPTED, DENIED }
+
     class LPSFriendRequest internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {
-        val isRequestAccepted =
+        val requestResult =
             when (msgReader.readByte(action)) {
-                LPSv3Tags.E_FRIEND_SAYS_YES -> true
-                LPSv3Tags.E_FRIEND_SAYS_NO -> false
+                LPSv3Tags.E_NEW_REQUEST ->FriendRequest.NEW_REQUEST
+                LPSv3Tags.E_FRIEND_SAYS_YES -> FriendRequest.ACCEPTED
+                LPSv3Tags.E_FRIEND_SAYS_NO -> FriendRequest.DENIED
                 else -> throw LPSException("Invalid friend request")
             }
     }
@@ -111,7 +117,7 @@ sealed class LPSMessage {
             val accept = msgReader.readBytes(LPSv3Tags.F_QUERY_USER_ACCEPT)
             val userIds = ByteBuffer.wrap(msgReader.readBytes(LPSv3Tags.F_QUERY_USER_IDS))
 
-            list = ArrayList<FriendsInfo>(size)
+            list = ArrayList(size)
             for (i in 0 until size) {
                 list.add(FriendsInfo(userIds.int, names[i], accept[i] > 0))
             }

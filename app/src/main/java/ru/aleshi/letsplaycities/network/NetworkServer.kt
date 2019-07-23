@@ -35,7 +35,13 @@ class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseSer
 
     override val timeout: Completable = mNetworkRepository.timeout
 
+    override val friendsRequest: Observable<LPSMessage.FriendRequest> = mNetworkRepository.friendsRequest
+
     override fun sendFriendRequest() {
         mNetworkRepository.sendFriendRequest()
+    }
+
+    override fun sendFriendAcceptance(accepted: Boolean) {
+        mNetworkRepository.sendFriendAcceptance(accepted)
     }
 }
