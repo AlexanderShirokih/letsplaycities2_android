@@ -5,6 +5,7 @@ import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.AuthType
 import ru.aleshi.letsplaycities.network.FriendModeResult
+import ru.aleshi.letsplaycities.ui.blacklist.BlackListItem
 import java.nio.ByteBuffer
 
 sealed class LPSMessage {
@@ -20,6 +21,7 @@ sealed class LPSMessage {
                 LPSv3Tags.S_ACTION_LEAVE -> LPSLeaveMessage(msgReader, action)
                 LPSv3Tags.ACTION_TIMEOUT -> LPSTimeoutMessage
                 LPSv3Tags.ACTION_BANNED -> LPSBannedMessage(msgReader, action)
+                LPSv3Tags.ACTION_QUERY_BANLIST_RES -> LPSBannedListMessage(msgReader, action)
                 LPSv3Tags.ACTION_FRIEND_MODE_REQ -> LPSFriendModeRequest(msgReader, action)
                 LPSv3Tags.ACTION_FRIEND_REQUEST -> LPSFriendRequest(msgReader, action)
                 LPSv3Tags.ACTION_QUERY_FRIEND_RES -> LPSFriendsList(msgReader, action)
@@ -32,6 +34,7 @@ sealed class LPSMessage {
     class LPSPlayMessage internal constructor(msgReader: LPSMessageReader) : LPSMessage() {
         val opponentPlayer = PlayerData()
         var youStarter = false
+        var banned = false
 
         init {
             var tag = msgReader.nextTag()
@@ -52,6 +55,7 @@ sealed class LPSMessage {
                     LPSv3Tags.S_OPP_UID -> userID = msgReader.readInt(tag)
                     LPSv3Tags.S_OPP_SN -> snName = AuthType.values()[msgReader.readByte(tag).toInt()].type()
                     LPSv3Tags.S_OPP_SNUID -> snUID = msgReader.readString(tag)
+                    LPSv3Tags.S_BANNED_BY_OPP -> banned = msgReader.readBoolean(tag)
                 }
                 tag = msgReader.nextTag()
             }
@@ -85,7 +89,26 @@ sealed class LPSMessage {
 
     class LPSBannedMessage internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {
         val isBannedBySystem = msgReader.readByte(action) == 2.toByte()
-        val description = msgReader.readString(LPSv3Tags.S_BAN_REASON)
+        val description = msgReader.optString(LPSv3Tags.S_BAN_REASON)
+    }
+
+    class LPSBannedListMessage internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {
+        val list: ArrayList<BlackListItem>
+
+        init {
+            val size = msgReader.readChar(action)
+            val names =
+                msgReader.readString(LPSv3Tags.F_QUERY_NAMES).split("\\|\\|".toRegex()).dropLastWhile { it.isEmpty() }
+                    .toTypedArray()
+            val userIds = ByteBuffer.wrap(msgReader.readBytes(LPSv3Tags.F_QUERY_USER_IDS))
+
+            list = ArrayList(size)
+            for (i in 0 until size) {
+                list.add(BlackListItem(names[i], userIds.int))
+            }
+
+            userIds.clear()
+        }
     }
 
     class LPSFriendModeRequest internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {
@@ -99,7 +122,7 @@ sealed class LPSMessage {
     class LPSFriendRequest internal constructor(msgReader: LPSMessageReader, action: Byte) : LPSMessage() {
         val requestResult =
             when (msgReader.readByte(action)) {
-                LPSv3Tags.E_NEW_REQUEST ->FriendRequest.NEW_REQUEST
+                LPSv3Tags.E_NEW_REQUEST -> FriendRequest.NEW_REQUEST
                 LPSv3Tags.E_FRIEND_SAYS_YES -> FriendRequest.ACCEPTED
                 LPSv3Tags.E_FRIEND_SAYS_NO -> FriendRequest.DENIED
                 else -> throw LPSException("Invalid friend request")

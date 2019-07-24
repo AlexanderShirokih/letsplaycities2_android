@@ -277,4 +277,7 @@
     <string name="loading_dictionary_error">Не удалось обновить словарь</string>
     <string name="loading_dictionary_completed">Обновление словаря загружено!</string>
     <string name="already_friend">Игрок уже у Вас в друзьях</string>
+    <string name="lost_connection">Потеряно соединение с сервером</string>
+    <string name="kicked_by_system">Вы были отключены системой.</string>
+    <string name="kicked_by_user">Подключённый игрок добавил вас в чёрный список</string>
 </resources>

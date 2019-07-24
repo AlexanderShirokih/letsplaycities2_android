@@ -60,33 +60,26 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
             user.reset()
         }
 
-        disposable.add(
+        disposable.addAll(
             mServer.getWordsResult()
                 .subscribe({ handleWordResult(it.first, it.second) }, { view::showError })
-        )
-
-        disposable.add(
-            mServer.getInputMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(
+            , mServer.getInputMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(
                 ::postMessage,
                 view::showError
             )
-        )
 
-        disposable.add(
-            mServer.leave.observeOn(AndroidSchedulers.mainThread()).subscribe({ leaved ->
+            , mServer.leave.observeOn(AndroidSchedulers.mainThread()).subscribe({ leaved ->
                 if (leaved) showToastAndDisconnect(R.string.player_leaved, false)
                 else showToastAndDisconnect(R.string.opp_disconnect, false)
-            }, view::showError)
-        )
+            }, view::showError, {
+                showToastAndDisconnect(R.string.lost_connection, false)
+            })
 
-        disposable.add(
-            mServer.timeout.observeOn(AndroidSchedulers.mainThread()).subscribe({
+            , mServer.timeout.observeOn(AndroidSchedulers.mainThread()).subscribe({
                 showToastAndDisconnect(R.string.time_out, true)
             }, view::showError)
-        )
 
-        disposable.add(
-            mServer.friendsRequest.observeOn(AndroidSchedulers.mainThread()).subscribe({
+            , mServer.friendsRequest.observeOn(AndroidSchedulers.mainThread()).subscribe({
                 when (it) {
                     LPSMessage.FriendRequest.NEW_REQUEST -> view.showFriendRequestDialog(getOpp().name)
                     LPSMessage.FriendRequest.ACCEPTED -> view.showInfo(
@@ -98,8 +91,19 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
                     LPSMessage.FriendRequest.DENIED -> view.showInfo(view.context().getString(R.string.friends_request_denied))
                 }
             }, view::showError)
+            ,
+            mServer.kick.observeOn(AndroidSchedulers.mainThread()).subscribe(::onKicked)
         )
     }
+
+    private fun onKicked(isBannedBySystem: Boolean) {
+        if (isBannedBySystem)
+            view.showInfo(view.context().getString(R.string.kicked_by_system))
+        else
+            view.showInfo(view.context().getString(R.string.kicked_by_user))
+    }
+
+    override fun banUser(userId: Int) = mServer.banUser(userId)
 
     override fun onFriendRequestResult(isAccepted: Boolean) {
         mServer.sendFriendAcceptance(isAccepted)
@@ -208,10 +212,11 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     private fun dispatchCityResult(city: String, player: User?, hasErrors: Boolean) {
         Completable.fromAction {
-            if (player != null)
-                view.putCity(city, mDictionary!!.getCountryCode(city), isLeft(player))
-            else
+            if (player != null) view.putCity(city, mDictionary!!.getCountryCode(city), isLeft(player))
+            else {
                 view.updateCity(city, hasErrors)
+                mDictionary!!.applyCity(city)
+            }
         }
             .subscribeOn(AndroidSchedulers.mainThread())
             .subscribe()
@@ -245,7 +250,12 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     override fun onStop() {
         stopTimer()
+        dispose()
+    }
+
+    private fun dispose() {
         disposable.dispose()
+        mServer.dispose()
         mScoreManager.updateScore()
     }
 
@@ -271,6 +281,7 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     private fun finishGame(timeIsUp: Boolean, remote: Boolean) {
         stopTimer()
+        dispose()
         val res = mScoreManager.getWinner(timeIsUp, remote)
         val score = if (findGameMode() == GameMode.MODE_PVP)
             -1

@@ -101,6 +101,12 @@ class NetworkClient {
         return LPSMessage.from(LPSMessageReader(mInputStream))
     }
 
+    fun requestBlackList() {
+        LPSMessageWriter(mOutputStream)
+            .writeByte(LPSv3Tags.ACTION_QUERY_BANLIST, LPSv3Tags.E_QUERY_LIST)
+            .buildAndFlush()
+    }
+
     fun requestFriendsList() {
         LPSMessageWriter(mOutputStream)
             .writeByte(LPSv3Tags.ACTION_QUERY_FRIEND_INFO, 1)
@@ -114,9 +120,17 @@ class NetworkClient {
             .buildAndFlush()
     }
 
-    fun kick() {
+    fun removeFromBanList(userId: Int) {
         LPSMessageWriter(mOutputStream)
-            .writeByte(LPSv3Tags.ACTION_BAN, 0)
+            .writeByte(LPSv3Tags.ACTION_QUERY_BANLIST, LPSv3Tags.E_DELETE_REQUEST)
+            .writeInt(LPSv3Tags.FRIEND_UID, userId)
+            .buildAndFlush()
+    }
+
+    fun banUser(userId: Int) {
+        LPSMessageWriter(mOutputStream)
+            .writeByte(LPSv3Tags.ACTION_BAN, LPSv3Tags.E_USER_BAN)
+            .writeInt(LPSv3Tags.S_UID, userId)
             .writeString(LPSv3Tags.BAN_REASON, "unimpl")
             .writeString(LPSv3Tags.ROOM_CONTENT, "unimpl")
             .buildAndFlush()
@@ -153,4 +167,5 @@ class NetworkClient {
         LPSMessageWriter(mOutputStream).writeString(LPSv3Tags.ACTION_FIREBASE_TOKEN, token)
             .buildAndFlush()
     }
+
 }

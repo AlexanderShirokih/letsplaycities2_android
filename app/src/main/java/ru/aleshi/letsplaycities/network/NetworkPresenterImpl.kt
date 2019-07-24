@@ -13,7 +13,6 @@ import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.LPSException
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.social.NativeAccess
@@ -87,6 +86,10 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
         mView?.onCancel()
     }
 
+    override fun onDispose() {
+        mDisposable.clear()
+    }
+
     private fun createPlayerData(versionInfo: Pair<String, Int>, callback: (playerData: PlayerData) -> Unit) {
         mView?.let {
             val prefs = it.getGamePreferences()
@@ -135,22 +138,14 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
                     }
                 }
                 .observeOn(Schedulers.io())
-                .flatMap { mNetworkRepository.play(friendsInfo != null, friendsInfo?.userId) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess {
-                    mView?.run {
-                        if (getBanManager().checkInBanList(it.first.authData!!)) {
-                            mView?.showMessage(R.string.banned_player)
-                            mNetworkRepository.disconnect()
-                            throw LPSException("banned")
-                        }
-                    }
+                .flatMapMaybe {
+                    mNetworkRepository.play(friendsInfo != null, friendsInfo?.userId)
                 }
-                .retry { t -> "banned" == t.message }
-                .subscribe({ play(userData, it.first, it.second) }) {
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ play(userData, it.first, it.second) }, {
                     onCancel()
                     mView?.handleError(it)
-                }
+                }, ::onCancel)
             )
         }
     }

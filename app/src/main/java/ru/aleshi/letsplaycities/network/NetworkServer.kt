@@ -1,8 +1,7 @@
 package ru.aleshi.letsplaycities.network
 
-import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Observable
-import io.reactivex.Single
 import ru.aleshi.letsplaycities.base.game.BaseServer
 import ru.aleshi.letsplaycities.base.game.WordResult
 import ru.aleshi.letsplaycities.network.lpsv3.LPSMessage
@@ -22,6 +21,10 @@ class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseSer
         private const val NETWORK_TIMER = 92L
     }
 
+    override fun dispose() {
+        mNetworkRepository.disconnect()
+    }
+
     override fun broadcastResult(city: String) {
         mNetworkRepository.sendWord(city)
     }
@@ -31,9 +34,9 @@ class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseSer
     override fun broadcastMessage(message: String) =
         mNetworkRepository.sendMessage(message)
 
-    override val leave: Single<Boolean> = mNetworkRepository.leave.map { it.leaved }
+    override val leave: Maybe<Boolean> = mNetworkRepository.leave.map { it.leaved }
 
-    override val timeout: Completable = mNetworkRepository.timeout
+    override val timeout: Maybe<LPSMessage> = mNetworkRepository.timeout
 
     override val friendsRequest: Observable<LPSMessage.FriendRequest> = mNetworkRepository.friendsRequest
 
@@ -44,4 +47,10 @@ class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseSer
     override fun sendFriendAcceptance(accepted: Boolean) {
         mNetworkRepository.sendFriendAcceptance(accepted)
     }
+
+    override fun banUser(userId: Int) {
+        mNetworkRepository.banUser(userId)
+    }
+
+    override val kick: Maybe<Boolean> = mNetworkRepository.kick.map { it.isBannedBySystem }
 }

@@ -42,6 +42,7 @@ interface GameContract {
         fun needsShowMenu(isLeft: Boolean)
         fun sendFriendRequest()
         fun onFriendRequestResult(isAccepted: Boolean)
+        fun banUser(userId: Int)
     }
 
 }

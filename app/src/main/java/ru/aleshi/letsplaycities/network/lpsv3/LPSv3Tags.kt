@@ -62,6 +62,11 @@ object LPSv3Tags {
     const val ACTION_FM_REQ_RESULT: Byte = 36
     const val SENDER_UID: Byte = 37// LPSv4
 
+    // Query banlist Tags
+    const val ACTION_QUERY_BANLIST: Byte = 106
+    const val ACTION_QUERY_BANLIST_RES: Byte = 107
+    const val E_QUERY_LIST: Byte = 1
+
     //Firebase request Tags
     const val ACTION_FIREBASE_TOKEN: Byte = 110
 
@@ -89,6 +94,7 @@ object LPSv3Tags {
     const val S_OPP_UID: Byte = 53// v4
     const val S_OPP_SN: Byte = 54// v4
     const val S_OPP_SNUID: Byte = 55// v4
+    const val S_BANNED_BY_OPP: Byte = 105
     const val OPP_IS_FRIEND: Byte = 104
 
     // Word Tags

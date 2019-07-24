@@ -53,7 +53,7 @@ class OdnoklassnikiSN : ISocialNetwork() {
 
                     SocialUtils.saveAvatar(activity, json.getString("pic_3").toUri()) {
                         val info = AuthData(
-                            json.getString("name"),
+                            json.getString("userName"),
                             json.getString("uid"),
                             "ok",
                             access_token

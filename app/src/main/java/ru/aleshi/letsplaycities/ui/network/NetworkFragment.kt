@@ -21,7 +21,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_network.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.BanManager
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.network.NetworkContract
@@ -129,8 +128,6 @@ class NetworkFragment : Fragment(), NetworkContract.View {
 
     override fun showMessage(msgResId: Int) = Snackbar.make(requireView(), msgResId, Snackbar.LENGTH_LONG).show()
 
-    override fun getBanManager(): BanManager = mApplication.banManager
-
     override fun getGamePreferences(): GamePreferences = mGamePreferences
 
     override fun onCancel() = setLoadingLayout(false)
@@ -157,6 +154,10 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         onActivityResult(requestCode, 0, Intent().apply { putExtra(key, value) })
     }
 
+    override fun onStop() {
+        super.onStop()
+        mNetworkPresenter.onDispose()
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val activity = requireActivity()

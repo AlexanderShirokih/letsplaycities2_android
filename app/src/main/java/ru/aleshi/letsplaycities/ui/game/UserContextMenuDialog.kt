@@ -46,7 +46,7 @@ class UserContextMenuDialog : DialogFragment() {
     }
 
     private fun banPlayer(login: String, userId: Int) {
-        lpsApplication.banManager.addToBanList(login, userId)
+        gameSessionViewModel.gameSession.value?.banUser(userId)
         Toast.makeText(requireActivity(), getString(R.string.user_banned, login), Toast.LENGTH_SHORT).show()
         findNavController().popBackStack(R.id.gameFragment, true)
     }

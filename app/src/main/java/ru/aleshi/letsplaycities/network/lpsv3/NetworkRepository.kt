@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.network.lpsv3
 import android.util.Log
 import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -10,6 +11,8 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.NetworkUtils
+import ru.aleshi.letsplaycities.ui.blacklist.BlackListItem
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandler: (t: Throwable) -> Unit */) {
@@ -23,6 +26,10 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
         it.onComplete()
     }
         .subscribeOn(Schedulers.io())
+        .retry(3) { t ->
+            mNetworkClient.disconnect()
+            t is IOException
+        }
         .doOnNext {
             Log.d("TAG", "Input message= $it")
         }
@@ -34,16 +41,20 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
     val messages: Observable<LPSMessage.LPSMsgMessage> =
         inputMessage.filter { it is LPSMessage.LPSMsgMessage }.cast(LPSMessage.LPSMsgMessage::class.java)
 
-    val leave: Single<LPSMessage.LPSLeaveMessage> =
+    val leave: Maybe<LPSMessage.LPSLeaveMessage> =
         inputMessage.filter { it is LPSMessage.LPSLeaveMessage }.cast(LPSMessage.LPSLeaveMessage::class.java)
-            .firstOrError()
+            .firstElement()
 
-    val timeout: Completable =
-        inputMessage.filter { it is LPSMessage.LPSTimeoutMessage }.firstOrError().ignoreElement()
+    val timeout: Maybe<LPSMessage> =
+        inputMessage.filter { it is LPSMessage.LPSTimeoutMessage }.firstElement()
 
     val friendsRequest: Observable<LPSMessage.FriendRequest> =
         inputMessage.filter { it is LPSMessage.LPSFriendRequest }.cast(LPSMessage.LPSFriendRequest::class.java)
             .map { it.requestResult }
+
+    val kick: Maybe<LPSMessage.LPSBannedMessage> =
+        inputMessage.filter { it is LPSMessage.LPSBannedMessage }.cast(LPSMessage.LPSBannedMessage::class.java)
+            .firstElement()
 
     val firebaseToken: Observable<Unit> =
         inputMessage.filter { it is LPSMessage.LPSRequestFirebaseToken }
@@ -69,18 +80,43 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
             .map { it.login(userData) }
     }
 
-    fun play(isWaiting: Boolean, friendId: Int?): Single<Pair<PlayerData, Boolean>> {
-        disposable.add(networkClient()
-            .subscribe { client -> client.play(isWaiting, friendId) })
-        return inputMessage.filter { it is LPSMessage.LPSPlayMessage }
-            .cast(LPSMessage.LPSPlayMessage::class.java)
-            .firstOrError()
+    class BannedPlayerException : Exception()
+
+    fun play(isWaiting: Boolean, friendId: Int?): Maybe<Pair<PlayerData, Boolean>> {
+        return networkClient()
+            .doOnSuccess { client -> client.play(isWaiting, friendId) }
+            .toObservable()
+            .flatMap {
+                inputMessage.filter { it is LPSMessage.LPSPlayMessage }
+                    .cast(LPSMessage.LPSPlayMessage::class.java)
+            }
+            .flatMap {
+                if (it.banned) Observable.error(BannedPlayerException()) else Observable.just(it)
+            }
+            .retry { t: Throwable -> t is BannedPlayerException }
             .map { it.opponentPlayer to it.youStarter }
+            .firstElement()
+    }
+
+    fun getBlackList(): Single<ArrayList<BlackListItem>> {
+        return networkClient()
+            .doOnSuccess { t -> t.requestBlackList() }
+            .toObservable()
+            .flatMap {
+                inputMessage.filter { it is LPSMessage.LPSBannedListMessage }
+                    .cast(LPSMessage.LPSBannedListMessage::class.java)
+            }
+            .firstOrError()
+            .map { it.list }
     }
 
     fun getFriendsList(): Single<ArrayList<FriendsInfo>> {
-        disposable.add(networkClient().subscribe { t -> t.requestFriendsList() })
-        return inputMessage.filter { it is LPSMessage.LPSFriendsList }.cast(LPSMessage.LPSFriendsList::class.java)
+        return networkClient()
+            .doOnSuccess { t -> t.requestFriendsList() }
+            .toObservable()
+            .flatMap {
+                inputMessage.filter { it is LPSMessage.LPSFriendsList }.cast(LPSMessage.LPSFriendsList::class.java)
+            }
             .firstOrError()
             .map { it.list }
     }
@@ -91,11 +127,11 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
             .ignoreElement()
     }
 
-    fun kick(): Completable {
+
+    fun removeFromBanList(userId: Int): Completable {
         return networkClient()
-            .doOnSuccess {
-                it.kick()
-            }.ignoreElement()
+            .doOnSuccess { mNetworkClient.removeFromBanList(userId) }
+            .ignoreElement()
     }
 
     fun disconnect() {
@@ -138,5 +174,9 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
                 callback(task.result!!.token)
             }
         }
+    }
+
+    fun banUser(userId: Int) {
+        disposable.add(networkClient().subscribe { client -> client.banUser(userId) })
     }
 }

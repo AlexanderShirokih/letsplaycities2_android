@@ -1,7 +1,6 @@
 package ru.aleshi.letsplaycities.network
 
 import androidx.lifecycle.Observer
-import ru.aleshi.letsplaycities.base.BanManager
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
@@ -18,7 +17,6 @@ interface NetworkContract {
         fun handleError(throwable: Throwable)
         fun onCancel()
         fun onResult(requestCode: Int, key: String, value: String)
-        fun getBanManager() : BanManager
         fun onStartGame(session: GameSession)
         fun updateInfo(infoMsgId: Int)
     }
@@ -30,5 +28,6 @@ interface NetworkContract {
         fun onCancel()
         fun onFriendsInfo(versionInfo: Pair<String, Int>): Observer<in FriendsInfo>
         fun onLogin(): Observer<in String>
+        fun onDispose()
     }
 }

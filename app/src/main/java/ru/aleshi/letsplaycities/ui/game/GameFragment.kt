@@ -266,8 +266,9 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun onStop() {
+        hideKeyboard()
         super.onStop()
-        disposable.dispose()
+        disposable.clear()
         mGameSession.onStop()
     }
 

@@ -29,7 +29,7 @@ class PlayerData {
                 ", clientBuild=" + clientBuild +
                 ", canReceiveMessages=" + canReceiveMessages +
                 ", allowSendUID=" + allowSendUID +
-                ", name='" + userName + '\''.toString() +
+                ", userName='" + userName + '\''.toString() +
                 ", avatar=" + (if (avatar == null) "no" else "yes") +
                 ", authData=" + (if (authData == null) "null" else authData.toString()) +
                 '}'.toString()
