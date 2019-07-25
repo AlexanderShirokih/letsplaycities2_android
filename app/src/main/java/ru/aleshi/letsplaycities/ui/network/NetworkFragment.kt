@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities.ui.network
 
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,6 +46,8 @@ class NetworkFragment : Fragment(), NetworkContract.View {
     private val mNormalConstraintSet: ConstraintSet = ConstraintSet()
     private val mLoadingConstraintSet: ConstraintSet = ConstraintSet()
 
+    private var mGameSound: MediaPlayer? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mApplication = lpsApplication
@@ -55,18 +58,21 @@ class NetworkFragment : Fragment(), NetworkContract.View {
             avatarPath.value = mApplication.gamePreferences.getAvatarPath()
             avatarPath.observe(this@NetworkFragment, Observer {
                 if (it == null) {
-                    roundedImageView.setImageResource(R.drawable.ic_player)
+                    roundedImageView?.setImageResource(R.drawable.ic_player)
                 } else {
                     Utils.loadAvatar(File(it).toUri())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnNext { bitmap ->
-                            roundedImageView.setImageBitmap(bitmap)
+                            roundedImageView?.setImageBitmap(bitmap)
                         }
                         .subscribe()
                 }
             })
             nativeLogin.observe(this@NetworkFragment, mNetworkPresenter.onLogin())
             friendsInfo.observe(this@NetworkFragment, mNetworkPresenter.onFriendsInfo(getVersionInfo()))
+        }
+        if (mGamePreferences.isSoundEnabled()) {
+            mGameSound = MediaPlayer.create(activity, R.raw.begin)
         }
     }
 
@@ -121,6 +127,7 @@ class NetworkFragment : Fragment(), NetworkContract.View {
 
     override fun onStartGame(session: GameSession) {
         ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession.value = session
+        mGameSound?.start()
         findNavController().navigate(R.id.start_game_fragment)
     }
 

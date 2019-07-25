@@ -48,7 +48,7 @@ class GameResultDialog : DialogFragment() {
             SelectedItem.REPLAY -> {
                 val nav = findNavController()
                 if (!nav.popBackStack(R.id.networkFragment, false))
-                    nav.navigate(R.id.start_game_fragment)
+                    nav.navigate(R.id.back_to_game_fragment)
             }
         }
     }

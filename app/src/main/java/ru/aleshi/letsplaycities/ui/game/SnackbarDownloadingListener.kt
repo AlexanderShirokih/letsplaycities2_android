@@ -7,8 +7,10 @@ import ru.aleshi.letsplaycities.R
 class SnackbarDownloadingListener(private val fragment: Fragment) : DictionaryUpdater.DownloadingListener {
 
     private var snackbar: Snackbar? = null
+    private var hasStarted = false
 
     override fun onStart() {
+        hasStarted = true
         fragment.view?.let {
             snackbar = Snackbar.make(it, R.string.loading_dictionary, Snackbar.LENGTH_INDEFINITE)
             snackbar!!.show()
@@ -19,7 +21,10 @@ class SnackbarDownloadingListener(private val fragment: Fragment) : DictionaryUp
         snackbar?.setText(fragment.getString(R.string.loading_dictionary) + " $res%")
     }
 
-    override fun onEnd() = showShortSnackbar(R.string.loading_dictionary_completed)
+    override fun onEnd() {
+        if (hasStarted)
+            showShortSnackbar(R.string.loading_dictionary_completed)
+    }
 
     override fun onError() = showShortSnackbar(R.string.loading_dictionary_error)
 

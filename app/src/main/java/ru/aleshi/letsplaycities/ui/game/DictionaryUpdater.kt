@@ -50,9 +50,10 @@ object DictionaryUpdater {
             .filter { it > dictionary.version }
             .map { "$HOST/data-$it.bin" }
             .toObservable()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext { listener.onStart() }
             .flatMap { loadFile(it, dictionary.savePath) }
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { listener.onStart() }
             .subscribe(listener::onProgress, { listener.onError() }, listener::onEnd)
     }
 

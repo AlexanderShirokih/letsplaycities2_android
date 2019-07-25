@@ -62,7 +62,7 @@ class GameFragment : Fragment(), GameContract.View {
                 it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(R.id.mainMenuFragment, false)
                 it.checkWithResultCode(SURRENDER) -> mGameSession.onSurrender()
                 it.checkWithResultCode(USE_HINT) -> showAd()
-                it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) ->mGameSession.onFriendRequestResult(it.result)
+                it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession.onFriendRequestResult(it.result)
             }
         })
 
@@ -265,9 +265,9 @@ class GameFragment : Fragment(), GameContract.View {
             .subscribe { nav.navigate(GameFragmentDirections.showGameResultDialog(result, score)) })
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         hideKeyboard()
-        super.onStop()
+        super.onDestroy()
         disposable.clear()
         mGameSession.onStop()
     }
@@ -330,8 +330,14 @@ class GameFragment : Fragment(), GameContract.View {
 
     private fun setMessagingLayout(isMessagingMode: Boolean) {
         TransitionManager.beginDelayedTransition(root)
-        messageInputLayout.visibility = if (isMessagingMode) View.VISIBLE else View.GONE
-        textInputLayout.visibility = if (isMessagingMode) View.GONE else View.VISIBLE
+        messageInputLayout.visibility = if (isMessagingMode) {
+            messageInput.requestFocus()
+            View.VISIBLE
+        } else View.GONE
+        textInputLayout.visibility = if (isMessagingMode) View.GONE else {
+            cityInput.requestFocus()
+            View.VISIBLE
+        }
     }
 
     override fun context(): Context = requireContext()

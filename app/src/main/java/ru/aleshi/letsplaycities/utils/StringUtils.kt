@@ -18,10 +18,11 @@ object StringUtils {
         return if (ind > 0) "${name.substring(0, ind)}а${name.substring(ind)}" else "${name}а"
     }
 
+    fun replaceWhitespaces(city: String) : String = city.replace(" ", "-")
 
     fun formatCity(city: String): String {
         val s = city.trim().toLowerCase()
-        val replaced = s.replace(" ", "-").replace("ё", "е")
+        val replaced = s.replace("ё", "е")
         val sb = StringBuilder()
         var prev: Char = 0.toChar()
         for (i in 0 until replaced.length) {

@@ -22,6 +22,8 @@ class Player(playerData: PlayerData) : User(playerData) {
         mFirstChar = firstChar
     }
 
+    class CityNotFoundException(val city: String) : Exception()
+
     fun submit(userInput: String, onSuccess: () -> Unit) {
         mCompositeDisposable.add(Maybe.just(userInput)
             .map { StringUtils.formatCity(it) }
@@ -33,7 +35,27 @@ class Player(playerData: PlayerData) : User(playerData) {
             .filter { it.second == null }
             .map { it.first }
             .observeOn(Schedulers.computation())
-            .map { gameSession.dictionary().applyCity(it) }
+            .flatMap {
+                var city = it
+                Maybe.just(0)
+                    .map { city }
+                    .map { c -> gameSession.dictionary().applyCity(c) }
+                    .flatMap { res ->
+                        if (res.second == Dictionary.CityResult.CITY_NOT_FOUND) Maybe.error(
+                            CityNotFoundException(res.first)
+                        ) else Maybe.just(res)
+                    }
+                    .retry { c, t ->
+                        city = StringUtils.replaceWhitespaces(city)
+                        c < 2 && t is CityNotFoundException
+                    }
+                    .onErrorResumeNext { t: Throwable ->
+                        if (t is CityNotFoundException)
+                            Maybe.just(t.city to Dictionary.CityResult.CITY_NOT_FOUND)
+                        else
+                            Maybe.error<Pair<String, Dictionary.CityResult>>(t)
+                    }
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ processCityResult(it, onSuccess) }, ::error)
         )
