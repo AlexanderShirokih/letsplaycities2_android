@@ -5,9 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_multiplayer.*
+import com.google.android.material.snackbar.Snackbar
 import ru.aleshi.letsplaycities.R
-
 
 class MultiplayerFragment : Fragment() {
 
@@ -16,9 +15,10 @@ class MultiplayerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        create.setOnClickListener {
+        val activity = requireActivity() as MainActivity
+        activity.setToolbarVisibility(true)
 
-        }
+        Snackbar.make(requireView(), R.string.unavail_in_beta, Snackbar.LENGTH_LONG).show()
     }
 
 }
