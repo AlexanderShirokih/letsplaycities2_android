@@ -1,9 +1,13 @@
 package ru.aleshi.letsplaycities.base.player
 
-import com.google.firebase.iid.FirebaseInstanceId
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.provider.Settings
 
-class DeviceId {
-    private var deviceId: String = FirebaseInstanceId.getInstance().id
+class DeviceId(activity: Activity) {
+
+    @SuppressLint("HardwareIds")
+    private val deviceId = Settings.Secure.getString(activity.contentResolver, Settings.Secure.ANDROID_ID)
 
     override fun toString(): String {
         return deviceId
