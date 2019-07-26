@@ -2,30 +2,14 @@
 <resources>
 
     <style name="VkStyleTheme" parent="AppTheme">
+        <item name="colorAccent">@color/vkColorPrimary</item>
+        <item name="colorPrimary">@color/vkColorPrimary</item>
+        <item name="colorPrimaryDark">@color/vkColorPrimaryDark</item>
+        <item name="colorSecondary">@color/vkColorPrimary</item>
+        <item name="colorOnBackground">@android:color/black</item>
         <item name="android:windowBackground">@color/vks_window_bg</item>
-        <item name="android:buttonStyle">@style/VksButtonStyle</item>
-        <item name="android:imageButtonStyle">@style/VksButtonStyle</item>
-        <item name="android:checkboxStyle">@style/VksCheckboxStyle</item>
-        <item name="android:seekBarStyle">@style/VksSeekbarStyle</item>
-        <item name="sepBg">@color/vks_sep</item>
-        <item name="iconColor">@color/vks_sep</item>
         <item name="itemBgMe">@drawable/vks_bg_me</item>
         <item name="itemBgOther">@drawable/vks_bg_other</item>
     </style>
 
-    <style name="VksSeekbarStyle" parent="@android:style/Widget.SeekBar">
-        <item name="android:thumb">@drawable/vks_scrubber_control</item>
-        <item name="android:progressDrawable">@drawable/vks_scrubber_progress</item>
-    </style>
-
-    <style name="VksButtonStyle" parent="@android:style/Widget.Button">
-        <item name="android:background">@drawable/vks_button</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="VksCheckboxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
-        <item name="android:button">@drawable/vks_checkbox</item>
-        <item name="android:drawablePadding">@dimen/chb_drawable_pad</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
 </resources>

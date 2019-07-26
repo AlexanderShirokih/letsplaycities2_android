@@ -2,26 +2,16 @@
 <resources>
 
     <style name="WhiteStyleTheme" parent="AppTheme">
-        <item name="android:buttonStyle">@style/WhiteButtonStyle</item>
-        <item name="android:imageButtonStyle">@style/WhiteButtonStyle</item>
-        <item name="android:seekBarStyle">@style/WhiteSeekbarStyle</item>
-
+        <item name="colorAccent">@color/whtColorPrimary</item>
+        <item name="colorPrimary">@color/whtColorPrimary</item>
+        <item name="colorPrimaryDark">@color/whtColorPrimaryDark</item>
+        <item name="colorSecondary">@color/whtColorPrimary</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorOnBackground">@android:color/black</item>
         <item name="android:windowBackground">@color/wht_window_bg</item>
-        <item name="sepBg">@color/wht_sep</item>
-        <item name="iconColor">@color/wht_sep</item>
-
         <item name="itemBgMe">@drawable/wht_bg_other</item>
         <item name="itemBgOther">@drawable/wht_bg_other</item>
-    </style>
-
-    <style name="WhiteButtonStyle" parent="@android:style/Widget.Button">
-        <item name="android:background">@drawable/wht_button</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
-
-    <style name="WhiteSeekbarStyle" parent="@android:style/Widget.SeekBar">
-        <item name="android:thumb">@drawable/white_scrubber_control</item>
-        <item name="android:progressDrawable">@drawable/white_scrubber_progress</item>
+        <item name="cityInputColor">#E7E7E7</item>
     </style>
 
 </resources>

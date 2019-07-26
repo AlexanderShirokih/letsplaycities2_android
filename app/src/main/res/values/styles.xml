@@ -1,21 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <declare-styleable name="CustomTheme">
-        <attr name="sepBg" format="reference"/>
-        <attr name="helpIcon" format="reference"/>
-        <attr name="surrIcon" format="reference"/>
-        <attr name="menuIcon" format="reference"/>
         <attr name="scoreColor" format="color|reference"/>
+        <attr name="cityInputColor" format="color|reference"/>
     </declare-styleable>
 
     <attr name="itemBgMe" format="reference"/>
     <attr name="itemBgOther" format="reference"/>
     <attr name="itemMsgMe" format="reference"/>
     <attr name="itemMsgOther" format="reference"/>
-
-    <attr name="iconColor" format="color|reference"/>
     <attr name="fgSpanColor" format="color|reference"/>
 
-    <!-- Default app token (Yellow) -->
+    <!-- Default app theme (Yellow) -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorAccent">@color/defColorPrimary</item>
         <item name="colorPrimary">@color/defColorPrimary</item>
@@ -24,14 +19,16 @@
         <item name="colorOnBackground">@android:color/black</item>
         <item name="android:windowBackground">@color/defWindowBg</item>
 
-        <item name="sepBg">@color/def_sep</item>
-        <item name="iconColor">@color/def_icon</item>
         <item name="itemBgMe">@drawable/bg_me</item>
         <item name="itemBgOther">@drawable/bg_other</item>
         <item name="itemMsgMe">@drawable/bg_msg_me</item>
         <item name="itemMsgOther">@drawable/bg_msg_other</item>
         <item name="fgSpanColor">@color/fg_span_color</item>
         <item name="scoreColor">?android:textColor</item>
+        <item name="cityInputColor">@android:color/white</item>
+
+        <item name="android:textColor">#2E2E2E</item>
+        <item name="android:textColorHint">#2E2E2E</item>
     </style>
 
     <style name="Social">
@@ -42,11 +39,9 @@
         <item name="android:elevation" tools:targetApi="lollipop">15dp</item>
     </style>
 
-    <style name="Toolbar">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">?attr/actionBarSize</item>
-        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
-        <item name="android:background">@color/defColorPrimary</item>
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
     </style>
 
     <style name="GameActionButton">

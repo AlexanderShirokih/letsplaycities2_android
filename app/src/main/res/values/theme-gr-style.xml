@@ -2,25 +2,14 @@
 <resources>
 
     <style name="GrStyleTheme" parent="AppTheme">
+        <item name="colorAccent">@color/grColorPrimary</item>
+        <item name="colorPrimary">@color/grColorPrimary</item>
+        <item name="colorPrimaryDark">@color/grColorPrimaryDark</item>
+        <item name="colorSecondary">@color/grColorPrimary</item>
+        <item name="colorOnBackground">@android:color/black</item>
         <item name="android:windowBackground">@color/grn_window_bg</item>
-        <item name="android:buttonStyle">@style/GrButtonStyle</item>
-        <item name="android:imageButtonStyle">@style/GrButtonStyle</item>
-        <item name="android:seekBarStyle">@style/GrSeekbarStyle</item>
-        <item name="sepBg">@color/grn_sep</item>
-        <item name="iconColor">@color/grn_sep</item>
-
         <item name="itemBgMe">@drawable/grn_bg_me</item>
         <item name="itemBgOther">@drawable/grn_bg_other</item>
-    </style>
-
-    <style name="GrButtonStyle" parent="@android:style/Widget.Button">
-        <item name="android:background">@drawable/grn_button</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="GrSeekbarStyle" parent="@android:style/Widget.SeekBar">
-        <item name="android:thumb">@drawable/grn_scrubber_control</item>
-        <item name="android:progressDrawable">@drawable/grn_scrubber_progress</item>
     </style>
 
 </resources>

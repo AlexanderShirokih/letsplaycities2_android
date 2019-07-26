@@ -2,30 +2,16 @@
 <resources>
 
     <style name="UsaStyleTheme" parent="AppTheme">
+        <item name="colorAccent">@color/usaColorPrimary</item>
+        <item name="colorPrimary">@color/usaColorPrimary</item>
+        <item name="colorPrimaryDark">@color/usaColorPrimaryDark</item>
+        <item name="colorSecondary">@color/usaColorPrimary</item>
+        <item name="colorOnBackground">@android:color/black</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textColorHint">@color/usa_hint</item>
         <item name="android:windowBackground">@drawable/bg_usa</item>
-        <item name="android:buttonStyle">@style/UsaButtonStyle</item>
-        <item name="android:imageButtonStyle">@style/UsaButtonStyle</item>
-        <item name="android:seekBarStyle">@style/UsaSeekbarStyle</item>
-        <item name="sepBg">@color/fr_sep</item>
-        <item name="iconColor">@color/fr_sep</item>
-
         <item name="itemBgMe">@drawable/usa_bg_me</item>
         <item name="itemBgOther">@drawable/usa_bg_other</item>
     </style>
-
-    <style name="UsaButtonStyle" parent="@android:style/Widget.Button">
-        <item name="android:background">@drawable/usa_button</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
-
-    <style name="UsaSeekbarStyle" parent="@android:style/Widget.SeekBar">
-        <item name="android:thumb">@drawable/rus_sb_scrubber_control_selector_holo_light</item>
-        <item name="android:progressDrawable">
-            @drawable/rus_sb_scrubber_progress_horizontal_holo_light
-        </item>
-    </style>
-
 </resources>

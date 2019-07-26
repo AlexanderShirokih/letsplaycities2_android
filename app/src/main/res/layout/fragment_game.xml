@@ -172,7 +172,7 @@
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/cityInput"
                     android:digits="АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя- "
-                    android:background="@android:color/white"
+                    android:background="?attr/cityInputColor"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:inputType="text"
