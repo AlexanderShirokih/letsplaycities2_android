@@ -2,12 +2,22 @@ package ru.aleshi.letsplaycities.social
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.ui.MainActivity
 
 
 object SocialNetworkManager {
 
     private var type: ServiceType? = null
+
+    fun onActivityResult(mainActivity: MainActivity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        ServiceType.values().forEach {
+            if (it.network.sendResult(mainActivity, requestCode, resultCode, data))
+                return true
+        }
+        return false
+    }
 
     fun login(serviceType: ServiceType, activity: Activity) {
         type = serviceType

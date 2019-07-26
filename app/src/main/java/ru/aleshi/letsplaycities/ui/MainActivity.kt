@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -8,6 +9,7 @@ import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.ThemeManager
+import ru.aleshi.letsplaycities.social.SocialNetworkManager
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,5 +35,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkForFirebaseNotifications() {
         //TODO
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (!SocialNetworkManager.onActivityResult(this, requestCode, resultCode, data))
+            super.onActivityResult(requestCode, resultCode, data)
     }
 }

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import com.facebook.*
 import com.facebook.AccessToken
-import com.facebook.Profile.getCurrentProfile
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import ru.aleshi.letsplaycities.base.player.AuthData
@@ -13,7 +12,7 @@ import ru.aleshi.letsplaycities.base.player.AuthData
 
 class Facebook : ISocialNetwork() {
 
-    var callbackManager: CallbackManager? = null
+    private var callbackManager: CallbackManager? = null
 
     override fun onInitialize(context: Context) {
         callbackManager = CallbackManager.Factory.create()
@@ -23,8 +22,21 @@ class Facebook : ISocialNetwork() {
         val loginManager = LoginManager.getInstance()
 
         object : ProfileTracker() {
-            override fun onCurrentProfileChanged(oldProfile: Profile, currentProfile: Profile) {
+            override fun onCurrentProfileChanged(oldProfile: Profile?, currentProfile: Profile) {
                 stopTracking()
+
+                val accessToken = AccessToken.getCurrentAccessToken()
+                if (accessToken != null && !accessToken.isExpired) {
+                    val login = currentProfile.name
+                    val userID = currentProfile.id
+
+                    val picture = currentProfile.getProfilePictureUri(128, 128)
+
+                    SocialUtils.saveAvatar(activity, picture) {
+                        val info = AuthData(login, userID, "fb", accessToken.token)
+                        callback?.onLoggedIn(info)
+                    }
+                }
             }
         }
 
@@ -35,10 +47,10 @@ class Facebook : ISocialNetwork() {
                 }
 
                 override fun onCancel() {
-                    this@Facebook.onError()
                 }
 
                 override fun onError(exception: FacebookException) {
+                    exception.printStackTrace()
                     this@Facebook.onError()
                 }
             })
@@ -46,20 +58,9 @@ class Facebook : ISocialNetwork() {
     }
 
     override fun onLoggedIn(activity: Activity, access_token: String) {
-        val accessToken = AccessToken.getCurrentAccessToken()
-        val profile = getCurrentProfile()
-        if (accessToken != null && !accessToken.isExpired && profile != null) {
-            val login = profile.name
-            val userID = profile.id
 
-            val picture = profile.getProfilePictureUri(128, 128)
-
-            SocialUtils.saveAvatar(activity, picture) {
-                val info = AuthData(login, userID, "fb", access_token)
-                callback?.onLoggedIn(info)
-            }
-        }
     }
+
 
     override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         return callbackManager!!.onActivityResult(requestCode, resultCode, data)

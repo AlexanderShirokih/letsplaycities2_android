@@ -26,7 +26,9 @@ import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.network.NetworkContract
 import ru.aleshi.letsplaycities.network.NetworkUtils
+import ru.aleshi.letsplaycities.social.NativeAccess
 import ru.aleshi.letsplaycities.social.ServiceType
+import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils
@@ -68,7 +70,7 @@ class NetworkFragment : Fragment(), NetworkContract.View {
                         .subscribe()
                 }
             })
-            nativeLogin.observe(this@NetworkFragment, mNetworkPresenter.onLogin())
+            nativeLogin.observe(this@NetworkFragment, Observer { NativeAccess.login(it!!, requireActivity()) })
             friendsInfo.observe(this@NetworkFragment, mNetworkPresenter.onFriendsInfo(getVersionInfo()))
         }
         if (mGamePreferences.isSoundEnabled()) {
@@ -157,24 +159,14 @@ class NetworkFragment : Fragment(), NetworkContract.View {
 //        checkForRequest()
     }
 
-    override fun onResult(requestCode: Int, key: String, value: String) {
-        onActivityResult(requestCode, 0, Intent().apply { putExtra(key, value) })
-    }
-
     override fun onStop() {
         super.onStop()
         mNetworkPresenter.onDispose()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val activity = requireActivity()
-
-        ServiceType.values().forEach {
-            if (it.network.onActivityResult(activity, requestCode, resultCode, data))
-                return
-        }
+        SocialNetworkManager.onActivityResult(requireActivity() as MainActivity, requestCode, resultCode, data)
     }
-
 
     override fun checkForWaiting(task: () -> Unit) {
         setLoadingLayout(true)

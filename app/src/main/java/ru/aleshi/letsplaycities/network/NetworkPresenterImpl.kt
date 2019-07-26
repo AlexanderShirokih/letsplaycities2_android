@@ -15,7 +15,6 @@ import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
-import ru.aleshi.letsplaycities.social.NativeAccess
 import ru.aleshi.letsplaycities.social.SocialNetworkLoginListener
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.utils.Utils
@@ -75,10 +74,6 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
                 }
             }
         }
-    }
-
-    override fun onLogin(): Observer<in String> {
-        return Observer { mView?.onResult(NativeAccess.REQUEST_NATIVE_ACCESS, "login", it!!) }
     }
 
     override fun onCancel() {

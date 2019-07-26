@@ -4,31 +4,38 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
-import kotlinx.coroutines.*
-import org.json.JSONException
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
+import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.json.JSONObject
 import ru.aleshi.letsplaycities.base.player.AuthData
+import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.ok.android.sdk.ContextOkListener
 import ru.ok.android.sdk.Odnoklassniki
-import ru.ok.android.sdk.OkListener
 import ru.ok.android.sdk.OkRequestMode
 import ru.ok.android.sdk.util.OkAuthType
 import ru.ok.android.sdk.util.OkScope
-import java.io.IOException
 
 
 @ExperimentalCoroutinesApi
 class OdnoklassnikiSN : ISocialNetwork() {
+
+    private val disposable: CompositeDisposable = CompositeDisposable()
+    private lateinit var odnoklassniki: Odnoklassniki
 
     companion object {
         private const val REDIRECT_URI = "okauth://ok1267998976"
     }
 
     override fun onInitialize(context: Context) {
-        Odnoklassniki.createInstance(context, "1267998976", "CBACCFJMEBABABABA")
+        odnoklassniki = Odnoklassniki.createInstance(context, "1267998976", "CBACCFJMEBABABABA")
     }
 
     override fun onLogin(activity: Activity) {
-        Odnoklassniki.getInstance().requestAuthorization(
+        odnoklassniki.requestAuthorization(
             activity,
             REDIRECT_URI,
             OkAuthType.ANY,
@@ -38,60 +45,44 @@ class OdnoklassnikiSN : ISocialNetwork() {
     }
 
     override fun onLoggedIn(activity: Activity, access_token: String) {
-        MainScope().launch {
-            val ret = withContext(Dispatchers.IO) {
-                try {
-                    Odnoklassniki.getInstance().request("users.getCurrentUser", null, OkRequestMode.DEFAULT)
-                } catch (e: IOException) {
-                    ""
-                }
-            }
-
-            if (ret.isNotEmpty()) {
-                try {
-                    val json = JSONObject(ret)
-
-                    SocialUtils.saveAvatar(activity, json.getString("pic_3").toUri()) {
-                        val info = AuthData(
-                            json.getString("userName"),
-                            json.getString("uid"),
-                            "ok",
-                            access_token
-                        )
-                        callback?.onLoggedIn(info)
-                    }
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                }
-            }
+        disposable.add(Observable.fromCallable {
+            odnoklassniki.request(
+                "users.getCurrentUser",
+                null,
+                OkRequestMode.DEFAULT
+            )!!
         }
+            .subscribeOn(Schedulers.single())
+            .filter { it.isNotEmpty() }
+            .map { JSONObject(it) }
+            .flatMap {
+                Observable.zip(
+                    Observable.just(it),
+                    SocialUtils.updateAvatar(activity as MainActivity, it.getString("pic_3").toUri()),
+                    BiFunction<JSONObject, String, AuthData> { user, _ ->
+                        AuthData(user.getString("name"), user.getString("uid"), "ok", access_token)
+                    }
+                )
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ callback?.onLoggedIn(it) }, { it.printStackTrace(); callback?.onError() })
+        )
     }
 
     override fun onLogout() {
-        Odnoklassniki.getInstance().clearTokens()
+        odnoklassniki.clearTokens()
+        disposable.clear()
         super.onLogout()
     }
 
     override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        val odnoklassniki = Odnoklassniki.getInstance()
-
-        if (odnoklassniki.onAuthActivityResult(requestCode, resultCode, data, object : OkListener {
-                override fun onSuccess(json: JSONObject) {
-                    onLoggedIn(activity, json.getString("access_token"))
-                }
-
-                override fun onError(error: String) = onError()
-            })) {
-
-            return true
-        } else if (odnoklassniki.onActivityResultResult(requestCode, resultCode, data, object : OkListener {
-                override fun onSuccess(json: JSONObject) {
-                    //access_token, secret_key
-                }
-
-                override fun onError(error: String) = onError()
-            })) {
-            return true
+        if (odnoklassniki.isActivityRequestOAuth(requestCode)) {
+            // process OAUTH sign-in response
+            odnoklassniki.onAuthActivityResult(requestCode, resultCode, data, ContextOkListener(activity,
+                onSuccess = { _, json -> onLoggedIn(activity, json.getString("access_token")) },
+                onError = { _, _ -> onError() },
+                onCancel = { _, _ -> Unit }
+            ))
         }
         return false
     }

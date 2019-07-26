@@ -7,11 +7,8 @@ import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.base.player.DeviceId
 
 class NativeAccess : ISocialNetwork() {
-    companion object {
-        const val REQUEST_NATIVE_ACCESS = 4312
-    }
 
-    private var userLogin: String = "User"
+    internal var userLogin: String = "User"
 
     override fun onInitialize(context: Context) {}
 
@@ -24,12 +21,12 @@ class NativeAccess : ISocialNetwork() {
         callback?.onLoggedIn(info)
     }
 
-    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (requestCode != REQUEST_NATIVE_ACCESS)
-            return false
+    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean = false
 
-        userLogin = data!!.extras!!.getString("login")!!
-        SocialNetworkManager.login(ServiceType.NV, activity)
-        return true
+    companion object {
+        fun login(login: String, activity: Activity) {
+            (ServiceType.NV.network as NativeAccess).userLogin = login
+            SocialNetworkManager.login(ServiceType.NV, activity)
+        }
     }
 }

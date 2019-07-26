@@ -20,7 +20,7 @@ object SocialUtils {
             .subscribe()
     }
 
-    fun updateAvatar(activity: MainActivity, src: Uri): Observable<String?> {
+    fun updateAvatar(activity: MainActivity, src: Uri): Observable<String> {
         val app = activity.applicationContext as LPSApplication
 
         return Utils.resizeAndSave(activity, src)

@@ -28,7 +28,8 @@ class Google : ISocialNetwork() {
     }
 
     override fun onLogin(activity: Activity) {
-        val account = GoogleSignIn.getLastSignedInAccount(activity)
+
+        val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(activity)
         if (account != null) {
             onLoggedIn(activity, account)
         } else {
@@ -40,7 +41,7 @@ class Google : ISocialNetwork() {
         }
     }
 
-    fun onLoggedIn(activity: Activity, account: GoogleSignInAccount) {
+    private fun onLoggedIn(activity: Activity, account: GoogleSignInAccount) {
         val accessToken = account.idToken!!
         val login = account.displayName
         val uid = account.id

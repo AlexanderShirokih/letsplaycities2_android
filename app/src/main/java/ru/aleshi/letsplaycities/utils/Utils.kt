@@ -31,14 +31,14 @@ object Utils {
     val Fragment.lpsApplication
         get() = requireContext().applicationContext as LPSApplication
 
-    fun resizeAndSave(context: Context, data: Uri): Observable<String?> {
+    fun resizeAndSave(context: Context, data: Uri): Observable<String> {
         val filesDir = context.filesDir
 
         return loadAvatar(data)
             .switchMap { saveAvatar(filesDir, it) }
     }
 
-    fun saveAvatar(filesDir: File, bitmap: Bitmap, saveFileName: String = "0.png"): Observable<String?> {
+    fun saveAvatar(filesDir: File, bitmap: Bitmap, saveFileName: String = "0.png"): Observable<String> {
         return Observable.just(bitmap)
             .subscribeOn(Schedulers.io())
             .map {
@@ -83,7 +83,7 @@ object Utils {
         }
     }
 
-    private fun saveToLocalStorage(filesDir: File, saveFileName: String, bitmap: Bitmap): String? {
+    private fun saveToLocalStorage(filesDir: File, saveFileName: String, bitmap: Bitmap): String {
         val ava = File(filesDir, "avatars")
         if (!ava.exists()) {
             ava.mkdir()
@@ -95,7 +95,7 @@ object Utils {
             file.absolutePath
         } catch (e: Exception) {
             e.printStackTrace()
-            null
+            ""
         }
 
     }

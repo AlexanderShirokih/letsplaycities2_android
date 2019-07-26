@@ -19,7 +19,6 @@ abstract class ISocialNetwork {
 
     protected abstract fun onInitialize(context: Context)
 
-
     fun login(activity: Activity) {
         onLogin(activity)
     }
@@ -36,6 +35,14 @@ abstract class ISocialNetwork {
         isInitialized = false
     }
 
-    abstract fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean
+    protected abstract fun onActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean
 
+    fun sendResult(mainActivity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return if (isInitialized) onActivityResult(mainActivity, requestCode, resultCode, data) else false
+    }
 }

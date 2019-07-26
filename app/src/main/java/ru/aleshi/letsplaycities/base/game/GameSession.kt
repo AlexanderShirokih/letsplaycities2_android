@@ -254,12 +254,6 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     }
 
     private fun dispose() {
-        try {
-            throw Exception()
-        }catch (e : java.lang.Exception){
-            e.printStackTrace()
-        }
-
         disposable.clear()
         mServer.dispose()
         mScoreManager.updateScore()

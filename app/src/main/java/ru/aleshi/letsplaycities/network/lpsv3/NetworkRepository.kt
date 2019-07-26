@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.network.lpsv3
 
-import android.util.Log
 import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -10,7 +9,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.base.player.PlayerData
-import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.blacklist.BlackListItem
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -29,9 +27,6 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
         .retry(3) { t ->
             mNetworkClient.disconnect()
             t is IOException
-        }
-        .doOnNext {
-            Log.d("TAG", "Input message= $it")
         }
         .publish().refCount(1, TimeUnit.SECONDS)
 
@@ -167,9 +162,7 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
 
     private fun updateToken(callback: (token: String) -> Unit) {
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w(NetworkUtils::class.java.simpleName, "FirebaseInstanceId.getInstance() failed", task.exception)
-            } else {
+            if (task.isSuccessful) {
                 //174 chars
                 callback(task.result!!.token)
             }
