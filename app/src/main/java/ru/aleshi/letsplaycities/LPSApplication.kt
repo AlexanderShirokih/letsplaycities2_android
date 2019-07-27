@@ -1,11 +1,11 @@
 package ru.aleshi.letsplaycities
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 
-class LPSApplication : Application() {
+class LPSApplication : MultiDexApplication() {
 
     val gamePreferences: GamePreferences by lazy {
         GamePreferences(this)
