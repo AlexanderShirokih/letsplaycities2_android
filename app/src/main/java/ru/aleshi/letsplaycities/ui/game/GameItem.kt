@@ -6,11 +6,12 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.utils.StringUtils
 
 class GameItem(
     val content: String,
-    val isLeft: Boolean,
+    val position: Position,
     var status: CityStatus = CityStatus.OK,
     val isMessage: Boolean = false,
     val countryCode: Short = 0

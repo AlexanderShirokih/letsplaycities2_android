@@ -7,22 +7,21 @@ import ru.aleshi.letsplaycities.ui.game.DictionaryUpdater
 
 interface GameContract {
 
-
     interface View {
-        fun showUserMenu(isFriend:Boolean, name: String, userId: Int)
+        fun showUserMenu(isFriend: Boolean, name: String, userId: Int)
         fun showInfo(msg: String)
         fun showError(err: Throwable)
-        fun updateLabel(info: String, left: Boolean)
-        fun updateAvatar(image: Drawable, left: Boolean)
+        fun updateLabel(info: String, position: Position)
+        fun updateAvatar(image: Drawable, position: Position)
         fun context(): Context
-        fun putMessage(message: String, isLeft: Boolean)
-        fun putCity(city: String, countryCode: Short, left: Boolean)
+        fun putMessage(message: String, position: Position)
+        fun putCity(city: String, countryCode: Short, position: Position)
         fun updateCity(city: String, hasErrors: Boolean)
         fun showGameResults(result: String, score: Int)
         fun showCorrectionDialog(word: String, errorMsg: String)
-        fun getGamePreferences() : GamePreferences
+        fun getGamePreferences(): GamePreferences
         fun onTimerUpdate(time: String)
-        fun onHighlightUser(left: Boolean)
+        fun onHighlightUser(position: Position)
         fun setMenuItemsVisibility(help: Boolean, msg: Boolean)
         fun downloadingListener(): DictionaryUpdater.DownloadingListener
         fun showFriendRequestDialog(name: String)
@@ -38,8 +37,8 @@ interface GameContract {
         fun postCorrectedWord(word: String?, errorMsg: String?)
         fun sendMessage(message: String)
         fun correct(word: String, errorMsg: String)
-        fun dictionary() : Dictionary
-        fun needsShowMenu(isLeft: Boolean)
+        fun dictionary(): Dictionary
+        fun needsShowMenu(position: Position)
         fun sendFriendRequest()
         fun onFriendRequestResult(isAccepted: Boolean)
         fun banUser(userId: Int)

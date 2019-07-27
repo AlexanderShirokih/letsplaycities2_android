@@ -64,7 +64,7 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
             mServer.getWordsResult()
                 .subscribe({ handleWordResult(it.first, it.second) }, { view::showError })
             , mServer.getInputMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(
-                ::postMessage,
+                ::onInputMessage,
                 view::showError
             )
 
@@ -164,24 +164,24 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
             help = gameMode == GameMode.MODE_PVA,
             msg = gameMode == GameMode.MODE_NET && isMessagesAllowed()
         )
-        // Apply to the left
-        applyUserView(players[0], false)
-        // Apply to the right
-        applyUserView(players[1], true)
+
+        players[0].position = Position.LEFT
+        players[1].position = Position.RIGHT
+        players.forEach(::applyUserView)
     }
 
     private fun isMessagesAllowed(): Boolean {
         return players.all { it.isMessagesAllowed() }
     }
 
-    private fun applyUserView(users: User, isLeft: Boolean) {
-        updateLabel(users, isLeft)
-        disposable.add(users.getAvatar(view.context())
-            .subscribe { view.updateAvatar(it, isLeft) })
+    private fun applyUserView(user: User) {
+        updateLabel(user, user.position)
+        disposable.add(user.getAvatar(view.context())
+            .subscribe { view.updateAvatar(it, user.position) })
     }
 
-    private fun updateLabel(user: User, isLeft: Boolean) {
-        view.updateLabel(user.info, isLeft)
+    private fun updateLabel(user: User, position: Position) {
+        view.updateLabel(user.info, position)
     }
 
     fun onCitySended(city: String, player: User) {
@@ -190,8 +190,6 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
             mServer.broadcastResult(city)
         }
     }
-
-    private fun isLeft(player: User): Boolean = players.indexOf(player) == 0
 
     private fun handleWordResult(result: WordResult, city: String) {
         when (result) {
@@ -212,7 +210,7 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     private fun dispatchCityResult(city: String, player: User?, hasErrors: Boolean) {
         Completable.fromAction {
-            if (player != null) view.putCity(city, mDictionary!!.getCountryCode(city), isLeft(player))
+            if (player != null) view.putCity(city, mDictionary!!.getCountryCode(city), player.position)
             else {
                 view.updateCity(city, hasErrors)
                 mDictionary!!.applyCity(city)
@@ -234,14 +232,14 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
         runTimer()
         city?.let { mFirstChar = StringUtils.findLastSuitableChar(it) }
         val next = switchToNext
-        view.onHighlightUser(!isLeft(currentPlayer))
+        view.onHighlightUser(currentPlayer.position)
         next.onBeginMove(mFirstChar)
         mScoreManager.moveStarted()
     }
 
     private fun endMove(city: String) {
         mScoreManager.moveEnded(city)
-        updateLabel(currentPlayer, !isLeft(currentPlayer))
+        updateLabel(currentPlayer, currentPlayer.position)
     }
 
     fun notify(msg: String) {
@@ -265,12 +263,12 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     }
 
     override fun useHint() {
-        getPlayer()?.let {
+        getCurrentAsPlayer()?.let {
             disposable.add(mDictionary!!.getRandomWord(mFirstChar ?: "абвгдеклмн".random(), true)
                 .delay(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    getPlayer()?.run { submit(it) {} }
+                    getCurrentAsPlayer()?.run { submit(it) {} }
                 })
         }
     }
@@ -292,15 +290,15 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
 
     override fun postCorrectedWord(word: String?, errorMsg: String?) {
         if (word != null) {
-            getPlayer()?.run {
+            getCurrentAsPlayer()?.run {
                 submit(word) {}
             }
         } else
             notify(errorMsg!!)
     }
 
-    private fun postMessage(message: String) {
-        view.putMessage(message, !isLeft(currentPlayer))
+    private fun onInputMessage(message: String) {
+        view.putMessage(message, getOpp().position)
     }
 
     override fun correct(word: String, errorMsg: String) {
@@ -312,22 +310,24 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     }
 
     override fun sendMessage(message: String) {
-        view.putMessage(message, isLeft(currentPlayer))
+        view.putMessage(message, getPlayer().position)
         mServer.broadcastMessage(message)
     }
 
-    private fun getPlayer(): Player? {
+    private fun getCurrentAsPlayer(): Player? {
         return if (currentPlayer is Player)
             currentPlayer as Player
         else null
     }
 
+    private fun getPlayer(): Player = players.first { it is Player } as Player
+
     private fun getOpp(): User {
         return players.first { it !is Player }
     }
 
-    override fun needsShowMenu(isLeft: Boolean) {
-        players.firstOrNull { !isLeft(it) == isLeft }?.run {
+    override fun needsShowMenu(position: Position) {
+        players.firstOrNull { it.position == position }?.run {
             if (needsShowMenu())
                 view.showUserMenu(playerData.isFriend, playerData.userName!!, playerData.authData!!.userID)
         }

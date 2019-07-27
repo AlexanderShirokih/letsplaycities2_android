@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_city.view.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.game.Position
 
 class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameViewHolder>() {
 
@@ -19,12 +20,12 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
             itemView.apply {
                 itemCityName.text = item.getSpannableString(context)
 
-                (this as LinearLayout).gravity = if (item.isLeft) Gravity.END else Gravity.START
+                (this as LinearLayout).gravity = if (item.position == Position.LEFT) Gravity.START else Gravity.END
 
                 val resID: Int = if (item.isMessage)
-                    if (item.isLeft) R.attr.itemMsgMe else R.attr.itemMsgOther
+                    if (item.position == Position.LEFT) R.attr.itemMsgMe else R.attr.itemMsgOther
                 else
-                    if (item.isLeft) R.attr.itemBgMe else R.attr.itemBgOther
+                    if (item.position == Position.LEFT) R.attr.itemBgMe else R.attr.itemBgOther
 
                 val out = TypedValue()
                 context.theme.resolveAttribute(resID, out, true)
@@ -58,8 +59,8 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
         holder.bind(mItems[position])
     }
 
-    fun addCity(city: String, countryCode: Short, left: Boolean) {
-        mItems.add(GameItem(city, left, CityStatus.WAITING, countryCode = countryCode))
+    fun addCity(city: String, countryCode: Short, position: Position) {
+        mItems.add(GameItem(city, position, CityStatus.WAITING, countryCode = countryCode))
         notifyItemInserted(mItems.size - 1)
     }
 
@@ -71,8 +72,8 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
         }
     }
 
-    fun addMessage(message: String, left: Boolean) {
-        mItems.add(GameItem(message, left, CityStatus.OK, true))
+    fun addMessage(message: String, position: Position) {
+        mItems.add(GameItem(message, position, CityStatus.OK, true))
     }
 
 }

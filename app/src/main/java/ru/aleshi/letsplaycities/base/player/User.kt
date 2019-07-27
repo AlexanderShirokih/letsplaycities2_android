@@ -4,12 +4,15 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
 import ru.aleshi.letsplaycities.base.game.GameSession
+import ru.aleshi.letsplaycities.base.game.Position
 
 abstract class User(internal val playerData: PlayerData) {
 
     lateinit var gameSession: GameSession
 
     var score: Int = 0
+
+    var position: Position = Position.UNKNOWN
 
     val name: String
         get() = playerData.userName!!

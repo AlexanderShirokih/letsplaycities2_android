@@ -33,6 +33,7 @@ import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameContract
+import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.MainActivity
@@ -135,8 +136,12 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun getGamePreferences(): GamePreferences = lpsApplication.gamePreferences
 
-    override fun onHighlightUser(left: Boolean) {
-        mGameViewModel.isLeftActive.set(left)
+    override fun onHighlightUser(position: Position) {
+        when (position) {
+            Position.LEFT -> mGameViewModel.isLeftActive.set(true)
+            Position.RIGHT -> mGameViewModel.isLeftActive.set(false)
+            else -> Unit
+        }
     }
 
     override fun onTimerUpdate(time: String) {
@@ -161,8 +166,8 @@ class GameFragment : Fragment(), GameContract.View {
         btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
         btnHelp.setOnClickListener { showConfirmationDialog(USE_HINT, R.string.use_hint) }
         btnMsg.setOnClickListener { setMessagingLayout(messageInputLayout.visibility != View.VISIBLE) }
-        avatarLeft.setOnClickListener { mGameSession.needsShowMenu(true) }
-        avatarRight.setOnClickListener { mGameSession.needsShowMenu(false) }
+        avatarLeft.setOnClickListener { mGameSession.needsShowMenu(Position.LEFT) }
+        avatarRight.setOnClickListener { mGameSession.needsShowMenu(Position.RIGHT) }
 
         recyclerView.apply {
             adapter = mAdapter
@@ -289,33 +294,31 @@ class GameFragment : Fragment(), GameContract.View {
         NetworkUtils.handleError(err, this)
     }
 
-    override fun updateLabel(info: String, left: Boolean) {
-        val field =
-            if (left)
-                mGameViewModel.infoLeft
-            else
-                mGameViewModel.infoRight
-        field.set(info)
+    override fun updateLabel(info: String, position: Position) {
+        when (position) {
+            Position.LEFT -> mGameViewModel.infoLeft.set(info)
+            Position.RIGHT -> mGameViewModel.infoRight.set(info)
+            else -> Unit
+        }
     }
 
-    override fun updateAvatar(image: Drawable, left: Boolean) {
-        val field =
-            if (left)
-                mGameViewModel.avatarLeft
-            else
-                mGameViewModel.avatarRight
-        field.set(image)
+    override fun updateAvatar(image: Drawable, position: Position) {
+        when (position) {
+            Position.LEFT -> mGameViewModel.avatarLeft.set(image)
+            Position.RIGHT -> mGameViewModel.avatarRight.set(image)
+            else -> Unit
+        }
     }
 
-    override fun putMessage(message: String, isLeft: Boolean) {
+    override fun putMessage(message: String, position: Position) {
         mClickSound?.start()
-        mAdapter.addMessage(message, isLeft)
+        mAdapter.addMessage(message, position)
         scrollRecyclerView()
     }
 
-    override fun putCity(city: String, countryCode: Short, left: Boolean) {
+    override fun putCity(city: String, countryCode: Short, position: Position) {
         mClickSound?.start()
-        mAdapter.addCity(city, countryCode, left)
+        mAdapter.addCity(city, countryCode, position)
         hideKeyboard()
         scrollRecyclerView()
     }
