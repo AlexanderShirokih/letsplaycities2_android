@@ -48,4 +48,8 @@
 
     <color name="aut_score">#020021</color>
     <color name="message_edittext_bg">#B2EBF2</color>
+
+    <!-- API<21 -->
+    <color name="primary">#000</color>
+    <color name="colorOnPrimary">#fff</color>
 </resources>

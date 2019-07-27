@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.ui.network
 
 import android.content.Intent
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -103,9 +104,11 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         }
 
         btnLoginNoSn.setOnClickListener {
-            val extras = FragmentNavigatorExtras(
-                roundedImageView to "transition_avatar"
-            )
+            val extras = FragmentNavigatorExtras()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                extras.sharedElements[roundedImageView] = "transition_avatar"
+            }
+
             findNavController().navigate(R.id.showLoginDialog, null, null, extras)
         }
 

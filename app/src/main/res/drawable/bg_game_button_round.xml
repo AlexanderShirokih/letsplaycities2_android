@@ -5,11 +5,11 @@
     <item>
         <shape android:shape="oval">
 
-            <solid android:color="?attr/colorPrimary"/>
+            <solid android:color="@color/primary"/>
 
             <stroke
                 android:width="2dp"
-                android:color="?attr/colorOnPrimary" />
+                android:color="@color/colorOnPrimary" />
 
             <padding
                     android:bottom="8dp"
