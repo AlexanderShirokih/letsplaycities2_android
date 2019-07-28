@@ -25,6 +25,9 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     lateinit var mExclusions: Exclusions
 
     lateinit var view: GameContract.View
+
+    var difficulty: Int = 1
+
     val disposable = CompositeDisposable()
 
     private val switchToNext: User
@@ -51,9 +54,10 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
     }
 
     private fun init() {
+        difficulty = view.getGamePreferences().getDifficulty()
         mCurrentPlayerIndex = -1
         mFirstChar = null
-        mDictionary?.reset()
+        mDictionary?.run { reset(); setDifficulty(this) }
 
         for (user in players) {
             user.gameSession = this
@@ -124,10 +128,15 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
                     .flatMap { Dictionary.load(context, mExclusions) }
                     .doOnSuccess { mDictionary = it }
                     .subscribe { dic ->
+                        setDifficulty(dic)
                         DictionaryUpdater.checkForUpdates(prefs, dic, view.downloadingListener())
                             ?.run { disposable.add(this) }
                     })
         }
+    }
+
+    private fun setDifficulty(dictionary: Dictionary) {
+        dictionary.difficulty = difficulty.toByte()
     }
 
     private fun runTimer() {

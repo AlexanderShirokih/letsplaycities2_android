@@ -11,7 +11,7 @@ class GamePreferences(context: Context) {
         const val PREFS_NAME = "letsplaycities"
 
         const val KEY_THEME = "token"
-        const val KEY_DIFF = "gamediff"
+        private const val KEY_DIFF = "gamediff"
         private const val F_LAUNCH = "first_launch"
         private const val LAUNCHES_TO_RATE = "l2r2"
         private const val KEY_SHOW_CHANGE_MODE_DIALOG = "_show_chm"
@@ -23,7 +23,6 @@ class GamePreferences(context: Context) {
         private const val KEY_UPD_DIC = "dic_upd"
         private const val KEY_NULL = "n"
         private const val KEY_SCR = "scrbkey"
-        private const val KEY_BANNED = "banned"
         private const val KEY_LAST_UPDATE = "last_upd_date"
 
         private val settings_pref_keys =
@@ -111,14 +110,6 @@ class GamePreferences(context: Context) {
     fun putScoring(scoring: String) {
         val encoded = Base64.encodeToString(scoring.toByteArray(), Base64.DEFAULT)
         prefs.edit().putString(KEY_SCR, encoded).apply()
-    }
-
-    fun getBanned(): String {
-        return prefs.getString(KEY_BANNED, "")!!
-    }
-
-    fun putBanned(banned: String) {
-        prefs.edit().putString(KEY_BANNED, banned).apply()
     }
 
     fun getString(key: String, def: String?): String? {
@@ -243,5 +234,9 @@ class GamePreferences(context: Context) {
         if (isFirst)
             prefs.edit().putBoolean(F_LAUNCH, false).apply()
         return isFirst
+    }
+
+    fun getDifficulty(): Int {
+        return prefs.getInt(KEY_DIFF, 0) + 1
     }
 }

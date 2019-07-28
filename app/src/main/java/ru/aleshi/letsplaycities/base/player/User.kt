@@ -28,7 +28,7 @@ abstract class User(internal val playerData: PlayerData) {
 
     abstract fun getAvatar(context: Context): Maybe<Drawable>
 
-    fun reset() {
+    open fun reset() {
         score = 0
     }
 
