@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +14,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.databinding.DataBindingUtil
@@ -159,6 +159,7 @@ class GameFragment : Fragment(), GameContract.View {
         val activity = requireActivity()
         (activity as MainActivity).setToolbarVisibility(false)
 
+        checkForFirstLaunch()
         setupCityListeners(activity)
         setupMessageListeners()
 
@@ -185,29 +186,36 @@ class GameFragment : Fragment(), GameContract.View {
         }
     }
 
+    private fun checkForFirstLaunch() {
+        if (getGamePreferences().isFirstLaunch()) {
+            val context = requireContext()
+            resources.getStringArray(R.array.hints).forEachIndexed { i, hint ->
+                Handler().postDelayed({
+                    Toast.makeText(context, hint, Toast.LENGTH_LONG).show()
+                }, 3600L * i)
+            }
+        }
+    }
+
     private fun setupCityListeners(activity: Activity) {
         textInputLayout.setStartIconOnClickListener { SpeechRecognitionHelper.speech(this, activity) }
         textInputLayout.setEndIconOnClickListener { submit() }
         // Converting to lambda gives an error: event is a nullable type
-        cityInput.setOnEditorActionListener(object : TextView.OnEditorActionListener {
-            override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
-                if (actionId == EditorInfo.IME_ACTION_DONE)
-                    submit()
-                return true
-            }
-        })
+        cityInput.setOnEditorActionListener { _, actionId, _: KeyEvent? ->
+            if (actionId == EditorInfo.IME_ACTION_DONE)
+                submit()
+            true
+        }
     }
 
     private fun setupMessageListeners() {
         messageInputLayout.setStartIconOnClickListener { setMessagingLayout(false) }
         messageInputLayout.setEndIconOnClickListener { submitMessage() }
-        messageInput.setOnEditorActionListener(object : TextView.OnEditorActionListener {
-            override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
-                if (actionId == EditorInfo.IME_ACTION_DONE)
-                    submitMessage()
-                return true
-            }
-        })
+        messageInput.setOnEditorActionListener { v, actionId, _: KeyEvent? ->
+            if (actionId == EditorInfo.IME_ACTION_DONE)
+                submitMessage()
+            true
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

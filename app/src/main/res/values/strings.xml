@@ -234,6 +234,14 @@
     <string name="friends_request_accepted">Игрок %1$s добавлен в друзья</string>
     <string name="friends_request_denied">Заявка отклонена!</string>
 
+    <string-array name="hints">
+        <item>Добро Пожаловать в игру!</item>
+        <item>Вы будете загадывать города с\nвашим андроидом по очереди</item>
+        <item>Каждое последующее слово \nдолжно начинаться на последнюю \nбукву предыдущего слова</item>
+        <item>Исключение составляют только: ь, ъ, ы, ё</item>
+        <item>Победителем считается тот, кто в конце игры набрал больше очков</item>
+    </string-array>
+
     <!-- UserContextMenuDialog -->
     <string name="user_banned">Пользователь %1$s заблокирован</string>
     <string name="new_friend_request">Заявка в друзья отправлена!</string>

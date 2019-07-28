@@ -12,6 +12,7 @@ class GamePreferences(context: Context) {
 
         const val KEY_THEME = "token"
         const val KEY_DIFF = "gamediff"
+        private const val F_LAUNCH = "first_launch"
         private const val LAUNCHES_TO_RATE = "l2r2"
         private const val KEY_SHOW_CHANGE_MODE_DIALOG = "_show_chm"
         private const val KEY_SCORING = "scoring_sys"
@@ -235,5 +236,12 @@ class GamePreferences(context: Context) {
 
     fun setDictionaryUpdateDate(time: Long) {
         prefs.edit { putLong(KEY_LAST_UPDATE, time) }
+    }
+
+    fun isFirstLaunch(): Boolean {
+        val isFirst = prefs.getBoolean(F_LAUNCH, true)
+        if (isFirst)
+            prefs.edit().putBoolean(F_LAUNCH, false).apply()
+        return isFirst
     }
 }
