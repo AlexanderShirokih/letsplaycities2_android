@@ -46,7 +46,7 @@
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintVertical_bias="0.132"/>
 
-         <ImageButton
+        <ImageButton
                 style="@style/GameActionButton"
                 android:id="@+id/btnSurrender"
                 android:src="@drawable/ic_surrender_round"
@@ -88,8 +88,8 @@
         <com.mikhaellopez.circularimageview.CircularImageView
                 style="@style/GameAvatarView"
                 android:id="@+id/avatarLeft"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
                 android:src="@{viewModel.avatarLeft}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/view"
@@ -98,8 +98,8 @@
         <com.mikhaellopez.circularimageview.CircularImageView
                 style="@style/GameAvatarView"
                 android:id="@+id/avatarRight"
-                android:layout_marginEnd="4dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="12dp"
                 android:src="@{viewModel.avatarRight}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/view"
