@@ -46,7 +46,7 @@
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintVertical_bias="0.132"/>
 
-        <ImageButton
+         <ImageButton
                 style="@style/GameActionButton"
                 android:id="@+id/btnSurrender"
                 android:src="@drawable/ic_surrender_round"
@@ -77,6 +77,7 @@
                 android:src="@drawable/ic_msg_round"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                tools:visibility="gone"
                 android:visibility="@{viewModel.msgBtnVisible? View.VISIBLE:View.GONE }"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btnHelp"

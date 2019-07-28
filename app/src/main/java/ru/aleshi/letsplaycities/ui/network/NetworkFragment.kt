@@ -104,10 +104,10 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         }
 
         btnLoginNoSn.setOnClickListener {
-            val extras = FragmentNavigatorExtras()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                extras.sharedElements[roundedImageView] = "transition_avatar"
-            }
+            val extras =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    FragmentNavigatorExtras(roundedImageView to "transition_avatar")
+                } else FragmentNavigatorExtras()
 
             findNavController().navigate(R.id.showLoginDialog, null, null, extras)
         }
