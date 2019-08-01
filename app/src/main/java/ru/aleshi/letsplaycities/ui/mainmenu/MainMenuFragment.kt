@@ -92,7 +92,7 @@ class MainMenuFragment : Fragment() {
                 Player(getString(R.string.player)),
                 Android(getString(R.string.android))
             )
-        //LocalServer(lpsApplication.gamePreferences)
+
         ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession =
             mGameSessionBuilder
                 .users(players)

@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import com.google.android.material.snackbar.Snackbar
+import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_network.*
 import ru.aleshi.letsplaycities.LPSApplication
@@ -32,14 +33,17 @@ import ru.aleshi.letsplaycities.social.NativeAccess
 import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.RECONNECTION_DELAY_MS
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import java.io.File
-
+import javax.inject.Inject
 
 class NetworkFragment : Fragment(), NetworkContract.View {
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
 
     private lateinit var mApplication: LPSApplication
     private lateinit var mGamePreferences: GamePreferences
@@ -53,10 +57,11 @@ class NetworkFragment : Fragment(), NetworkContract.View {
     private var mGameSound: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         mApplication = lpsApplication
         mGamePreferences = mApplication.gamePreferences
-        mNetworkViewModel = ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java]
+        mNetworkViewModel = ViewModelProviders.of(requireActivity(), viewModelFactory)[NetworkViewModel::class.java]
         mNetworkViewModel.run {
             mNetworkPresenter = networkPresenter
             avatarPath.value = mApplication.gamePreferences.getAvatarPath()

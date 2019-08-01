@@ -23,6 +23,6 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(NetworkViewModel::class)
-    internal abstract fun photosViewModel(viewModel: NetworkViewModel): ViewModel
+    internal abstract fun networkViewModel(viewModel: NetworkViewModel): ViewModel
 
 }

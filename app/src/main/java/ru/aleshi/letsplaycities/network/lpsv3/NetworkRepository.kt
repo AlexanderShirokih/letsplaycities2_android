@@ -12,7 +12,9 @@ import ru.aleshi.letsplaycities.ui.blacklist.BlackListItem
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class NetworkRepository @Inject constructor(private val mNetworkClient: NetworkClient) {
 
     private val disposable = CompositeDisposable()

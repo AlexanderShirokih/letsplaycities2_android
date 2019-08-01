@@ -13,7 +13,6 @@ class FriendRequestPresenter(private val mView: FriendRequestContract.View) : Fr
             NetworkRepository(NetworkClient()).apply {
                 login(userData)
                     .flatMapCompletable { sendFriendRequestResult(false, userId) }
-                    .doOnEvent { disconnect() }
                     .subscribe({}, { e -> mView.onError(e) })
             }
         }

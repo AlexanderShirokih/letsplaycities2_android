@@ -5,6 +5,7 @@ import dagger.android.ContributesAndroidInjector
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryModule
 import ru.aleshi.letsplaycities.base.game.GameModule
 import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
+import ru.aleshi.letsplaycities.ui.network.NetworkFragment
 
 @Module
 abstract class FragmentsModule {
@@ -13,4 +14,7 @@ abstract class FragmentsModule {
     @ContributesAndroidInjector(modules = [GameModule::class, DictionaryModule::class])
     abstract fun contributeMainMenuFragment(): MainMenuFragment
 
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeNetworkFragment(): NetworkFragment
 }
