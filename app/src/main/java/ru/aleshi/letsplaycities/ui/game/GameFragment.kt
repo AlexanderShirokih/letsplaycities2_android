@@ -70,10 +70,8 @@ class GameFragment : Fragment(), GameContract.View {
 
         mGameViewModel = ViewModelProviders.of(this)[GameViewModel::class.java]
         mGameSessionViewModel = ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
-            gameSession.observe(this@GameFragment, Observer {
-                mGameSession = it.apply { onAttachView(this@GameFragment) }
-                setupAds(activity)
-            })
+            mGameSession = gameSession!!
+
             correctedWord.observe(this@GameFragment, Observer {
                 if (it != null) {
                     mGameSession.postCorrectedWord(it.first, it.second)
@@ -81,6 +79,10 @@ class GameFragment : Fragment(), GameContract.View {
                     correctedWord.value = null
                 }
             })
+            restart.subscribe {
+                stopGame()
+                startGame()
+            }
         }
         mAdapter = GameAdapter(activity)
         activity.onBackPressedDispatcher.addCallback(this) {
@@ -163,6 +165,7 @@ class GameFragment : Fragment(), GameContract.View {
         checkForFirstLaunch()
         setupCityListeners(activity)
         setupMessageListeners()
+        setupAds(activity)
 
         btnMenu.setOnClickListener { showGoToMenuDialog() }
         btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
@@ -279,11 +282,25 @@ class GameFragment : Fragment(), GameContract.View {
             .subscribe { nav.navigate(GameFragmentDirections.showGameResultDialog(result, score)) })
     }
 
-    override fun onDestroy() {
+    private fun startGame() {
+        mGameSession.onAttachView(this)
+        mAdapter.clear()
+    }
+
+    private fun stopGame() {
         hideKeyboard()
-        super.onDestroy()
         disposable.clear()
         mGameSession.onStop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        startGame()
+    }
+
+    override fun onStop() {
+        stopGame()
+        super.onStop()
     }
 
     override fun onDetach() {

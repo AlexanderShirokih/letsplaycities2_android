@@ -76,4 +76,9 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameAdapter.GameV
         mItems.add(GameItem(message, position, CityStatus.OK, true))
     }
 
+    fun clear() {
+        mItems.clear()
+        notifyDataSetChanged()
+    }
+
 }

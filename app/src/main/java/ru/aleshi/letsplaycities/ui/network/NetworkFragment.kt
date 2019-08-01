@@ -132,7 +132,7 @@ class NetworkFragment : Fragment(), NetworkContract.View {
     }
 
     override fun onStartGame(session: GameSession) {
-        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession.value = session
+        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession = session
         mGameSound?.start()
         findNavController().navigate(R.id.start_game_fragment)
     }

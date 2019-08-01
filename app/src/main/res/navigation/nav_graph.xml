@@ -149,7 +149,8 @@
         <argument android:name="result" app:argType="string"/>
         <argument android:name="score" app:argType="integer"/>
         <action android:id="@+id/back_to_game_fragment"
-                app:destination="@id/gameFragment"/>
+                app:popUpTo="@id/gameFragment"
+                app:popUpToInclusive="false" />
     </dialog>
 
     <dialog

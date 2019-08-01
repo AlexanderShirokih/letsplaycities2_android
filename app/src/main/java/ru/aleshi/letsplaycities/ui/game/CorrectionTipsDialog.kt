@@ -55,7 +55,7 @@ class CorrectionTipsDialog : DialogFragment() {
 
     private fun loadItems(callback: (adapter: CorrectionTipsAdapter) -> Unit) {
         val args = CorrectionTipsDialogArgs.fromBundle(requireArguments())
-        val dictionary = gameSessionViewModel.gameSession.value!!.dictionary()
+        val dictionary = gameSessionViewModel.gameSession!!.dictionary()
         disposable.add(
             Maybe.just(dictionary)
                 .subscribeOn(Schedulers.computation())

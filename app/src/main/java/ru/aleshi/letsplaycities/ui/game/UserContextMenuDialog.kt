@@ -8,7 +8,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 
 class UserContextMenuDialog : DialogFragment() {
 
@@ -39,14 +38,14 @@ class UserContextMenuDialog : DialogFragment() {
     }
 
     private fun sendFriendRequest() {
-        gameSessionViewModel.gameSession.value?.let {
+        gameSessionViewModel.gameSession?.let {
             it.sendFriendRequest()
             Toast.makeText(requireActivity(), R.string.new_friend_request, Toast.LENGTH_LONG).show()
         }
     }
 
     private fun banPlayer(login: String, userId: Int) {
-        gameSessionViewModel.gameSession.value?.banUser(userId)
+        gameSessionViewModel.gameSession?.banUser(userId)
         Toast.makeText(requireActivity(), getString(R.string.user_banned, login), Toast.LENGTH_SHORT).show()
         findNavController().popBackStack(R.id.gameFragment, true)
     }

@@ -23,8 +23,6 @@ import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import javax.inject.Inject
-import javax.inject.Named
-
 
 class MainMenuFragment : Fragment() {
     @Inject
@@ -95,7 +93,7 @@ class MainMenuFragment : Fragment() {
                 Android(getString(R.string.android))
             )
         //LocalServer(lpsApplication.gamePreferences)
-        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession.value =
+        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession =
             mGameSessionBuilder
                 .users(players)
                 .server(mLocalServer)
