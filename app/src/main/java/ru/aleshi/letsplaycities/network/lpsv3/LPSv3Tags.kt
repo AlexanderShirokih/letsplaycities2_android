@@ -23,6 +23,7 @@ object LPSv3Tags {
     const val SN_UID: Byte = 13// v4
     const val ACCESS_TOKEN: Byte = 91// v4
     const val ALLOW_SEND_UID: Byte = 92// v4
+    const val FIREBASE_TOKEN: Byte = 111// v4, since LPS v2.0
 
     // Play Tags
     const val ACTION_PLAY: Byte = 14

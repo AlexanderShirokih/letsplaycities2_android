@@ -6,8 +6,9 @@ import ru.aleshi.letsplaycities.base.game.BaseServer
 import ru.aleshi.letsplaycities.base.game.WordResult
 import ru.aleshi.letsplaycities.network.lpsv3.LPSMessage
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
+import javax.inject.Inject
 
-class NetworkServer(private val mNetworkRepository: NetworkRepository) : BaseServer() {
+class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) : BaseServer() {
 
     override fun getWordsResult(): Observable<Pair<WordResult, String>> {
         return mNetworkRepository.words.map { it.result to it.word }

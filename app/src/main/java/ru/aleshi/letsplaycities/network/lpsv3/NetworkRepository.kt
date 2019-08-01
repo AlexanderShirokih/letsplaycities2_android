@@ -6,14 +6,14 @@ import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.ui.blacklist.BlackListItem
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandler: (t: Throwable) -> Unit */) {
+class NetworkRepository @Inject constructor(private val mNetworkClient: NetworkClient) {
 
     private val disposable = CompositeDisposable()
 
@@ -51,20 +51,6 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
         inputMessage.filter { it is LPSMessage.LPSBannedMessage }.cast(LPSMessage.LPSBannedMessage::class.java)
             .firstElement()
 
-    val firebaseToken: Observable<Unit> =
-        inputMessage.filter { it is LPSMessage.LPSRequestFirebaseToken }
-            .switchMap {
-                networkClient().toObservable().zipWith(
-                    Observable.create<String> {
-                        updateToken { token -> it.onNext(token); it.onComplete() }
-                    },
-                    BiFunction<NetworkClient, String, Pair<NetworkClient, String>> { client, token -> client to token })
-
-            }
-            .observeOn(Schedulers.io())
-            .doOnNext { it.first.sendFirebaseToken(it.second) }
-            .map { Unit }
-
     private fun networkClient(): Single<NetworkClient> =
         Single.just(mNetworkClient)
             .subscribeOn(Schedulers.io())
@@ -72,6 +58,7 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
 
     fun login(userData: PlayerData): Single<NetworkClient.AuthResult> {
         return networkClient()
+            .doOnSuccess { userData.firebaseToken = getToken().blockingGet() }
             .map { it.login(userData) }
     }
 
@@ -142,6 +129,13 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
         }
     }
 
+    fun sendFriendRequestResult(result: Boolean, userId: Int): Completable {
+        return networkClient()
+            .subscribeOn(Schedulers.io())
+            .doOnSuccess { it.sendFriendRequestResult(result, userId) }
+            .ignoreElement()
+    }
+
     fun sendWord(city: String) {
         disposable.add(networkClient()
             .subscribe { client -> client.sendWord(city) })
@@ -160,16 +154,20 @@ class NetworkRepository(private val mNetworkClient: NetworkClient /*, errorHandl
         disposable.add(networkClient().subscribe { client -> client.sendFriendAcceptance(accepted) })
     }
 
-    private fun updateToken(callback: (token: String) -> Unit) {
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
+    private fun getToken(): Single<String> {
+        return Single.create {
+            FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
                 //174 chars
-                callback(task.result!!.token)
+                if (task.isSuccessful)
+                    it.onSuccess(task.result!!.token)
+                else it.onError(LPSException("Cannot get firebase token"))
             }
         }
+
     }
 
     fun banUser(userId: Int) {
         disposable.add(networkClient().subscribe { client -> client.banUser(userId) })
     }
+
 }

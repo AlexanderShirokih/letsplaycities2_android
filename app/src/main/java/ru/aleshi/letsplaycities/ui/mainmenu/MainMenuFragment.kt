@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameSession
@@ -21,9 +22,21 @@ import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
+import javax.inject.Inject
+import javax.inject.Named
 
 
 class MainMenuFragment : Fragment() {
+    @Inject
+    lateinit var mGameSessionBuilder: GameSession.GameSessionBuilder
+
+    @Inject
+    lateinit var mLocalServer: LocalServer
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main_menu, container, false)
@@ -81,8 +94,13 @@ class MainMenuFragment : Fragment() {
                 Player(getString(R.string.player)),
                 Android(getString(R.string.android))
             )
+        //LocalServer(lpsApplication.gamePreferences)
         ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession.value =
-            GameSession(players, LocalServer(lpsApplication.gamePreferences))
+            mGameSessionBuilder
+                .users(players)
+                .server(mLocalServer)
+                .build()
+
         navController.navigate(R.id.start_game_fragment)
     }
 

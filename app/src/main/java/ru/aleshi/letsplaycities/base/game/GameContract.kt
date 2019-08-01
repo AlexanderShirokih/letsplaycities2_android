@@ -3,7 +3,8 @@ package ru.aleshi.letsplaycities.base.game
 import android.content.Context
 import android.graphics.drawable.Drawable
 import ru.aleshi.letsplaycities.base.GamePreferences
-import ru.aleshi.letsplaycities.ui.game.DictionaryUpdater
+import ru.aleshi.letsplaycities.base.dictionary.Dictionary
+import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 
 interface GameContract {
 

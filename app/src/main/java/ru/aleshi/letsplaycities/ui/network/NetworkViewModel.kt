@@ -4,10 +4,10 @@ import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.aleshi.letsplaycities.network.NetworkContract
-import ru.aleshi.letsplaycities.network.NetworkPresenterImpl
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
+import javax.inject.Inject
 
-class NetworkViewModel : ViewModel() {
+class NetworkViewModel @Inject constructor(val networkPresenter: NetworkContract.Presenter) : ViewModel() {
 
     val avatarPath: MutableLiveData<String> = MutableLiveData()
 
@@ -16,6 +16,4 @@ class NetworkViewModel : ViewModel() {
     val nativeLogin: MutableLiveData<String> = MutableLiveData()
 
     val friendsInfo: MutableLiveData<FriendsInfo> = MutableLiveData()
-
-    val networkPresenter: NetworkContract.Presenter = NetworkPresenterImpl()
 }

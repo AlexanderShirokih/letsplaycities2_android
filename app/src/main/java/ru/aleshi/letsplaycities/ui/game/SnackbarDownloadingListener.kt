@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.ui.game
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 
 class SnackbarDownloadingListener(private val fragment: Fragment) : DictionaryUpdater.DownloadingListener {
 

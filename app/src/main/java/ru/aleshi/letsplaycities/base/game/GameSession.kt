@@ -7,14 +7,40 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.dictionary.Dictionary
+import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.player.*
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
 import ru.aleshi.letsplaycities.network.lpsv3.LPSMessage
-import ru.aleshi.letsplaycities.ui.game.DictionaryUpdater
 import ru.aleshi.letsplaycities.utils.StringUtils
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class GameSession(val players: Array<User>, private val mServer: BaseServer) : GameContract.Presenter {
+class GameSession private constructor(
+    val players: Array<User>,
+    private val mServer: BaseServer,
+    private val dictionaryUpdater: DictionaryUpdater
+) :
+    GameContract.Presenter {
+
+    class GameSessionBuilder @Inject constructor(private val dictionaryUpdater: DictionaryUpdater) {
+        private lateinit var server: BaseServer
+        private lateinit var players: Array<User>
+
+        fun server(baseServer: BaseServer): GameSessionBuilder {
+            server = baseServer
+            return this
+        }
+
+        fun users(users: Array<User>): GameSessionBuilder {
+            players = users
+            return this
+        }
+
+        fun build(): GameSession {
+            return GameSession(players, server, dictionaryUpdater)
+        }
+    }
 
     private var mCurrentPlayerIndex: Int = -1
     private var mFirstChar: Char? = null
@@ -129,7 +155,7 @@ class GameSession(val players: Array<User>, private val mServer: BaseServer) : G
                     .doOnSuccess { mDictionary = it }
                     .subscribe { dic ->
                         setDifficulty(dic)
-                        DictionaryUpdater.checkForUpdates(prefs, dic, view.downloadingListener())
+                        dictionaryUpdater.checkForUpdates(prefs, dic, view.downloadingListener())
                             ?.run { disposable.add(this) }
                     })
         }

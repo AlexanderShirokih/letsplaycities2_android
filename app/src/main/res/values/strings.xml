@@ -159,6 +159,7 @@
     <string name="connect_net">Подключиться</string>
     <string name="logout">Выйти</string>
     <string name="auth_error">Не удалось авторизоваться через соц.сеть</string>
+    <string name="sign_to_continue">Нельзя начать игру, так как Вы не авторизованы</string>
 
     <!-- ChangeAvatarDialog -->
     <string name="select_action">Выберите действие</string>
@@ -289,4 +290,10 @@
     <string name="lost_connection">Потеряно соединение с сервером</string>
     <string name="kicked_by_system">Вы были отключены системой.</string>
     <string name="kicked_by_user">Подключённый игрок добавил вас в чёрный список</string>
+
+    <!-- FriendRequestDialog -->
+    <string name="request_dialog_title">Приглашение в игру</string>
+    <string name="request_dialog_msg">%1$s приглашает Вас сыграть в города.\nПринять заявку?</string>
+    <string name="accept">Принять</string>
+    <string name="decline">Отклонить</string>
 </resources>

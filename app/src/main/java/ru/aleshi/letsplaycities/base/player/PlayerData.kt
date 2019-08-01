@@ -1,5 +1,7 @@
 package ru.aleshi.letsplaycities.base.player
 
+import ru.aleshi.letsplaycities.base.GamePreferences
+
 class PlayerData {
     var clientVersion: String = "unk"
     var clientBuild: Int = 80
@@ -9,10 +11,20 @@ class PlayerData {
     var isFriend: Boolean = false
     var avatar: ByteArray? = null
     var authData: AuthData? = null
+    var firebaseToken: String? = null
 
     companion object Factory {
         fun create(login: String): PlayerData {
             return PlayerData().apply { userName = login }
+        }
+
+        fun load(prefs: GamePreferences): PlayerData? {
+            if (!prefs.isLoggedFromAnySN()) return null
+
+            return PlayerData().apply {
+                authData = AuthData.loadFromPreferences(prefs)
+                userName = "#" + authData!!.userID
+            }
         }
     }
 

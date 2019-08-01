@@ -7,7 +7,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.game.Dictionary
+import ru.aleshi.letsplaycities.base.dictionary.Dictionary
 import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.utils.Utils
 

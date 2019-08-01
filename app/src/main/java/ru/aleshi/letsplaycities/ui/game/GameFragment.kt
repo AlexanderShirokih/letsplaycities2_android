@@ -32,6 +32,7 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.game.GameContract
 import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
@@ -211,7 +212,7 @@ class GameFragment : Fragment(), GameContract.View {
     private fun setupMessageListeners() {
         messageInputLayout.setStartIconOnClickListener { setMessagingLayout(false) }
         messageInputLayout.setEndIconOnClickListener { submitMessage() }
-        messageInput.setOnEditorActionListener { v, actionId, _: KeyEvent? ->
+        messageInput.setOnEditorActionListener { _, actionId, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_DONE)
                 submitMessage()
             true

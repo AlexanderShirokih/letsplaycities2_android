@@ -43,11 +43,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-                android:name="com.vk.sdk.VKServiceActivity"
-                android:label="ServiceActivity"
-                android:theme="@style/VK.Transparent"/>
-
         <activity android:name="ru.ok.android.sdk.OkAuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -86,6 +81,13 @@
         <meta-data
                 android:name="com.google.android.gms.ads.APPLICATION_ID"
                 android:value="ca-app-pub-1936321025389344~3764122915"/>
+
+        <service android:name=".MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

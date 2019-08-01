@@ -1,10 +1,11 @@
-package ru.aleshi.letsplaycities.base.game
+package ru.aleshi.letsplaycities.base.dictionary
 
 import android.content.Context
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.BadTokenException
+import ru.aleshi.letsplaycities.base.game.Exclusions
 import java.io.DataInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -32,8 +33,15 @@ class Dictionary private constructor(
         }
 
         private fun parseDictionary(context: Context, exclusions: Exclusions): Dictionary {
-            val internalPath = File(context.filesDir, DOWNLOADED_DATA)
-            val inputStream = DataInputStream(openInputStream(internalPath, context))
+            val internalPath = File(context.filesDir,
+                DOWNLOADED_DATA
+            )
+            val inputStream = DataInputStream(
+                openInputStream(
+                    internalPath,
+                    context
+                )
+            )
             val count = inputStream.readInt()
             val version = inputStream.readInt()
             val countTest = inputStream.readInt()
@@ -73,7 +81,13 @@ class Dictionary private constructor(
                 list.add(name)
             }
             inputStream.close()
-            return Dictionary(dictionary, subDictionary, exclusions, version, internalPath)
+            return Dictionary(
+                dictionary,
+                subDictionary,
+                exclusions,
+                version,
+                internalPath
+            )
         }
 
         private fun openInputStream(internal: File, context: Context): InputStream {

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.net.toUri
@@ -159,12 +160,23 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         group_sn.visibility = View.GONE
         group_connect.visibility = View.VISIBLE
         sn_desc.text = mApplication.gamePreferences.getLogin()
-//        checkForRequest()
     }
 
     override fun onStop() {
         super.onStop()
         mNetworkPresenter.onDispose()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        arguments?.let { args ->
+            if (args["action"] == "fm_game") {
+                if (mGamePreferences.isLoggedFromAnySN()) {
+
+                } else
+                    Toast.makeText(requireContext(), R.string.sign_to_continue, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
@@ -34,7 +33,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
 
     private lateinit var mApplication: LPSApplication
     private lateinit var mAdapter: FriendsListAdapter
-    private lateinit var mNetworkRepository: NetworkRepository
+    private var mNetworkRepository: NetworkRepository? = null
     private lateinit var mSelectedFriendsInfo: FriendsInfo
     private val mDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -52,10 +51,11 @@ class FriendsFragment : Fragment(), FriendsItemListener {
                             findNavController().popBackStack(R.id.networkFragment, false)
                         }
                         REQUEST_CODE_REMOVE_ITEM -> {
-                            if (::mNetworkRepository.isInitialized)
-                                mNetworkRepository.deleteFriend(mSelectedFriendsInfo.userId)
+                            mNetworkRepository?.let { rep ->
+                                rep.deleteFriend(mSelectedFriendsInfo.userId)
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe { mAdapter.removeItem(mSelectedFriendsInfo) }
+                            }
                         }
                     }
                 }
@@ -103,31 +103,31 @@ class FriendsFragment : Fragment(), FriendsItemListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val userData = PlayerData()
-        userData.authData = AuthData.loadFromPreferences(mApplication.gamePreferences)
-        userData.userName = "#" + userData.authData!!.userID
-
-        mNetworkRepository = NetworkRepository(NetworkClient())
-        mDisposable.addAll(
-            mNetworkRepository.login(userData)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ requestFriendsList() }, ::handleError)
-        )
+        PlayerData.load(mApplication.gamePreferences)?.let { userData ->
+            mNetworkRepository = NetworkRepository(NetworkClient()).apply {
+                mDisposable.addAll(
+                    login(userData)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ requestFriendsList() }, ::handleError)
+                )
+            }
+        }
     }
 
     override fun onStop() {
         super.onStop()
         mDisposable.dispose()
-        mNetworkRepository.disconnect()
+        mNetworkRepository?.disconnect()
     }
 
     private fun requestFriendsList() {
-        mDisposable.addAll(
-            mNetworkRepository.firebaseToken.subscribe(),
-            mNetworkRepository.getFriendsList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(::populateList, ::handleError)
-        )
+        mNetworkRepository?.let { rep ->
+            mDisposable.addAll(
+                rep.getFriendsList()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(::populateList, ::handleError)
+            )
+        }
     }
 
     private fun populateList(list: ArrayList<FriendsInfo>) {

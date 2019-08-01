@@ -1,5 +1,6 @@
-package ru.aleshi.letsplaycities.ui.game
+package ru.aleshi.letsplaycities.base.dictionary
 
+import com.google.gson.Gson
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -7,15 +8,17 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.base.GamePreferences
-import ru.aleshi.letsplaycities.base.game.Dictionary
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStreamReader
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
-object DictionaryUpdater {
+@Singleton
+class DictionaryUpdater(val mGson: Gson) {
 
     interface DownloadingListener {
         fun onStart()
@@ -24,7 +27,10 @@ object DictionaryUpdater {
         fun onError()
     }
 
-    private const val HOST = "http://${NetworkClient.HOST}:80"
+    companion object {
+        private val HOST = "http://${NetworkClient.HOST}:80"
+    }
+
     private var inProgress = false
 
     fun checkForUpdates(
@@ -58,24 +64,16 @@ object DictionaryUpdater {
     }
 
     private fun fetchLastDataVersion(): Maybe<Int> {
-        val url = URL("$HOST/getdata")
+        val url = URL("$HOST/update")
 
         return Single.just(url)
             .subscribeOn(Schedulers.io())
             .map { it.openConnection() }
             .doOnSuccess { it.connect() }
             .filter { it.contentLength > 0 }
-            .map {
-                val buffer = ByteArray(it.contentLength)
-                BufferedInputStream(url.openStream(), 64).apply {
-                    read(buffer)
-                    close()
-                }
-                buffer
-            }
-            .map { String(it).replace(10.toChar().toString(), "").trim { t -> t <= ' ' } }
-            .filter { it.toIntOrNull() != null }
-            .map { it.toInt() }
+            .map { InputStreamReader(BufferedInputStream(url.openStream(), 64)) }
+            .map { mGson.fromJson(it, UpdateRequest::class.java) }
+            .map { it.dictionary.version }
     }
 
     private fun loadFile(name: String, file: File): Observable<Int> {

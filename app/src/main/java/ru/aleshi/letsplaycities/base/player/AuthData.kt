@@ -35,7 +35,7 @@ class AuthData(var login: String, var snUID: String, var snName: String, var acc
             val login = prefs.getString("sn_login", "")!!
             val id = prefs.getString("sn_uid", "")!!
             val snName = prefs.getString("sn_name", "nv")!!
-            val accessToken = prefs.getString("acc_tkn", null)!!
+            val accessToken = prefs.getString("acc_tkn", "")!!
 
             return AuthData(login, id, snName, accessToken).apply {
                 accessHash = prefs.getString("acc_hash", null)

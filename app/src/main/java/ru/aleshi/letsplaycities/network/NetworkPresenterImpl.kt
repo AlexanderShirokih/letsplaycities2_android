@@ -13,19 +13,22 @@ import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.social.SocialNetworkLoginListener
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.utils.Utils
 import java.io.ByteArrayOutputStream
 import java.io.File
+import javax.inject.Inject
 
 
-class NetworkPresenterImpl : NetworkContract.Presenter {
+class NetworkPresenterImpl @Inject constructor(
+    private val mGameSessionBuilder: GameSession.GameSessionBuilder,
+    private val mNetworkServer: NetworkServer,
+    private val mNetworkRepository: NetworkRepository
+) : NetworkContract.Presenter {
 
     private val mDisposable: CompositeDisposable = CompositeDisposable()
-    private val mNetworkRepository: NetworkRepository = NetworkRepository(NetworkClient())
     private var mView: NetworkContract.View? = null
     private lateinit var mAuthData: AuthData
 
@@ -119,7 +122,6 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
     private fun startGame(userData: PlayerData, friendsInfo: FriendsInfo?) {
         mView?.checkForWaiting {
             mDisposable.add(mNetworkRepository.login(userData)
-                .doOnSuccess { mDisposable.add(mNetworkRepository.firebaseToken.subscribe()) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     mView!!.updateInfo(R.string.connecting_to_server)
@@ -154,7 +156,12 @@ class NetworkPresenterImpl : NetworkContract.Presenter {
                 reverse()
         }
 
-        mView?.onStartGame(GameSession(users, NetworkServer(mNetworkRepository)))
+        mView?.onStartGame(
+            mGameSessionBuilder
+                .server(mNetworkServer)
+                .users(users)
+                .build()
+        )
     }
 
 }

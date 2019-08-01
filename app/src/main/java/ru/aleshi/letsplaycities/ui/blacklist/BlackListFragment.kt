@@ -15,7 +15,6 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.base.player.PlayerData
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
@@ -27,12 +26,12 @@ import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 class BlackListFragment : Fragment() {
 
     private lateinit var mApplication: LPSApplication
-    private lateinit var mNetworkRepository: NetworkRepository
     private lateinit var mAdapter: BlackListAdapter
     private val mDisposable: CompositeDisposable = CompositeDisposable()
     private val requestCodeConfirmRemoving = 9352
     private lateinit var confirmViewModel: ConfirmViewModel
     private var callback: (() -> Unit)? = null
+    private var mNetworkRepository: NetworkRepository? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,13 +46,14 @@ class BlackListFragment : Fragment() {
         mAdapter = BlackListAdapter(object : OnItemClickListener {
             override fun onRemove(item: BlackListItem, pos: Int) {
                 showConfirmDialog(requireContext().getString(R.string.remove_from_blacklist, item.userName)) {
-                    if (::mNetworkRepository.isInitialized)
-                        mNetworkRepository.removeFromBanList(item.userId)
+                    mNetworkRepository?.let { rep ->
+                        rep.removeFromBanList(item.userId)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 mAdapter.remove(pos)
                                 setListVisibility(mAdapter.itemCount != 0)
                             }
+                    }
                 }
             }
         })
@@ -80,31 +80,31 @@ class BlackListFragment : Fragment() {
     }
 
     private fun buildBlackList() {
-        val userData = PlayerData()
-        userData.authData = AuthData.loadFromPreferences(mApplication.gamePreferences)
-        userData.userName = "#" + userData.authData!!.userID
-
-        mNetworkRepository = NetworkRepository(NetworkClient())
-        mDisposable.addAll(
-            mNetworkRepository.login(userData)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ requestFriendsList() }, ::handleError)
-        )
+        PlayerData.load(mApplication.gamePreferences)?.let { userData ->
+            mNetworkRepository = NetworkRepository(NetworkClient()).apply {
+                mDisposable.addAll(
+                    login(userData)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ requestFriendsList() }, ::handleError)
+                )
+            }
+        }
     }
 
     override fun onStop() {
         super.onStop()
         mDisposable.dispose()
-        mNetworkRepository.disconnect()
+        mNetworkRepository?.disconnect()
     }
 
     private fun requestFriendsList() {
-        mDisposable.addAll(
-            mNetworkRepository.firebaseToken.subscribe(),
-            mNetworkRepository.getBlackList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(::populateList, ::handleError)
-        )
+        mNetworkRepository?.let { rep ->
+            mDisposable.add(
+                rep.getBlackList()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(::populateList, ::handleError)
+            )
+        }
     }
 
     private fun populateList(list: ArrayList<BlackListItem>) {
