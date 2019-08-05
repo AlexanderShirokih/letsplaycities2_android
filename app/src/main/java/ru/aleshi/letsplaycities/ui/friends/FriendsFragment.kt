@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.ui.friends
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,14 +17,15 @@ import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.player.PlayerData
+import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
+import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
 import ru.aleshi.letsplaycities.network.NetworkUtils
-import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
+import ru.quandastudio.lpsclient.NetworkRepository
+import ru.quandastudio.lpsclient.core.NetworkClient
+import ru.quandastudio.lpsclient.model.FriendsInfo
 
 class FriendsFragment : Fragment(), FriendsItemListener {
     companion object {
@@ -103,15 +105,17 @@ class FriendsFragment : Fragment(), FriendsItemListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        PlayerData.load(mApplication.gamePreferences)?.let { userData ->
-            mNetworkRepository = NetworkRepository(NetworkClient()).apply {
-                mDisposable.addAll(
-                    login(userData)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ requestFriendsList() }, ::handleError)
-                )
+        //TODO: Inject variables
+        GamePlayerDataFactory(GameAuthDataFactory())
+            .load(mApplication.gamePreferences)?.let { userData ->
+                mNetworkRepository = NetworkRepository(NetworkClient(Build.HOST), NetworkUtils.getToken()).apply {
+                    mDisposable.addAll(
+                        login(userData)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ requestFriendsList() }, ::handleError)
+                    )
+                }
             }
-        }
     }
 
     override fun onStop() {

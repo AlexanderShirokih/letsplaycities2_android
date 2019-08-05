@@ -11,8 +11,9 @@ import ru.aleshi.letsplaycities.base.dictionary.Dictionary
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.player.*
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
-import ru.aleshi.letsplaycities.network.lpsv3.LPSMessage
 import ru.aleshi.letsplaycities.utils.StringUtils
+import ru.quandastudio.lpsclient.core.LPSMessage
+import ru.quandastudio.lpsclient.model.WordResult
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

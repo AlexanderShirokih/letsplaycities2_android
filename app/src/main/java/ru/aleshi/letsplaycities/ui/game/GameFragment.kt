@@ -28,6 +28,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.reward.RewardedVideoAd
 import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
@@ -79,10 +80,12 @@ class GameFragment : Fragment(), GameContract.View {
                     correctedWord.value = null
                 }
             })
-            restart.subscribe {
-                stopGame()
-                startGame()
-            }
+            disposable.add(restart
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    stopGame()
+                    startGame()
+                })
         }
         mAdapter = GameAdapter(activity)
         activity.onBackPressedDispatcher.addCallback(this) {

@@ -1,9 +1,9 @@
 package ru.aleshi.letsplaycities.base.game
 
-/**/
 import io.reactivex.Maybe
 import io.reactivex.Observable
-import ru.aleshi.letsplaycities.network.lpsv3.LPSMessage
+import ru.quandastudio.lpsclient.core.LPSMessage
+import ru.quandastudio.lpsclient.model.WordResult
 
 abstract class BaseServer {
 

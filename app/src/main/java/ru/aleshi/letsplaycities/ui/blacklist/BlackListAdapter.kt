@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_blacklist.view.*
 import ru.aleshi.letsplaycities.R
+import ru.quandastudio.lpsclient.model.BlackListItem
 
 class BlackListAdapter(private val onItemClickListener: OnItemClickListener) :
     RecyclerView.Adapter<BlackListAdapter.BlackListViewHolder>() {

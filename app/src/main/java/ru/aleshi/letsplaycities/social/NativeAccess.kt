@@ -3,8 +3,8 @@ package ru.aleshi.letsplaycities.social
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.base.player.DeviceId
+import ru.quandastudio.lpsclient.model.AuthData
 
 class NativeAccess : ISocialNetwork() {
 

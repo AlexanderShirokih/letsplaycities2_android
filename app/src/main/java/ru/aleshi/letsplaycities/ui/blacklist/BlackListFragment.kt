@@ -13,14 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_blacklist.*
+import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.player.PlayerData
+import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
+import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
 import ru.aleshi.letsplaycities.network.NetworkUtils
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
+import ru.quandastudio.lpsclient.NetworkRepository
+import ru.quandastudio.lpsclient.core.NetworkClient
+import ru.quandastudio.lpsclient.model.BlackListItem
 
 
 class BlackListFragment : Fragment() {
@@ -80,15 +83,17 @@ class BlackListFragment : Fragment() {
     }
 
     private fun buildBlackList() {
-        PlayerData.load(mApplication.gamePreferences)?.let { userData ->
-            mNetworkRepository = NetworkRepository(NetworkClient()).apply {
-                mDisposable.addAll(
-                    login(userData)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ requestFriendsList() }, ::handleError)
-                )
+        //TODO: Inject variables
+        GamePlayerDataFactory(GameAuthDataFactory())
+            .load(mApplication.gamePreferences)?.let { userData ->
+                mNetworkRepository = NetworkRepository(NetworkClient(BuildConfig.HOST), NetworkUtils.getToken()).apply {
+                    mDisposable.addAll(
+                        login(userData)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ requestFriendsList() }, ::handleError)
+                    )
+                }
             }
-        }
     }
 
     override fun onStop() {

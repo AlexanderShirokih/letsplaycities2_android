@@ -1,6 +1,6 @@
 package ru.aleshi.letsplaycities.social
 
-import ru.aleshi.letsplaycities.base.player.AuthData
+import ru.quandastudio.lpsclient.model.AuthData
 
 interface SocialNetworkLoginListener {
 

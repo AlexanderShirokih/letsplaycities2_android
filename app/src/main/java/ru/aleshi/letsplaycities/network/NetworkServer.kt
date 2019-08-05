@@ -3,9 +3,9 @@ package ru.aleshi.letsplaycities.network
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import ru.aleshi.letsplaycities.base.game.BaseServer
-import ru.aleshi.letsplaycities.base.game.WordResult
-import ru.aleshi.letsplaycities.network.lpsv3.LPSMessage
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
+import ru.quandastudio.lpsclient.NetworkRepository
+import ru.quandastudio.lpsclient.core.LPSMessage
+import ru.quandastudio.lpsclient.model.WordResult
 import javax.inject.Inject
 
 class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) : BaseServer() {

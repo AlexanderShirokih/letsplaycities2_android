@@ -11,13 +11,13 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.json.JSONObject
-import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.ok.android.sdk.ContextOkListener
 import ru.ok.android.sdk.Odnoklassniki
 import ru.ok.android.sdk.OkRequestMode
 import ru.ok.android.sdk.util.OkAuthType
 import ru.ok.android.sdk.util.OkScope
+import ru.quandastudio.lpsclient.model.AuthData
 
 
 @ExperimentalCoroutinesApi

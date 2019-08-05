@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.base.game
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.quandastudio.lpsclient.model.WordResult
 
 class LocalServer(gamePreferences: GamePreferences) : BaseServer() {
 

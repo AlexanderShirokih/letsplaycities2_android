@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.utils.Utils
+import ru.quandastudio.lpsclient.model.PlayerData
 
 class NetworkUser(playerData: PlayerData) : User(playerData) {
 

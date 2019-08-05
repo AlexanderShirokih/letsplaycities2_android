@@ -7,8 +7,8 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.base.GamePreferences
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkClient
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -28,7 +28,7 @@ class DictionaryUpdater(val mGson: Gson) {
     }
 
     companion object {
-        private val HOST = "http://${NetworkClient.HOST}:80"
+        private val HOST = "http://${BuildConfig.HOST}:80"
     }
 
     private var inProgress = false

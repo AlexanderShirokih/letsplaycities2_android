@@ -14,8 +14,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
-import ru.aleshi.letsplaycities.base.player.AuthData
 import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.quandastudio.lpsclient.model.AuthData
 
 class VKontakte : ISocialNetwork() {
 

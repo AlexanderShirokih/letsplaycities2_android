@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.game.Position
+import ru.quandastudio.lpsclient.model.PlayerData
 
 abstract class User(internal val playerData: PlayerData) {
 

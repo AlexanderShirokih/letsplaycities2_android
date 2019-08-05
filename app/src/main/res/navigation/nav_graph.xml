@@ -36,9 +36,8 @@
         <action android:id="@+id/showLoginDialog" app:destination="@id/loginFragment"/>
         <action android:id="@+id/start_friends_fragment" app:destination="@id/friendsFragment"/>
         <action android:id="@+id/start_game_fragment" app:destination="@id/gameFragment"/>
-        <argument android:name="action" app:argType="string" app:nullable="true"/>
-        <argument android:name="login" app:argType="string" app:nullable="true"/>
-        <argument android:name="userId" app:argType="integer"/>
+        <argument android:name="action" app:argType="string" android:defaultValue="default"/>
+        <argument android:name="oppId" app:argType="integer" android:defaultValue="0"/>
     </fragment>
 
     <fragment
@@ -150,7 +149,7 @@
         <argument android:name="score" app:argType="integer"/>
         <action android:id="@+id/back_to_game_fragment"
                 app:popUpTo="@id/gameFragment"
-                app:popUpToInclusive="false" />
+                app:popUpToInclusive="false"/>
     </dialog>
 
     <dialog

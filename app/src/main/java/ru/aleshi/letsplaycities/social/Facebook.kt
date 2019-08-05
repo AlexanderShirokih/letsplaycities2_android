@@ -7,8 +7,7 @@ import com.facebook.*
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import ru.aleshi.letsplaycities.base.player.AuthData
-
+import ru.quandastudio.lpsclient.model.AuthData
 
 class Facebook : ISocialNetwork() {
 

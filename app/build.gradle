@@ -66,7 +66,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:19.0.1'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
-    implementation "io.reactivex.rxjava2:rxkotlin:2.3.0"
+    implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
     testImplementation 'junit:junit:4.12'
@@ -82,4 +82,5 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
+    implementation 'ru.quandastudio.lps:lpsclient:0.1'
 }

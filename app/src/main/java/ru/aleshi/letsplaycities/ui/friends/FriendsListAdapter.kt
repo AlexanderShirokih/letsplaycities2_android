@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_friends.view.*
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
+import ru.quandastudio.lpsclient.model.FriendsInfo
 
 class FriendsListAdapter(private val mFriendsItemListener: FriendsItemListener) :
     RecyclerView.Adapter<FriendsViewHolder>() {

@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.aleshi.letsplaycities.network.NetworkContract
-import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
+import ru.quandastudio.lpsclient.model.FriendsInfo
 import javax.inject.Inject
 
 class NetworkViewModel @Inject constructor(val networkPresenter: NetworkContract.Presenter) : ViewModel() {

@@ -1,6 +1,6 @@
 package ru.aleshi.letsplaycities.ui.friends
 
-import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
+import ru.quandastudio.lpsclient.model.FriendsInfo
 
 interface FriendsItemListener {
 

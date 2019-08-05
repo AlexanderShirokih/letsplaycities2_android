@@ -10,10 +10,11 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.dictionary.Dictionary
 import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.utils.Utils
+import ru.quandastudio.lpsclient.model.PlayerData
 
 class Player(playerData: PlayerData) : User(playerData) {
 
-    constructor(name: String) : this(PlayerData.create(name))
+    constructor(name: String) : this(PlayerData.SimpleFactory().create(name))
 
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
     private var mFirstChar: Char? = null

@@ -38,6 +38,7 @@ import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.RECONNECTION_DELAY_MS
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
+import ru.quandastudio.lpsclient.model.FriendModeResult
 import java.io.File
 import javax.inject.Inject
 
@@ -83,6 +84,16 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         if (mGamePreferences.isSoundEnabled()) {
             mGameSound = MediaPlayer.create(activity, R.raw.begin)
         }
+    }
+
+    override fun onFriendModeResult(result: FriendModeResult, login: String?) {
+        val msgId = when (result) {
+            FriendModeResult.BUSY -> R.string.friend_busy
+            FriendModeResult.DENIED -> R.string.friend_denied
+            FriendModeResult.OFFLINE -> R.string.friend_offline
+            FriendModeResult.NOT_FRIEND -> R.string.not_friend
+        }
+        Toast.makeText(requireContext(), getString(msgId, login ?: ""), Toast.LENGTH_LONG).show()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -175,9 +186,10 @@ class NetworkFragment : Fragment(), NetworkContract.View {
     override fun onResume() {
         super.onResume()
         arguments?.let { args ->
-            if (args["action"] == "fm_game") {
+            val nfa = NetworkFragmentArgs.fromBundle(args)
+            if ("fm_game" == nfa.action) {
                 if (mGamePreferences.isLoggedFromAnySN()) {
-
+                    mNetworkPresenter.onConnectToFriendGame(getVersionInfo(), nfa.oppId)
                 } else
                     Toast.makeText(requireContext(), R.string.sign_to_continue, Toast.LENGTH_LONG).show()
             }

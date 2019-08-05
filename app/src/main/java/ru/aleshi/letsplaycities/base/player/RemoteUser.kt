@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.base.player
 import android.content.Context
 import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
+import ru.quandastudio.lpsclient.model.PlayerData
 
 
 class RemoteUser(playerData: PlayerData) : User(playerData) {

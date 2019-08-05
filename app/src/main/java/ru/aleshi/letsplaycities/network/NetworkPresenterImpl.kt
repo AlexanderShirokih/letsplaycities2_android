@@ -8,15 +8,17 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameSession
-import ru.aleshi.letsplaycities.base.player.AuthData
+import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
+import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
 import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.base.player.PlayerData
-import ru.aleshi.letsplaycities.network.lpsv3.FriendsInfo
-import ru.aleshi.letsplaycities.network.lpsv3.NetworkRepository
 import ru.aleshi.letsplaycities.social.SocialNetworkLoginListener
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.utils.Utils
+import ru.quandastudio.lpsclient.NetworkRepository
+import ru.quandastudio.lpsclient.model.AuthData
+import ru.quandastudio.lpsclient.model.FriendsInfo
+import ru.quandastudio.lpsclient.model.PlayerData
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
@@ -25,9 +27,12 @@ import javax.inject.Inject
 class NetworkPresenterImpl @Inject constructor(
     private val mGameSessionBuilder: GameSession.GameSessionBuilder,
     private val mNetworkServer: NetworkServer,
-    private val mNetworkRepository: NetworkRepository
+    private val mNetworkRepository: NetworkRepository,
+    private val mAuthDataFactory: GameAuthDataFactory,
+    private val mGamePlayerDataFactory: GamePlayerDataFactory
 ) : NetworkContract.Presenter {
 
+    private lateinit var mSaveProvider: GameAuthDataFactory.GameSaveProvider
     private val mDisposable: CompositeDisposable = CompositeDisposable()
     private var mView: NetworkContract.View? = null
     private lateinit var mAuthData: AuthData
@@ -36,15 +41,17 @@ class NetworkPresenterImpl @Inject constructor(
         mView = view
         val prefs = view.getGamePreferences()
         if (prefs.isLoggedFromAnySN()) {
-            mAuthData = AuthData.loadFromPreferences(prefs)
+            mAuthData = mAuthDataFactory.loadFromPreferences(prefs)
             view.setupWithSN()
         }
+
+        mSaveProvider = GameAuthDataFactory.GameSaveProvider(prefs)
 
         SocialNetworkManager.registerCallback(object : SocialNetworkLoginListener {
 
             override fun onLoggedIn(data: AuthData) {
                 mView?.let {
-                    mAuthData = data.apply { saveToPreferences(it.getGamePreferences()) }
+                    mAuthData = data.apply { mSaveProvider.save(this) }
                     it.setupWithSN()
                 }
             }
@@ -60,6 +67,12 @@ class NetworkPresenterImpl @Inject constructor(
         mView?.run {
             SocialNetworkManager.logout(getGamePreferences())
             setup()
+        }
+    }
+
+    override fun onConnectToFriendGame(versionInfo: Pair<String, Int>, oppId: Int) {
+        createPlayerData(versionInfo) {
+            startFriendGame(it, oppId)
         }
     }
 
@@ -91,7 +104,7 @@ class NetworkPresenterImpl @Inject constructor(
     private fun createPlayerData(versionInfo: Pair<String, Int>, callback: (playerData: PlayerData) -> Unit) {
         mView?.let {
             val prefs = it.getGamePreferences()
-            val userData = PlayerData.create(mAuthData.login).apply {
+            val userData = mGamePlayerDataFactory.create(mAuthData.login).apply {
                 setBuildInfo(versionInfo.first, versionInfo.second)
                 authData = mAuthData
                 canReceiveMessages = prefs.canReceiveMessages()
@@ -118,18 +131,32 @@ class NetworkPresenterImpl @Inject constructor(
         }
     }
 
+    private fun startFriendGame(userData: PlayerData, oppId: Int) {
+        mDisposable.add(
+            mNetworkRepository.login(userData)
+                .doOnSuccess { mView?.updateInfo(R.string.waiting_for_friend) }
+                .flatMapCompletable { mNetworkRepository.sendFriendRequestResult(true, oppId) }
+                .toSingleDefault(Unit)
+                .flatMapMaybe { mNetworkRepository.connectToFriend() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ play(userData, oppData = it.first, youStarter = it.second) }, {
+                    onCancel()
+                    mView?.handleError(it)
+                }, ::onCancel)
+        )
+    }
 
     private fun startGame(userData: PlayerData, friendsInfo: FriendsInfo?) {
         mView?.checkForWaiting {
             mDisposable.add(mNetworkRepository.login(userData)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
-                    mView!!.updateInfo(R.string.connecting_to_server)
+                    mView?.updateInfo(R.string.connecting_to_server)
                 }
                 .doOnSuccess {
                     mView?.let { view ->
                         view.updateInfo(R.string.waiting_for_opp)
-                        it.authData.saveToPreferences(view.getGamePreferences())
+                        mSaveProvider.save(it.authData)
                         if (it.newerBuild > userData.clientBuild)
                             view.notifyAboutUpdates()
                     }
