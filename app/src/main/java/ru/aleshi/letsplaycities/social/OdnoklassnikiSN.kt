@@ -18,6 +18,7 @@ import ru.ok.android.sdk.OkRequestMode
 import ru.ok.android.sdk.util.OkAuthType
 import ru.ok.android.sdk.util.OkScope
 import ru.quandastudio.lpsclient.model.AuthData
+import ru.quandastudio.lpsclient.model.AuthType
 
 
 @ExperimentalCoroutinesApi
@@ -60,7 +61,7 @@ class OdnoklassnikiSN : ISocialNetwork() {
                     Observable.just(it),
                     SocialUtils.updateAvatar(activity as MainActivity, it.getString("pic_3").toUri()),
                     BiFunction<JSONObject, String, AuthData> { user, _ ->
-                        AuthData(user.getString("name"), user.getString("uid"), "ok", access_token)
+                        AuthData(user.getString("name"), user.getString("uid"), AuthType.Odnoklassniki, access_token)
                     }
                 )
             }

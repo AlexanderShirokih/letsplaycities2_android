@@ -106,7 +106,7 @@ class CorrectionTipsDialog : DialogFragment() {
 
     class CorrectionItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: String) {
-            itemView.findViewById<TextView>(android.R.id.text1).text = StringUtils.firstToUpper(item)
+            itemView.findViewById<TextView>(android.R.id.text1).text = StringUtils.toTitleCase(item)
         }
     }
 }

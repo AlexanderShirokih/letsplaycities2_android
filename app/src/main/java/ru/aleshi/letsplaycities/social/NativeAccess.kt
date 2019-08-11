@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import ru.aleshi.letsplaycities.base.player.DeviceId
 import ru.quandastudio.lpsclient.model.AuthData
+import ru.quandastudio.lpsclient.model.AuthType
 
 class NativeAccess : ISocialNetwork() {
 
@@ -17,7 +18,7 @@ class NativeAccess : ISocialNetwork() {
     }
 
     override fun onLoggedIn(activity: Activity, access_token: String) {
-        val info = AuthData(userLogin, DeviceId(activity).toString(), "nv", access_token)
+        val info = AuthData(userLogin, DeviceId(activity).toString(), AuthType.Native, access_token)
         callback?.onLoggedIn(info)
     }
 

@@ -56,10 +56,10 @@ class Exclusions private constructor(
 
     fun check(city: String): Pair<String, String?> {
         if (countries.contains(city))
-            return city to String.format(errMsgs[0], StringUtils.firstToUpper(city))
+            return city to String.format(errMsgs[0], StringUtils.toTitleCase(city))
 
         if (states.contains(city))
-            return city to String.format(errMsgs[1], StringUtils.firstToUpper(city))
+            return city to String.format(errMsgs[1], StringUtils.toTitleCase(city))
 
         return city to checkCity(city)
     }
@@ -85,16 +85,16 @@ class Exclusions private constructor(
 
         when (ex.type) {
             0 -> { // Город был переименован
-                msg = String.format(errMsgs[2], StringUtils.firstToUpper(city), StringUtils.firstToUpper(ex.thing))
+                msg = String.format(errMsgs[2], StringUtils.toTitleCase(city), StringUtils.toTitleCase(ex.thing))
             }
             2 -> { // Неполное название
-                msg = String.format(errMsgs[3], StringUtils.firstToUpper(ex.thing))
+                msg = String.format(errMsgs[3], StringUtils.toTitleCase(ex.thing))
             }
             3 -> { // Географические объекты - не города
-                msg = String.format(errMsgs[4], StringUtils.firstToUpper(city), ex.thing)
+                msg = String.format(errMsgs[4], StringUtils.toTitleCase(city), ex.thing)
             }
             4 -> { // Исторические название областей
-                msg = String.format(errMsgs[5], StringUtils.firstToUpper(city))
+                msg = String.format(errMsgs[5], StringUtils.toTitleCase(city))
             }
         }
         return msg

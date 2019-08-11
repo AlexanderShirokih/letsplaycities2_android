@@ -143,10 +143,10 @@ class ScoreFragment : Fragment() {
                     val indOf = v.indexOf('=')
                     if (indOf > 0) {
                         text = v.substring(indOf + 1)
-                        name.text = StringUtils.firstToUpper(v.substring(0, indOf))
+                        name.text = StringUtils.toTitleCase(v.substring(0, indOf))
                     } else {
                         text = v.length.toString()
-                        name.text = StringUtils.firstToUpper(v)
+                        name.text = StringUtils.toTitleCase(v)
                     }
                 } else
                     text = field.value()

@@ -365,7 +365,7 @@ class GameSession private constructor(
     override fun needsShowMenu(position: Position) {
         players.firstOrNull { it.position == position }?.run {
             if (needsShowMenu())
-                view.showUserMenu(playerData.isFriend, playerData.userName!!, playerData.authData!!.userID)
+                view.showUserMenu(playerData.isFriend, playerData.authData.login, playerData.authData.userID)
         }
     }
 

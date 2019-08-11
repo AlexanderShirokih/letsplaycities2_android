@@ -1,10 +1,10 @@
 package ru.aleshi.letsplaycities.ui.friends
 
-import ru.quandastudio.lpsclient.model.FriendsInfo
+import ru.quandastudio.lpsclient.model.FriendInfo
 
 interface FriendsItemListener {
 
-    fun onFriendsItemClicked(friendsInfo: FriendsInfo)
+    fun onFriendsItemClicked(friendsInfo: FriendInfo)
 
-    fun onRemoveFriendsItem(friendsInfo: FriendsInfo)
+    fun onRemoveFriendsItem(friendsInfo: FriendInfo)
 }

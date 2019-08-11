@@ -23,7 +23,7 @@ class GameItem(
         else {
             val foregroundSpanColor: Int = resolveForegroundColor(context)
             val end = content.lastIndexOf(StringUtils.findLastSuitableChar(content.toLowerCase()) ?: 0.toChar())
-            SpannableStringBuilder(StringUtils.firstToUpper(content)).apply {
+            SpannableStringBuilder(StringUtils.toTitleCase(content)).apply {
                 setSpan(
                     ForegroundColorSpan(foregroundSpanColor),
                     0,

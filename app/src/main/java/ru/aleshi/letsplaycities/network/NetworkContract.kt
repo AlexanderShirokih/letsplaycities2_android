@@ -4,7 +4,7 @@ import androidx.lifecycle.Observer
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.quandastudio.lpsclient.model.FriendModeResult
-import ru.quandastudio.lpsclient.model.FriendsInfo
+import ru.quandastudio.lpsclient.model.FriendInfo
 
 interface NetworkContract {
 
@@ -28,7 +28,7 @@ interface NetworkContract {
         fun onConnectToFriendGame(versionInfo: Pair<String, Int>, oppId: Int)
         fun onConnect(versionInfo: Pair<String, Int>)
         fun onCancel()
-        fun onFriendsInfo(versionInfo: Pair<String, Int>): Observer<in FriendsInfo>
+        fun onFriendsInfo(versionInfo: Pair<String, Int>): Observer<in FriendInfo>
         fun onDispose()
     }
 }

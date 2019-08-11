@@ -16,6 +16,7 @@ import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.quandastudio.lpsclient.model.AuthData
+import ru.quandastudio.lpsclient.model.AuthType
 
 class VKontakte : ISocialNetwork() {
 
@@ -54,7 +55,7 @@ class VKontakte : ISocialNetwork() {
                     Observable.just(it),
                     SocialUtils.updateAvatar(activity as MainActivity, it.photo),
                     BiFunction<VKUser, String, AuthData> { user, _ ->
-                        AuthData(user.login, user.id.toString(), "vk", access_token)
+                        AuthData(user.login, user.id.toString(), AuthType.Vkontakte, access_token)
                     }
                 )
             }

@@ -9,6 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import ru.quandastudio.lpsclient.model.AuthData
+import ru.quandastudio.lpsclient.model.AuthType
 
 
 class Google : ISocialNetwork() {
@@ -48,7 +49,7 @@ class Google : ISocialNetwork() {
         val picture = account.photoUrl
 
         SocialUtils.saveAvatar(activity, picture!!) {
-            val info = AuthData(login!!, uid!!, "gl", accessToken)
+            val info = AuthData(login!!, uid!!, AuthType.Google, accessToken)
             callback?.onLoggedIn(info)
         }
     }

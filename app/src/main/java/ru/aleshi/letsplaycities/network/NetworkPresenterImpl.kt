@@ -17,7 +17,7 @@ import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.AuthData
-import ru.quandastudio.lpsclient.model.FriendsInfo
+import ru.quandastudio.lpsclient.model.FriendInfo
 import ru.quandastudio.lpsclient.model.PlayerData
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -82,11 +82,11 @@ class NetworkPresenterImpl @Inject constructor(
         }
     }
 
-    override fun onFriendsInfo(versionInfo: Pair<String, Int>): Observer<in FriendsInfo> {
-        return Observer { friendsInfo ->
-            friendsInfo?.run {
+    override fun onFriendsInfo(versionInfo: Pair<String, Int>): Observer<in FriendInfo> {
+        return Observer { friendInfo ->
+            friendInfo?.run {
                 createPlayerData(versionInfo) { playerData ->
-                    startGame(playerData, friendsInfo)
+                    startGame(playerData, friendInfo)
                 }
             }
         }
@@ -104,9 +104,9 @@ class NetworkPresenterImpl @Inject constructor(
     private fun createPlayerData(versionInfo: Pair<String, Int>, callback: (playerData: PlayerData) -> Unit) {
         mView?.let {
             val prefs = it.getGamePreferences()
-            val userData = mGamePlayerDataFactory.create(mAuthData.login).apply {
-                setBuildInfo(versionInfo.first, versionInfo.second)
-                authData = mAuthData
+            val userData = mGamePlayerDataFactory.create(mAuthData).apply {
+                clientVersion = versionInfo.first
+                clientBuild = versionInfo.second
                 canReceiveMessages = prefs.canReceiveMessages()
             }
 
@@ -146,7 +146,7 @@ class NetworkPresenterImpl @Inject constructor(
         )
     }
 
-    private fun startGame(userData: PlayerData, friendsInfo: FriendsInfo?) {
+    private fun startGame(userData: PlayerData, friendsInfo: FriendInfo?) {
         mView?.checkForWaiting {
             mDisposable.add(mNetworkRepository.login(userData)
                 .observeOn(AndroidSchedulers.mainThread())

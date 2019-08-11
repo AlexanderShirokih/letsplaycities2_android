@@ -2,7 +2,7 @@ package ru.aleshi.letsplaycities.utils
 
 object StringUtils {
 
-    fun firstToUpper(input: String): String {
+    fun toTitleCase(input: String): String {
         val sb = StringBuilder()
         for (i in 0 until input.length) {
             var c = input[i]

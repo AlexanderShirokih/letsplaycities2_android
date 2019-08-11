@@ -5,19 +5,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_friends.view.*
 import ru.aleshi.letsplaycities.R
-import ru.quandastudio.lpsclient.model.FriendsInfo
+import ru.quandastudio.lpsclient.model.FriendInfo
 
 class FriendsListAdapter(private val mFriendsItemListener: FriendsItemListener) :
     RecyclerView.Adapter<FriendsViewHolder>() {
 
-    private var list: MutableList<FriendsInfo> = mutableListOf()
+    private var list: MutableList<FriendInfo> = mutableListOf()
 
-    fun updateItems(list: MutableList<FriendsInfo>) {
+    fun updateItems(list: MutableList<FriendInfo>) {
         this.list = list
         notifyDataSetChanged()
     }
 
-    fun removeItem(item: FriendsInfo) {
+    fun removeItem(item: FriendInfo) {
         val index = list.indexOf(item)
         if (index != -1) {
             list.removeAt(index)

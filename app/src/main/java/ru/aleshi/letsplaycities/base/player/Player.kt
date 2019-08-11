@@ -14,7 +14,7 @@ import ru.quandastudio.lpsclient.model.PlayerData
 
 class Player(playerData: PlayerData) : User(playerData) {
 
-    constructor(name: String) : this(PlayerData.SimpleFactory().create(name))
+    constructor(name: String) : this(PlayerData.Factory().create(name))
 
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
     private var mFirstChar: Char? = null
@@ -70,14 +70,14 @@ class Player(playerData: PlayerData) : User(playerData) {
             Dictionary.CityResult.ALREADY_USED -> gameSession.notify(
                 gameSession.view.context().getString(
                     R.string.already_used,
-                    StringUtils.firstToUpper(data.first)
+                    StringUtils.toTitleCase(data.first)
                 )
             )
             Dictionary.CityResult.CITY_NOT_FOUND -> gameSession.correct(
                 data.first,
                 gameSession.view.context().getString(
                     R.string.city_not_found,
-                    StringUtils.firstToUpper(data.first)
+                    StringUtils.toTitleCase(data.first)
                 )
             )
             Dictionary.CityResult.OK -> {
