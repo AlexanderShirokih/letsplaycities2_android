@@ -14,7 +14,7 @@ import ru.quandastudio.lpsclient.model.PlayerData
 
 class Player(playerData: PlayerData) : User(playerData) {
 
-    constructor(name: String) : this(PlayerData.SimpleFactory().create(name))
+    constructor(name: String) : this(PlayerData.Factory().create(name))
 
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
     private var mFirstChar: Char? = null

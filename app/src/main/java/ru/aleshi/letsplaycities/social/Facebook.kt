@@ -8,6 +8,7 @@ import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import ru.quandastudio.lpsclient.model.AuthData
+import ru.quandastudio.lpsclient.model.AuthType
 
 class Facebook : ISocialNetwork() {
 
@@ -32,7 +33,7 @@ class Facebook : ISocialNetwork() {
                     val picture = currentProfile.getProfilePictureUri(128, 128)
 
                     SocialUtils.saveAvatar(activity, picture) {
-                        val info = AuthData(login, userID, "fb", accessToken.token)
+                        val info = AuthData(login, userID, AuthType.Facebook, accessToken.token)
                         callback?.onLoggedIn(info)
                     }
                 }

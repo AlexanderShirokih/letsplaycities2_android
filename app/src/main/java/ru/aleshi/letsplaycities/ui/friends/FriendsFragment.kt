@@ -25,7 +25,7 @@ import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.core.NetworkClient
-import ru.quandastudio.lpsclient.model.FriendsInfo
+import ru.quandastudio.lpsclient.model.FriendInfo
 
 class FriendsFragment : Fragment(), FriendsItemListener {
     companion object {
@@ -36,7 +36,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
     private lateinit var mApplication: LPSApplication
     private lateinit var mAdapter: FriendsListAdapter
     private var mNetworkRepository: NetworkRepository? = null
-    private lateinit var mSelectedFriendsInfo: FriendsInfo
+    private lateinit var mSelectedFriendsInfo: FriendInfo
     private val mDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +80,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
         }
     }
 
-    override fun onFriendsItemClicked(friendsInfo: FriendsInfo) {
+    override fun onFriendsItemClicked(friendsInfo: FriendInfo) {
         mSelectedFriendsInfo = friendsInfo
         val msg = resources.getString(R.string.invite_friend, friendsInfo.name)
         findNavController().navigate(
@@ -92,7 +92,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
         )
     }
 
-    override fun onRemoveFriendsItem(friendsInfo: FriendsInfo) {
+    override fun onRemoveFriendsItem(friendsInfo: FriendInfo) {
         mSelectedFriendsInfo = friendsInfo
         val msg = resources.getString(R.string.invite_friend, friendsInfo.name)
         findNavController().navigate(
@@ -134,7 +134,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
         }
     }
 
-    private fun populateList(list: ArrayList<FriendsInfo>) {
+    private fun populateList(list: ArrayList<FriendInfo>) {
         mAdapter.updateItems(list)
         if (list.isNotEmpty()) {
             recyclerView.visibility = View.VISIBLE

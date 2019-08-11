@@ -9,7 +9,7 @@ import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.model.PlayerData
 import java.util.concurrent.TimeUnit
 
-class Android(name: String) : User(PlayerData.SimpleFactory().create(name)) {
+class Android(name: String) : User(PlayerData.Factory().create(name)) {
     private var mEstimatedMoves: Int = 1
 
     override fun onBeginMove(firstChar: Char?) {

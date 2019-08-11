@@ -16,7 +16,7 @@ abstract class User(internal val playerData: PlayerData) {
     var position: Position = Position.UNKNOWN
 
     val name: String
-        get() = playerData.userName!!
+        get() = playerData.authData.login
 
     val info: String
         get() = if (score == 0) name else "$name: $score"
