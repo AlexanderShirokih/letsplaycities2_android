@@ -65,7 +65,6 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         mNetworkViewModel = ViewModelProviders.of(requireActivity(), viewModelFactory)[NetworkViewModel::class.java]
         mNetworkViewModel.run {
             mNetworkPresenter = networkPresenter
-            avatarPath.value = mApplication.gamePreferences.getAvatarPath()
             avatarPath.observe(this@NetworkFragment, Observer {
                 if (it == null) {
                     roundedImageView?.setImageResource(R.drawable.ic_player)
@@ -85,6 +84,7 @@ class NetworkFragment : Fragment(), NetworkContract.View {
             mGameSound = MediaPlayer.create(activity, R.raw.begin)
         }
     }
+
 
     override fun onFriendModeResult(result: FriendModeResult, login: String?) {
         val msgId = when (result) {
@@ -185,6 +185,7 @@ class NetworkFragment : Fragment(), NetworkContract.View {
 
     override fun onResume() {
         super.onResume()
+        mNetworkViewModel.avatarPath.value = mApplication.gamePreferences.getAvatarPath()
         arguments?.let { args ->
             val nfa = NetworkFragmentArgs.fromBundle(args)
             if ("fm_game" == nfa.action) {

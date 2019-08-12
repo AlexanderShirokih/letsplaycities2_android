@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.ui.friends
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,21 +10,22 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
 import ru.aleshi.letsplaycities.network.NetworkUtils
+import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.quandastudio.lpsclient.NetworkRepository
-import ru.quandastudio.lpsclient.core.NetworkClient
 import ru.quandastudio.lpsclient.model.FriendInfo
+import javax.inject.Inject
 
 class FriendsFragment : Fragment(), FriendsItemListener {
     companion object {
@@ -33,27 +33,37 @@ class FriendsFragment : Fragment(), FriendsItemListener {
         private const val REQUEST_CODE_REMOVE_ITEM = 2
     }
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var mNetworkRepository: NetworkRepository
+    @Inject
+    lateinit var mGamePlayerDataFactory: GamePlayerDataFactory
+
     private lateinit var mApplication: LPSApplication
     private lateinit var mAdapter: FriendsListAdapter
-    private var mNetworkRepository: NetworkRepository? = null
     private lateinit var mSelectedFriendsInfo: FriendInfo
     private val mDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         mApplication = lpsApplication
-        ViewModelProviders.of(requireActivity())[ConfirmViewModel::class.java].callback.observe(this,
+        ViewModelProviders.of(requireActivity(), viewModelFactory)[ConfirmViewModel::class.java].callback.observe(this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.result && ::mSelectedFriendsInfo.isInitialized) {
                     when (request.resultCode) {
                         REQUEST_CODE_SELECT_ITEM -> {
-                            ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java].friendsInfo.postValue(
+                            ViewModelProviders.of(
+                                requireActivity(),
+                                viewModelFactory
+                            )[NetworkViewModel::class.java].friendsInfo.postValue(
                                 mSelectedFriendsInfo
                             )
                             findNavController().popBackStack(R.id.networkFragment, false)
                         }
                         REQUEST_CODE_REMOVE_ITEM -> {
-                            mNetworkRepository?.let { rep ->
+                            mNetworkRepository.let { rep ->
                                 rep.deleteFriend(mSelectedFriendsInfo.userId)
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe { mAdapter.removeItem(mSelectedFriendsInfo) }
@@ -94,7 +104,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
 
     override fun onRemoveFriendsItem(friendsInfo: FriendInfo) {
         mSelectedFriendsInfo = friendsInfo
-        val msg = resources.getString(R.string.invite_friend, friendsInfo.name)
+        val msg = resources.getString(R.string.remove_from_friends, friendsInfo.name)
         findNavController().navigate(
             FriendsFragmentDirections.showConfimationDialog(
                 REQUEST_CODE_REMOVE_ITEM,
@@ -105,33 +115,28 @@ class FriendsFragment : Fragment(), FriendsItemListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        //TODO: Inject variables
-        GamePlayerDataFactory(GameAuthDataFactory())
-            .load(mApplication.gamePreferences)?.let { userData ->
-                mNetworkRepository = NetworkRepository(NetworkClient(Build.HOST), NetworkUtils.getToken()).apply {
-                    mDisposable.addAll(
-                        login(userData)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({ requestFriendsList() }, ::handleError)
-                    )
-                }
-            }
+        mGamePlayerDataFactory.load(mApplication.gamePreferences)?.let { userData ->
+            mDisposable.addAll(
+                mNetworkRepository.login(userData)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ requestFriendsList() }, ::handleError)
+            )
+        }
     }
 
     override fun onStop() {
         super.onStop()
         mDisposable.dispose()
-        mNetworkRepository?.disconnect()
+        mNetworkRepository.disconnect()
     }
 
     private fun requestFriendsList() {
-        mNetworkRepository?.let { rep ->
-            mDisposable.addAll(
-                rep.getFriendsList()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(::populateList, ::handleError)
-            )
-        }
+        mDisposable.addAll(
+            mNetworkRepository.getFriendsList()
+                .doOnEvent { _, _ -> mNetworkRepository.disconnect() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(::populateList, ::handleError)
+        )
     }
 
     private fun populateList(list: ArrayList<FriendInfo>) {

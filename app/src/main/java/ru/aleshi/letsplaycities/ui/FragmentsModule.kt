@@ -4,6 +4,8 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryModule
 import ru.aleshi.letsplaycities.base.game.GameModule
+import ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment
+import ru.aleshi.letsplaycities.ui.friends.FriendsFragment
 import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkFragment
 
@@ -17,4 +19,12 @@ abstract class FragmentsModule {
     @ActivityScope
     @ContributesAndroidInjector
     abstract fun contributeNetworkFragment(): NetworkFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeFriendsFragment(): FriendsFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeBlackListFragment(): BlackListFragment
 }

@@ -149,7 +149,10 @@ class GamePreferences(context: Context) {
     fun getLogin(): String = prefs.getString("sn_login", "User")!!
 
     fun removeAvatarPath() {
-        prefs.edit().remove("avatar_path").apply()
+        prefs.edit {
+            remove("avatar_path")
+            remove("last_avatar_uri")
+        }
     }
 
     fun setAvatarPath(avatar: String) {

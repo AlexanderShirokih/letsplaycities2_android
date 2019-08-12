@@ -10,23 +10,31 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
 import ru.aleshi.letsplaycities.network.NetworkUtils
+import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.core.NetworkClient
 import ru.quandastudio.lpsclient.model.BlackListItem
-
+import javax.inject.Inject
 
 class BlackListFragment : Fragment() {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var mNetworkRepository: NetworkRepository
+    @Inject
+    lateinit var mGamePlayerDataFactory: GamePlayerDataFactory
 
     private lateinit var mApplication: LPSApplication
     private lateinit var mAdapter: BlackListAdapter
@@ -34,12 +42,12 @@ class BlackListFragment : Fragment() {
     private val requestCodeConfirmRemoving = 9352
     private lateinit var confirmViewModel: ConfirmViewModel
     private var callback: (() -> Unit)? = null
-    private var mNetworkRepository: NetworkRepository? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         mApplication = lpsApplication
-        confirmViewModel = ViewModelProviders.of(requireActivity())[ConfirmViewModel::class.java]
+        confirmViewModel = ViewModelProviders.of(requireActivity(), viewModelFactory)[ConfirmViewModel::class.java]
         confirmViewModel.callback.observe(this, Observer<ConfirmViewModel.Request> { request ->
             if (request.resultCode == requestCodeConfirmRemoving && request.result) {
                 callback?.invoke()
@@ -49,14 +57,12 @@ class BlackListFragment : Fragment() {
         mAdapter = BlackListAdapter(object : OnItemClickListener {
             override fun onRemove(item: BlackListItem, pos: Int) {
                 showConfirmDialog(requireContext().getString(R.string.remove_from_blacklist, item.userName)) {
-                    mNetworkRepository?.let { rep ->
-                        rep.removeFromBanList(item.userId)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                mAdapter.remove(pos)
-                                setListVisibility(mAdapter.itemCount != 0)
-                            }
-                    }
+                    mNetworkRepository.removeFromBanList(item.userId)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            mAdapter.remove(pos)
+                            setListVisibility(mAdapter.itemCount != 0)
+                        }
                 }
             }
         })
@@ -79,37 +85,33 @@ class BlackListFragment : Fragment() {
             adapter = mAdapter
         }
         buildBlackList()
-
     }
 
     private fun buildBlackList() {
-        //TODO: Inject variables
-        GamePlayerDataFactory(GameAuthDataFactory())
-            .load(mApplication.gamePreferences)?.let { userData ->
-                mNetworkRepository = NetworkRepository(NetworkClient(BuildConfig.HOST), NetworkUtils.getToken()).apply {
-                    mDisposable.addAll(
-                        login(userData)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({ requestFriendsList() }, ::handleError)
-                    )
-                }
+        mGamePlayerDataFactory.load(mApplication.gamePreferences)?.let { userData ->
+            mNetworkRepository = NetworkRepository(NetworkClient(BuildConfig.HOST), NetworkUtils.getToken()).apply {
+                mDisposable.addAll(
+                    login(userData)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ requestFriendsList() }, ::handleError)
+                )
             }
+        }
     }
 
     override fun onStop() {
         super.onStop()
         mDisposable.dispose()
-        mNetworkRepository?.disconnect()
+        mNetworkRepository.disconnect()
     }
 
     private fun requestFriendsList() {
-        mNetworkRepository?.let { rep ->
-            mDisposable.add(
-                rep.getBlackList()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(::populateList, ::handleError)
-            )
-        }
+        mDisposable.add(
+            mNetworkRepository.getBlackList()
+                .doOnEvent { _, _ -> mNetworkRepository.disconnect() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(::populateList, ::handleError)
+        )
     }
 
     private fun populateList(list: ArrayList<BlackListItem>) {

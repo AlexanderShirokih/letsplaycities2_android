@@ -69,7 +69,7 @@ object Utils {
                     .load(it)
                     .networkPolicy(NetworkPolicy.NO_CACHE)
                     .memoryPolicy(MemoryPolicy.NO_CACHE)
-                    .resize(128, 128)
+                    .resize(0, 128)
                     .get()
             }
     }
