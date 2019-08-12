@@ -93,6 +93,7 @@ class NetworkPresenterImpl @Inject constructor(
     }
 
     override fun onCancel() {
+        onDispose()
         mNetworkRepository.disconnect()
         mView?.onCancel()
     }
@@ -151,7 +152,7 @@ class NetworkPresenterImpl @Inject constructor(
             mDisposable.add(mNetworkRepository.login(userData)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
-                    mView?.updateInfo(R.string.connecting_to_server)
+                    mView!!.updateInfo(R.string.connecting_to_server)
                 }
                 .doOnSuccess {
                     mView?.let { view ->

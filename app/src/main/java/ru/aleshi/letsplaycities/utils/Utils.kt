@@ -16,17 +16,17 @@ import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.dialog_waiting.view.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import java.io.File
 import java.io.FileOutputStream
-import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 object Utils {
-    const val RECONNECTION_DELAY_MS = 5000
 
     val Fragment.lpsApplication
         get() = requireContext().applicationContext as LPSApplication
@@ -74,7 +74,6 @@ object Utils {
             }
     }
 
-
     fun loadDrawable(context: Context, resId: Int): Drawable {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             context.resources.getDrawable(resId, context.theme)
@@ -100,32 +99,38 @@ object Utils {
 
     }
 
-    fun showWaitingForConnectionDialog(activity: Activity, task: () -> Unit, cancelCallback: () -> Unit) {
+    fun showWaitingForConnectionDialog(
+        reconnectionDelay: Int,
+        activity: Activity,
+        task: () -> Unit,
+        cancelCallback: () -> Unit
+    ) {
+        var active = true
         val view = LayoutInflater.from(activity).inflate(R.layout.dialog_waiting, null, false)
         with(AlertDialog.Builder(activity)) {
             setCancelable(true)
             setView(view)
             create()
         }.apply {
-            val timeBegin = System.currentTimeMillis()
-            val tt = Timer()
-            tt.schedule(object : TimerTask() {
-                override fun run() {
-                    val t = (RECONNECTION_DELAY_MS - (System.currentTimeMillis() - timeBegin)) / 1000
-                    if (t <= 0) {
-                        tt.cancel()
+            val disposable = Observable.intervalRange(0, reconnectionDelay.toLong(), 0, 1, TimeUnit.SECONDS)
+                .map { reconnectionDelay - it }
+                .observeOn(AndroidSchedulers.mainThread())
+                .takeWhile { active }
+                .subscribe(
+                    {
+                        view.con_waiting_tv.text =
+                            activity.getString(R.string.waiting_for_connection, it)
+                    },
+                    ::error,
+                    {
                         dismiss()
-                        task()
-                    } else
-                        activity.runOnUiThread {
-                            view.con_waiting_tv.text =
-                                activity.getString(R.string.waiting_for_connection, t.toString())
-                        }
-                }
-            }, 0, 500)
+                        if (active) task() else cancelCallback()
+                    }
+                )
             setOnCancelListener {
-                tt.cancel()
+                active = false
                 cancelCallback()
+                disposable.dispose()
             }
         }.show()
     }

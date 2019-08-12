@@ -36,7 +36,6 @@ import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils
-import ru.aleshi.letsplaycities.utils.Utils.RECONNECTION_DELAY_MS
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.quandastudio.lpsclient.model.FriendModeResult
 import java.io.File
@@ -51,6 +50,7 @@ class NetworkFragment : Fragment(), NetworkContract.View {
     private lateinit var mNetworkViewModel: NetworkViewModel
     private lateinit var mNetworkPresenter: NetworkContract.Presenter
     private var mLastConnectionTime: Long = 0
+    private val reconnectionDelay = 5
 
     private val mNormalConstraintSet: ConstraintSet = ConstraintSet()
     private val mLoadingConstraintSet: ConstraintSet = ConstraintSet()
@@ -205,8 +205,8 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         setLoadingLayout(true)
 
         val now = System.currentTimeMillis()
-        if (now - mLastConnectionTime < RECONNECTION_DELAY_MS) {
-            Utils.showWaitingForConnectionDialog(requireActivity(), task) {
+        if (now - mLastConnectionTime < reconnectionDelay * 1000) {
+            Utils.showWaitingForConnectionDialog(reconnectionDelay, requireActivity(), task) {
                 mNetworkPresenter.onCancel()
             }
         } else

@@ -198,7 +198,7 @@
     </string>
     <string name="remove_from_friends">Вы действительно хотите удалить \"%1$s\" из списка друзей?</string>
     <string name="request">[Заявка]</string>
-    <string name="waiting_for_connection">Ожидание подключения&#8230; %1$s</string>
+    <string name="waiting_for_connection">Ожидание подключения&#8230; %1$d</string>
     <string name="waiting_for_opp">Ожидание оппонента&#8230;</string>
     <string name="waiting_for_friend">Ожидание игрока %1$s</string>
     <string name="connecting_to_friend">Подключение к другу&#8230;</string>

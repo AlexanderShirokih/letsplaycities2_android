@@ -348,8 +348,11 @@ class GameFragment : Fragment(), GameContract.View {
     override fun putCity(city: String, countryCode: Short, position: Position) {
         mClickSound?.start()
         mAdapter.addCity(city, countryCode, position)
-        hideKeyboard()
-        scrollRecyclerView()
+        Completable.fromAction { hideKeyboard() }
+            .andThen(Completable.timer(200, TimeUnit.MILLISECONDS))
+            .observeOn(AndroidSchedulers.mainThread())
+            .andThen(Completable.fromAction { scrollRecyclerView() })
+            .subscribe()
     }
 
     override fun updateCity(city: String, hasErrors: Boolean) {
