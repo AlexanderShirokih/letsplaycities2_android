@@ -139,6 +139,7 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         btnCancel.setOnClickListener {
             mNetworkPresenter.onCancel()
         }
+
     }
 
     private fun getVersionInfo(): Pair<String, Int> {

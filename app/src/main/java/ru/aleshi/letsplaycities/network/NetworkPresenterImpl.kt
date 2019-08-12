@@ -61,6 +61,7 @@ class NetworkPresenterImpl @Inject constructor(
             }
 
         })
+        disconnect()
     }
 
     override fun onLogout() {
@@ -92,9 +93,14 @@ class NetworkPresenterImpl @Inject constructor(
         }
     }
 
-    override fun onCancel() {
+    private fun disconnect() {
         onDispose()
         mNetworkRepository.disconnect()
+    }
+
+
+    override fun onCancel() {
+        disconnect()
         mView?.onCancel()
     }
 
