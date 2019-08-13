@@ -140,7 +140,16 @@
     <string name="no">Нет</string>
 
     <!-- ThemeFragment -->
-    <string name="theme_title">Выберите тему</string>
+    <string name="theme_title">Тема</string>
+    <string-array name="sampleCities">
+        <item>Берлин</item>
+        <item>Москва</item>
+        <item>Лиссабон</item>
+        <item>Абу-Даби</item>
+        <item>Эр-Рияд</item>
+        <item>Париж</item>
+        <item>Вашингтон</item>
+    </string-array>
 
     <!-- MutliplayerFragment -->
     <string name="multiplayer_title">Мультиплеер</string>

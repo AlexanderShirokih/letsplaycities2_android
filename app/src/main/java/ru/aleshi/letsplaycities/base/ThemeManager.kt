@@ -20,11 +20,7 @@ object ThemeManager {
     private val DEFAULT_THEME = themes[4]
 
     fun applyTheme(context: Context) {
-        val app = context.applicationContext as LPSApplication
-        val theme: Theme = getThemeById(
-            app.gamePreferences.getThemeId(DEFAULT_THEME.stid),
-            app
-        )
+        val theme = getCurrentTheme(context)
         if (theme.isFreeOrAvailable())
             context.setTheme(theme.themeId)
     }
@@ -53,22 +49,26 @@ object ThemeManager {
         }
     }
 
-    fun getCurrentThemeName(context: Context): String {
+    fun getCurrentTheme(context: Context): Theme {
         val app = context.applicationContext as LPSApplication
-        val theme: Theme = getThemeById(
+        return getThemeById(
             app.gamePreferences.getThemeId(DEFAULT_THEME.stid),
             app
         )
+    }
+
+    fun getCurrentThemeName(context: Context): String {
+        val theme = getCurrentTheme(context)
         if (theme.isFreeOrAvailable()) {
             val index = themes.indexOf(theme)
             if (index != -1) {
-                return app.resources.getStringArray(R.array.themes)[index]
+                return context.resources.getStringArray(R.array.themes)[index]
             }
         }
-        return app.resources.getStringArray(R.array.themes)[0]
+        return context.resources.getStringArray(R.array.themes)[0]
     }
 
-    fun getThemeBySKU(productId: String): Theme {
+    private fun getThemeBySKU(productId: String): Theme {
         for (t in themes) {
             if (productId == t.sku)
                 return t

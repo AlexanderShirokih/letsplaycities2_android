@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.BadTokenException
@@ -30,6 +29,7 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
         mInAppPurchaseManager = InAppPurchaseManager(requireActivity(), this)
         mInAppPurchaseManager.startConnection()
 
+        //Test for cracking themes
         if (test2()) {
             try {
                 throw BadTokenException()
@@ -51,13 +51,8 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
         mThemeListAdapter = ThemeListAdapter(getThemesList(), this)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    (layoutManager as LinearLayoutManager).orientation
-                )
-            )
             adapter = mThemeListAdapter
+            setHasFixedSize(true)
         }
     }
 
@@ -97,9 +92,6 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
     private fun getThemesList(): Array<ThemeListAdapter.NamedTheme> {
         val themeNames = resources.getStringArray(R.array.themes)
         val themes = ThemeManager.themes
-        var index = 0
-        return Array(themes.size) {
-            ThemeListAdapter.NamedTheme(themeNames[index], themes[index++])
-        }
+        return Array(themes.size) { ThemeListAdapter.NamedTheme(themeNames[it], themes[it]) }
     }
 }

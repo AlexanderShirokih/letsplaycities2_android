@@ -22,8 +22,4 @@ class ThemeListAdapter(private val list: Array<NamedTheme>, private val listener
         holder.bind(list[position])
     }
 
-    fun notifyItemChanged(theme: Theme) {
-        notifyItemChanged(list.indexOfFirst { it.theme == theme })
-    }
-
 }
