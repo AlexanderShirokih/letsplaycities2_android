@@ -12,7 +12,7 @@ class GameItem(
     val isMessage: Boolean = false,
     val countryCode: Short = 0
 ) {
-    constructor(content: String, countryCode: Short) : this(content, Position.LEFT, CityStatus.OK, false, countryCode)
+    constructor(content: String, countryCode: Short, position: Position) : this(content, position, CityStatus.OK, false, countryCode)
 
     fun getSpannableString(foregroundSpanColor: Int): CharSequence? {
         return if (isMessage)

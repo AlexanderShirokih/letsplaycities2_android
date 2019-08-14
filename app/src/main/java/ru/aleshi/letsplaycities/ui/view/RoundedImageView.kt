@@ -6,11 +6,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.util.AttributeSet
 import android.widget.ImageView
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import kotlin.math.min
 
@@ -22,12 +19,11 @@ class RoundedImageView(context: Context, attributeSet: AttributeSet, defStyle: I
     companion object {
         private const val DEFAULT_BORDER_WIDTH = 3
         private const val DEFAULT_FILL_COLOR = Color.DKGRAY
-        private const val DEFAULT_BORDER_OVERLAY = true
+        private const val DEFAULT_BORDER_COLOR = Color.LTGRAY
         private const val COLORDRAWABLE_DIMENSION = 2
 
         private val SCALE_TYPE = ScaleType.CENTER
         private val BITMAP_CONFIG = Bitmap.Config.ARGB_8888
-        val DEFAULT_BORDER_COLOR = Color.LTGRAY
     }
 
     private val mDrawableRect = RectF()
@@ -114,76 +110,6 @@ class RoundedImageView(context: Context, attributeSet: AttributeSet, defStyle: I
     override fun setPaddingRelative(start: Int, top: Int, end: Int, bottom: Int) {
         super.setPaddingRelative(start, top, end, bottom)
         setup()
-    }
-
-    fun setBorderColor(@ColorInt borderColor: Int) {
-        if (borderColor == mBorderColor) {
-            return
-        }
-
-        mBorderColor = borderColor
-        mBorderPaint.color = mBorderColor
-        invalidate()
-    }
-
-    fun setBorderColorResource(@ColorRes borderColorRes: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            setBorderColor(context.resources.getColor(borderColorRes, context.theme))
-        } else
-            setBorderColor(context.resources.getColor(borderColorRes))
-    }
-
-    fun setFillColor(@ColorInt fillColor: Int) {
-        if (fillColor == mFillColor) {
-            return
-        }
-
-        mFillColor = fillColor
-        mFillPaint.color = fillColor
-        invalidate()
-    }
-
-    fun setFillColorResource(@ColorRes fillColorRes: Int) {
-        setFillColor(context.resources.getColor(fillColorRes))
-    }
-
-    fun getBorderWidth(): Int {
-        return mBorderWidth
-    }
-
-    fun setBorderWidth(borderWidth: Int) {
-        if (borderWidth == mBorderWidth) {
-            return
-        }
-
-        mBorderWidth = borderWidth
-        setup()
-    }
-
-    fun isBorderOverlay(): Boolean {
-        return mBorderOverlay
-    }
-
-    fun setBorderOverlay(borderOverlay: Boolean) {
-        if (borderOverlay == mBorderOverlay) {
-            return
-        }
-
-        mBorderOverlay = borderOverlay
-        setup()
-    }
-
-    fun isDisableCircularTransformation(): Boolean {
-        return mDisableCircularTransformation
-    }
-
-    fun setDisableCircularTransformation(disableCircularTransformation: Boolean) {
-        if (mDisableCircularTransformation == disableCircularTransformation) {
-            return
-        }
-
-        mDisableCircularTransformation = disableCircularTransformation
-        initializeBitmap()
     }
 
     override fun setImageBitmap(bm: Bitmap) {
@@ -324,7 +250,6 @@ class RoundedImageView(context: Context, attributeSet: AttributeSet, defStyle: I
     private fun updateShaderMatrix() {
         val scale: Float
         var dx = 0f
-        //  float dy = 0;
 
         mShaderMatrix.set(null)
 
@@ -333,7 +258,6 @@ class RoundedImageView(context: Context, attributeSet: AttributeSet, defStyle: I
             dx = (mDrawableRect.width() - mBitmapWidth * scale) * 0.5f
         } else {
             scale = mDrawableRect.width() / mBitmapWidth.toFloat()
-            // dy = (mDrawableRect.height() - mBitmapHeight * scale) * 0.5f;
         }
 
         mShaderMatrix.setScale(scale, scale)

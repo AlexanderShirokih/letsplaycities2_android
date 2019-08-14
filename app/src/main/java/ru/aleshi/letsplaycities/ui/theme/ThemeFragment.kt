@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.BadTokenException
@@ -70,15 +69,6 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
             ThemeManager.putTheme(mApplication, productId, purchaseToken, signature)
             requireActivity().recreate()
         }
-    }
-
-    override fun onShowPreview(theme: ThemeListAdapter.NamedTheme, position: Int) {
-        findNavController().navigate(
-            ThemeFragmentDirections.showPreviewImageDialog(
-                "scr${position + 1}.png",
-                theme.name
-            )
-        )
     }
 
     override fun onSelectTheme(namedTheme: ThemeListAdapter.NamedTheme) {

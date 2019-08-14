@@ -9,7 +9,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.json.JSONObject
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.ok.android.sdk.ContextOkListener
@@ -21,7 +20,6 @@ import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.AuthType
 
 
-@ExperimentalCoroutinesApi
 class OdnoklassnikiSN : ISocialNetwork() {
 
     private val disposable: CompositeDisposable = CompositeDisposable()

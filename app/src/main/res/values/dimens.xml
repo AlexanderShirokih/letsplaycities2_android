@@ -20,9 +20,6 @@
 
     <dimen name="chb_drawable_pad">4dp</dimen>
 
-    <dimen name="previewImageWidth">400dp</dimen>
-    <dimen name="previewImageHeight">355dp</dimen>
-
     <dimen name="flagImgWidth">36dp</dimen>
     <dimen name="flagImgHeight">24dp</dimen>
 </resources>

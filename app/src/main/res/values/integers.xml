@@ -5,11 +5,7 @@
     <!-- ThemeFragment -->
     <integer-array name="sampleCitiesCountryCode">
         <item>118</item>
-        <item>51</item>
-        <item>117</item>
-        <item>79</item>
-        <item>152</item>
-        <item>106</item>
         <item>44</item>
+        <item>51</item>
     </integer-array>
 </resources>
