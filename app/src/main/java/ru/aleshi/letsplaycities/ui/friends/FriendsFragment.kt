@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -79,13 +78,8 @@ class FriendsFragment : Fragment(), FriendsItemListener {
             recyclerView.run {
                 mAdapter = FriendsListAdapter(this@FriendsFragment)
                 layoutManager = LinearLayoutManager(requireContext())
-                addItemDecoration(
-                    DividerItemDecoration(
-                        requireContext(),
-                        (layoutManager as LinearLayoutManager).orientation
-                    )
-                )
                 adapter = mAdapter
+                setHasFixedSize(true)
             }
         }
     }

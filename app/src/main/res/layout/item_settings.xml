@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:paddingTop="15dp"
-              android:paddingBottom="15dp"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+<com.google.android.material.circularreveal.cardview.CircularRevealCardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:descendantFocusability="blocksDescendants"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp">
 
-    <TextView
-            android:textSize="20sp"
+    <LinearLayout
             android:paddingStart="10dp"
-            android:id="@+id/item_sett_name"
-            android:layout_weight="1"
+            android:paddingEnd="10dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="Параметр" />
+            android:layout_height="wrap_content">
 
-    <TextView
-            android:textSize="21sp"
-            android:id="@+id/item_sett_val"
-            android:layout_weight="1.5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="ВКЛ" />
-</LinearLayout>
+        <TextView
+                android:textSize="20sp"
+                android:paddingStart="10dp"
+                android:id="@+id/item_sett_name"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Параметр"/>
+
+        <TextView
+                android:textSize="21sp"
+                android:id="@+id/item_sett_val"
+                android:layout_weight="1.5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="ВКЛ"/>
+    </LinearLayout>
+</com.google.android.material.circularreveal.cardview.CircularRevealCardView>

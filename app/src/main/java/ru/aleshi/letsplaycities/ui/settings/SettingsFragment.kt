@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_settings.*
 import ru.aleshi.letsplaycities.LPSApplication
@@ -32,12 +31,6 @@ class SettingsFragment : Fragment() {
         (requireActivity() as MainActivity).setToolbarVisibility(true)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    (layoutManager as LinearLayoutManager).orientation
-                )
-            )
             adapter = SettingsListAdapter(createSettingsItems(), object :
                 SettingsListAdapter.OnItemClickListener {
                 override fun onItemClicked(position: Int, value: Int) {
