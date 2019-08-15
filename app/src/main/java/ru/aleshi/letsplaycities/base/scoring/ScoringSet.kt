@@ -62,8 +62,7 @@ class ScoringSet(size: Int) {
             value = try {
                 Integer.parseInt(value as String)
             } catch (e: NumberFormatException) {
-                //Ignore
-                0
+                value
             }
             return ScoringField(name, value)
         }
