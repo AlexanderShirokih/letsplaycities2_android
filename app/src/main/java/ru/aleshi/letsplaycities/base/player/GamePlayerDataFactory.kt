@@ -11,7 +11,9 @@ class GamePlayerDataFactory @Inject constructor(private val gameAuthDataFactory:
     fun load(prefs: GamePreferences): PlayerData? {
         if (!prefs.isLoggedFromAnySN()) return null
 
-        return create(gameAuthDataFactory.loadFromPreferences(prefs).apply { login = "#$userID" })
+        return create(gameAuthDataFactory.loadFromPreferences(prefs).apply {
+            if (login.isEmpty()) login = "#$userID"
+        })
     }
 
     fun create(authData: AuthData): PlayerData {
