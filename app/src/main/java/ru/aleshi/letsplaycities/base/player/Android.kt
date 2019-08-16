@@ -15,7 +15,7 @@ class Android(name: String) : User(PlayerData.Factory().create(name)) {
     override fun onBeginMove(firstChar: Char?) {
         gameSession.disposable.add(Maybe.just(firstChar)
             .subscribeOn(Schedulers.computation())
-            .delay(300, TimeUnit.MILLISECONDS)
+            .delay(1500, TimeUnit.MILLISECONDS)
             .filter { mEstimatedMoves-- > 0 }
             .flatMap { gameSession.dictionary().getRandomWord(it, false) }
             .subscribe(::sendCity, {}, { gameSession.onSurrender() })
