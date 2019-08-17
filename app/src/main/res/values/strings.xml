@@ -53,7 +53,7 @@
     </string-array>
 
     <string-array name="timing">
-        <item>ВЫКЛ</item>
+        <item>Выкл</item>
         <item>1 мин</item>
         <item>3 мин</item>
         <item>5 мин</item>
@@ -65,15 +65,20 @@
     </string-array>
 
     <string-array name="on_off">
-        <item>ВЫКЛ</item>
-        <item>ВКЛ</item>
+        <item>Выкл</item>
+        <item>Вкл</item>
     </string-array>
 
     <string-array name="dic_upd">
         <item>Каждые 3ч</item>
         <item>Каждый день</item>
-        <item>ВЫКЛ</item>
+        <item>Выкл</item>
     </string-array>
+
+    <string name="hint_addcity">Правила добавления городов</string>
+    <string name="hint_stats">Просмотр статистики</string>
+    <string name="hint_blacklist">Управление заблокированными игроками</string>
+
 
     <!-- AddCityFragment -->
     <string name="addcity_title">Правила добавления городов</string>

@@ -22,12 +22,12 @@ class FriendRequestDialog : DialogFragment(), FriendRequestContract.View {
             .setTitle(R.string.request_dialog_title)
             .setMessage(getString(R.string.request_dialog_msg, args.getString("login")))
             .setPositiveButton(R.string.accept) { _, _ ->
-                findNavController().navigate(
-                    FriendRequestDialogDirections.startNetworkFragment()
-                        .setAction("fm_game")
-                        .setOppId(
-                            args.getString("user_id")!!.toInt()
-                        )
+                findNavController().navigate(FriendRequestDialogDirections.startNetworkFragment().apply {
+                    arguments.apply {
+                        putString("action", "fm_game")
+                        putInt("oppId", args.getString("user_id")!!.toInt())
+                    }
+                }
                 )
             }
             .setNegativeButton(R.string.decline) { _, _ -> mPresenter.onDecline(args.getString("user_id")!!.toInt()) }
