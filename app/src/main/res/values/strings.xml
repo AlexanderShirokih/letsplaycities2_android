@@ -152,7 +152,7 @@
     <string name="wifi_desc">Для создания соединения вы должны находиться в одной Wi-Fi сети с вашим оппонентом</string>
     <string name="create">Создать</string>
     <string name="connect">Присоединиться</string>
-    <string name="unavail_in_beta">Данный режим пока не доступен в бета версии</string>
+    <string name="unavail_in_beta">Локальный мультиплеер пока не доступен в данной версии</string>
 
     <!-- NetworkFragment -->
     <string name="network_title">Онлайн</string>
