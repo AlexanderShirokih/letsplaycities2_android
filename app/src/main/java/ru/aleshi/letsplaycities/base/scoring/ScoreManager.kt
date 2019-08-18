@@ -4,16 +4,20 @@ import android.content.Context
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.combos.CityComboInfo
+import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
-import ru.aleshi.letsplaycities.base.player.Android
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.utils.StringUtils
-import kotlin.math.roundToInt
 
-
-class ScoreManager(private val gameSession: GameSession, private val mode: GameMode, val context: Context) {
+class ScoreManager(
+    private val gameSession: GameSession,
+    private val mode: GameMode,
+    private val comboSystem: ComboSystem,
+    val context: Context
+) {
     companion object {
         const val G_PARTS = "tt_n_pts"
         const val G_ONLINE = "tt_onl"
@@ -190,25 +194,32 @@ class ScoreManager(private val gameSession: GameSession, private val mode: GameM
             groupOnline.findField(F_TIME).add(deltaTime.toInt() / 1000)
         mostChecker(word)
 
+
         lastTime += deltaTime
 
-        var points = when (scoringType) {
-            ScoringType.BY_SCORE -> word.length
+        val points = when (scoringType) {
+            ScoringType.BY_SCORE -> {
+                checkCombos(deltaTime, word)
+                word.length
+            }
             ScoringType.BY_TIME -> {
+                checkCombos(deltaTime, word)
                 val dt = ((40000 - deltaTime.toInt()) / 2000)
                 2 + if (dt > 0) dt else 0
             }
             ScoringType.LAST_MOVE -> 0
         }
+        gameSession.currentPlayer.score += (points * comboSystem.multiplier).toInt()
+    }
 
-        if (gameSession.currentPlayer is Android) {
-            points = (points * 0.9f).roundToInt()
+    private fun checkCombos(deltaTime: Long, word: String) {
+        if (currentIsPlayer()) {
+            comboSystem.addCity(CityComboInfo.create(deltaTime, word))
         }
-        gameSession.currentPlayer.score += points
     }
 
     private fun mostChecker(word: String) {
-        if (gameSession.currentPlayer != getPlayer())
+        if (!currentIsPlayer())
             return
         //Most biggest cities
         val wlen = word.length
@@ -234,6 +245,7 @@ class ScoreManager(private val gameSession: GameSession, private val mode: GameM
 
         saveStats()
     }
+
 
     //onGameEnded
     fun updateScore() {
@@ -293,6 +305,8 @@ class ScoreManager(private val gameSession: GameSession, private val mode: GameM
         }
         saveStats()
     }
+
+    private fun currentIsPlayer() = gameSession.currentPlayer == getPlayer()
 
     private fun getPlayer(): User {
         return gameSession.players.first { it is Player }

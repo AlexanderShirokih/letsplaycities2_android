@@ -245,6 +245,14 @@
     <string name="confirm_friend_request">Игрок %1$s хочет добавить Вас в друзья.\nПринять заявку?</string>
     <string name="friends_request_accepted">Игрок %1$s добавлен в друзья</string>
     <string name="friends_request_denied">Заявка отклонена!</string>
+    <string name="multiplier">&#xD7;%1$.1f</string>
+
+    <string-array name="combo_badge_names">
+        <item>Быстрый ответ</item>
+        <item>Короткие города</item>
+        <item>Длинные города</item>
+        <item>Одна страна</item>
+    </string-array>
 
     <string-array name="hints">
         <item>Добро Пожаловать в игру!</item>

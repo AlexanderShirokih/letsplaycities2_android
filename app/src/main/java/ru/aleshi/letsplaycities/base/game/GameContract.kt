@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.base.game
 import android.content.Context
 import android.graphics.drawable.Drawable
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.dictionary.Dictionary
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 
@@ -26,6 +27,7 @@ interface GameContract {
         fun setMenuItemsVisibility(help: Boolean, msg: Boolean)
         fun downloadingListener(): DictionaryUpdater.DownloadingListener
         fun showFriendRequestDialog(name: String)
+        fun comboSystemView(): ComboSystemView
     }
 
     interface Presenter {

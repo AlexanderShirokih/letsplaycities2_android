@@ -7,6 +7,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.dictionary.Dictionary
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.player.*
@@ -47,8 +48,8 @@ class GameSession private constructor(
     private var mFirstChar: Char? = null
     private val mGameTimer = Observable.interval(0, 1, TimeUnit.SECONDS)
     private var mGameTimerDisposable: Disposable? = null
-    private lateinit var mScoreManager: ScoreManager
     private var mDictionary: Dictionary? = null
+    private lateinit var mScoreManager: ScoreManager
     lateinit var mExclusions: Exclusions
 
     lateinit var view: GameContract.View
@@ -74,7 +75,7 @@ class GameSession private constructor(
         this.view = view
         init()
         val context = view.context()
-        mScoreManager = ScoreManager(this, findGameMode(), context)
+        mScoreManager = ScoreManager(this, findGameMode(), ComboSystem(view.comboSystemView()), context)
         loadData(context)
         applyToFragment()
         beginNextMove(null)

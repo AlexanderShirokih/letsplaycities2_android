@@ -33,7 +33,9 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
+import ru.aleshi.letsplaycities.base.game.ComboBadgeView
 import ru.aleshi.letsplaycities.base.game.GameContract
 import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
@@ -98,6 +100,12 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun downloadingListener(): DictionaryUpdater.DownloadingListener {
         return SnackbarDownloadingListener(this)
+    }
+
+    override fun comboSystemView(): ComboSystemView {
+        val view = layoutInflater.inflate(R.layout.combo_badge, badgeRoot, false)
+        badgeRoot.addView(view)
+        return ComboBadgeView(view)
     }
 
     override fun setMenuItemsVisibility(help: Boolean, msg: Boolean) {
@@ -207,7 +215,6 @@ class GameFragment : Fragment(), GameContract.View {
     private fun setupCityListeners(activity: Activity) {
         textInputLayout.setStartIconOnClickListener { SpeechRecognitionHelper.speech(this, activity) }
         textInputLayout.setEndIconOnClickListener { submit() }
-        // Converting to lambda gives an error: event is a nullable type
         cityInput.setOnEditorActionListener { _, actionId, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_DONE)
                 submit()
