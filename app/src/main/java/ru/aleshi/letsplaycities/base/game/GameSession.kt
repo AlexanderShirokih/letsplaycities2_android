@@ -66,7 +66,6 @@ class GameSession private constructor(
     val currentPlayer: User
         get() = players[mCurrentPlayerIndex]
 
-
     val nextPlayer: User
         get() = players[(mCurrentPlayerIndex + 1) % players.size]
 

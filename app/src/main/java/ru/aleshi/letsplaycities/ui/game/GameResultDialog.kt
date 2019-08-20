@@ -49,7 +49,7 @@ class GameResultDialog : DialogFragment() {
             SelectedItem.REPLAY -> {
                 val nav = findNavController()
                 if (!nav.popBackStack(R.id.networkFragment, false)) {
-                    ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].restart.onNext(Unit)
+                    ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].restart.value = true
                     nav.navigate(R.id.back_to_game_fragment)
                 }
             }

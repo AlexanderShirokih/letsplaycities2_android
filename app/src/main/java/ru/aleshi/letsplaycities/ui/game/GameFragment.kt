@@ -80,12 +80,13 @@ class GameFragment : Fragment(), GameContract.View {
                     correctedWord.value = null
                 }
             })
-            disposable.add(restart
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
+            restart.observe(this@GameFragment, Observer {
+                if (it) {
                     stopGame()
                     startGame()
-                })
+                    restart.value = false
+                }
+            })
         }
         mAdapter = GameAdapter(activity)
         activity.onBackPressedDispatcher.addCallback(this) {
@@ -207,7 +208,6 @@ class GameFragment : Fragment(), GameContract.View {
     private fun setupCityListeners(activity: Activity) {
         textInputLayout.setStartIconOnClickListener { SpeechRecognitionHelper.speech(this, activity) }
         textInputLayout.setEndIconOnClickListener { submit() }
-        // Converting to lambda gives an error: event is a nullable type
         cityInput.setOnEditorActionListener { _, actionId, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_DONE)
                 submit()

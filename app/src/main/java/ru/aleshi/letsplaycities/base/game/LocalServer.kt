@@ -5,10 +5,9 @@ import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.quandastudio.lpsclient.model.WordResult
 
-class LocalServer(gamePreferences: GamePreferences) : BaseServer() {
+class LocalServer(private val gamePreferences: GamePreferences) : BaseServer() {
 
     private var result: PublishSubject<Pair<WordResult, String>> = PublishSubject.create()
-    private val timeLimit = gamePreferences.getTimeLimit()
 
     override fun broadcastResult(city: String) {
         // We trust our local users
@@ -17,6 +16,6 @@ class LocalServer(gamePreferences: GamePreferences) : BaseServer() {
 
     override fun getWordsResult(): Observable<Pair<WordResult, String>> = result
 
-    override fun getTimeLimit(): Long = timeLimit
+    override fun getTimeLimit(): Long = gamePreferences.getTimeLimit()
 
 }
