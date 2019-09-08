@@ -67,12 +67,12 @@ class NetworkFragment : Fragment(), NetworkContract.View {
             mNetworkPresenter = networkPresenter
             avatarPath.observe(this@NetworkFragment, Observer {
                 if (it == null) {
-                    roundedImageView?.setImageResource(R.drawable.ic_player)
+                    avatar?.setImageResource(R.drawable.ic_player)
                 } else {
                     Utils.loadAvatar(File(it).toUri())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnNext { bitmap ->
-                            roundedImageView?.setImageBitmap(bitmap)
+                            avatar?.setImageBitmap(bitmap)
                         }
                         .subscribe()
                 }
@@ -123,7 +123,7 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         btnLoginNoSn.setOnClickListener {
             val extras =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    FragmentNavigatorExtras(roundedImageView to "transition_avatar")
+                    FragmentNavigatorExtras(avatar to "transition_avatar")
                 } else FragmentNavigatorExtras()
 
             findNavController().navigate(R.id.showLoginDialog, null, null, extras)

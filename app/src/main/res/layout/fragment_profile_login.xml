@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        tools:context=".ui.profile.FragmentLoginProfile">
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:cardMaxElevation="8dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="8dp">
+
+            <ru.aleshi.letsplaycities.ui.view.RoundedImageView
+                    android:id="@+id/avatar"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="32dp"
+                    android:src="@drawable/ic_player"
+                    android:transitionName="transition_avatar"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    tools:targetApi="lollipop" />
+
+            <TextView
+                    android:id="@+id/sn_desc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/networkmode_auth_desc"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/avatar" />
+
+            <ImageButton
+                    android:id="@+id/btnGl"
+                    style="@style/Social"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/ic_gl"
+                    app:layout_constraintEnd_toStartOf="@id/btnVk"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sn_desc" />
+
+            <ImageButton
+                    android:id="@+id/btnVk"
+                    style="@style/Social"
+                    android:src="@drawable/ic_vk"
+                    app:layout_constraintEnd_toStartOf="@id/btnOk"
+                    app:layout_constraintStart_toEndOf="@+id/btnGl"
+                    app:layout_constraintTop_toTopOf="@+id/btnGl" />
+
+            <ImageButton
+                    android:id="@+id/btnOk"
+                    style="@style/Social"
+                    android:src="@drawable/ic_ok"
+                    app:layout_constraintEnd_toStartOf="@id/btnFb"
+                    app:layout_constraintStart_toEndOf="@+id/btnVk"
+                    app:layout_constraintTop_toTopOf="@+id/btnVk" />
+
+            <ImageButton
+                    android:id="@+id/btnFb"
+                    style="@style/Social"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_fb"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btnOk"
+                    app:layout_constraintTop_toTopOf="@+id/btnOk" />
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLoginNoSn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/login_no_sn"
+                    app:layout_constraintEnd_toEndOf="@+id/btnFb"
+                    app:layout_constraintStart_toStartOf="@+id/btnGl"
+                    app:layout_constraintTop_toBottomOf="@+id/btnGl" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

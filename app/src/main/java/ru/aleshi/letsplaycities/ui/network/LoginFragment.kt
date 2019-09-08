@@ -31,9 +31,9 @@ class LoginFragment : Fragment() {
         mAvatarModelView = ViewModelProviders.of(requireActivity())[NetworkViewModel::class.java]
         mAvatarModelView.avatarBitmap.observe(this, Observer {
             if (it != null) {
-                roundedImageView.setImageBitmap(it)
+                avatar.setImageBitmap(it)
             } else
-                roundedImageView.setImageResource(R.drawable.ic_player)
+                avatar.setImageResource(R.drawable.ic_player)
         })
     }
 
@@ -53,7 +53,7 @@ class LoginFragment : Fragment() {
             btnCancel.setOnClickListener {
                 findNavController().navigateUp()
             }
-            roundedImageView.setOnClickListener { findNavController().navigate(R.id.showChangeAvatarDialog) }
+            avatar.setOnClickListener { findNavController().navigate(R.id.showChangeAvatarDialog) }
         }
     }
 
