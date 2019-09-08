@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import io.reactivex.Single
 import ru.aleshi.letsplaycities.BuildConfig
+import ru.aleshi.letsplaycities.ui.ActivityScope
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.core.NetworkClient
 import javax.inject.Singleton
@@ -18,16 +19,10 @@ abstract class NetworkModule {
     @Module
     companion object {
         @JvmStatic
-        @Singleton
+        @ActivityScope
         @Provides
         fun networkRepository(client: NetworkClient, token: Single<String>): NetworkRepository {
             return NetworkRepository(client, token)
-        }
-
-        @JvmStatic
-        @Provides
-        fun networkClient(): NetworkClient {
-            return NetworkClient(BuildConfig.HOST)
         }
 
         @JvmStatic
