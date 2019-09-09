@@ -4,15 +4,11 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
-import android.view.animation.OvershootInterpolator
 import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import androidx.transition.ChangeBounds
-import androidx.transition.TransitionManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_network.*
@@ -41,10 +37,6 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     }
     private var mLastConnectionTime: Long = 0
     private val reconnectionDelay = 5
-
-    private val mNormalConstraintSet: ConstraintSet = ConstraintSet()
-    private val mLoadingConstraintSet: ConstraintSet = ConstraintSet()
-
     private var mGameSound: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,9 +54,6 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val activity = requireActivity() as MainActivity
         activity.setToolbarVisibility(true)
-
-        mNormalConstraintSet.clone(root)
-        mLoadingConstraintSet.clone(activity, R.layout.fragment_network_connecting)
 
         if (mGamePreferences.isChangeModeDialogRequested()) {
             findNavController().navigate(R.id.showChangeModeDialog)
@@ -161,17 +150,9 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     }
 
     private fun setLoadingLayout(isLoadingLayout: Boolean) {
-        val constraint = if (isLoadingLayout) {
-            mNormalConstraintSet.clone(root)
-            mLoadingConstraintSet
-        } else mNormalConstraintSet
-
-        constraint.applyTo(root)
-
-        ChangeBounds().run {
-            interpolator = OvershootInterpolator()
-            TransitionManager.beginDelayedTransition(root, this)
-        }
+        groupLoading.visibility = if (isLoadingLayout) View.VISIBLE else View.GONE
+        root.findViewById<View>(R.id.fragment).isEnabled = !isLoadingLayout
+        setupLayout(false)
     }
 
     override fun updateInfo(infoMsgId: Int) {

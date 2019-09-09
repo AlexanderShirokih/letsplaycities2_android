@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/root"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/root"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     <TextView
@@ -29,17 +29,17 @@
             android:text="@string/connect_net"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fragment2"
+            app:layout_constraintTop_toBottomOf="@+id/fragment"
             tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnFriends"
-            android:src="@drawable/ic_friends"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            android:src="@drawable/ic_friends"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     <ProgressBar
             android:id="@+id/loadingBar"
@@ -50,29 +50,29 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fragment2" />
+            app:layout_constraintTop_toBottomOf="@+id/fragment" />
 
     <TextView
             android:id="@+id/infoTv"
-            tools:text="Подключение..."
             android:layout_width="wrap_content"
             android:layout_height="17dp"
+            android:layout_marginTop="8dp"
             android:textAlignment="center"
-            app:layout_constraintStart_toStartOf="@+id/loadingBar"
             app:layout_constraintEnd_toEndOf="@+id/loadingBar"
+            app:layout_constraintStart_toStartOf="@+id/loadingBar"
             app:layout_constraintTop_toBottomOf="@+id/loadingBar"
-            android:layout_marginTop="8dp"/>
+            tools:text="Подключение..." />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancel"
-            android:text="@string/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="@+id/infoTv"
-            app:layout_constraintStart_toStartOf="@+id/infoTv"
             android:layout_marginTop="40dp"
-            app:layout_constraintTop_toBottomOf="@+id/infoTv"
-            app:layout_constraintHorizontal_bias="0.5"/>
+            android:text="@string/cancel"
+            app:layout_constraintEnd_toEndOf="@+id/infoTv"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/infoTv"
+            app:layout_constraintTop_toBottomOf="@+id/infoTv" />
 
     <androidx.constraintlayout.widget.Group
             android:id="@+id/group_connect"
@@ -90,7 +90,8 @@
             app:constraint_referenced_ids="loadingBar,infoTv,btnCancel" />
 
     <fragment
-            android:id="@+id/fragment2"
+            android:id="@+id/fragment"
+            android:tag="ProfileCard"
             android:name="ru.aleshi.letsplaycities.ui.profile.ProfileCardFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
