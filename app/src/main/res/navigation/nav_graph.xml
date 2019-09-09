@@ -279,7 +279,7 @@
         </fragment>
         <dialog
                 android:id="@+id/changeAvatarDialog"
-                android:name="ru.aleshi.letsplaycities.ui.network.ChangeAvatarDialog"
+                android:name="ru.aleshi.letsplaycities.ui.profile.ChangeAvatarDialog"
                 android:label="ChangeAvatarDialog" />
     </navigation>
     <navigation
@@ -287,7 +287,7 @@
             app:startDestination="@id/fragmentViewProfile">
         <fragment
                 android:id="@+id/fragmentViewProfile"
-                android:name="ru.aleshi.letsplaycities.ui.profile.FragmentViewProfile"
+                android:name="ru.aleshi.letsplaycities.ui.profile.ViewProfileFragment"
                 android:label="@string/profile"
                 tools:layout="@layout/fragment_profile_view" >
             <action
@@ -297,7 +297,7 @@
 
         <fragment
                 android:id="@+id/fragmentLoginProfile"
-                android:name="ru.aleshi.letsplaycities.ui.profile.FragmentLoginProfile"
+                android:name="ru.aleshi.letsplaycities.ui.profile.LoginProfileFragment"
                 android:label="@string/profile"
                 tools:layout="@layout/fragment_profile_login" >
             <action
@@ -307,9 +307,17 @@
 
         <fragment
                 android:id="@+id/fragmentLoginNoSnProfile"
-                android:name="ru.aleshi.letsplaycities.ui.profile.FragmentLoginNoSnProfile"
+                android:name="ru.aleshi.letsplaycities.ui.profile.LoginNoSnProfileFragment"
                 android:label="@string/profile"
-                tools:layout="@layout/fragment_profile_login_no_sn" />
+                tools:layout="@layout/fragment_profile_login_no_sn" >
+            <action
+                    android:id="@+id/showChangeAvatarDialog"
+                    app:destination="@id/changeAvatarDialog2" />
+        </fragment>
+        <dialog
+                android:id="@+id/changeAvatarDialog2"
+                android:name="ru.aleshi.letsplaycities.ui.profile.ChangeAvatarDialog"
+                android:label="ChangeAvatarDialog" />
     </navigation>
 
 </navigation>

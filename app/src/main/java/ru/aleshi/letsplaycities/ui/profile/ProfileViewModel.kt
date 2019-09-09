@@ -27,10 +27,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     val authType: ObservableField<Drawable> = ObservableField()
 
-
-    fun loadCurrentProfileIfNotPresent() {
-        if (login.get().isNullOrEmpty())
-            loadCurrentProfile()
+    init {
+        loadDefaultAvatar()
     }
 
     fun loadCurrentProfile() {
@@ -42,14 +40,22 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             authType.set(context.getDrawableFromResource(getAuthResourceByAuthType(authData.snType)))
             val avatar = prefs.getAvatarPath()
             if (avatar == null) {
-                this.avatar.set(context.getDrawableFromResource(R.drawable.ic_player))
+                loadDefaultAvatar()
             } else {
                 disposable = Utils.loadAvatar(File(avatar).toUri())
                     .map { BitmapDrawable(context.resources, it) }
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this.avatar::set)
             }
+        } else {
+            login.set(context.getString(R.string.profile_not_authorized))
+            authType.set(context.getDrawableFromResource(getAuthResourceByAuthType(AuthType.Native)))
+            loadDefaultAvatar()
         }
+    }
+
+    fun loadDefaultAvatar() {
+        avatar.set(getApplication<LPSApplication>().getDrawableFromResource(R.drawable.ic_player))
     }
 
     private fun getAuthResourceByAuthType(type: AuthType): Int {
@@ -58,11 +64,12 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             AuthType.Google -> R.drawable.ic_gl
             AuthType.Vkontakte -> R.drawable.ic_vk
             AuthType.Odnoklassniki -> R.drawable.ic_ok
-            AuthType.Facebook -> R.drawable.ic_ok
+            AuthType.Facebook -> R.drawable.ic_fb
         }
     }
 
     private fun Context.getDrawableFromResource(resId: Int): Drawable {
+        @Suppress("DEPRECATION")
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             resources.getDrawable(resId, theme)
         } else

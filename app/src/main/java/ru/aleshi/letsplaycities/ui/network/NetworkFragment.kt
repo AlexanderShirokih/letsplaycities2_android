@@ -35,6 +35,7 @@ import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
+import ru.aleshi.letsplaycities.ui.profile.OnSocialButtonClickedListener
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.quandastudio.lpsclient.model.FriendModeResult
@@ -112,10 +113,30 @@ class NetworkFragment : Fragment(), NetworkContract.View {
         }
         mNetworkPresenter.onAttachView(this)
 
-        btnVk.setOnClickListener(OnSocialButtonClickedListener(activity, ServiceType.VK))
-        btnOk.setOnClickListener(OnSocialButtonClickedListener(activity, ServiceType.OK))
-        btnFb.setOnClickListener(OnSocialButtonClickedListener(activity, ServiceType.FB))
-        btnGl.setOnClickListener(OnSocialButtonClickedListener(activity, ServiceType.GL))
+        btnVk.setOnClickListener(
+            OnSocialButtonClickedListener(
+                activity,
+                ServiceType.VK
+            )
+        )
+        btnOk.setOnClickListener(
+            OnSocialButtonClickedListener(
+                activity,
+                ServiceType.OK
+            )
+        )
+        btnFb.setOnClickListener(
+            OnSocialButtonClickedListener(
+                activity,
+                ServiceType.FB
+            )
+        )
+        btnGl.setOnClickListener(
+            OnSocialButtonClickedListener(
+                activity,
+                ServiceType.GL
+            )
+        )
         btnLogout.setOnClickListener {
             mNetworkPresenter.onLogout()
         }

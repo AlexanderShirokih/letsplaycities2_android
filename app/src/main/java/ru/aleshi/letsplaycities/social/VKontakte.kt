@@ -39,13 +39,9 @@ class VKontakte : ISocialNetwork() {
         }
     }
 
-    override fun onInitialize(context: Context) {
-//        VKSdk.initialize(context)
-    }
+    override fun onInitialize(context: Context) = Unit
 
-    override fun onLogin(activity: Activity) {
-        VK.login(activity)
-    }
+    override fun onLogin(activity: Activity) = VK.login(activity)
 
     override fun onLoggedIn(activity: Activity, access_token: String) {
         disposable.add(Observable.fromCallable { VK.executeSync(VKUsersRequest()) }
@@ -68,7 +64,12 @@ class VKontakte : ISocialNetwork() {
         disposable.clear()
     }
 
-    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
         return VK.onActivityResult(requestCode, resultCode, data, object : VKAuthCallback {
             override fun onLogin(token: VKAccessToken) {
                 onLoggedIn(activity, token.accessToken)

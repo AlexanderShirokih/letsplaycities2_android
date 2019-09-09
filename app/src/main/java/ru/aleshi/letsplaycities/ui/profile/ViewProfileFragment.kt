@@ -13,7 +13,7 @@ import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.databinding.FragmentProfileViewBinding
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 
-class FragmentViewProfile : Fragment() {
+class ViewProfileFragment : Fragment() {
     private lateinit var mGamePreferences: GamePreferences
     private lateinit var mProfileViewModel: ProfileViewModel
     private var mVisited = false
@@ -49,7 +49,7 @@ class FragmentViewProfile : Fragment() {
     ): View {
         return FragmentProfileViewBinding.inflate(inflater, container, false).apply {
             profile = mProfileViewModel
-            fragment = this@FragmentViewProfile
+            fragment = this@ViewProfileFragment
         }.root
     }
 }

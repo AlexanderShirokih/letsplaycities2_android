@@ -12,7 +12,7 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.databinding.FragmentProfileCardBinding
 
-class FragmentProfileCard : DialogFragment() {
+class ProfileCardFragment : DialogFragment() {
 
     private lateinit var mGamePreferences: GamePreferences
     private lateinit var mProfileViewModel: ProfileViewModel
@@ -27,10 +27,7 @@ class FragmentProfileCard : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-
-        if (mGamePreferences.isLoggedFromAnySN()) {
-            mProfileViewModel.loadCurrentProfileIfNotPresent()
-        }
+        mProfileViewModel.loadCurrentProfile()
     }
 
     override fun onCreateView(

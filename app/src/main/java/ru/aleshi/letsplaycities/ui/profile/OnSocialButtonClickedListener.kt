@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui.network
+package ru.aleshi.letsplaycities.ui.profile
 
 import android.app.Activity
 import android.view.View

@@ -308,6 +308,7 @@
     <string name="accept">Принять</string>
     <string name="decline">Отклонить</string>
 
-    <!-- FragmentViewProfile -->
+    <!-- ViewProfileFragment -->
     <string name="profile">Профиль</string>
+    <string name="profile_not_authorized">Войдите для продолжения</string>
 </resources>
