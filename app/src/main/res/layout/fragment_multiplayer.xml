@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -15,25 +14,40 @@
             android:text="@string/wifi_desc"
             android:textAlignment="center"
             android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@+id/create"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.26999998"
             app:layout_constraintVertical_chainStyle="packed" />
+
+    <fragment
+            android:id="@+id/fragment"
+            android:name="ru.aleshi.letsplaycities.ui.profile.ProfileCardFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView2"
+            tools:layout="@layout/fragment_profile_card" />
+
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/create"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:layout_marginBottom="10dp"
             android:padding="@dimen/btn_pad"
             android:text="@string/create"
             app:icon="@drawable/ic_wifi_tethering_24"
             app:layout_constraintBottom_toTopOf="@+id/connect"
             app:layout_constraintEnd_toEndOf="@+id/connect"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/connect"
-            app:layout_constraintTop_toBottomOf="@id/textView2" />
+            app:layout_constraintTop_toBottomOf="@+id/fragment"
+            app:layout_constraintVertical_bias="0.3"
+            app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/connect"
@@ -44,19 +58,7 @@
             app:icon="@drawable/ic_net_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/create" />
-
-    <fragment
-            android:id="@+id/fragment"
-            android:name="ru.aleshi.letsplaycities.ui.profile.ProfileCardFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            app:layout_constraintBottom_toTopOf="@+id/textView2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout="@layout/fragment_profile_card" />
-
+            app:layout_constraintTop_toBottomOf="@+id/create" />
 </androidx.constraintlayout.widget.ConstraintLayout>

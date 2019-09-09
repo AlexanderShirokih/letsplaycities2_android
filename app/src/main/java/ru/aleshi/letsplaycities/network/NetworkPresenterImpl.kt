@@ -12,8 +12,6 @@ import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
 import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.social.SocialNetworkLoginListener
-import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.AuthData
@@ -23,7 +21,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
-
 class NetworkPresenterImpl @Inject constructor(
     private val mGameSessionBuilder: GameSession.GameSessionBuilder,
     private val mNetworkServer: NetworkServer,
@@ -32,43 +29,24 @@ class NetworkPresenterImpl @Inject constructor(
     private val mGamePlayerDataFactory: GamePlayerDataFactory
 ) : NetworkContract.Presenter {
 
-    private lateinit var mSaveProvider: GameAuthDataFactory.GameSaveProvider
+    private lateinit var mAuthData: AuthData
     private val mDisposable: CompositeDisposable = CompositeDisposable()
     private var mView: NetworkContract.View? = null
-    private lateinit var mAuthData: AuthData
+    private val mSaveProvider: GameAuthDataFactory.GameSaveProvider by lazy {
+        GameAuthDataFactory.GameSaveProvider(
+            mView!!.getGamePreferences()
+        )
+    }
 
     override fun onAttachView(view: NetworkContract.View) {
         mView = view
         val prefs = view.getGamePreferences()
-        if (prefs.isLoggedFromAnySN()) {
+        val isLoggedIn = prefs.isLoggedFromAnySN()
+        if (isLoggedIn) {
             mAuthData = mAuthDataFactory.loadFromPreferences(prefs)
-            view.setupWithSN()
         }
-
-        mSaveProvider = GameAuthDataFactory.GameSaveProvider(prefs)
-
-        SocialNetworkManager.registerCallback(object : SocialNetworkLoginListener {
-
-            override fun onLoggedIn(data: AuthData) {
-                mView?.let {
-                    mAuthData = data.apply { mSaveProvider.save(this) }
-                    it.setupWithSN()
-                }
-            }
-
-            override fun onError() {
-                mView?.showMessage(R.string.auth_error)
-            }
-
-        })
+        view.setupLayout(isLoggedIn)
         disconnect()
-    }
-
-    override fun onLogout() {
-        mView?.run {
-            SocialNetworkManager.logout(getGamePreferences())
-            setup()
-        }
     }
 
     override fun onConnectToFriendGame(versionInfo: Pair<String, Int>, oppId: Int) {
@@ -108,7 +86,10 @@ class NetworkPresenterImpl @Inject constructor(
         mDisposable.clear()
     }
 
-    private fun createPlayerData(versionInfo: Pair<String, Int>, callback: (playerData: PlayerData) -> Unit) {
+    private fun createPlayerData(
+        versionInfo: Pair<String, Int>,
+        callback: (playerData: PlayerData) -> Unit
+    ) {
         mView?.let {
             val prefs = it.getGamePreferences()
             val userData = mGamePlayerDataFactory.create(mAuthData).apply {
@@ -123,9 +104,10 @@ class NetworkPresenterImpl @Inject constructor(
                 if (file.exists()) {
                     Utils.loadAvatar(file.toUri())
                         .doOnNext { bitmap ->
-                            val stream = ByteArrayOutputStream()
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
-                            userData.avatar = stream.toByteArray()
+                            ByteArrayOutputStream().apply {
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 90, this)
+                                userData.avatar = toByteArray()
+                            }
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnNext {

@@ -235,9 +235,6 @@
                     android:id="@+id/showChangeModeDialog"
                     app:destination="@id/changeModeDialog" />
             <action
-                    android:id="@+id/showLoginDialog"
-                    app:destination="@id/loginFragment" />
-            <action
                     android:id="@+id/start_friends_fragment"
                     app:destination="@id/friendsFragment" />
             <action
@@ -254,6 +251,9 @@
             <argument
                     android:name="host"
                     app:argType="string" />
+            <action
+                    android:id="@+id/actionManageProfile"
+                    app:destination="@id/profileManager" />
         </fragment>
         <fragment
                 android:id="@+id/friendsFragment"
@@ -268,19 +268,6 @@
                 android:id="@+id/changeModeDialog"
                 android:name="ru.aleshi.letsplaycities.ui.network.ChangeModeDialog"
                 android:label="ChangeModeDialog" />
-        <fragment
-                android:id="@+id/loginFragment"
-                android:name="ru.aleshi.letsplaycities.ui.network.LoginFragment"
-                android:label="@string/login_no_sn"
-                tools:layout="@layout/fragment_login">
-            <action
-                    android:id="@+id/showChangeAvatarDialog"
-                    app:destination="@id/changeAvatarDialog" />
-        </fragment>
-        <dialog
-                android:id="@+id/changeAvatarDialog"
-                android:name="ru.aleshi.letsplaycities.ui.profile.ChangeAvatarDialog"
-                android:label="ChangeAvatarDialog" />
     </navigation>
     <navigation
             android:id="@+id/profileManager"

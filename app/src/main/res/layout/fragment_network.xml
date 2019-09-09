@@ -7,110 +7,30 @@
         android:layout_height="match_parent">
 
     <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:padding="20dp"
             android:text="@string/networkmode_desc"
             android:textAlignment="center"
-            android:padding="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:id="@+id/textView3"
-            app:layout_constraintVertical_bias="0.3"
             app:layout_constraintHorizontal_bias="0.0"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ru.aleshi.letsplaycities.ui.view.RoundedImageView
-            android:transitionName="transition_avatar"
-            android:src="@drawable/ic_player"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:id="@+id/avatar"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="36dp"
-            app:layout_constraintEnd_toStartOf="@id/sn_desc"
-            app:layout_constraintTop_toBottomOf="@+id/textView3"
-            tools:targetApi="lollipop"/>
-
-    <TextView
-            android:id="@+id/sn_desc"
-            android:text="@string/networkmode_auth_desc"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintStart_toEndOf="@+id/avatar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/avatar"
-            app:layout_constraintBottom_toBottomOf="@+id/avatar"/>
-
-    <ImageButton
-            style="@style/Social"
-            android:src="@drawable/ic_gl"
-            android:id="@+id/btnGl"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintTop_toBottomOf="@id/sn_desc"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnVk"
-            android:layout_marginTop="20dp"/>
-
-    <ImageButton
-            android:id="@+id/btnVk"
-            style="@style/Social"
-            android:src="@drawable/ic_vk"
-            app:layout_constraintTop_toTopOf="@+id/btnGl"
-            app:layout_constraintStart_toEndOf="@+id/btnGl"
-            app:layout_constraintEnd_toStartOf="@id/btnOk"/>
-
-    <ImageButton
-            style="@style/Social"
-            android:id="@+id/btnOk"
-            android:src="@drawable/ic_ok"
-            app:layout_constraintTop_toTopOf="@+id/btnVk"
-            app:layout_constraintStart_toEndOf="@+id/btnVk"
-            app:layout_constraintEnd_toStartOf="@id/btnFb"/>
-
-    <ImageButton
-            android:id="@+id/btnFb"
-            style="@style/Social"
-            android:src="@drawable/ic_fb"
-            app:layout_constraintTop_toTopOf="@+id/btnOk"
-            app:layout_constraintStart_toEndOf="@+id/btnOk"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"/>
-
-    <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLoginNoSn"
-            android:text="@string/login_no_sn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/btnGl"
-            app:layout_constraintStart_toStartOf="@+id/btnGl"
-            app:layout_constraintEnd_toEndOf="@+id/btnFb"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
             android:text="@string/connect_net"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/avatar"/>
-
-    <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogout"
-            android:text="@string/logout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="@+id/btnConnect"
-            app:layout_constraintEnd_toEndOf="@+id/btnConnect"
-            app:layout_constraintTop_toBottomOf="@+id/btnConnect"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragment2"
+            tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnFriends"
@@ -121,29 +41,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <androidx.constraintlayout.widget.Group
-            android:id="@+id/group_sn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="btnGl,btnVk,btnOk,btnFb,btnLoginNoSn"/>
-
-    <androidx.constraintlayout.widget.Group
-            android:visibility="gone"
-            android:id="@+id/group_connect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="btnConnect,btnLogout,btnFriends"/>
-
     <ProgressBar
+            android:id="@+id/loadingBar"
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/loadingBar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             android:layout_marginTop="32dp"
-            app:layout_constraintTop_toBottomOf="@+id/btnLoginNoSn"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragment2" />
 
     <TextView
             android:id="@+id/infoTv"
@@ -168,10 +75,29 @@
             app:layout_constraintHorizontal_bias="0.5"/>
 
     <androidx.constraintlayout.widget.Group
-            android:visibility="gone"
-            app:constraint_referenced_ids="loadingBar,infoTv,btnCancel"
+            android:id="@+id/group_connect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/groupLoading"/>
+            android:visibility="gone"
+            app:constraint_referenced_ids="btnConnect,btnFriends"
+            tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupLoading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="loadingBar,infoTv,btnCancel" />
+
+    <fragment
+            android:id="@+id/fragment2"
+            android:name="ru.aleshi.letsplaycities.ui.profile.ProfileCardFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3"
+            tools:layout="@layout/fragment_profile_card" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
