@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui
+package ru.aleshi.letsplaycities.ui.remote
 
 import android.Manifest
 import android.content.ComponentName
@@ -10,23 +10,17 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_multiplayer.*
 import kotlinx.android.synthetic.main.fragment_multiplayer.view.*
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.remote.LPSServer
-import ru.aleshi.letsplaycities.remote.RemoteContract
+import ru.aleshi.letsplaycities.remote.internal.LPSServer
+import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.utils.NetworkUtil
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
-import javax.inject.Inject
 
-class MultiplayerFragment : Fragment(R.layout.fragment_multiplayer), RemoteContract.View {
-
-    @Inject
-    lateinit var remotePresenter: RemoteContract.Presenter
+class MultiplayerFragment : Fragment(R.layout.fragment_multiplayer) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         requestPermissions()
     }
@@ -46,7 +40,7 @@ class MultiplayerFragment : Fragment(R.layout.fragment_multiplayer), RemoteContr
                         )
                     })
             } else
-                remotePresenter.onCreateConnection()
+                findNavController().navigate(R.id.action_multiplayerFragment_to_waitingForDevicesFragment)
         }
         view.connect.setOnClickListener {
             val context = requireContext()
@@ -56,7 +50,8 @@ class MultiplayerFragment : Fragment(R.layout.fragment_multiplayer), RemoteContr
                 //TODO: Show WaitingForHostsDialog
                 findNavController().navigate(
                     MultiplayerFragmentDirections.showRemoteNetworkFragment(
-                        LPSServer.LOCAL_NETWORK_IP
+                        LPSServer.LOCAL_NETWORK_IP,
+                        LPSServer.LOCAL_PORT
                     )
                 )
             } else {

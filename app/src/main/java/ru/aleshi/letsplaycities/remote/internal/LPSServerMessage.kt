@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.remote
+package ru.aleshi.letsplaycities.remote.internal
 
 import ru.quandastudio.lpsclient.core.LPSMessageReader
 import ru.quandastudio.lpsclient.core.LPSv3Tags
@@ -9,8 +9,14 @@ sealed class LPSServerMessage {
     companion object {
         fun from(msgReader: LPSMessageReader): LPSServerMessage {
             return when (val action = msgReader.getMasterTag()) {
-                LPSv3Tags.ACTION_WORD -> LPSWordServerMessage(msgReader, action)
-                LPSv3Tags.ACTION_MSG -> LPSMsgServerMessage(msgReader, action)
+                LPSv3Tags.ACTION_WORD -> LPSWordServerMessage(
+                    msgReader,
+                    action
+                )
+                LPSv3Tags.ACTION_MSG -> LPSMsgServerMessage(
+                    msgReader,
+                    action
+                )
                 else -> LPSUnknownServerMessage
             }
         }

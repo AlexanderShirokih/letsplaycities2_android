@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.remote
+package ru.aleshi.letsplaycities.remote.internal
 
 import ru.quandastudio.lpsclient.core.LPSMessageReader
 import ru.quandastudio.lpsclient.core.LPSMessageWriter
@@ -35,7 +35,7 @@ class LPSServer @Inject constructor(private val playerData: PlayerData) :
 
     override fun run() {
         try {
-            serverSocket = ServerSocket(DEFAULT_PORT)
+            serverSocket = ServerSocket(LOCAL_PORT)
 
             // Wait for client to be connected
             clientSocket = serverSocket!!.accept().apply {
@@ -178,8 +178,11 @@ class LPSServer @Inject constructor(private val playerData: PlayerData) :
             .buildAndFlush(asServer = true)
     }
 
+
+    fun getPlayerData() = playerData
+
     companion object {
         const val LOCAL_NETWORK_IP = "192.168.43.1"
-        private const val DEFAULT_PORT = 8988
+        const val LOCAL_PORT = 8988
     }
 }

@@ -9,7 +9,7 @@ class NetworkClientFromNetworkFragmentModule {
 
     @Provides
     fun provideNetworkClient(fragment: NetworkFragment): NetworkClient {
-        val host = NetworkFragmentArgs.fromBundle(fragment.requireArguments()).host
-        return NetworkClient(host)
+        val args = NetworkFragmentArgs.fromBundle(fragment.requireArguments())
+        return NetworkClient(args.host, args.port)
     }
 }

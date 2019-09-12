@@ -311,4 +311,8 @@
     <!-- ViewProfileFragment -->
     <string name="profile">Профиль</string>
     <string name="profile_not_authorized">Войдите для продолжения</string>
+
+    <!-- WaitingForDevicesFragment -->
+    <string name="error_err">Произошла ошибка: %1$s</string>
+
 </resources>

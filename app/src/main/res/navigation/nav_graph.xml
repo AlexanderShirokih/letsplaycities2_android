@@ -12,7 +12,7 @@
             tools:layout="@layout/fragment_main_menu">
         <action
                 android:id="@+id/start_multiplayer_fragment"
-                app:destination="@id/multiplayerFragment" />
+                app:destination="@id/remoteNav" />
         <action
                 android:id="@+id/start_network_fragment"
                 app:destination="@id/networkNav">
@@ -32,23 +32,6 @@
         <action
                 android:id="@+id/showConfimationDialog"
                 app:destination="@id/confirmationDialog" />
-    </fragment>
-
-    <fragment
-            android:id="@+id/multiplayerFragment"
-            android:name="ru.aleshi.letsplaycities.ui.MultiplayerFragment"
-            android:label="@string/multiplayer_title"
-            tools:layout="@layout/fragment_multiplayer">
-        <action
-                android:id="@+id/showRemoteNetworkFragment"
-                app:destination="@id/networkNav">
-            <argument
-                    android:name="host"
-                    app:argType="string" />
-        </action>
-        <action
-                android:id="@+id/actionManageProfile"
-                app:destination="@id/profileManager" />
     </fragment>
 
     <dialog
@@ -254,6 +237,9 @@
             <action
                     android:id="@+id/actionManageProfile"
                     app:destination="@id/profileManager" />
+            <argument
+                    android:name="port"
+                    app:argType="integer" />
         </fragment>
         <fragment
                 android:id="@+id/friendsFragment"
@@ -305,6 +291,41 @@
                 android:id="@+id/changeAvatarDialog2"
                 android:name="ru.aleshi.letsplaycities.ui.profile.ChangeAvatarDialog"
                 android:label="ChangeAvatarDialog" />
+    </navigation>
+    <navigation
+            android:id="@+id/remoteNav"
+            app:startDestination="@id/multiplayerFragment" >
+        <fragment
+                android:id="@+id/multiplayerFragment"
+                android:name="ru.aleshi.letsplaycities.ui.remote.MultiplayerFragment"
+                android:label="@string/multiplayer_title"
+                tools:layout="@layout/fragment_multiplayer">
+            <action
+                    android:id="@+id/showRemoteNetworkFragment"
+                    app:destination="@id/networkNav">
+                <argument
+                        android:name="host"
+                        app:argType="string" />
+                <argument
+                        android:name="port"
+                        app:argType="integer" />
+            </action>
+            <action
+                    android:id="@+id/actionManageProfile"
+                    app:destination="@id/profileManager" />
+            <action
+                    android:id="@+id/action_multiplayerFragment_to_waitingForDevicesFragment"
+                    app:destination="@id/waitingForDevicesFragment" />
+        </fragment>
+        <fragment
+                android:id="@+id/waitingForDevicesFragment"
+                android:name="ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment"
+                android:label="@string/waiting_for_connection"
+                tools:layout="@layout/fragment_waiting_for_devices" >
+            <action
+                    android:id="@+id/start_game_fragment"
+                    app:destination="@+id/gameNav" />
+        </fragment>
     </navigation>
 
 </navigation>

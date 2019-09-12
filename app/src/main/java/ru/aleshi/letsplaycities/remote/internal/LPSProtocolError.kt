@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.remote
+package ru.aleshi.letsplaycities.remote.internal
 
 import java.io.IOException
 

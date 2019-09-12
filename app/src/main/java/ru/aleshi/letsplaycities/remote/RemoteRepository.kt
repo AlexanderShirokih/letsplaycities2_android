@@ -3,12 +3,14 @@ package ru.aleshi.letsplaycities.remote
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import ru.aleshi.letsplaycities.remote.internal.LPSProtocolError
+import ru.aleshi.letsplaycities.remote.internal.LPSServer
+import ru.aleshi.letsplaycities.remote.internal.LPSServerMessage
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.WordResult
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class RemoteRepository @Inject constructor(private val server: LPSServer) {
+class RemoteRepository constructor(private val server: LPSServer) {
 
     private val inputMessage: Observable<LPSServerMessage> by lazy {
         Observable.create<LPSServerMessage> {
@@ -61,4 +63,6 @@ class RemoteRepository @Inject constructor(private val server: LPSServer) {
     fun sendWord(wordResult: WordResult, city: String) {
         server.sendCity(wordResult, city)
     }
+
+    fun getPlayerData() = server.getPlayerData()
 }

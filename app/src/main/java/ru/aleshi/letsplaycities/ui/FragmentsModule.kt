@@ -12,6 +12,8 @@ import ru.aleshi.letsplaycities.ui.friends.FriendsFragment
 import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkClientFromNetworkFragmentModule
+import ru.aleshi.letsplaycities.ui.remote.MultiplayerFragment
+import ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment
 
 @Module
 abstract class FragmentsModule {
@@ -26,7 +28,7 @@ abstract class FragmentsModule {
 
     @ActivityScope
     @ContributesAndroidInjector(modules = [RemoteModule::class])
-    abstract fun contributeMultiplayerFragment(): MultiplayerFragment
+    abstract fun contributeWaitingForDevicesFragment(): WaitingForDevicesFragment
 
     @ActivityScope
     @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientModule::class])

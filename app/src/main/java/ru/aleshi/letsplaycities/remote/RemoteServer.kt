@@ -11,7 +11,6 @@ class RemoteServer @Inject constructor(private val mRemoteRepository: RemoteRepo
 
     private var result: PublishSubject<Pair<WordResult, String>> = PublishSubject.create()
 
-
     override fun getWordsResult(): Observable<Pair<WordResult, String>> {
         return result.mergeWith(mRemoteRepository.words
             .doOnNext { mRemoteRepository.sendWord(WordResult.ACCEPTED, it.word) }
