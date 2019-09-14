@@ -11,6 +11,8 @@ interface Connection {
 
     fun isConnected(): Boolean
 
+    fun isClientConnected(): Boolean
+
     fun getInputStream(): DataInputStream
 
     fun getOutputStream(): DataOutputStream

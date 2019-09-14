@@ -1,5 +1,7 @@
 package ru.aleshi.letsplaycities.remote.internal
 
+import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import ru.quandastudio.lpsclient.core.LPSMessageReader
 import ru.quandastudio.lpsclient.core.LPSMessageWriter
 import ru.quandastudio.lpsclient.core.LPSv3Tags
@@ -12,11 +14,13 @@ import java.io.InterruptedIOException
 import javax.inject.Inject
 
 class LPSServerImpl @Inject constructor(
-    private val playerData: PlayerData,
+    private val playerData: Single<PlayerData>,
     private val connection: Connection
 ) :
     Thread("LPS-Server"), LPSServer {
 
+    private val disposable = CompositeDisposable()
+    private lateinit var cachedPlayerData: PlayerData
     private var writer: LPSMessageWriter? = null
     private lateinit var _listener: LPSServer.ConnectionListener
 
@@ -33,15 +37,17 @@ class LPSServerImpl @Inject constructor(
 
     override fun run() {
         try {
+            cachedPlayerData = playerData.blockingGet()
             connection.connect(LOCAL_PORT)
             writer = LPSMessageWriter(connection.getOutputStream())
 
             readClientLoginRequest()
             writeLoginResponse()
             readPlayRequest()
-            writePlayResponse(playerData)
 
-            while (connection.isConnected()) {
+            writePlayResponse(cachedPlayerData)
+
+            while (connection.isClientConnected()) {
                 readClientMessage()
             }
 
@@ -134,10 +140,11 @@ class LPSServerImpl @Inject constructor(
     private fun reader(): LPSMessageReader = LPSMessageReader(connection.getInputStream())
 
     override fun close() {
+        disposable.clear()
         if (connection.isConnected()) {
-            connection.close()
             _listener.onDisconnected()
         }
+        connection.close()
         if (!isInterrupted)
             interrupt()
     }
@@ -149,8 +156,14 @@ class LPSServerImpl @Inject constructor(
             .buildAndFlush(asServer = true)
     }
 
+    override fun sendMessage(message: String) {
+        writer()
+            .writeString(LPSv3Tags.S_ACTION_MSG, message)
+            .writeBool(LPSv3Tags.MSG_OWNER, false)
+            .buildAndFlush(asServer = true)
+    }
 
-    override fun getPlayerData() = playerData
+    override fun getPlayerData() = cachedPlayerData
 
     companion object {
         const val LOCAL_NETWORK_IP = "192.168.43.1"

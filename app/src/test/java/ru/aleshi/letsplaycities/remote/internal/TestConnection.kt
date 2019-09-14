@@ -24,21 +24,23 @@ class TestConnection : Connection {
     )
     private val internalIS = DataInputStream(pipedOut)
 
-    private var isConnected = false
+    private var connected = false
 
     override fun connect(port: Int) {
-        isConnected = true
+        connected = true
     }
 
     override fun close() {
-        isConnected = false
+        connected = false
         getInputStream().close()
         getOutputStream().close()
         internalIS.close()
         internalOS.close()
     }
 
-    override fun isConnected(): Boolean = isConnected
+    override fun isConnected(): Boolean = connected
+
+    override fun isClientConnected(): Boolean = connected
 
     override fun getInputStream(): DataInputStream = input
 

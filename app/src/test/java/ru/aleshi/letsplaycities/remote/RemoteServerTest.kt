@@ -72,6 +72,13 @@ class RemoteServerTest {
     }
 
     @Test
+    fun broadcastMessage() {
+        remoteServer.broadcastMessage("Hello message")
+
+        verify(server, times(1)).sendMessage("Hello message")
+    }
+
+    @Test
     fun getTimeLimit() {
         Assert.assertEquals(remoteServer.getTimeLimit(), 92L)
     }

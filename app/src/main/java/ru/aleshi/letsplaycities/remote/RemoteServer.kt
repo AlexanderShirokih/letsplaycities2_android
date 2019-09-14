@@ -31,6 +31,10 @@ class RemoteServer @Inject constructor(private val mRemoteRepository: RemoteRepo
         result.onNext(WordResult.ACCEPTED to city)
     }
 
+    override fun broadcastMessage(message: String) {
+        mRemoteRepository.sendMessage(message)
+    }
+
     override val leave: Maybe<Boolean>
         get() = mRemoteRepository.leave
             .map { !it.message.isNullOrEmpty() }

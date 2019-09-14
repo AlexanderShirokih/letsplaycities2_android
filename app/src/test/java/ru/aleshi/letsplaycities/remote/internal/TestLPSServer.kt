@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.remote.internal
 
+import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -12,11 +13,9 @@ import ru.quandastudio.lpsclient.model.WordResult
 
 class TestLPSServer {
 
-    private fun createPlayerData(): PlayerData {
-        return PlayerData.Factory().create("TestData")
-    }
+    private fun createPlayerData(): Single<PlayerData> =
+        Single.fromCallable { PlayerData.Factory().create("TestData") }
 
-    private val playerData = createPlayerData()
     private lateinit var lpsServer: LPSServer
     private lateinit var connection: TestConnection
     lateinit var connectionListener: LPSServer.ConnectionListener
@@ -24,7 +23,7 @@ class TestLPSServer {
     @Before
     fun setUp() {
         connection = TestConnection()
-        lpsServer = LPSServerImpl(playerData, connection)
+        lpsServer = LPSServerImpl(createPlayerData(), connection)
         connectionListener = mock(LPSServer.ConnectionListener::class.java)
         lpsServer.setListener(connectionListener)
         lpsServer.startServer()
@@ -62,6 +61,8 @@ class TestLPSServer {
             .writer()
             .writeBool(LPSv3Tags.ACTION_PLAY, false)
             .buildAndFlush()
+
+        val playerData = lpsServer.getPlayerData()
 
         val playMsg = connection.reader()
         assertFalse(playMsg.readBoolean(LPSv3Tags.ACTION_JOIN))
@@ -109,7 +110,21 @@ class TestLPSServer {
         lpsServer.sendCity(WordResult.ACCEPTED, "city")
 
         val cityMsg = connection.reader()
-        assertEquals(cityMsg.readByte(LPSv3Tags.S_ACTION_WORD), WordResult.ACCEPTED.ordinal.toByte())
+        assertEquals(
+            cityMsg.readByte(LPSv3Tags.S_ACTION_WORD),
+            WordResult.ACCEPTED.ordinal.toByte()
+        )
         assertEquals(cityMsg.readString(LPSv3Tags.WORD), "city")
+    }
+
+    @Test
+    fun testReceiveMessage() {
+        testLogIn()
+
+        lpsServer.sendMessage("Test")
+
+        val cityMsg = connection.reader()
+        assertEquals(cityMsg.readString(LPSv3Tags.S_ACTION_MSG), "Test")
+        assertFalse(cityMsg.readBoolean(LPSv3Tags.MSG_OWNER))
     }
 }

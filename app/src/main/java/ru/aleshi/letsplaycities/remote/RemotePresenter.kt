@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.remote
 
-import android.util.Log
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import ru.aleshi.letsplaycities.base.game.GameSession
@@ -51,10 +50,6 @@ class RemotePresenter @Inject constructor(
             Player(playerData),
             RemoteUser(oppData)
         )
-
-        Log.d("TAG", "User0=${users[0].playerData}, User1=${users[1].playerData}")
-
-        
 
         view.onStartGame(
             gameSessionBuilder

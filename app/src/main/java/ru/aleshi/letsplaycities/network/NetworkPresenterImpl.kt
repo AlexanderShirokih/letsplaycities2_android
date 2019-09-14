@@ -1,7 +1,5 @@
 package ru.aleshi.letsplaycities.network
 
-import android.graphics.Bitmap
-import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -12,13 +10,10 @@ import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
 import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.FriendInfo
 import ru.quandastudio.lpsclient.model.PlayerData
-import java.io.ByteArrayOutputStream
-import java.io.File
 import javax.inject.Inject
 
 class NetworkPresenterImpl @Inject constructor(
@@ -91,32 +86,13 @@ class NetworkPresenterImpl @Inject constructor(
         callback: (playerData: PlayerData) -> Unit
     ) {
         mView?.let {
-            val prefs = it.getGamePreferences()
-            val userData = mGamePlayerDataFactory.create(mAuthData).apply {
-                clientVersion = versionInfo.first
-                clientBuild = versionInfo.second
-                canReceiveMessages = prefs.canReceiveMessages()
-            }
-
-            val path = prefs.getAvatarPath()
-            if (path != null) {
-                val file = File(path)
-                if (file.exists()) {
-                    Utils.loadAvatar(file.toUri())
-                        .doOnNext { bitmap ->
-                            ByteArrayOutputStream().apply {
-                                bitmap.compress(Bitmap.CompressFormat.PNG, 90, this)
-                                userData.avatar = toByteArray()
-                            }
-                        }
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext {
-                            callback(userData)
-                        }
-                        .subscribe()
-                } else
-                    callback(userData)
-            } else callback(userData)
+            NetworkUtils.createPlayerData(
+                versionInfo,
+                callback,
+                it.getGamePreferences(),
+                mGamePlayerDataFactory,
+                mAuthData
+            )
         }
     }
 

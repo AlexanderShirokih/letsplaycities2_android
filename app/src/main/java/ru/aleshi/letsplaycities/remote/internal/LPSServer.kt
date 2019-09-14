@@ -22,5 +22,7 @@ interface LPSServer {
 
     fun sendCity(wordResult: WordResult, city: String)
 
+    fun sendMessage(message: String)
+
     fun getPlayerData(): PlayerData
 }

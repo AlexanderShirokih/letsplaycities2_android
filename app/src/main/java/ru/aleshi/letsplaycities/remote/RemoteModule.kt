@@ -3,10 +3,12 @@ package ru.aleshi.letsplaycities.remote
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import io.reactivex.Single
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
+import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.remote.internal.Connection
 import ru.aleshi.letsplaycities.remote.internal.LPSServerImpl
 import ru.aleshi.letsplaycities.remote.internal.SocketConnection
@@ -30,12 +32,15 @@ abstract class RemoteModule {
             authDataFactory: GameAuthDataFactory,
             gamePlayerDataFactory: GamePlayerDataFactory,
             gamePreferences: GamePreferences
-        ): PlayerData {
-            val authData = authDataFactory.loadFromPreferences(gamePreferences)
-            return gamePlayerDataFactory.create(authData).apply {
-                clientVersion = BuildConfig.VERSION_NAME
-                clientBuild = BuildConfig.VERSION_CODE
-                canReceiveMessages = gamePreferences.canReceiveMessages()
+        ): Single<PlayerData> {
+            return Single.create<PlayerData> {
+                val versionInfo = BuildConfig.VERSION_NAME to BuildConfig.VERSION_CODE
+                NetworkUtils.createPlayerData(
+                    versionInfo,
+                    { playerData: PlayerData -> it.onSuccess(playerData) }, gamePreferences,
+                    gamePlayerDataFactory,
+                    authDataFactory.loadFromPreferences(gamePreferences)
+                )
             }
         }
 

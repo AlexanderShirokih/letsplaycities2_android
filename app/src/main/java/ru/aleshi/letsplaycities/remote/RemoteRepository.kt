@@ -57,13 +57,11 @@ open class RemoteRepository constructor(var server: LPSServer) : LPSServer.Conne
             }
     }
 
-    fun disconnect() {
-        server.close()
-    }
+    fun disconnect() = server.close()
 
-    fun sendWord(wordResult: WordResult, city: String) {
-        server.sendCity(wordResult, city)
-    }
+    fun sendWord(wordResult: WordResult, city: String) = server.sendCity(wordResult, city)
+
+    fun sendMessage(message: String) = server.sendMessage(message)
 
     fun getPlayerData() = server.getPlayerData()
 }

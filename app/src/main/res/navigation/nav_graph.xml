@@ -234,12 +234,15 @@
             <argument
                     android:name="host"
                     app:argType="string" />
+
+            <argument
+                    android:name="port"
+                    android:defaultValue="-1"
+                    app:argType="integer" />
+
             <action
                     android:id="@+id/actionManageProfile"
                     app:destination="@id/profileManager" />
-            <argument
-                    android:name="port"
-                    app:argType="integer" />
         </fragment>
         <fragment
                 android:id="@+id/friendsFragment"

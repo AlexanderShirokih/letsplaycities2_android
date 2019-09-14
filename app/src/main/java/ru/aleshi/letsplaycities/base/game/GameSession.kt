@@ -197,7 +197,7 @@ class GameSession private constructor(
         val gameMode = findGameMode()
         view.setMenuItemsVisibility(
             help = gameMode == GameMode.MODE_PVA,
-            msg = gameMode == GameMode.MODE_NET && isMessagesAllowed()
+            msg = (gameMode == GameMode.MODE_NET || gameMode == GameMode.MODE_MUL) && isMessagesAllowed()
         )
 
         players[0].position = Position.LEFT

@@ -87,4 +87,13 @@ class RemoteRepositoryTest {
             .sendCity(WordResult.ACCEPTED, "word")
         verifyNoMoreInteractions(server)
     }
+
+    @Test
+    fun sendMessage() {
+        repository.sendMessage("Hello world")
+
+        verify(server, times(1))
+            .sendMessage("Hello world")
+        verifyNoMoreInteractions(server)
+    }
 }

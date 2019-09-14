@@ -26,25 +26,31 @@ class SocketConnection @Inject constructor() : Connection {
 
     override fun close() {
         try {
-            input?.close()
-        } catch (e: IOException) {
-        }
-        try {
-            output?.close()
-        } catch (e: IOException) {
-        }
-        try {
             serverSocket?.close()
         } catch (e: IOException) {
+            e.printStackTrace()
         }
         try {
             clientSocket?.close()
         } catch (e: IOException) {
-
+            e.printStackTrace()
         }
+        try {
+            input?.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        try {
+            output?.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
     }
 
-    override fun isConnected(): Boolean =
+    override fun isConnected(): Boolean = serverSocket != null && !serverSocket!!.isClosed
+
+    override fun isClientConnected(): Boolean =
         clientSocket != null && clientSocket!!.isConnected && !clientSocket!!.isClosed
 
     override fun getInputStream(): DataInputStream = input!!

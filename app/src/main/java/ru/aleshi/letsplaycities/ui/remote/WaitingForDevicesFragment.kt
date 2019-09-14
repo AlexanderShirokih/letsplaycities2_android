@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_waiting_for_devices.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameSession
@@ -16,7 +15,6 @@ import ru.aleshi.letsplaycities.remote.RemoteContract
 import ru.aleshi.letsplaycities.remote.RemotePresenter
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices),
@@ -42,18 +40,6 @@ class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices
     }
 
     override fun onStartGame(gameSession: GameSession) {
-        if(isAdded) {
-           start(gameSession)
-        }
-        else {
-            Completable.fromAction { start(gameSession) }
-                .timeout(1000, TimeUnit.MILLISECONDS)
-                .subscribe()
-        }
-
-    }
-
-    private fun start(gameSession: GameSession) {
         ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession =
             gameSession
         mGameSound?.start()
