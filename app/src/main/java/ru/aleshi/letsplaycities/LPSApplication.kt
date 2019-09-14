@@ -1,6 +1,6 @@
 package ru.aleshi.letsplaycities
 
-import androidx.multidex.MultiDexApplication
+import android.app.Application
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -9,7 +9,7 @@ import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import javax.inject.Inject
 
-class LPSApplication : MultiDexApplication(), HasAndroidInjector {
+class LPSApplication : Application(), HasAndroidInjector {
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
