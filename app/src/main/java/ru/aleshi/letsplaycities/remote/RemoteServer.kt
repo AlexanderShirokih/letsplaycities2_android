@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.remote
 
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.subjects.ReplaySubject
 import ru.aleshi.letsplaycities.base.game.BaseServer
@@ -29,6 +30,10 @@ class RemoteServer @Inject constructor(private val mRemoteRepository: RemoteRepo
         mRemoteRepository.sendWord(WordResult.RECEIVED, city)
         result.onNext(WordResult.ACCEPTED to city)
     }
+
+    override val leave: Maybe<Boolean>
+        get() = mRemoteRepository.leave
+            .map { !it.message.isNullOrEmpty() }
 
     override fun getTimeLimit(): Long = 92L
 

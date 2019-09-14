@@ -13,7 +13,10 @@ import java.util.concurrent.TimeUnit
 
 open class RemoteRepository constructor(var server: LPSServer) : LPSServer.ConnectionListener {
 
-    override fun onDisconnected() = message.onComplete()
+    override fun onDisconnected() {
+        message.onNext(LPSServerMessage.LPSLeaveServerMessage(""))
+        message.onComplete()
+    }
 
     override fun onProtocolError(err: LPSProtocolError) = message.onError(err)
 
@@ -48,7 +51,10 @@ open class RemoteRepository constructor(var server: LPSServer) : LPSServer.Conne
             .cast(LPSServerMessage.LPSConnectedMessage::class.java)
             .map { it.opponentData }
             .firstElement()
-            .doOnSubscribe { server.startServer() }
+            .doOnSubscribe {
+                server.setListener(this)
+                server.startServer()
+            }
     }
 
     fun disconnect() {

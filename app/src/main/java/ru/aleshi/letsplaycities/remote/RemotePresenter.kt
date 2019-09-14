@@ -52,6 +52,10 @@ class RemotePresenter @Inject constructor(
             RemoteUser(oppData)
         )
 
+        Log.d("TAG", "User0=${users[0].playerData}, User1=${users[1].playerData}")
+
+        
+
         view.onStartGame(
             gameSessionBuilder
                 .server(remoteServer)
@@ -61,7 +65,6 @@ class RemotePresenter @Inject constructor(
     }
 
     override fun onStop() {
-        Log.d("TAG", "Disconnecting!")
         remoteRepository.disconnect()
     }
 }

@@ -1,8 +1,7 @@
 package ru.aleshi.letsplaycities.remote.internal
 
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
@@ -65,7 +64,7 @@ class TestLPSServer {
             .buildAndFlush()
 
         val playMsg = connection.reader()
-        assertTrue(playMsg.readBoolean(LPSv3Tags.ACTION_JOIN))
+        assertFalse(playMsg.readBoolean(LPSv3Tags.ACTION_JOIN))
         assertEquals(playMsg.readBoolean(LPSv3Tags.S_CAN_REC_MSG), playerData.canReceiveMessages)
         assertEquals(playMsg.readString(LPSv3Tags.OPP_LOGIN), playerData.authData.login)
         assertEquals(playMsg.readString(LPSv3Tags.OPP_CLIENT_VERSION), playerData.clientVersion)

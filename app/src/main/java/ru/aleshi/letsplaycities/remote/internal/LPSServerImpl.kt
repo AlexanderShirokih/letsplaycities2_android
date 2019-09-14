@@ -63,7 +63,7 @@ class LPSServerImpl @Inject constructor(
 
     private fun writePlayResponse(playerData: PlayerData) {
         val playMsg = writer()
-            .writeBool(LPSv3Tags.ACTION_JOIN, true)
+            .writeBool(LPSv3Tags.ACTION_JOIN, false)
             .writeBool(LPSv3Tags.S_CAN_REC_MSG, playerData.canReceiveMessages)
             .writeString(LPSv3Tags.OPP_LOGIN, playerData.authData.login)
             .writeString(LPSv3Tags.OPP_CLIENT_VERSION, playerData.clientVersion)
