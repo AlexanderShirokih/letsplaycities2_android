@@ -19,7 +19,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.3" />
+            app:layout_constraintVertical_bias="0.277" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConnect"
@@ -87,15 +87,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="loadingBar,infoTv,btnCancel" />
+            app:constraint_referenced_ids="loadingBar,infoTv,btnCancel"
+            tools:visibility="visible" />
 
     <fragment
             android:id="@+id/fragment"
-            android:tag="ProfileCard"
             android:name="ru.aleshi.letsplaycities.ui.profile.ProfileCardFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
+            android:tag="ProfileCard"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView3"
