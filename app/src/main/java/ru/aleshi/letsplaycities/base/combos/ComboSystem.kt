@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.base.combos
 
 import java.util.*
 import kotlin.math.max
+import kotlin.math.min
 
 class ComboSystem(private val view: ComboSystemView) {
 
@@ -48,7 +49,7 @@ class ComboSystem(private val view: ComboSystemView) {
         return max(infoList.takeLastWhile(predicate).size - minComboSize + 1, 0)
     }
 
-    private fun getScore(s: Int) = max((s + 1) * 0.5f + 0.5f, maxSingleScore)
+    private fun getScore(s: Int) = min((s + 1) * 0.5f + 0.5f, maxSingleScore)
 
     fun clear() {
         infoList.clear()

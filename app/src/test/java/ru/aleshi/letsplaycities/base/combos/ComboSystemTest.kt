@@ -107,6 +107,12 @@ class ComboSystemTest {
         test.assertValues(0, 0, 0)
 
         cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
         test.assertValues(1, 1, 0)
 
         cs.addCity(CityComboInfo.create(5200, "tests", 14))
