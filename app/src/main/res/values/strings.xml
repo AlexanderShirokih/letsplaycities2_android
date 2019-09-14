@@ -108,17 +108,21 @@
     <!-- ScoreFragment -->
     <string name="score_title">Статистика</string>
     <string name="missing">-- Данные отсутствуют --</string>
-    <string name="nothing">Здесь пока ничего нет :(\nСыграйте хотя бы одну партию</string>
 
     <string-array name="group_names">
         <item>Всего сыграно партий</item>
         <item>Онлайн</item>
         <item>Рекорд</item>
+        <item>Комбо</item>
         <item>Самые загадываемые города</item>
         <item>Самые длинные города</item>
     </string-array>
 
     <string-array name="field_names">
+        <item>Быстрый ответ</item>
+        <item>Короткие города</item>
+        <item>Длинные города</item>
+        <item>Одна страна</item>
         <item>В режиме против Андроида</item>
         <item>В режиме против Игрока</item>
         <item>В режиме Мультиплеер</item>
@@ -246,13 +250,6 @@
     <string name="friends_request_accepted">Игрок %1$s добавлен в друзья</string>
     <string name="friends_request_denied">Заявка отклонена!</string>
     <string name="multiplier">&#xD7;%1$.1f</string>
-
-    <string-array name="combo_badge_names">
-        <item>Быстрый ответ</item>
-        <item>Короткие города</item>
-        <item>Длинные города</item>
-        <item>Одна страна</item>
-    </string-array>
 
     <string-array name="hints">
         <item>Добро Пожаловать в игру!</item>

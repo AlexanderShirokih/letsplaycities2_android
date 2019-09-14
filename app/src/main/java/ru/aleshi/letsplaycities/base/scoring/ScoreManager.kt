@@ -3,13 +3,22 @@ package ru.aleshi.letsplaycities.base.scoring
 import android.content.Context
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.CityComboInfo
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_LOSE
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_TIME
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_WINS
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_BIG_CITIES
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_COMBO
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_FRQ_CITIES
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_HISCORE
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_ONLINE
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_PARTS
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.V_EMPTY_S
 import ru.aleshi.letsplaycities.utils.StringUtils
 
 class ScoreManager(
@@ -18,24 +27,6 @@ class ScoreManager(
     private val comboSystem: ComboSystem,
     val context: Context
 ) {
-    companion object {
-        const val G_PARTS = "tt_n_pts"
-        const val G_ONLINE = "tt_onl"
-        const val G_HISCORE = "hscr"
-        const val G_FRQ_CITIES = "mst_frq_cts"
-        const val G_BIG_CITIES = "msg_big_cts"
-
-        const val F_ANDROID = "pva"
-        const val F_PLAYER = "pvp"
-        const val F_NETWORK = "pvn"
-        const val F_ONLINE = "pvo"
-        const val F_TIME = "tim"
-        const val F_WINS = "win"
-        const val F_LOSE = "los"
-        const val F_P = "pval"
-
-        const val V_EMPTY_S = "--"
-    }
 
     enum class ScoringType {
         BY_SCORE, // Чем длиннее слово, тем больше очков
@@ -49,133 +40,33 @@ class ScoreManager(
     private lateinit var groupOnline: ScoringGroup
     // Статистика рекордов
     private lateinit var groupHighScores: ScoringGroup
+    // Статистика комбо
+    private lateinit var groupCombo: ScoringGroup
     // Самые загадываемые города
     private lateinit var groupMostFrqCities: ScoringGroup
     // Самые длинные города
     private lateinit var groupMostBigCities: ScoringGroup
 
+
     private val allGroups: ScoringSet
-    private val cityStatDatabaseHelper: CityStatDatabaseHelper =
-        CityStatDatabaseHelper(context)
-    private val prefs: GamePreferences = (context.applicationContext as LPSApplication).gamePreferences
+    private val cityStatDatabaseHelper = CityStatDatabaseHelper(context)
+    private val prefs = (context.applicationContext as LPSApplication).gamePreferences
     private val scoringType: ScoringType = ScoringType.values()[prefs.getCurrentScoringType()]
     private var lastTime: Long = 0
 
     init {
-        //Load or build stats
-        val scrstr = prefs.getScoring()
-        if (scrstr != null) {
-            allGroups = ScoringSet.fromString(scrstr)
-            loadStatGroups()
-        } else {
-            allGroups = ScoringSet(5)
-            buildStatsGroups()
-            saveStats()
-        }
+        allGroups = ScoringGroupsHelper.fromPreferences(prefs)
+        loadStatGroups()
+        saveStats()
     }
 
     private fun loadStatGroups() {
+        groupCombo = allGroups.getGroupAt(G_COMBO)
         groupParts = allGroups.getGroupAt(G_PARTS)
         groupOnline = allGroups.getGroupAt(G_ONLINE)
         groupHighScores = allGroups.getGroupAt(G_HISCORE)
         groupMostFrqCities = allGroups.getGroupAt(G_FRQ_CITIES)
         groupMostBigCities = allGroups.getGroupAt(G_BIG_CITIES)
-    }
-
-    private fun buildStatsGroups() {
-
-        groupParts = ScoringGroup(
-            ScoringField(
-                G_PARTS,
-                0
-            ),
-            arrayOf(
-                ScoringField(
-                    F_ANDROID,
-                    0
-                ),
-                ScoringField(
-                    F_PLAYER,
-                    0
-                ),
-                ScoringField(
-                    F_NETWORK,
-                    0
-                ),
-                ScoringField(
-                    F_ONLINE,
-                    0
-                )
-            )
-        )
-        allGroups.set(0, groupParts)
-
-        groupOnline = ScoringGroup(
-            ScoringField(G_ONLINE),
-            arrayOf(
-                ScoringField(
-                    F_TIME,
-                    0
-                ),
-                ScoringField(
-                    F_WINS,
-                    0
-                ),
-                ScoringField(
-                    F_LOSE,
-                    0
-                )
-            )
-        )
-        allGroups.set(1, groupOnline)
-
-        groupHighScores = ScoringGroup(
-            ScoringField(
-                G_HISCORE,
-                0
-            ),
-            arrayOf(
-                ScoringField(
-                    F_ANDROID,
-                    0
-                ),
-                ScoringField(
-                    F_PLAYER,
-                    0
-                ),
-                ScoringField(
-                    F_NETWORK,
-                    0
-                ),
-                ScoringField(
-                    F_ONLINE,
-                    0
-                )
-            )
-        )
-        allGroups.set(2, groupHighScores)
-
-        groupMostFrqCities = ScoringGroup(
-            ScoringField(G_FRQ_CITIES),
-            Array(10) { i ->
-                ScoringField(
-                    F_P + i,
-                    V_EMPTY_S
-                )
-            }
-        )
-        allGroups.set(3, groupMostFrqCities)
-
-        groupMostBigCities = ScoringGroup(
-            ScoringField(G_BIG_CITIES),
-            Array(10) { i ->
-                ScoringField(
-                    F_P + i,
-                    V_EMPTY_S
-                )
-            }
-        )
-        allGroups.set(4, groupMostBigCities)
     }
 
     fun saveStats() {
@@ -210,11 +101,22 @@ class ScoreManager(
             ScoringType.LAST_MOVE -> 0
         }
         gameSession.currentPlayer.score += (points * comboSystem.multiplier).toInt()
+
+        saveStats()
     }
 
     private fun checkCombos(deltaTime: Long, word: String) {
         if (currentIsPlayer()) {
-            comboSystem.addCity(CityComboInfo.create(deltaTime, word))
+            comboSystem.addCity(
+                CityComboInfo.create(
+                    deltaTime,
+                    word,
+                    gameSession.dictionary().getCountryCode(word)
+                )
+            )
+            comboSystem.activeCombosList.forEach {
+                groupCombo.child[it.key.ordinal].max(it.value)
+            }
         }
     }
 
@@ -223,7 +125,7 @@ class ScoreManager(
             return
         //Most biggest cities
         val wlen = word.length
-        for (i in 0 until groupMostBigCities.child.size) {
+        for (i in groupMostBigCities.child.indices) {
             val f = groupMostBigCities.child[i]
             if (f.hasValue() && f.value() != V_EMPTY_S) {
                 if (wlen > f.value().length) {
@@ -242,8 +144,6 @@ class ScoreManager(
 
         //Most frequent words
         cityStatDatabaseHelper.updateFrequentWords(word, groupMostFrqCities, this)
-
-        saveStats()
     }
 
 
@@ -269,7 +169,11 @@ class ScoreManager(
                 updWinsForNetMode(next)
                 return context.getString(R.string.timeup, next.name, gameSession.currentPlayer.name)
             }
-            return context.getString(R.string.timeup, next.name, StringUtils.formatName(gameSession.currentPlayer.name))
+            return context.getString(
+                R.string.timeup,
+                next.name,
+                StringUtils.formatName(gameSession.currentPlayer.name)
+            )
         }
 
         if (scoringType == ScoringType.LAST_MOVE) {

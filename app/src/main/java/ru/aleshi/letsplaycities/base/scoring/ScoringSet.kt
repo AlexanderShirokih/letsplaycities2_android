@@ -6,7 +6,7 @@ class ScoringSet(size: Int) {
 
     fun storeStatsGroups(): String {
         val stringBuilder = StringBuilder()
-        for (i in 0 until allGroups.size) {
+        for (i in allGroups.indices) {
             stringBuilder.append(allGroups[i]?.toStringBuilder())
             if (i != allGroups.size - 1)
                 stringBuilder.append(',')
@@ -25,47 +25,52 @@ class ScoringSet(size: Int) {
         throw RuntimeException("Requested group by key $key not found")
     }
 
+
     fun set(pos: Int, group: ScoringGroup) {
         allGroups[pos] = group
     }
 
-    companion object {
-        fun fromString(s: String): ScoringSet {
-            val groups = s.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val set = ScoringSet(groups.size)
-            for (i in groups.indices) {
-                val t = groups[i].trim { it <= ' ' }.replace(">", "")
-                val main = parseField(
-                    t.substring(
-                        0,
-                        t.indexOf('<')
-                    )
-                )
-                val fields =
-                    t.substring(t.indexOf('<') + 1).split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val scoringFields = Array(fields.size) {
-                    parseField(
-                        fields[it]
-                    )
-                }
-                set.set(i, ScoringGroup(main, scoringFields))
-            }
-            return set
-        }
-
-        private fun parseField(s: String): ScoringField {
-            val eq = s.indexOf('=')
-            if (eq < 0)
-                return ScoringField(s)
-            val name = s.substring(0, eq)
-            var value: Any = s.substring(eq + 1)
-            value = try {
-                Integer.parseInt(value as String)
-            } catch (e: NumberFormatException) {
-                value
-            }
-            return ScoringField(name, value)
+    fun set(key: String, main: ScoringField, child: Array<ScoringField>) {
+        getGroupAt(key).apply {
+            this.main = main
+            this.child = child
         }
     }
 
+    fun loadFromString(s: String) {
+        val groups = s.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+
+        for (i in groups.indices) {
+            val group = groups[i].trim { it <= ' ' }.replace(">", "")
+            val main = parseField(
+                group.substring(
+                    0,
+                    group.indexOf('<')
+                )
+            )
+            val fields =
+                group.substring(group.indexOf('<') + 1).split("\\|".toRegex())
+                    .dropLastWhile { it.isEmpty() }.toTypedArray()
+            val scoringFields = Array(fields.size) {
+                parseField(
+                    fields[it]
+                )
+            }
+            set(main.name, main, scoringFields)
+        }
+    }
+
+    private fun parseField(s: String): ScoringField {
+        val eq = s.indexOf('=')
+        if (eq < 0)
+            return ScoringField(s)
+        val name = s.substring(0, eq)
+        var value: Any = s.substring(eq + 1)
+        value = try {
+            Integer.parseInt(value as String)
+        } catch (e: NumberFormatException) {
+            value
+        }
+        return ScoringField(name, value)
+    }
 }

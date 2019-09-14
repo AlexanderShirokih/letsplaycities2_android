@@ -1,6 +1,6 @@
 package ru.aleshi.letsplaycities.base.scoring
 
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_TIME
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_TIME
 import java.util.*
 
 class ScoringField(val name: String, var value: Any? = null) {

@@ -20,7 +20,7 @@ class ComboSystemTest {
             adders++
         }
 
-        override fun updateBadge(comboType: ComboType, multiplier: Int) {
+        override fun updateBadge(comboType: ComboType, multiplier: Float) {
             updates++
         }
 
@@ -48,51 +48,69 @@ class ComboSystemTest {
 
     @Test
     fun addNormalCites() {
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 10))
         test.assertValues(0, 0, 0)
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 11))
         test.assertValues(0, 0, 0)
-        cs.addCity(CityComboInfo.create(4000, "tests"))
+        cs.addCity(CityComboInfo.create(5100, "tests", 12))
         test.assertValues(0, 0, 0)
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 13))
         test.assertValues(0, 0, 0)
     }
 
     @Test
     fun addCity() {
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 16))
         test.assertValues(0, 0, 0)
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 17))
         test.assertValues(0, 0, 0)
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 18))
         test.assertValues(1, 1, 0)
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 19))
         test.assertValues(1, 2, 0)
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 20))
         test.assertValues(1, 3, 0)
-        cs.addCity(CityComboInfo.create(3000, "tests"))
+        cs.addCity(CityComboInfo.create(5100, "tests", 21))
         test.assertValues(1, 3, 1)
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 22))
         test.assertValues(1, 3, 1)
     }
 
     @Test
     fun testCombinedCombos() {
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 14))
         test.assertValues(0, 0, 0)
-        cs.addCity(CityComboInfo.create(1000, "tts"))
+        cs.addCity(CityComboInfo.create(1000, "tts", 15))
         test.assertValues(0, 0, 0)
-        cs.addCity(CityComboInfo.create(1000, "tts"))
+        cs.addCity(CityComboInfo.create(1000, "tts", 16))
         test.assertValues(1, 1, 0)
-        cs.addCity(CityComboInfo.create(1000, "tts"))
+        cs.addCity(CityComboInfo.create(1000, "tts", 17))
         test.assertValues(2, 3, 0)
-        cs.addCity(CityComboInfo.create(3000, "tts"))
+        cs.addCity(CityComboInfo.create(5200, "tts", 18))
         test.assertValues(2, 4, 1)
-        cs.addCity(CityComboInfo.create(1000, "tests"))
+        cs.addCity(CityComboInfo.create(1000, "tests", 19))
         test.assertValues(2, 4, 2)
     }
 
     @Test
-    fun clear() {
+    fun testSameCountry() {
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(1, 1, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(1, 2, 0)
     }
+
 }

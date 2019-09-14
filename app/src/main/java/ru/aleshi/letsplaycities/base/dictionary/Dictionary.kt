@@ -173,7 +173,7 @@ class Dictionary private constructor(
         val firstChar = word[0]
         var s: String
 
-        for (i in 0 until word.length) {
+        for (i in word.indices) {
             s = word.substring(0, i) + word.substring(i + 1)
             if (s.isNotEmpty() && s[0] == firstChar)
                 result.add(s)
@@ -184,7 +184,7 @@ class Dictionary private constructor(
             if (s.isNotEmpty() && s[0] == firstChar)
                 result.add(s)
         }
-        for (i in 0 until word.length) {
+        for (i in word.indices) {
             for (c in 'а' until 'я') {
                 s = word.substring(0, i) + c.toString() + word.substring(i + 1)
                 if (s.isNotEmpty() && s[0] == firstChar)

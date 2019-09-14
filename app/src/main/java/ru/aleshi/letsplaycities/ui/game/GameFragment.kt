@@ -35,7 +35,6 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
-import ru.aleshi.letsplaycities.base.game.ComboBadgeView
 import ru.aleshi.letsplaycities.base.game.GameContract
 import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding

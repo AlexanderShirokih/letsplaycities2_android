@@ -74,7 +74,8 @@ class GameSession private constructor(
         this.view = view
         init()
         val context = view.context()
-        mScoreManager = ScoreManager(this, findGameMode(), ComboSystem(view.comboSystemView()), context)
+        mScoreManager =
+            ScoreManager(this, findGameMode(), ComboSystem(view.comboSystemView()), context)
         loadData(context)
         applyToFragment()
         beginNextMove(null)

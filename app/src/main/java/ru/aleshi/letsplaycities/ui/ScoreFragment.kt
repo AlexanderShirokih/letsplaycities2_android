@@ -14,33 +14,56 @@ import kotlinx.android.synthetic.main.fragment_score.*
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_ANDROID
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_LOSE
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_NETWORK
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_ONLINE
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_P
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_PLAYER
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_TIME
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.F_WINS
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_BIG_CITIES
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_FRQ_CITIES
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_HISCORE
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_ONLINE
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.G_PARTS
-import ru.aleshi.letsplaycities.base.scoring.ScoreManager.Companion.V_EMPTY_S
 import ru.aleshi.letsplaycities.base.scoring.ScoringField
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_ANDROID
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_LONG_WORD
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_LOSE
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_NETWORK
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_ONLINE
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_P
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_PLAYER
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_QUICK_TIME
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_SAME_COUNTRY
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_SHORT_WORD
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_TIME
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_WINS
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_BIG_CITIES
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_COMBO
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_FRQ_CITIES
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_HISCORE
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_ONLINE
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_PARTS
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.V_EMPTY_S
 import ru.aleshi.letsplaycities.base.scoring.ScoringSet
 import ru.aleshi.letsplaycities.utils.StringUtils
 
 class ScoreFragment : Fragment() {
 
-    private val groups = arrayOf(G_PARTS, G_ONLINE, G_HISCORE, G_FRQ_CITIES, G_BIG_CITIES)
-    private val fields = arrayOf(F_ANDROID, F_PLAYER, F_NETWORK, F_ONLINE, F_TIME, F_WINS, F_LOSE, F_P)
+    private val groups = arrayOf(G_PARTS, G_ONLINE, G_HISCORE, G_COMBO, G_FRQ_CITIES, G_BIG_CITIES)
+    private val fields = arrayOf(
+        F_QUICK_TIME,
+        F_SHORT_WORD,
+        F_LONG_WORD,
+        F_SAME_COUNTRY,
+        F_ANDROID,
+        F_PLAYER,
+        F_NETWORK,
+        F_ONLINE,
+        F_TIME,
+        F_WINS,
+        F_LOSE,
+        F_P
+    )
     private lateinit var groupNames: Array<String>
     private lateinit var fieldNames: Array<String>
     private lateinit var prefs: GamePreferences
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_score, container, false)
     }
 
@@ -54,16 +77,9 @@ class ScoreFragment : Fragment() {
 
     private fun loadStats() {
         //Load or build stats
-        val scrstr = prefs.getScoring()
-        if (scrstr != null) {
-            val allGroups = ScoringSet.fromString(scrstr)
+        val allGroups = ScoringGroupsHelper.fromPreferences(prefs)
+
             buildLayout(stat_root, allGroups)
-        } else {
-            val empty = TextView(requireContext())
-            empty.setText(R.string.nothing)
-            empty.gravity = Gravity.CENTER
-            stat_root.addView(empty)
-        }
     }
 
     private fun buildLayout(root: LinearLayout, set: ScoringSet) {
@@ -90,7 +106,10 @@ class ScoreFragment : Fragment() {
     private fun buildMainFieldLayout(root: LinearLayout, main: ScoringField, isTop: Boolean) {
         root.addView(LinearLayout(requireContext()).apply {
             layoutParams =
-                LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
             orientation = LinearLayout.HORIZONTAL
             setPadding(0, if (isTop) 0 else px2dp(15), 0, px2dp(2))
 
@@ -117,7 +136,10 @@ class ScoreFragment : Fragment() {
     private fun buildChildFieldLayout(root: LinearLayout, field: ScoringField): Boolean {
         val ll = LinearLayout(requireContext()).apply {
             layoutParams =
-                LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
             orientation = LinearLayout.HORIZONTAL
             setPadding(px2dp(25), 0, 0, 0)
         }
@@ -127,7 +149,11 @@ class ScoreFragment : Fragment() {
 
         val name = TextView(requireContext()).apply {
             layoutParams =
-                TableLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                TableLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    1f
+                )
             text = translate(field.name)
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
 
@@ -158,11 +184,11 @@ class ScoreFragment : Fragment() {
     }
 
     private fun translate(key: String): String {
-        for (i in 0 until groups.size)
+        for (i in groups.indices)
             if (groups[i] == key)
                 return groupNames[i]
 
-        for (i in 0 until fields.size)
+        for (i in fields.indices)
             if (fields[i] == key)
                 return fieldNames[i]
         return getString(R.string.missing)

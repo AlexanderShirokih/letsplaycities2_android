@@ -5,13 +5,15 @@ import kotlin.math.max
 
 class ComboSystem(private val view: ComboSystemView) {
 
-    private val minComboSize = 3 - 1
+    private val maxSingleScore = 3f
     private val activeCombos = mutableMapOf<ComboType, Int>()
     private val infoList: LinkedList<CityComboInfo> = LinkedList()
 
-
     val multiplier: Float
         get() = max(activeCombos.values.map { getScore(it) }.sum(), 1f)
+
+    val activeCombosList: Map<ComboType, Int>
+        get() = activeCombos
 
     fun addCity(cityComboInfo: CityComboInfo) {
         infoList.add(cityComboInfo)
@@ -19,13 +21,16 @@ class ComboSystem(private val view: ComboSystemView) {
     }
 
     private fun updateCombos() {
+        val lastCountryCode = infoList.lastOrNull()?.countryCode ?: 0
+
         updateCombo(ComboType.QUICK_TIME) { it.isQuick }
         updateCombo(ComboType.SHORT_WORD) { it.isShort }
         updateCombo(ComboType.LONG_WORD) { it.isLong }
+        updateCombo(ComboType.SAME_COUNTRY) { it.countryCode > 0 && it.countryCode == lastCountryCode }
     }
 
     private fun updateCombo(type: ComboType, predicate: (info: CityComboInfo) -> Boolean) {
-        val quickCombo = getCombo(predicate)
+        val quickCombo = getCombo(type.minSize, predicate)
 
         if (quickCombo > 0) {
             if (!activeCombos.containsKey(type))
@@ -39,11 +44,11 @@ class ComboSystem(private val view: ComboSystemView) {
         }
     }
 
-    private fun getCombo(predicate: (info: CityComboInfo) -> Boolean): Int {
-        return max(infoList.takeLastWhile(predicate).size - minComboSize, 0)
+    private fun getCombo(minComboSize: Int, predicate: (info: CityComboInfo) -> Boolean): Int {
+        return max(infoList.takeLastWhile(predicate).size - minComboSize + 1, 0)
     }
 
-    private fun getScore(s: Int) = (s + 1) * 0.5f + 0.5f
+    private fun getScore(s: Int) = max((s + 1) * 0.5f + 0.5f, maxSingleScore)
 
     fun clear() {
         infoList.clear()

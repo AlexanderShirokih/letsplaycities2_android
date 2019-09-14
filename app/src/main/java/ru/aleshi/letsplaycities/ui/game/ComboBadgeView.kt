@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.base.game
+package ru.aleshi.letsplaycities.ui.game
 
 import android.view.View
 import kotlinx.android.synthetic.main.combo_badge.view.*
@@ -31,7 +31,7 @@ class ComboBadgeView(private val view: View) : ComboSystemView {
         getView(comboType).apply {
             text = context.getString(R.string.multiplier, multiplier)
         }
-        view.description.text = view.context.resources.getStringArray(R.array.combo_badge_names)[comboType.ordinal]
+        view.description.text = view.context.resources.getStringArray(R.array.field_names)[comboType.ordinal]
     }
 
     private fun getView(comboType: ComboType) = when (comboType) {
