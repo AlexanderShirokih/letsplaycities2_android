@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.remote
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.ReplaySubject
 import ru.aleshi.letsplaycities.remote.internal.LPSProtocolError
 import ru.aleshi.letsplaycities.remote.internal.LPSServer
 import ru.aleshi.letsplaycities.remote.internal.LPSServerMessage
@@ -10,28 +11,21 @@ import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.WordResult
 import java.util.concurrent.TimeUnit
 
-class RemoteRepository constructor(private val server: LPSServer) {
+open class RemoteRepository constructor(var server: LPSServer) : LPSServer.ConnectionListener {
+
+    override fun onDisconnected() = message.onComplete()
+
+    override fun onProtocolError(err: LPSProtocolError) = message.onError(err)
+
+    override fun onMessage(msg: LPSServerMessage) = message.onNext(msg)
+
+    private val message: ReplaySubject<LPSServerMessage> =
+        ReplaySubject.create<LPSServerMessage>()
 
     private val inputMessage: Observable<LPSServerMessage> by lazy {
-        Observable.create<LPSServerMessage> {
-            server.start()
-            server.setListener(object : LPSServer.ConnectionListener {
-                override fun onMessage(msg: LPSServerMessage) {
-                    it.onNext(msg)
-                }
-
-                override fun onProtocolError(err: LPSProtocolError) {
-                    it.onError(err)
-                }
-
-                override fun onDisconnected() {
-                    it.onComplete()
-                }
-
-            })
-        }
+        message
             .subscribeOn(Schedulers.io())
-            .onErrorReturn { LPSServerMessage.LPSDisconnectServerMessage(it.message) }
+            .onErrorReturn { LPSServerMessage.LPSLeaveServerMessage(it.message) }
             .publish().refCount(1, TimeUnit.SECONDS)
     }
 
@@ -43,9 +37,9 @@ class RemoteRepository constructor(private val server: LPSServer) {
         inputMessage.filter { it is LPSServerMessage.LPSMsgServerMessage }
             .cast(LPSServerMessage.LPSMsgServerMessage::class.java)
 
-    val disconnect: Maybe<LPSServerMessage.LPSDisconnectServerMessage> =
-        inputMessage.filter { it is LPSServerMessage.LPSDisconnectServerMessage }
-            .cast(LPSServerMessage.LPSDisconnectServerMessage::class.java)
+    val leave: Maybe<LPSServerMessage.LPSLeaveServerMessage> =
+        inputMessage.filter { it is LPSServerMessage.LPSLeaveServerMessage }
+            .cast(LPSServerMessage.LPSLeaveServerMessage::class.java)
             .firstElement()
 
     fun connect(): Maybe<PlayerData> {
@@ -54,6 +48,7 @@ class RemoteRepository constructor(private val server: LPSServer) {
             .cast(LPSServerMessage.LPSConnectedMessage::class.java)
             .map { it.opponentData }
             .firstElement()
+            .doOnSubscribe { server.startServer() }
     }
 
     fun disconnect() {

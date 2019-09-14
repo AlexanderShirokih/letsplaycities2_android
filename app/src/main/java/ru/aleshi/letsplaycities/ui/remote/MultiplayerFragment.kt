@@ -13,7 +13,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_multiplayer.*
 import kotlinx.android.synthetic.main.fragment_multiplayer.view.*
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.remote.internal.LPSServer
+import ru.aleshi.letsplaycities.remote.internal.LPSServerImpl
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.utils.NetworkUtil
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
@@ -50,8 +50,8 @@ class MultiplayerFragment : Fragment(R.layout.fragment_multiplayer) {
                 //TODO: Show WaitingForHostsDialog
                 findNavController().navigate(
                     MultiplayerFragmentDirections.showRemoteNetworkFragment(
-                        LPSServer.LOCAL_NETWORK_IP,
-                        LPSServer.LOCAL_PORT
+                        LPSServerImpl.LOCAL_NETWORK_IP,
+                        LPSServerImpl.LOCAL_PORT
                     )
                 )
             } else {

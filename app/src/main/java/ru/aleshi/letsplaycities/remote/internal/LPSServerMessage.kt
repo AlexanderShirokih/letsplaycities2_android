@@ -22,19 +22,18 @@ sealed class LPSServerMessage {
         }
     }
 
-    class LPSWordServerMessage internal constructor(msgReader: LPSMessageReader, action: Byte) :
+    class LPSWordServerMessage internal constructor(val word: String) :
         LPSServerMessage() {
-        val word = msgReader.readString(action)
+        constructor(msgReader: LPSMessageReader, action: Byte) : this(msgReader.readString(action))
     }
 
-    class LPSMsgServerMessage internal constructor(msgReader: LPSMessageReader, action: Byte) :
-        LPSServerMessage() {
-        val message = msgReader.readString(action)
+    class LPSMsgServerMessage internal constructor(val message: String) : LPSServerMessage() {
+        constructor(msgReader: LPSMessageReader, action: Byte) : this(msgReader.readString(action))
     }
 
-    class LPSConnectedMessage(val opponentData: PlayerData) : LPSServerMessage()
+    data class LPSConnectedMessage(val opponentData: PlayerData) : LPSServerMessage()
 
-    class LPSDisconnectServerMessage(val message: String?) : LPSServerMessage()
+    class LPSLeaveServerMessage(val message: String?) : LPSServerMessage()
 
     object LPSUnknownServerMessage : LPSServerMessage()
 }
