@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.network.lpsv3
 
 import org.junit.Assert
 import org.junit.Test
+import ru.quandastudio.lpsclient.core.LPSMessageWriter
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.util.*
