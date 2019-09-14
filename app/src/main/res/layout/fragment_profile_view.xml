@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+                name="profile"
+                type="ru.aleshi.letsplaycities.ui.profile.ProfileViewModel" />
+
+        <variable
+                name="fragment"
+                type="ru.aleshi.letsplaycities.ui.profile.ViewProfileFragment" />
+    </data>
+
+    <LinearLayout
+            android:id="@+id/root"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+        <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardMaxElevation="8dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="64dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="64dp"
+                    android:layout_marginBottom="8dp">
+
+                <ru.aleshi.letsplaycities.ui.view.RoundedImageView
+                        android:id="@+id/avatar"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="32dp"
+                        android:src="@{ profile.avatar }"
+                        android:transitionName="transition_avatar"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.2"
+                        tools:src="@tools:sample/avatars"
+                        tools:targetApi="lollipop" />
+
+                <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnLogout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:onClick="@{fragment::onLogout}"
+                        android:text="@string/logout"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvLogin" />
+
+                <TextView
+                        android:id="@+id/tvLogin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:text="@{profile.login}"
+                        android:textAlignment="center"
+                        android:textSize="24sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/avatar"
+                        tools:text="Alexander Shirokih" />
+
+                <ImageView
+                        android:id="@+id/iconAvatar"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:src="@{ profile.authType}"
+                        app:layout_constraintBottom_toBottomOf="@+id/avatar"
+                        app:layout_constraintEnd_toEndOf="@+id/avatar"
+                        tools:srcCompat="@drawable/ic_vk" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</layout>

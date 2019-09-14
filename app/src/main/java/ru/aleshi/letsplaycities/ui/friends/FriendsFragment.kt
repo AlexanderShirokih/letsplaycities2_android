@@ -20,7 +20,6 @@ import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
-import ru.aleshi.letsplaycities.ui.network.NetworkViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.FriendInfo
@@ -48,15 +47,15 @@ class FriendsFragment : Fragment(), FriendsItemListener {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         mApplication = lpsApplication
-        ViewModelProviders.of(requireActivity(), viewModelFactory)[ConfirmViewModel::class.java].callback.observe(this,
+        ViewModelProviders.of(
+            requireActivity(),
+            viewModelFactory
+        )[ConfirmViewModel::class.java].callback.observe(this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.result && ::mSelectedFriendsInfo.isInitialized) {
                     when (request.resultCode) {
                         REQUEST_CODE_SELECT_ITEM -> {
-                            ViewModelProviders.of(
-                                requireActivity(),
-                                viewModelFactory
-                            )[NetworkViewModel::class.java].friendsInfo.postValue(
+                            ViewModelProviders.of(requireActivity())[FriendsViewModel::class.java].friendsInfo.postValue(
                                 mSelectedFriendsInfo
                             )
                             findNavController().popBackStack(R.id.networkFragment, false)
@@ -73,7 +72,11 @@ class FriendsFragment : Fragment(), FriendsItemListener {
             })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_friends, container, false).apply {
             recyclerView.run {
                 mAdapter = FriendsListAdapter(this@FriendsFragment)

@@ -25,9 +25,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="@string/pva"
+            android:layout_marginBottom="14dp"
             android:padding="@dimen/btn_pad"
-            android:layout_marginBottom="16dp"
+            android:text="@string/pva"
             app:icon="@drawable/ic_android_24dp"
             app:layout_constraintBottom_toTopOf="@+id/btn_pvp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -78,13 +78,13 @@
             android:id="@+id/btn_set"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="22dp"
-            android:text="@string/settings"
+            android:layout_marginBottom="24dp"
             android:padding="@dimen/btn_pad"
+            android:text="@string/settings"
             app:icon="@drawable/ic_settings_black_24"
-            app:layout_constraintStart_toStartOf="@+id/btn_pva"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/btn_pva"
-            app:layout_constraintTop_toBottomOf="@+id/btn_mul"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintStart_toStartOf="@+id/btn_pva"
+            app:layout_constraintTop_toBottomOf="@+id/btn_mul" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

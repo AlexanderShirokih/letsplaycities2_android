@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
+import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.game.LocalServer
@@ -36,7 +37,11 @@ class MainMenuFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_main_menu, container, false)
     }
 
@@ -73,7 +78,11 @@ class MainMenuFragment : Fragment() {
                     R.id.btn_pva -> startGame(navController, false)
                     R.id.btn_pvp -> startGame(navController, true)
                     R.id.btn_mul -> navController.navigate(R.id.start_multiplayer_fragment)
-                    R.id.btn_net -> navController.navigate(R.id.start_network_fragment)
+                    R.id.btn_net -> navController.navigate(
+                        MainMenuFragmentDirections.startNetworkFragment(
+                            BuildConfig.HOST
+                        )
+                    )
                     R.id.btn_set -> navController.navigate(R.id.start_settings_fragment)
                     else -> throw IllegalStateException("Unknown button clicked!")
                 }
@@ -120,7 +129,10 @@ class MainMenuFragment : Fragment() {
 
     private fun startAnimation(v: View, delay: Int, inAnimation: Boolean, fb: Runnable?) {
         val animation =
-            if (inAnimation) makeInAnimation(requireContext(), true) else makeOutAnimation(requireContext(), true)
+            if (inAnimation) makeInAnimation(requireContext(), true) else makeOutAnimation(
+                requireContext(),
+                true
+            )
         animation.duration = 500
         animation.startOffset = delay.toLong()
         if (!inAnimation) {

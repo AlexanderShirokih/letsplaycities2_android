@@ -1,188 +1,334 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/nav"
-            app:startDestination="@id/mainMenuFragment">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nav"
+        app:startDestination="@id/mainMenuFragment">
 
     <fragment
             android:id="@+id/mainMenuFragment"
             android:name="ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment"
             android:label="MainMenu"
             tools:layout="@layout/fragment_main_menu">
-        <action android:id="@+id/start_multiplayer_fragment"
-                app:destination="@id/multiplayerFragment"/>
-        <action android:id="@+id/start_network_fragment"
-                app:destination="@id/networkNav"/>
-        <action android:id="@+id/start_game_fragment" app:destination="@id/gameNav"/>
-        <action android:id="@+id/start_settings_fragment" app:destination="@id/settingsNav"/>
-        <action android:id="@+id/showRateDialog" app:destination="@id/rateDialog"/>
-        <action android:id="@+id/showConfimationDialog"
-                app:destination="@id/confirmationDialog"/>
+        <action
+                android:id="@+id/start_multiplayer_fragment"
+                app:destination="@id/remoteNav" />
+        <action
+                android:id="@+id/start_network_fragment"
+                app:destination="@id/networkNav">
+            <argument
+                    android:name="host"
+                    app:argType="string" />
+        </action>
+        <action
+                android:id="@+id/start_game_fragment"
+                app:destination="@id/gameNav" />
+        <action
+                android:id="@+id/start_settings_fragment"
+                app:destination="@id/settingsNav" />
+        <action
+                android:id="@+id/showRateDialog"
+                app:destination="@id/rateDialog" />
+        <action
+                android:id="@+id/showConfimationDialog"
+                app:destination="@id/confirmationDialog" />
     </fragment>
-
-    <fragment
-            android:id="@+id/multiplayerFragment"
-            android:name="ru.aleshi.letsplaycities.ui.MultiplayerFragment"
-            android:label="@string/multiplayer_title"
-            tools:layout="@layout/fragment_multiplayer"/>
 
     <dialog
             android:id="@+id/confirmationDialog"
             android:name="ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmationDialog"
             android:label="ConfirmationDialog">
 
-        <argument android:name="requestCode" app:argType="integer"/>
+        <argument
+                android:name="requestCode"
+                app:argType="integer" />
         <argument
                 android:name="message"
-                app:argType="string"/>
-        <argument android:name="title" app:argType="string" app:nullable="true"/>
+                app:argType="string" />
+        <argument
+                android:name="title"
+                app:argType="string"
+                app:nullable="true" />
     </dialog>
 
     <dialog
             android:id="@+id/rateDialog"
             android:name="ru.aleshi.letsplaycities.ui.mainmenu.RateDialog"
-            android:label="RateDialog"/>
+            android:label="RateDialog" />
 
     <dialog
             android:id="@+id/friendRequestDialog"
             android:name="ru.aleshi.letsplaycities.ui.FriendRequestDialog"
             android:label="FriendRequestDialog">
-        <argument android:name="login" app:argType="string"/>
-        <action android:id="@+id/start_network_fragment" app:destination="@id/networkNav"/>
+        <argument
+                android:name="login"
+                app:argType="string" />
+        <action
+                android:id="@+id/start_network_fragment"
+                app:destination="@id/networkNav" />
     </dialog>
 
     <action
             android:id="@+id/globalStartFriendRequestDialog"
-            app:destination="@id/friendRequestDialog"/>
+            app:destination="@id/friendRequestDialog" />
 
-    <navigation android:id="@+id/settingsNav" app:startDestination="@id/settingsFragment">
+    <navigation
+            android:id="@+id/settingsNav"
+            app:startDestination="@id/settingsFragment">
         <fragment
                 android:id="@+id/settingsFragment"
                 android:name="ru.aleshi.letsplaycities.ui.settings.SettingsFragment"
                 android:label="@string/settings"
                 tools:layout="@layout/fragment_settings">
-            <action android:id="@+id/start_addcity_fragment" app:destination="@id/addCityFragment"/>
-            <action android:id="@+id/start_blacklist_fragment" app:destination="@id/blackListFragment"/>
-            <action android:id="@+id/start_theme_fragment" app:destination="@id/themeFragment"/>
-            <action android:id="@+id/start_score_fragment" app:destination="@id/scoreFragment"/>
-            <action android:id="@+id/showSelectVariantDialog"
-                    app:destination="@id/selectVariantDialog"/>
+            <action
+                    android:id="@+id/start_addcity_fragment"
+                    app:destination="@id/addCityFragment" />
+            <action
+                    android:id="@+id/start_blacklist_fragment"
+                    app:destination="@id/blackListFragment" />
+            <action
+                    android:id="@+id/start_theme_fragment"
+                    app:destination="@id/themeFragment" />
+            <action
+                    android:id="@+id/start_score_fragment"
+                    app:destination="@id/scoreFragment" />
+            <action
+                    android:id="@+id/showSelectVariantDialog"
+                    app:destination="@id/selectVariantDialog" />
         </fragment>
         <fragment
                 android:id="@+id/themeFragment"
                 android:name="ru.aleshi.letsplaycities.ui.theme.ThemeFragment"
                 android:label="@string/theme_title"
-                tools:layout="@layout/fragment_theme"/>
+                tools:layout="@layout/fragment_theme" />
         <fragment
                 android:id="@+id/scoreFragment"
                 android:name="ru.aleshi.letsplaycities.ui.ScoreFragment"
                 android:label="@string/score_title"
-                tools:layout="@layout/fragment_score"/>
+                tools:layout="@layout/fragment_score" />
         <fragment
                 android:id="@+id/blackListFragment"
                 android:name="ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment"
                 android:label="@string/black_list_title"
                 tools:layout="@layout/fragment_blacklist">
-            <action android:id="@+id/showConfimationDialog"
-                    app:destination="@id/confirmationDialog"/>
+            <action
+                    android:id="@+id/showConfimationDialog"
+                    app:destination="@id/confirmationDialog" />
         </fragment>
         <fragment
                 android:id="@+id/addCityFragment"
                 android:name="ru.aleshi.letsplaycities.ui.AddCityFragment"
-                tools:layout="@layout/fragment_addcity"
-                android:label="@string/addcity_title"/>
+                android:label="@string/addcity_title"
+                tools:layout="@layout/fragment_addcity" />
 
-        <dialog android:id="@+id/selectVariantDialog"
+        <dialog
+                android:id="@+id/selectVariantDialog"
                 android:name="ru.aleshi.letsplaycities.ui.settings.SelectVariantDialog"
                 android:label="SelectVariantDialog">
-            <argument android:name="items" app:argType="reference"/>
-            <argument android:name="currentItem" app:argType="integer"/>
-            <argument android:name="title" app:argType="string"/>
-            <argument android:name="itemPosition" app:argType="integer"/>
+            <argument
+                    android:name="items"
+                    app:argType="reference" />
+            <argument
+                    android:name="currentItem"
+                    app:argType="integer" />
+            <argument
+                    android:name="title"
+                    app:argType="string" />
+            <argument
+                    android:name="itemPosition"
+                    app:argType="integer" />
         </dialog>
     </navigation>
-    <navigation android:id="@+id/gameNav" app:startDestination="@id/gameFragment">
+    <navigation
+            android:id="@+id/gameNav"
+            app:startDestination="@id/gameFragment">
         <fragment
                 android:id="@+id/gameFragment"
                 android:name="ru.aleshi.letsplaycities.ui.game.GameFragment"
                 android:label="@string/app_name"
                 tools:layout="@layout/fragment_game">
-            <action android:id="@+id/showGameResultDialog" app:destination="@+id/gameResultDialog"/>
-            <action android:id="@+id/showConfimationDialog" app:destination="@id/confirmationDialog"/>
-            <action android:id="@+id/showCorrectionTipsDialog"
-                    app:destination="@id/correctionTipsDialog"/>
-            <action android:id="@+id/showUserContextDialog"
-                    app:destination="@id/userContextMenuDialog"/>
+            <action
+                    android:id="@+id/showGameResultDialog"
+                    app:destination="@+id/gameResultDialog" />
+            <action
+                    android:id="@+id/showConfimationDialog"
+                    app:destination="@id/confirmationDialog" />
+            <action
+                    android:id="@+id/showCorrectionTipsDialog"
+                    app:destination="@id/correctionTipsDialog" />
+            <action
+                    android:id="@+id/showUserContextDialog"
+                    app:destination="@id/userContextMenuDialog" />
         </fragment>
         <dialog
                 android:id="@+id/gameResultDialog"
                 android:name="ru.aleshi.letsplaycities.ui.game.GameResultDialog"
                 android:label="GameResultDialog"
                 tools:layout="@layout/dialog_game_result">
-            <argument android:name="result" app:argType="string"/>
-            <argument android:name="score" app:argType="integer"/>
-            <action android:id="@+id/back_to_game_fragment"
+            <argument
+                    android:name="result"
+                    app:argType="string" />
+            <argument
+                    android:name="score"
+                    app:argType="integer" />
+            <action
+                    android:id="@+id/back_to_game_fragment"
                     app:popUpTo="@id/gameFragment"
-                    app:popUpToInclusive="false"/>
+                    app:popUpToInclusive="false" />
         </dialog>
         <dialog
                 android:id="@+id/correctionTipsDialog"
                 android:name="ru.aleshi.letsplaycities.ui.game.CorrectionTipsDialog"
                 android:label="CorrectionTipsDialog"
                 tools:layout="@layout/dialog_correction_tips">
-            <argument android:name="word" app:argType="string"/>
-            <argument android:name="errorMsg" app:argType="string"/>
+            <argument
+                    android:name="word"
+                    app:argType="string" />
+            <argument
+                    android:name="errorMsg"
+                    app:argType="string" />
         </dialog>
         <dialog
                 android:id="@+id/userContextMenuDialog"
                 android:name="ru.aleshi.letsplaycities.ui.game.UserContextMenuDialog"
                 android:label="UserContextMenuDialog">
-            <argument android:name="isFriend" app:argType="boolean"/>
-            <argument android:name="name" app:argType="string"/>
-            <argument android:name="userId" app:argType="integer"/>
-            <action android:id="@+id/showConfimationDialog"
-                    app:destination="@id/confirmationDialog"/>
+            <argument
+                    android:name="isFriend"
+                    app:argType="boolean" />
+            <argument
+                    android:name="name"
+                    app:argType="string" />
+            <argument
+                    android:name="userId"
+                    app:argType="integer" />
+            <action
+                    android:id="@+id/showConfimationDialog"
+                    app:destination="@id/confirmationDialog" />
         </dialog>
     </navigation>
-    <navigation android:id="@+id/networkNav" app:startDestination="@id/networkFragment">
+    <navigation
+            android:id="@+id/networkNav"
+            app:startDestination="@id/networkFragment">
         <fragment
                 android:id="@+id/networkFragment"
                 android:name="ru.aleshi.letsplaycities.ui.network.NetworkFragment"
                 android:label="@string/network_title"
                 tools:layout="@layout/fragment_network">
-            <action android:id="@+id/showChangeModeDialog" app:destination="@id/changeModeDialog"/>
-            <action android:id="@+id/showLoginDialog" app:destination="@id/loginFragment"/>
-            <action android:id="@+id/start_friends_fragment" app:destination="@id/friendsFragment"/>
-            <action android:id="@+id/start_game_fragment" app:destination="@+id/gameNav"/>
-            <argument android:name="action" app:argType="string" android:defaultValue="default"/>
-            <argument android:name="oppId" app:argType="integer" android:defaultValue="0"/>
+            <action
+                    android:id="@+id/showChangeModeDialog"
+                    app:destination="@id/changeModeDialog" />
+            <action
+                    android:id="@+id/start_friends_fragment"
+                    app:destination="@id/friendsFragment" />
+            <action
+                    android:id="@+id/start_game_fragment"
+                    app:destination="@+id/gameNav" />
+            <argument
+                    android:name="action"
+                    android:defaultValue="default"
+                    app:argType="string" />
+            <argument
+                    android:name="oppId"
+                    android:defaultValue="0"
+                    app:argType="integer" />
+            <argument
+                    android:name="host"
+                    app:argType="string" />
+
+            <argument
+                    android:name="port"
+                    android:defaultValue="-1"
+                    app:argType="integer" />
+
+            <action
+                    android:id="@+id/actionManageProfile"
+                    app:destination="@id/profileManager" />
         </fragment>
         <fragment
                 android:id="@+id/friendsFragment"
                 android:name="ru.aleshi.letsplaycities.ui.friends.FriendsFragment"
                 android:label="@string/friends_title"
                 tools:layout="@layout/fragment_friends">
-            <action android:id="@+id/showConfimationDialog"
-                    app:destination="@id/confirmationDialog"/>
+            <action
+                    android:id="@+id/showConfimationDialog"
+                    app:destination="@id/confirmationDialog" />
         </fragment>
         <dialog
                 android:id="@+id/changeModeDialog"
                 android:name="ru.aleshi.letsplaycities.ui.network.ChangeModeDialog"
-                android:label="ChangeModeDialog"/>
+                android:label="ChangeModeDialog" />
+    </navigation>
+    <navigation
+            android:id="@+id/profileManager"
+            app:startDestination="@id/fragmentViewProfile">
         <fragment
-                android:id="@+id/loginFragment"
-                android:name="ru.aleshi.letsplaycities.ui.network.LoginFragment"
-                android:label="@string/login_no_sn"
-                tools:layout="@layout/fragment_login">
+                android:id="@+id/fragmentViewProfile"
+                android:name="ru.aleshi.letsplaycities.ui.profile.ViewProfileFragment"
+                android:label="@string/profile"
+                tools:layout="@layout/fragment_profile_view" >
+            <action
+                    android:id="@+id/actionLogin"
+                    app:destination="@id/fragmentLoginProfile" />
+        </fragment>
+
+        <fragment
+                android:id="@+id/fragmentLoginProfile"
+                android:name="ru.aleshi.letsplaycities.ui.profile.LoginProfileFragment"
+                android:label="@string/profile"
+                tools:layout="@layout/fragment_profile_login" >
+            <action
+                    android:id="@+id/actionLoginNoSn"
+                    app:destination="@id/fragmentLoginNoSnProfile" />
+        </fragment>
+
+        <fragment
+                android:id="@+id/fragmentLoginNoSnProfile"
+                android:name="ru.aleshi.letsplaycities.ui.profile.LoginNoSnProfileFragment"
+                android:label="@string/profile"
+                tools:layout="@layout/fragment_profile_login_no_sn" >
             <action
                     android:id="@+id/showChangeAvatarDialog"
-                    app:destination="@id/changeAvatarDialog"/>
+                    app:destination="@id/changeAvatarDialog2" />
         </fragment>
         <dialog
-                android:id="@+id/changeAvatarDialog"
-                android:name="ru.aleshi.letsplaycities.ui.network.ChangeAvatarDialog"
-                android:label="ChangeAvatarDialog"/>
+                android:id="@+id/changeAvatarDialog2"
+                android:name="ru.aleshi.letsplaycities.ui.profile.ChangeAvatarDialog"
+                android:label="ChangeAvatarDialog" />
+    </navigation>
+    <navigation
+            android:id="@+id/remoteNav"
+            app:startDestination="@id/multiplayerFragment" >
+        <fragment
+                android:id="@+id/multiplayerFragment"
+                android:name="ru.aleshi.letsplaycities.ui.remote.MultiplayerFragment"
+                android:label="@string/multiplayer_title"
+                tools:layout="@layout/fragment_multiplayer">
+            <action
+                    android:id="@+id/showRemoteNetworkFragment"
+                    app:destination="@id/networkNav">
+                <argument
+                        android:name="host"
+                        app:argType="string" />
+                <argument
+                        android:name="port"
+                        app:argType="integer" />
+            </action>
+            <action
+                    android:id="@+id/actionManageProfile"
+                    app:destination="@id/profileManager" />
+            <action
+                    android:id="@+id/action_multiplayerFragment_to_waitingForDevicesFragment"
+                    app:destination="@id/waitingForDevicesFragment" />
+        </fragment>
+        <fragment
+                android:id="@+id/waitingForDevicesFragment"
+                android:name="ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment"
+                android:label="@string/waiting_for_connection"
+                tools:layout="@layout/fragment_waiting_for_devices" >
+            <action
+                    android:id="@+id/start_game_fragment"
+                    app:destination="@+id/gameNav" />
+        </fragment>
     </navigation>
 
 </navigation>

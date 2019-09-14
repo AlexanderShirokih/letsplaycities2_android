@@ -67,7 +67,6 @@ class GameSession private constructor(
     val currentPlayer: User
         get() = players[mCurrentPlayerIndex]
 
-
     val nextPlayer: User
         get() = players[(mCurrentPlayerIndex + 1) % players.size]
 
@@ -199,7 +198,7 @@ class GameSession private constructor(
         val gameMode = findGameMode()
         view.setMenuItemsVisibility(
             help = gameMode == GameMode.MODE_PVA,
-            msg = gameMode == GameMode.MODE_NET && isMessagesAllowed()
+            msg = (gameMode == GameMode.MODE_NET || gameMode == GameMode.MODE_MUL) && isMessagesAllowed()
         )
 
         players[0].position = Position.LEFT
@@ -247,7 +246,11 @@ class GameSession private constructor(
 
     private fun dispatchCityResult(city: String, player: User?, hasErrors: Boolean) {
         Completable.fromAction {
-            if (player != null) view.putCity(city, mDictionary!!.getCountryCode(city), player.position)
+            if (player != null) view.putCity(
+                city,
+                mDictionary!!.getCountryCode(city),
+                player.position
+            )
             else {
                 view.updateCity(city, hasErrors)
                 mDictionary!!.applyCity(city)
@@ -295,7 +298,8 @@ class GameSession private constructor(
     }
 
     override fun onDetachView() {
-        mExclusions.dispose()
+        if (::mExclusions.isInitialized)
+            mExclusions.dispose()
         mDictionary?.dispose()
     }
 
@@ -366,7 +370,11 @@ class GameSession private constructor(
     override fun needsShowMenu(position: Position) {
         players.firstOrNull { it.position == position }?.run {
             if (needsShowMenu())
-                view.showUserMenu(playerData.isFriend, playerData.authData.login, playerData.authData.userID)
+                view.showUserMenu(
+                    playerData.isFriend,
+                    playerData.authData.login,
+                    playerData.authData.userID
+                )
         }
     }
 

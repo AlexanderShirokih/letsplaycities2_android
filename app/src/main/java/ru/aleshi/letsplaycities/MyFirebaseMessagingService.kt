@@ -14,8 +14,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         private const val ACTION_FM = "fm_request"
     }
 
-    override fun onMessageReceived(remoteMessage: RemoteMessage?) {
-        remoteMessage?.data?.let {
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        remoteMessage.data.let {
             if (ACTION_FM == it[KEY_ACTION]) {
                 LocalBroadcastManager.getInstance(this)
                     .sendBroadcast(Intent(it[KEY_ACTION]).apply {

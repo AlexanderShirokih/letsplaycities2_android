@@ -82,12 +82,13 @@ class GameFragment : Fragment(), GameContract.View {
                     correctedWord.value = null
                 }
             })
-            disposable.add(restart
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
+            restart.observe(this@GameFragment, Observer {
+                if (it) {
                     stopGame()
                     startGame()
-                })
+                    restart.value = false
+                }
+            })
         }
         mAdapter = GameAdapter(activity)
         activity.onBackPressedDispatcher.addCallback(this) {

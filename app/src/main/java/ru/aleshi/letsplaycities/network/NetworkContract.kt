@@ -10,8 +10,7 @@ interface NetworkContract {
 
     interface View {
         fun getGamePreferences(): GamePreferences
-        fun setupWithSN()
-        fun setup()
+        fun setupLayout(isLoggedIn: Boolean)
         fun checkForWaiting(task: () -> Unit)
         fun notifyAboutUpdates()
         fun showMessage(msgResId: Int)
@@ -24,7 +23,6 @@ interface NetworkContract {
 
     interface Presenter {
         fun onAttachView(view: View)
-        fun onLogout()
         fun onConnectToFriendGame(versionInfo: Pair<String, Int>, oppId: Int)
         fun onConnect(versionInfo: Pair<String, Int>)
         fun onCancel()

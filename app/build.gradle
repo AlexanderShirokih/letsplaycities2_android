@@ -5,28 +5,39 @@ apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-kapt'
 
-def lifecycle_version = "2.0.0"
-def dagger_version = "2.23.2"
+def lifecycle_version = "2.1.0"
+def dagger_version = '2.24'
 
 android {
     def HOST_LOCAL = "\"192.168.2.244\""
-    def HOST_EMULATOR = "\"10.0.2.2\""
     def HOST_REMOTE = "\"letsplaycities.online\""
 
     compileSdkVersion 29
     defaultConfig {
         applicationId "ru.aleshi.letsplaycities"
+        multiDexEnabled true
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 202
-        versionName "2.0.1"
+        versionCode 203
+        versionName "2.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "HOST", HOST_REMOTE)
+
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "server"
+    productFlavors {
+        local {
+            buildConfigField("String", "HOST", HOST_LOCAL)
+            dimension "server"
+        }
+        remote {
+            buildConfigField("String", "HOST", HOST_REMOTE)
+            dimension "server"
         }
     }
     dataBinding {
@@ -42,37 +53,42 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.core:core-ktx:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navVersion"
     implementation "androidx.navigation:navigation-runtime-ktx:$rootProject.navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$rootProject.navVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
+    implementation 'androidx.multidex:multidex:2.0.1'
+
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.google.android.material:material:1.1.0-alpha09'
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
     implementation 'com.mikhaellopez:circularimageview:4.0.1'
     implementation 'com.android.billingclient:billing:2.0.1'
 
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
-    implementation 'com.google.android.gms:play-services-ads-lite:18.1.1'
+    implementation 'com.google.android.gms:play-services-ads-lite:18.2.0'
     implementation 'com.vk:androidsdk:2.1.1'
     implementation 'com.facebook.android:facebook-login:4.42.0'
     implementation 'ru.ok:odnoklassniki-android-sdk:2.1.8'
 
 
-    implementation 'com.google.firebase:firebase-core:17.0.1'
-    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation 'com.google.firebase:firebase-core:17.2.0'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:3.0.0"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
     implementation 'com.google.code.gson:gson:2.8.5'
     // Dagger 2
