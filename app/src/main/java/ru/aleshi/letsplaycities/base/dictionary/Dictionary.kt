@@ -27,15 +27,19 @@ class Dictionary private constructor(
         private const val DOWNLOADED_DATA = "data-last.bin"
 
         fun load(context: Context, exclusions: Exclusions): Single<Dictionary> {
+            val internalPath = File(context.filesDir, DOWNLOADED_DATA)
             return Single.just(context)
                 .subscribeOn(Schedulers.computation())
-                .map { parseDictionary(it, exclusions) }
+                .map { parseDictionary(internalPath, it, exclusions) }
+                .doOnError { internalPath.delete() }
+                .retry(1)
         }
 
-        private fun parseDictionary(context: Context, exclusions: Exclusions): Dictionary {
-            val internalPath = File(context.filesDir,
-                DOWNLOADED_DATA
-            )
+        private fun parseDictionary(
+            internalPath: File,
+            context: Context,
+            exclusions: Exclusions
+        ): Dictionary {
             val inputStream = DataInputStream(
                 openInputStream(
                     internalPath,
