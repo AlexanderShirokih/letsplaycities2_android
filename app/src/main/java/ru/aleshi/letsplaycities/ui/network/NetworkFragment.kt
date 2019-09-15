@@ -96,7 +96,11 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     override fun getGamePreferences(): GamePreferences = mGamePreferences
 
-    override fun onCancel() = setLoadingLayout(false)
+    override fun onCancel()
+    {
+        setLoadingLayout(false)
+        setupLayout(true)
+    }
 
     override fun notifyAboutUpdates() =
         Snackbar.make(requireView(), R.string.new_version_available, Snackbar.LENGTH_SHORT).show()
