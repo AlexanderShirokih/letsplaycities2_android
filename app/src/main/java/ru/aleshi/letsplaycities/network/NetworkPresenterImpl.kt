@@ -6,10 +6,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameSession
-import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
-import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
-import ru.aleshi.letsplaycities.base.player.NetworkUser
-import ru.aleshi.letsplaycities.base.player.Player
+import ru.aleshi.letsplaycities.base.player.*
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.FriendInfo
@@ -141,7 +138,7 @@ class NetworkPresenterImpl @Inject constructor(
 
     private fun play(playerData: PlayerData, oppData: PlayerData, youStarter: Boolean) {
         val users = arrayOf(
-            NetworkUser(oppData),
+            if (mNetworkRepository.isLocal) RemoteUser(oppData) else NetworkUser(oppData),
             Player(playerData)
         ).apply {
             if (youStarter)

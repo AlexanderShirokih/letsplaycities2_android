@@ -10,6 +10,6 @@ class NetworkClientFromNetworkFragmentModule {
     @Provides
     fun provideNetworkClient(fragment: NetworkFragment): NetworkClient {
         val args = NetworkFragmentArgs.fromBundle(fragment.requireArguments())
-        return if(args.port > 0) NetworkClient(args.host, args.port) else NetworkClient(args.host)
+        return if(args.port > 0) NetworkClient(args.isLocal, args.host, args.port) else NetworkClient(args.isLocal, args.host)
     }
 }

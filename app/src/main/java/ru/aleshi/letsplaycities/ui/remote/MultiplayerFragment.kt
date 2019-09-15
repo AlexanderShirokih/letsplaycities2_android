@@ -47,11 +47,11 @@ class MultiplayerFragment : Fragment(R.layout.fragment_multiplayer) {
             if (!NetworkUtil.isWifiEnabled(context)) {
                 startActivity(Intent(WifiManager.ACTION_PICK_WIFI_NETWORK))
             } else if (NetworkUtil.isWifiIPAddressValid(context)) {
-                //TODO: Show WaitingForHostsDialog
                 findNavController().navigate(
                     MultiplayerFragmentDirections.showRemoteNetworkFragment(
                         LPSServerImpl.LOCAL_NETWORK_IP,
-                        LPSServerImpl.LOCAL_PORT
+                        LPSServerImpl.LOCAL_PORT,
+                        true
                     )
                 )
             } else {

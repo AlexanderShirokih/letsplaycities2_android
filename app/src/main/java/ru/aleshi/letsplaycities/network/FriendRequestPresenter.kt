@@ -14,7 +14,7 @@ class FriendRequestPresenter(private val mView: FriendRequestContract.View) : Fr
         //TODO: Inject variables
         GamePlayerDataFactory(GameAuthDataFactory())
             .load(mView.gamePreferences())?.let { userData ->
-                NetworkRepository(NetworkClient(BuildConfig.HOST), NetworkUtils.getToken()).apply {
+                NetworkRepository(NetworkClient(false, BuildConfig.HOST), NetworkUtils.getToken()).apply {
                     login(userData)
                         .flatMapCompletable { sendFriendRequestResult(false, userId) }
                         .subscribe({}, { e -> mView.onError(e) })
