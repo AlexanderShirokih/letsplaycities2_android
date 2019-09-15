@@ -3,13 +3,19 @@ package ru.aleshi.letsplaycities.base.player
 import android.content.Context
 import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
+import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.game.Position
 import ru.quandastudio.lpsclient.model.PlayerData
 
-abstract class User(internal val playerData: PlayerData) {
+abstract class User(
+    internal val playerData: PlayerData,
+    internal val hasUserInput: Boolean = false,
+    internal val canUseQuickTime: Boolean = true
+) {
 
     lateinit var gameSession: GameSession
+    lateinit var comboSystem: ComboSystem
 
     var score: Int = 0
 
@@ -27,6 +33,8 @@ abstract class User(internal val playerData: PlayerData) {
         gameSession.onCitySended(city, this)
     }
 
+    open fun onUserInput(userInput: String, onSuccess: () -> Unit) = Unit
+
     abstract fun getAvatar(context: Context): Maybe<Drawable>
 
     open fun reset() {
@@ -36,4 +44,8 @@ abstract class User(internal val playerData: PlayerData) {
     fun isMessagesAllowed() = playerData.canReceiveMessages
 
     open fun needsShowMenu() = false
+
+    fun increaseScore(points: Int) {
+        score += (points * comboSystem.multiplier).toInt()
+    }
 }

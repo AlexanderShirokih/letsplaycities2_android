@@ -4,7 +4,6 @@ import android.content.Context
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.combos.CityComboInfo
-import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.Player
@@ -24,7 +23,6 @@ import ru.aleshi.letsplaycities.utils.StringUtils
 class ScoreManager(
     private val gameSession: GameSession,
     private val mode: GameMode,
-    private val comboSystem: ComboSystem,
     val context: Context
 ) {
 
@@ -100,21 +98,23 @@ class ScoreManager(
             }
             ScoringType.LAST_MOVE -> 0
         }
-        gameSession.currentPlayer.score += (points * comboSystem.multiplier).toInt()
+
+        gameSession.currentPlayer.increaseScore(points)
 
         saveStats()
     }
 
     private fun checkCombos(deltaTime: Long, word: String) {
-        if (currentIsPlayer()) {
-            comboSystem.addCity(
-                CityComboInfo.create(
-                    deltaTime,
-                    word,
-                    gameSession.dictionary().getCountryCode(word)
-                )
+        gameSession.currentPlayer.comboSystem.addCity(
+            CityComboInfo.create(
+                deltaTime,
+                word,
+                gameSession.dictionary().getCountryCode(word)
             )
-            comboSystem.activeCombosList.forEach {
+        )
+
+        if (currentIsPlayer()) {
+            gameSession.currentPlayer.comboSystem.activeCombosList.forEach {
                 groupCombo.child[it.key.ordinal].max(it.value)
             }
         }

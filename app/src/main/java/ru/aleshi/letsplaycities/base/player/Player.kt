@@ -12,7 +12,7 @@ import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.model.PlayerData
 
-class Player(playerData: PlayerData) : User(playerData) {
+class Player(playerData: PlayerData) : User(playerData, hasUserInput = true) {
 
     constructor(name: String) : this(PlayerData.Factory().create(name))
 
@@ -25,7 +25,7 @@ class Player(playerData: PlayerData) : User(playerData) {
 
     class CityNotFoundException(val city: String) : Exception()
 
-    fun submit(userInput: String, onSuccess: () -> Unit) {
+    override fun onUserInput(userInput: String, onSuccess: () -> Unit) {
         mCompositeDisposable.add(Maybe.just(userInput)
             .map { StringUtils.formatCity(it) }
             .filter { it.isNotEmpty() }

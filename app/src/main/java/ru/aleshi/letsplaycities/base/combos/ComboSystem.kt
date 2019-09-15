@@ -4,7 +4,7 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
-class ComboSystem(private val view: ComboSystemView) {
+class ComboSystem(private val view: ComboSystemView, private val canUseQuickTime: Boolean) {
 
     private val maxSingleScore = 3f
     private val activeCombos = mutableMapOf<ComboType, Int>()
@@ -24,7 +24,7 @@ class ComboSystem(private val view: ComboSystemView) {
     private fun updateCombos() {
         val lastCountryCode = infoList.lastOrNull()?.countryCode ?: 0
 
-        updateCombo(ComboType.QUICK_TIME) { it.isQuick }
+        updateCombo(ComboType.QUICK_TIME) { canUseQuickTime && it.isQuick }
         updateCombo(ComboType.SHORT_WORD) { it.isShort }
         updateCombo(ComboType.LONG_WORD) { it.isLong }
         updateCombo(ComboType.SAME_COUNTRY) { it.countryCode > 0 && it.countryCode == lastCountryCode }

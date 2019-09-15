@@ -8,6 +8,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
+import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.dictionary.Dictionary
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.player.*
@@ -74,8 +75,7 @@ class GameSession private constructor(
         this.view = view
         init()
         val context = view.context()
-        mScoreManager =
-            ScoreManager(this, findGameMode(), ComboSystem(view.comboSystemView()), context)
+        mScoreManager = ScoreManager(this, findGameMode(), context)
         loadData(context)
         applyToFragment()
         beginNextMove(null)
@@ -89,6 +89,9 @@ class GameSession private constructor(
 
         for (user in players) {
             user.gameSession = this
+            user.comboSystem =
+                ComboSystem(if (user.hasUserInput) view.comboSystemView() else object :
+                    ComboSystemView {}, user.canUseQuickTime)
             user.reset()
         }
 
@@ -262,8 +265,8 @@ class GameSession private constructor(
     }
 
     override fun submit(userInput: String, callback: () -> Unit): Boolean {
-        if (currentPlayer is Player) {
-            (currentPlayer as Player).submit(userInput, callback)
+        if (currentPlayer.hasUserInput) {
+            (currentPlayer as Player).onUserInput(userInput, callback)
             return true
         }
         return false
@@ -310,7 +313,7 @@ class GameSession private constructor(
                 .delay(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    getCurrentAsPlayer()?.run { submit(it) {} }
+                    getCurrentAsPlayer()?.run { onUserInput(it) {} }
                 })
         }
     }
@@ -333,7 +336,7 @@ class GameSession private constructor(
     override fun postCorrectedWord(word: String?, errorMsg: String?) {
         if (word != null) {
             getCurrentAsPlayer()?.run {
-                submit(word) {}
+                onUserInput(word) {}
             }
         } else
             notify(errorMsg!!)

@@ -38,7 +38,7 @@ class ComboSystemTest {
     @Before
     fun setUp() {
         test = TestSystemView()
-        cs = ComboSystem(test)
+        cs = ComboSystem(test, true)
     }
 
     @After
