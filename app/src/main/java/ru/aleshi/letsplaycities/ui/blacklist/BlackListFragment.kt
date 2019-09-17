@@ -55,7 +55,7 @@ class BlackListFragment : Fragment() {
         })
         mAdapter = BlackListAdapter(object : OnItemClickListener {
             override fun onRemove(item: BlackListItem, pos: Int) {
-                showConfirmDialog(requireContext().getString(R.string.remove_from_blacklist, item.userName)) {
+                showConfirmDialog(requireContext().getString(R.string.remove_from_blacklist, item.login)) {
                     mNetworkRepository.removeFromBanList(item.userId)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -108,7 +108,7 @@ class BlackListFragment : Fragment() {
         )
     }
 
-    private fun populateList(list: ArrayList<BlackListItem>) {
+    private fun populateList(list: List<BlackListItem>) {
         mAdapter.updateItems(list)
         setListVisibility(list.isNotEmpty())
     }

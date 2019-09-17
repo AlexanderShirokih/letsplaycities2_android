@@ -6,7 +6,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
 import ru.aleshi.letsplaycities.remote.internal.LPSServer
-import ru.aleshi.letsplaycities.remote.internal.LPSServerMessage
+import ru.quandastudio.lpsclient.core.LPSClientMessage
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.WordResult
 import java.util.concurrent.TimeUnit
@@ -29,7 +29,7 @@ class RemoteRepositoryTest {
 
     @Test
     fun getWords() {
-        repository.onMessage(LPSServerMessage.LPSWordServerMessage("Hello"))
+        repository.onMessage(LPSClientMessage.LPSWord("Hello"))
 
         val t = repository.words.test()
         t.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
@@ -38,11 +38,11 @@ class RemoteRepositoryTest {
 
     @Test
     fun getMessages() {
-        repository.onMessage(LPSServerMessage.LPSMsgServerMessage("Hello"))
+        repository.onMessage(LPSClientMessage.LPSMsg("Hello"))
 
         val t = repository.messages.test()
         t.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
-        t.assertNoErrors().assertValue { it.message == "Hello" }
+        t.assertNoErrors().assertValue { it.msg == "Hello" }
     }
 
     @Test
@@ -56,11 +56,11 @@ class RemoteRepositoryTest {
 
     @Test
     fun getLeave() {
-        repository.onMessage(LPSServerMessage.LPSLeaveServerMessage("leave"))
+        repository.onMessage(LPSClientMessage.LPSLeave("leave"))
 
         val t = repository.leave.test()
         t.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
-        t.assertNoErrors().assertValue { it.message == "leave" }
+        t.assertNoErrors().assertValue { it.reason == "leave" }
     }
 
     @Test
@@ -68,7 +68,15 @@ class RemoteRepositoryTest {
         `when`(server.startServer())
             .then {
                 repository
-                    .onMessage(LPSServerMessage.LPSConnectedMessage(PlayerData.Factory().create("Test")))
+                    .onMessage(
+                        LPSClientMessage.LPSLogIn(
+                            pd = PlayerData.Factory().create("Test"),
+                            fbToken = "",
+                            userId = 1,
+                            hash = "",
+                            avatar = null
+                        )
+                    )
             }
 
         val t = repository.connect().test()

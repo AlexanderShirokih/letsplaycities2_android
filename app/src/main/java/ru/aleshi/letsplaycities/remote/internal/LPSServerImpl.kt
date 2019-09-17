@@ -2,11 +2,8 @@ package ru.aleshi.letsplaycities.remote.internal
 
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import ru.quandastudio.lpsclient.core.LPSMessageReader
-import ru.quandastudio.lpsclient.core.LPSMessageWriter
-import ru.quandastudio.lpsclient.core.LPSv3Tags
-import ru.quandastudio.lpsclient.model.AuthData
-import ru.quandastudio.lpsclient.model.AuthType
+import ru.quandastudio.lpsclient.core.LPSClientMessage
+import ru.quandastudio.lpsclient.core.LPSMessage
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.WordResult
 import java.io.IOException
@@ -15,13 +12,13 @@ import javax.inject.Inject
 
 class LPSServerImpl @Inject constructor(
     private val playerData: Single<PlayerData>,
-    private val connection: Connection
+    private val connection: Connection,
+    private val message: MessagePipe
 ) :
     Thread("LPS-Server"), LPSServer {
 
     private val disposable = CompositeDisposable()
     private lateinit var cachedPlayerData: PlayerData
-    private var writer: LPSMessageWriter? = null
     private lateinit var _listener: LPSServer.ConnectionListener
 
 
@@ -39,7 +36,6 @@ class LPSServerImpl @Inject constructor(
         try {
             cachedPlayerData = playerData.blockingGet()
             connection.connect(LOCAL_PORT)
-            writer = LPSMessageWriter(connection.getOutputStream())
 
             readClientLoginRequest()
             writeLoginResponse()
@@ -64,80 +60,54 @@ class LPSServerImpl @Inject constructor(
     }
 
     private fun readClientMessage() {
-        _listener.onMessage(LPSServerMessage.from(reader()))
+        _listener.onMessage(readMessage())
     }
 
+    private fun writeMessage(msg: LPSMessage) = message.write(connection.getOutputStream(), msg)
+
+    private fun readMessage() = message.read(connection.getInputStream())
+
     private fun writePlayResponse(playerData: PlayerData) {
-        val playMsg = writer()
-            .writeBool(LPSv3Tags.ACTION_JOIN, false)
-            .writeBool(LPSv3Tags.S_CAN_REC_MSG, playerData.canReceiveMessages)
-            .writeString(LPSv3Tags.OPP_LOGIN, playerData.authData.login)
-            .writeString(LPSv3Tags.OPP_CLIENT_VERSION, playerData.clientVersion)
-            .writeChar(LPSv3Tags.OPP_CLIENT_BUILD, playerData.clientBuild)
-            .writeBool(LPSv3Tags.OPP_IS_FRIEND, true)
-            .writeInt(LPSv3Tags.S_OPP_UID, playerData.authData.userID)
-            .writeString(LPSv3Tags.S_OPP_SNUID, playerData.authData.snUID)
-            .writeByte(LPSv3Tags.S_OPP_SN, playerData.authData.snType.ordinal.toByte())
-
-        playerData.avatar?.run { playMsg.writeBytes(LPSv3Tags.S_AVATAR_PART0, this) }
-
-        playMsg.buildAndFlush(asServer = true)
+        writeMessage(
+            LPSMessage.LPSPlayMessage(
+                youStarter = false,
+                canReceiveMessages = playerData.canReceiveMessages,
+                login = playerData.authData.login,
+                clientVersion = playerData.clientVersion,
+                clientBuild = playerData.clientBuild,
+                isFriend = true,
+                oppUid = playerData.authData.userID,
+                snUID = playerData.authData.snUID,
+                authType = playerData.authData.snType
+            ).setAvatar(playerData.avatar)
+        )
     }
 
     private fun readPlayRequest() {
-        val playRequest = reader()
-        if (playRequest.getMasterTag() != LPSv3Tags.ACTION_PLAY || playRequest.readBoolean(LPSv3Tags.ACTION_PLAY)) {
+        val playRequest = readMessage()
+        if (playRequest !is LPSClientMessage.LPSPlay || playRequest.mode != LPSClientMessage.PlayMode.RANDOM_PAIR) {
             throw LPSProtocolError()
         }
     }
 
     private fun writeLoginResponse() {
         //Send authorization response
-        writer()
-            .writeBool(LPSv3Tags.ACTION_LOGIN_RESULT, true)
-            .writeChar(LPSv3Tags.NEWER_BUILD, 1)
-            .writeInt(LPSv3Tags.S_UID, 1)
-            .writeString(LPSv3Tags.S_ACC_HASH, "-remote-")
-            .buildAndFlush(asServer = true)
-    }
-
-    private fun readClientLoginRequest() {
-        val loginMsg = reader()
-        val version = loginMsg.readByte(LPSv3Tags.ACTION_LOGIN).toInt()
-        if (4 != version)
-            throw LPSProtocolError("Incompatible protocol versions(4 != $version)! Please, upgrade your application")
-
-        val login = loginMsg.readString(LPSv3Tags.LOGIN)
-        val snUID = loginMsg.readString(LPSv3Tags.SN_UID)
-        val snType = AuthType.from(loginMsg.readByte(LPSv3Tags.SN).toInt())
-        val canReceiveMessages = loginMsg.readBoolean(LPSv3Tags.CAN_REC_MSG)
-        val avatar: ByteArray? = loginMsg.optBytes(LPSv3Tags.AVATAR_PART0)
-        val clientBuild = loginMsg.readChar(LPSv3Tags.CLIENT_BUILD)
-        val clientVersion = loginMsg.readString(LPSv3Tags.CLIENT_VERSION)
-
-        _listener.onMessage(
-            LPSServerMessage.LPSConnectedMessage(
-                PlayerData(
-                    AuthData(
-                        login,
-                        snUID,
-                        snType,
-                        ""
-                    )
-                ).apply {
-                    this.canReceiveMessages = canReceiveMessages
-                    this.avatar = avatar
-                    this.clientVersion = clientVersion
-                    this.clientBuild = clientBuild
-                    isFriend = true
-                    allowSendUID = true
-                })
+        writeMessage(
+            LPSMessage.LPSLoggedIn(
+                newerBuild = 1,
+                userId = 1,
+                accHash = "-remote-"
+            )
         )
     }
 
-    private fun writer(): LPSMessageWriter = writer!!
+    private fun readClientLoginRequest() {
+        val loginMsg = readMessage() as LPSClientMessage.LPSLogIn
+        if (4 != loginMsg.version)
+            throw LPSProtocolError("Incompatible protocol versions(4 != ${loginMsg.version})! Please, upgrade your application")
 
-    private fun reader(): LPSMessageReader = LPSMessageReader(connection.getInputStream())
+        _listener.onMessage(loginMsg)
+    }
 
     override fun close() {
         disposable.clear()
@@ -150,17 +120,11 @@ class LPSServerImpl @Inject constructor(
     }
 
     override fun sendCity(wordResult: WordResult, city: String) {
-        writer()
-            .writeByte(LPSv3Tags.S_ACTION_WORD, wordResult.ordinal.toByte())
-            .writeString(LPSv3Tags.WORD, city)
-            .buildAndFlush(asServer = true)
+        writeMessage(LPSMessage.LPSWordMessage(wordResult, city))
     }
 
     override fun sendMessage(message: String) {
-        writer()
-            .writeString(LPSv3Tags.S_ACTION_MSG, message)
-            .writeBool(LPSv3Tags.MSG_OWNER, false)
-            .buildAndFlush(asServer = true)
+        writeMessage(LPSMessage.LPSMsgMessage(message, false))
     }
 
     override fun getPlayerData() = cachedPlayerData

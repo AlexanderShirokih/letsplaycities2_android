@@ -89,7 +89,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
 
     override fun onFriendsItemClicked(friendsInfo: FriendInfo) {
         mSelectedFriendsInfo = friendsInfo
-        val msg = resources.getString(R.string.invite_friend, friendsInfo.name)
+        val msg = resources.getString(R.string.invite_friend, friendsInfo.login)
         findNavController().navigate(
             FriendsFragmentDirections.showConfimationDialog(
                 REQUEST_CODE_SELECT_ITEM,
@@ -101,7 +101,7 @@ class FriendsFragment : Fragment(), FriendsItemListener {
 
     override fun onRemoveFriendsItem(friendsInfo: FriendInfo) {
         mSelectedFriendsInfo = friendsInfo
-        val msg = resources.getString(R.string.remove_from_friends, friendsInfo.name)
+        val msg = resources.getString(R.string.remove_from_friends, friendsInfo.login)
         findNavController().navigate(
             FriendsFragmentDirections.showConfimationDialog(
                 REQUEST_CODE_REMOVE_ITEM,

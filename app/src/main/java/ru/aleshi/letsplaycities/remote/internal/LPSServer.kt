@@ -1,11 +1,12 @@
 package ru.aleshi.letsplaycities.remote.internal
 
+import ru.quandastudio.lpsclient.core.LPSClientMessage
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.WordResult
 
 interface LPSServer {
     interface ConnectionListener {
-        fun onMessage(msg: LPSServerMessage)
+        fun onMessage(msg: LPSClientMessage)
 
         fun onProtocolError(err: LPSProtocolError)
 

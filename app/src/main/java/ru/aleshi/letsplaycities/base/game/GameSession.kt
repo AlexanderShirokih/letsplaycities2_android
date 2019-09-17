@@ -151,7 +151,7 @@ class GameSession private constructor(
     }
 
     private fun loadData(context: Context) {
-        if (!::mExclusions.isInitialized || mDictionary != null) {
+        if (!isDataInitialized()) {
             val prefs = view.getGamePreferences()
             disposable.add(
                 Exclusions.load(context)
@@ -165,6 +165,8 @@ class GameSession private constructor(
                     })
         }
     }
+
+    private fun isDataInitialized() = ::mExclusions.isInitialized && mDictionary != null
 
     private fun setDifficulty(dictionary: Dictionary) {
         dictionary.difficulty = difficulty.toByte()
@@ -252,7 +254,7 @@ class GameSession private constructor(
         Completable.fromAction {
             if (player != null) view.putCity(
                 city,
-                mDictionary!!.getCountryCode(city),
+                mDictionary?.getCountryCode(city) ?: 0,
                 player.position
             )
             else {
@@ -265,7 +267,7 @@ class GameSession private constructor(
     }
 
     override fun submit(userInput: String, callback: () -> Unit): Boolean {
-        if (currentPlayer.hasUserInput) {
+        if (currentPlayer.hasUserInput && isDataInitialized()) {
             (currentPlayer as Player).onUserInput(userInput, callback)
             return true
         }

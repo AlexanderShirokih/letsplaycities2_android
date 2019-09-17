@@ -6,7 +6,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
-import ru.quandastudio.lpsclient.core.LPSv3Tags
+import ru.quandastudio.lpsclient.core.LPSClientMessage
+import ru.quandastudio.lpsclient.core.LPSMessage
 import ru.quandastudio.lpsclient.model.AuthType
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.WordResult
@@ -23,7 +24,7 @@ class TestLPSServer {
     @Before
     fun setUp() {
         connection = TestConnection()
-        lpsServer = LPSServerImpl(createPlayerData(), connection)
+        lpsServer = LPSServerImpl(createPlayerData(), connection, connection.pipe())
         connectionListener = mock(LPSServer.ConnectionListener::class.java)
         lpsServer.setListener(connectionListener)
         lpsServer.startServer()
@@ -38,54 +39,65 @@ class TestLPSServer {
     @Test
     fun testLogIn() {
         connection
-            .writer()
-            .writeByte(LPSv3Tags.ACTION_LOGIN, 4)
-            .writeString(LPSv3Tags.LOGIN, "TestClient")
-            .writeString(LPSv3Tags.SN_UID, "test-snuid")
-            .writeByte(LPSv3Tags.SN, AuthType.Native.ordinal.toByte())
-            .writeBool(LPSv3Tags.CAN_REC_MSG, false)
-            .writeChar(LPSv3Tags.CLIENT_BUILD, 10)
-            .writeString(LPSv3Tags.CLIENT_VERSION, "test")
-            .buildAndFlush()
+            .write(
+                LPSClientMessage.LPSLogIn(
+                    version = 4,
+                    login = "TestClient",
+                    snUID = "test-snuio",
+                    authType = AuthType.Native,
+                    canReceiveMessages = false,
+                    clientBuild = 10,
+                    clientVersion = "test",
+                    accToken = "tkn",
+                    allowSendUID = false,
+                    firebaseToken = "fb",
+                    uid = 1,
+                    hash = null,
+                    avatar = null
+                )
+            )
 
         verify(connectionListener, timeout(2000).times(1))
             .onMessage(com.nhaarman.mockitokotlin2.any())
 
         val loginMsg = connection.reader()
-        assertTrue(loginMsg.readBoolean(LPSv3Tags.ACTION_LOGIN_RESULT))
-        assertEquals(loginMsg.readChar(LPSv3Tags.NEWER_BUILD), 1)
-        assertEquals(loginMsg.readInt(LPSv3Tags.S_UID), 1)
-        assertEquals(loginMsg.readString(LPSv3Tags.S_ACC_HASH), "-remote-")
+        assertTrue(loginMsg is LPSMessage.LPSLoggedIn)
+
+        loginMsg as LPSMessage.LPSLoggedIn
+
+        assertEquals(loginMsg.newerBuild, 1)
+        assertEquals(loginMsg.userId, 1)
+        assertEquals(loginMsg.accHash, "-remote-")
 
         connection
-            .writer()
-            .writeBool(LPSv3Tags.ACTION_PLAY, false)
-            .buildAndFlush()
+            .write(
+                LPSClientMessage.LPSPlay(
+                    mode = LPSClientMessage.PlayMode.RANDOM_PAIR,
+                    oppUid = null
+                )
+            )
 
         val playerData = lpsServer.getPlayerData()
 
         val playMsg = connection.reader()
-        assertFalse(playMsg.readBoolean(LPSv3Tags.ACTION_JOIN))
-        assertEquals(playMsg.readBoolean(LPSv3Tags.S_CAN_REC_MSG), playerData.canReceiveMessages)
-        assertEquals(playMsg.readString(LPSv3Tags.OPP_LOGIN), playerData.authData.login)
-        assertEquals(playMsg.readString(LPSv3Tags.OPP_CLIENT_VERSION), playerData.clientVersion)
-        assertEquals(playMsg.readChar(LPSv3Tags.OPP_CLIENT_BUILD), playerData.clientBuild)
-        assertEquals(playMsg.readBoolean(LPSv3Tags.OPP_IS_FRIEND), true)
-        assertEquals(playMsg.readInt(LPSv3Tags.S_OPP_UID), playerData.authData.userID)
-        assertEquals(playMsg.readString(LPSv3Tags.S_OPP_SNUID), playerData.authData.snUID)
-        assertEquals(
-            playMsg.readByte(LPSv3Tags.S_OPP_SN),
-            playerData.authData.snType.ordinal.toByte()
-        )
+        playMsg as LPSMessage.LPSPlayMessage
+
+        assertFalse(playMsg.youStarter)
+        assertEquals(playMsg.canReceiveMessages, playerData.canReceiveMessages)
+        assertEquals(playMsg.login, playerData.authData.login)
+        assertEquals(playMsg.clientVersion, playerData.clientVersion)
+        assertEquals(playMsg.clientBuild, playerData.clientBuild)
+        assertEquals(playMsg.isFriend, true)
+        assertEquals(playMsg.oppUid, playerData.authData.userID)
+        assertEquals(playMsg.snUID, playerData.authData.snUID)
+        assertEquals(playMsg.authType, playerData.authData.snType)
     }
 
     @Test
     fun testSendCity() {
         testLogIn()
 
-        connection.writer()
-            .writeString(LPSv3Tags.ACTION_WORD, "word")
-            .buildAndFlush()
+        connection.write(LPSClientMessage.LPSWord("word"))
 
         verify(connectionListener, timeout(500).times(1))
             .onMessage(com.nhaarman.mockitokotlin2.any())
@@ -95,9 +107,9 @@ class TestLPSServer {
     fun testSendMsg() {
         testLogIn()
 
-        connection.writer()
-            .writeString(LPSv3Tags.ACTION_MSG, "word")
-            .buildAndFlush()
+        connection.write(
+            LPSClientMessage.LPSMsg("word")
+        )
 
         verify(connectionListener, timeout(500).times(1))
             .onMessage(com.nhaarman.mockitokotlin2.any())
@@ -110,11 +122,11 @@ class TestLPSServer {
         lpsServer.sendCity(WordResult.ACCEPTED, "city")
 
         val cityMsg = connection.reader()
-        assertEquals(
-            cityMsg.readByte(LPSv3Tags.S_ACTION_WORD),
-            WordResult.ACCEPTED.ordinal.toByte()
-        )
-        assertEquals(cityMsg.readString(LPSv3Tags.WORD), "city")
+
+        cityMsg as LPSMessage.LPSWordMessage
+
+        assertEquals(cityMsg.result, WordResult.ACCEPTED)
+        assertEquals(cityMsg.word, "city")
     }
 
     @Test
@@ -124,7 +136,10 @@ class TestLPSServer {
         lpsServer.sendMessage("Test")
 
         val cityMsg = connection.reader()
-        assertEquals(cityMsg.readString(LPSv3Tags.S_ACTION_MSG), "Test")
-        assertFalse(cityMsg.readBoolean(LPSv3Tags.MSG_OWNER))
+
+        cityMsg as LPSMessage.LPSMsgMessage
+
+        assertEquals(cityMsg.msg, "Test")
+        assertFalse(cityMsg.isSystemMsg)
     }
 }

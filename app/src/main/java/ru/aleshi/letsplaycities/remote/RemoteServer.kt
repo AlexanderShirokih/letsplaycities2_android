@@ -19,7 +19,7 @@ class RemoteServer @Inject constructor(private val mRemoteRepository: RemoteRepo
     }
 
     override fun getInputMessages(): Observable<String> {
-        return mRemoteRepository.messages.map { it.message }
+        return mRemoteRepository.messages.map { it.msg }
     }
 
     override fun dispose() {
@@ -37,7 +37,7 @@ class RemoteServer @Inject constructor(private val mRemoteRepository: RemoteRepo
 
     override val leave: Maybe<Boolean>
         get() = mRemoteRepository.leave
-            .map { !it.message.isNullOrEmpty() }
+            .map { !it.reason.isNullOrEmpty() }
 
     override fun getTimeLimit(): Long = 92L
 

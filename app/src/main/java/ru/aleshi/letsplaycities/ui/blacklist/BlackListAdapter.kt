@@ -14,7 +14,8 @@ class BlackListAdapter(private val onItemClickListener: OnItemClickListener) :
     private var list: MutableList<BlackListItem> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlackListViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_blacklist, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_blacklist, parent, false)
         val holder = BlackListViewHolder(view)
         view.btn_remove.setOnClickListener {
             if (holder.adapterPosition != RecyclerView.NO_POSITION)
@@ -34,15 +35,16 @@ class BlackListAdapter(private val onItemClickListener: OnItemClickListener) :
         notifyItemRemoved(pos)
     }
 
-    fun updateItems(newList: MutableList<BlackListItem>) {
-        list = newList
+    fun updateItems(newList: List<BlackListItem>) {
+        list.clear()
+        list.addAll(newList)
         notifyDataSetChanged()
     }
 
     class BlackListViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
         fun bind(s: BlackListItem) {
-            view.item_name.text = s.userName
+            view.item_name.text = s.login
         }
 
     }

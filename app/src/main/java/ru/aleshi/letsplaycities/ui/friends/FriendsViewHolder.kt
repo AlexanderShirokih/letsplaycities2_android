@@ -9,8 +9,8 @@ import ru.quandastudio.lpsclient.model.FriendInfo
 class FriendsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     fun bind(info: FriendInfo) {
-        var value = info.name
-        if (!info.isAccepted) {
+        var value = info.login
+        if (!info.accepted) {
             value += itemView.context.getString(R.string.request)
         }
         itemView.item_name.text = value

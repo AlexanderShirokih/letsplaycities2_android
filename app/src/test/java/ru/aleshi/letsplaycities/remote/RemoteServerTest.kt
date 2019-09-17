@@ -11,7 +11,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import ru.aleshi.letsplaycities.remote.internal.LPSServer
-import ru.aleshi.letsplaycities.remote.internal.LPSServerMessage
+import ru.quandastudio.lpsclient.core.LPSClientMessage
 import ru.quandastudio.lpsclient.model.WordResult
 import java.util.concurrent.TimeUnit
 
@@ -47,7 +47,7 @@ class RemoteServerTest {
 
     @Test
     fun getInputMessages() {
-        repository.onMessage(LPSServerMessage.LPSMsgServerMessage("test"))
+        repository.onMessage(LPSClientMessage.LPSMsg("test"))
 
         val test = remoteServer.getInputMessages().test()
 
