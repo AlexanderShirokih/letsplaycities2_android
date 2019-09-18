@@ -9,6 +9,7 @@ import ru.quandastudio.lpsclient.core.NetworkClient
 class NetworkClientModule {
 
     @Provides
-    fun provideNetworkClient(): NetworkClient = NetworkClient(false, BuildConfig.HOST)
+    fun provideNetworkClient(): NetworkClient =
+        NetworkClient(AndroidBase64Provider, false, BuildConfig.HOST)
 
 }

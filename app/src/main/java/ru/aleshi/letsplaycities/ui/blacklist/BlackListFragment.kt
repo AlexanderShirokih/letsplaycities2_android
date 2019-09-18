@@ -17,6 +17,7 @@ import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
+import ru.aleshi.letsplaycities.network.AndroidBase64Provider
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
@@ -83,7 +84,7 @@ class BlackListFragment : Fragment() {
 
     private fun buildBlackList() {
         mGamePlayerDataFactory.load(mApplication.gamePreferences)?.let { userData ->
-            mNetworkRepository = NetworkRepository(NetworkClient(false, BuildConfig.HOST), NetworkUtils.getToken()).apply {
+            mNetworkRepository = NetworkRepository(NetworkClient(AndroidBase64Provider,false, BuildConfig.HOST), NetworkUtils.getToken()).apply {
                 mDisposable.addAll(
                     login(userData)
                         .observeOn(AndroidSchedulers.mainThread())
