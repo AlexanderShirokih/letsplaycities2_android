@@ -30,6 +30,9 @@ class NetworkPresenterImpl @Inject constructor(
         )
     }
 
+    /**
+     * Called right after user view was created.
+     */
     override fun onAttachView(view: NetworkContract.View) {
         mView = view
         val prefs = view.getGamePreferences()
@@ -38,21 +41,29 @@ class NetworkPresenterImpl @Inject constructor(
             mAuthData = mAuthDataFactory.loadFromPreferences(prefs)
         }
         view.setupLayout(isLoggedIn)
-        disconnect()
     }
 
+    /**
+     * Called when received request to start game in friend mode.
+     */
     override fun onConnectToFriendGame(versionInfo: Pair<String, Int>, oppId: Int) {
         createPlayerData(versionInfo) {
             startFriendGame(it, oppId)
         }
     }
 
+    /**
+     * Called when user touched connect button.
+     */
     override fun onConnect(versionInfo: Pair<String, Int>) {
         createPlayerData(versionInfo) {
             startGame(it, null)
         }
     }
 
+    /**
+     * Called when user wants to start game in friend mode.
+     */
     override fun onFriendsInfo(versionInfo: Pair<String, Int>): Observer<in FriendInfo> {
         return Observer { friendInfo ->
             friendInfo?.run {
@@ -63,19 +74,15 @@ class NetworkPresenterImpl @Inject constructor(
         }
     }
 
-    private fun disconnect() {
-        onDispose()
-        mNetworkRepository.disconnect()
-    }
-
-
+    /**
+     * This function is called when user wants to cancel connection,
+     * either an error was or another problems occurred in login sequence.
+     */
     override fun onCancel() {
-        disconnect()
-        mView?.onCancel()
-    }
-
-    override fun onDispose() {
+        println("Cancel the flow!")
         mDisposable.clear()
+        mNetworkRepository.disconnect()
+        mView?.onCancel()
     }
 
     private fun createPlayerData(

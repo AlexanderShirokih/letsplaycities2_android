@@ -27,6 +27,5 @@ interface NetworkContract {
         fun onConnect(versionInfo: Pair<String, Int>)
         fun onCancel()
         fun onFriendsInfo(versionInfo: Pair<String, Int>): Observer<in FriendInfo>
-        fun onDispose()
     }
 }

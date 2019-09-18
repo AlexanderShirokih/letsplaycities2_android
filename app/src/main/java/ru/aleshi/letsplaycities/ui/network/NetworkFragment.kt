@@ -111,7 +111,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     override fun onStop() {
         super.onStop()
-        mNetworkPresenter.onDispose()
+        mNetworkPresenter.onCancel()
     }
 
     override fun onResume() {
