@@ -76,13 +76,16 @@ class NetworkPresenterImpl @Inject constructor(
 
     /**
      * This function is called when user wants to cancel connection,
-     * either an error was or another problems occurred in login sequence.
+     * either an error or another problems was occurred in login sequence.
      */
     override fun onCancel() {
-        println("Cancel the flow!")
-        mDisposable.clear()
         mNetworkRepository.disconnect()
+        onDispose()
         mView?.onCancel()
+    }
+
+    override fun onDispose() {
+        mDisposable.clear()
     }
 
     private fun createPlayerData(
