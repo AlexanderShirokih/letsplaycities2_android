@@ -130,7 +130,6 @@ class FriendsFragment : Fragment(), FriendsItemListener {
     private fun requestFriendsList() {
         mDisposable.addAll(
             mNetworkRepository.getFriendsList()
-                .doOnEvent { _, _ -> mNetworkRepository.disconnect() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(::populateList, ::handleError)
         )

@@ -103,7 +103,6 @@ class BlackListFragment : Fragment() {
     private fun requestFriendsList() {
         mDisposable.add(
             mNetworkRepository.getBlackList()
-                .doOnEvent { _, _ -> mNetworkRepository.disconnect() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(::populateList, ::handleError)
         )
