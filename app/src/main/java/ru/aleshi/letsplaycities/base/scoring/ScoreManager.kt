@@ -1,6 +1,8 @@
 package ru.aleshi.letsplaycities.base.scoring
 
 import android.content.Context
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.combos.CityComboInfo
@@ -105,19 +107,26 @@ class ScoreManager(
     }
 
     private fun checkCombos(deltaTime: Long, word: String) {
-        gameSession.currentPlayer.comboSystem.addCity(
-            CityComboInfo.create(
-                deltaTime,
-                word,
-                gameSession.dictionary().getCountryCode(word)
-            )
-        )
+        val current = gameSession.currentPlayer
 
-        if (currentIsPlayer()) {
-            gameSession.currentPlayer.comboSystem.activeCombosList.forEach {
-                groupCombo.child[it.key.ordinal].max(it.value)
-            }
+        Completable.fromAction {
+            current.comboSystem.addCity(
+                CityComboInfo.create(
+                    deltaTime,
+                    word,
+                    gameSession.dictionary().getCountryCode(word)
+                )
+            )
         }
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .andThen(Completable.fromAction {
+                if (currentIsPlayer()) {
+                    current.comboSystem.activeCombosList.forEach {
+                        groupCombo.child[it.key.ordinal].max(it.value)
+                    }
+                }
+            })
+            .subscribe()
     }
 
     private fun mostChecker(word: String) {
