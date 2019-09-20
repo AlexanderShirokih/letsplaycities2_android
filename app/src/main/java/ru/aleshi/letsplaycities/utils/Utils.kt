@@ -35,6 +35,7 @@ object Utils {
         val filesDir = context.filesDir
 
         return loadAvatar(data)
+            .onErrorReturnItem((context.resources.getDrawable(R.drawable.ic_player) as BitmapDrawable).bitmap)
             .switchMap { saveAvatar(filesDir, it) }
     }
 
