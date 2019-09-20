@@ -65,7 +65,17 @@
                 app:argType="string" />
         <action
                 android:id="@+id/start_network_fragment"
-                app:destination="@id/networkNav" />
+                app:destination="@id/networkNav">
+            <argument
+                    android:name="host"
+                    app:argType="string" />
+            <argument
+                    android:name="action"
+                    app:argType="string" />
+            <argument
+                    android:name="oppId"
+                    app:argType="integer" />
+        </action>
     </dialog>
 
     <action

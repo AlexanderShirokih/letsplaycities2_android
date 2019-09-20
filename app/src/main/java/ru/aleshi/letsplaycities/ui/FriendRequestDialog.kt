@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
+import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.network.FriendRequestContract
@@ -22,12 +23,12 @@ class FriendRequestDialog : DialogFragment(), FriendRequestContract.View {
             .setTitle(R.string.request_dialog_title)
             .setMessage(getString(R.string.request_dialog_msg, args.getString("login")))
             .setPositiveButton(R.string.accept) { _, _ ->
-                findNavController().navigate(FriendRequestDialogDirections.startNetworkFragment().apply {
-                    arguments.apply {
-                        putString("action", "fm_game")
-                        putInt("oppId", args.getString("user_id")!!.toInt())
-                    }
-                }
+                findNavController().navigate(
+                    FriendRequestDialogDirections.startNetworkFragment(
+                        BuildConfig.HOST,
+                        "fm_game",
+                        args.getString("user_id")!!.toInt()
+                    )
                 )
             }
             .setNegativeButton(R.string.decline) { _, _ -> mPresenter.onDecline(args.getString("user_id")!!.toInt()) }

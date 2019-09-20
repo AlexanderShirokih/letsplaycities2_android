@@ -120,6 +120,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
             val nfa = NetworkFragmentArgs.fromBundle(args)
             if ("fm_game" == nfa.action) {
                 if (mGamePreferences.isLoggedFromAnySN()) {
+                    setLoadingLayout(true)
                     mNetworkPresenter.onConnectToFriendGame(getVersionInfo(), nfa.oppId)
                 } else
                     Toast.makeText(

@@ -20,7 +20,7 @@ class FriendRequestPresenter(private val mView: FriendRequestContract.View) :
                     NetworkUtils.getToken()
                 ).apply {
                     login(userData)
-                        .flatMapCompletable { sendFriendRequestResult(false, userId) }
+                        .flatMap { sendFriendRequestResult(false, userId) }
                         .subscribe({}, { e -> mView.onError(e) })
                 }
             }

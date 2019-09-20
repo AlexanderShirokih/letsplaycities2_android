@@ -106,9 +106,12 @@ class NetworkPresenterImpl @Inject constructor(
     private fun startFriendGame(userData: PlayerData, oppId: Int) {
         mDisposable.add(
             mNetworkRepository.login(userData)
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext { mView?.updateInfo(R.string.waiting_for_friend) }
-                .flatMapCompletable { mNetworkRepository.sendFriendRequestResult(true, oppId) }
-                .toSingleDefault(Unit)
+                .observeOn(Schedulers.io())
+                .doOnNext { println("Ready to send request") }
+                .flatMap { mNetworkRepository.sendFriendRequestResult(true, oppId) }
+                .doOnComplete { println("Sended!") }
                 .flatMapMaybe { mNetworkRepository.connectToFriend() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ play(userData, oppData = it.first, youStarter = it.second) }, {
