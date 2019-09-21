@@ -19,3 +19,24 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file snName.
 #-renamesourcefileattribute SourceFile
+-keepattributes Exceptions,LineNumberTable,Signature,Annotation,SourceFile,EnclosingMethod,InnerClasses
+-keep public class ru.quandastudio.lpsclient.** { *; }
+-keepclassmembers class ru.quandastudio.lpsclient.** { *; }
+
+##---------------Begin: proguard configuration for Gson ----------
+# Gson uses generic type information stored in a class file when working with
+#fields. Proguard removes such information by default, so configure it to keep
+#all of it.
+
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+# Gson specific classes
+-keep class sun.misc.Unsafe { *; }
+#-keep class com.google.gson.stream.** { *; }
+
+##---------------End: proguard configuration for Gson ----------
+-keepclassmembers enum * { *; }
+-keep public class com.google.gson.**
+-keep public class com.google.gson.** {public private protected *;}
+-dontobfuscate
