@@ -136,16 +136,4 @@ object Utils {
         }.show()
     }
 
-    fun makeConfirmDialog(activity: Activity, msg: String, onResult: (result: Boolean) -> Unit) {
-        AlertDialog.Builder(activity)
-            .setMessage(msg)
-            .setPositiveButton(R.string.yes) { _, _ ->
-                onResult(true)
-            }
-            .setNegativeButton(R.string.no) { _, _ ->
-                onResult(false)
-            }
-            .create().show()
-    }
-
 }
