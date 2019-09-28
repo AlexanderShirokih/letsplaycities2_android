@@ -24,7 +24,7 @@ object ScoringGroupsHelper {
     const val F_SHORT_WORD = "sw"
     const val F_LONG_WORD = "lw"
     const val F_SAME_COUNTRY = "sc"
-    const val F_DIFF_COUNTRY = "fc"
+    const val F_DIFF_COUNTRY = "dc"
 
     const val V_EMPTY_S = "--"
 
@@ -106,7 +106,8 @@ object ScoringGroupsHelper {
                 ScoringField(F_QUICK_TIME, 0),
                 ScoringField(F_SHORT_WORD, 0),
                 ScoringField(F_LONG_WORD, 0),
-                ScoringField(F_SAME_COUNTRY, 0)
+                ScoringField(F_SAME_COUNTRY, 0),
+                ScoringField(F_DIFF_COUNTRY, 0)
             )
         )
         allGroups.set(3, groupCombo)

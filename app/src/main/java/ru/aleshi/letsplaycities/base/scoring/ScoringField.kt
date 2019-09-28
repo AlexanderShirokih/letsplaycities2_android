@@ -32,6 +32,10 @@ class ScoringField(val name: String, var value: Any? = null) {
         return value != null
     }
 
+    fun copyValue(from: ScoringField) {
+        this.value = from.value
+    }
+
     private fun sec2time(t: Int): String {
         var s = t
         var h = 0

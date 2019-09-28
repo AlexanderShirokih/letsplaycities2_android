@@ -2,11 +2,9 @@ package ru.aleshi.letsplaycities.base.scoring
 
 class ScoringGroup(var main: ScoringField, var child: Array<ScoringField>) {
 
-    fun findField(s: String): ScoringField {
-        for (f in child)
-            if (f.name == s)
-                return f
-        throw RuntimeException("Requested field $s not found!")
+    fun findField(key: String): ScoringField {
+        return child.firstOrNull { it.name == key }
+            ?: throw RuntimeException("Requested field $key not found!")
     }
 
     fun toStringBuilder(): StringBuilder {
@@ -32,4 +30,5 @@ class ScoringGroup(var main: ScoringField, var child: Array<ScoringField>) {
         sb.append('>')
         return sb
     }
+
 }

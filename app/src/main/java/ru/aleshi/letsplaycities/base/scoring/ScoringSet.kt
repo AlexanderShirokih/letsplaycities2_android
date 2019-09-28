@@ -32,8 +32,8 @@ class ScoringSet(size: Int) {
 
     fun set(key: String, main: ScoringField, child: Array<ScoringField>) {
         getGroupAt(key).apply {
-            this.main = main
-            this.child = child
+            this.main.copyValue(main)
+            child.forEach { this.findField(it.name).copyValue(it) }
         }
     }
 

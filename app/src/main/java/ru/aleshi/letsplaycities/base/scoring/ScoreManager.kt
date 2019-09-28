@@ -219,7 +219,7 @@ class ScoreManager(
         saveStats()
     }
 
-    private fun currentIsPlayer() = gameSession.currentPlayer == getPlayer()
+    private fun currentIsPlayer() = gameSession.currentPlayer is Player
 
     private fun getPlayer(): User {
         return gameSession.players.first { it is Player }
