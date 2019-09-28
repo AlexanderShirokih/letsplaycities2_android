@@ -51,16 +51,17 @@ class TestConnection : Connection {
     fun write(msg: LPSClientMessage) {
         val data = messagePipe.write(msg)
         internalOS.bufferedWriter().use {
-            it.write("size:${data.size}\n")
             it.write(data)
+            it.flush()
         }
     }
 
     fun reader(): LPSMessage {
         val reader = internalIS.bufferedReader()
-        val size = reader.readLine().substring(5).toInt()
-        val buffer = CharArray(size)
-        reader.read(buffer)
+        val buffer = JsonMessageReader(reader).read()
+        val header = "size:".toCharArray()
+        if (buffer.sliceArray(header.indices).contentEquals(header))
+            return messagePipe.readMessage(buffer.sliceArray(buffer.indexOf('\n') + 1 until buffer.size))
         return messagePipe.readMessage(buffer)
     }
 
