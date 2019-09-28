@@ -22,12 +22,19 @@ class ComboSystem(private val view: ComboSystemView, private val canUseQuickTime
     }
 
     private fun updateCombos() {
+        val usedCountries = mutableSetOf<Short>()
         val lastCountryCode = infoList.lastOrNull()?.countryCode ?: 0
 
         updateCombo(ComboType.QUICK_TIME) { canUseQuickTime && it.isQuick }
         updateCombo(ComboType.SHORT_WORD) { it.isShort }
         updateCombo(ComboType.LONG_WORD) { it.isLong }
         updateCombo(ComboType.SAME_COUNTRY) { it.countryCode > 0 && it.countryCode == lastCountryCode }
+        updateCombo(ComboType.DIFFERENT_COUNTRIES) {
+            val res = !usedCountries.contains(it.countryCode)
+            usedCountries.add(it.countryCode)
+            res
+        }
+        usedCountries.clear()
     }
 
     private fun updateCombo(type: ComboType, predicate: (info: CityComboInfo) -> Boolean) {

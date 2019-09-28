@@ -24,6 +24,7 @@ object ScoringGroupsHelper {
     const val F_SHORT_WORD = "sw"
     const val F_LONG_WORD = "lw"
     const val F_SAME_COUNTRY = "sc"
+    const val F_DIFF_COUNTRY = "fc"
 
     const val V_EMPTY_S = "--"
 

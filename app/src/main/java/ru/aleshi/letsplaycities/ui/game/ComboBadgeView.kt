@@ -12,6 +12,7 @@ class ComboBadgeView(private val view: View) : ComboSystemView {
     private val shortTv = view.iconShort
     private val longTv = view.iconLong
     private val countryTv = view.iconCountry
+    private val diffCountryTv = view.iconDiffCountry
 
     private var activeBadges = 0
 
@@ -39,6 +40,7 @@ class ComboBadgeView(private val view: View) : ComboSystemView {
         ComboType.SHORT_WORD -> shortTv
         ComboType.LONG_WORD -> longTv
         ComboType.SAME_COUNTRY -> countryTv
+        ComboType.DIFFERENT_COUNTRIES -> diffCountryTv
     }
 
 }

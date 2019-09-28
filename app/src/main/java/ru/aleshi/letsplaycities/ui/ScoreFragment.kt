@@ -2,7 +2,6 @@ package ru.aleshi.letsplaycities.ui
 
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,7 @@ import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.scoring.ScoringField
 import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper
 import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_ANDROID
+import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_DIFF_COUNTRY
 import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_LONG_WORD
 import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_LOSE
 import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.F_NETWORK
@@ -46,6 +46,7 @@ class ScoreFragment : Fragment() {
         F_SHORT_WORD,
         F_LONG_WORD,
         F_SAME_COUNTRY,
+        F_DIFF_COUNTRY,
         F_ANDROID,
         F_PLAYER,
         F_NETWORK,
@@ -78,8 +79,7 @@ class ScoreFragment : Fragment() {
     private fun loadStats() {
         //Load or build stats
         val allGroups = ScoringGroupsHelper.fromPreferences(prefs)
-
-            buildLayout(stat_root, allGroups)
+        buildLayout(stat_root, allGroups)
     }
 
     private fun buildLayout(root: LinearLayout, set: ScoringSet) {

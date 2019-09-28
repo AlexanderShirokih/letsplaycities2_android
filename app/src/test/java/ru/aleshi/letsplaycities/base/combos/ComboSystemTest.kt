@@ -70,9 +70,9 @@ class ComboSystemTest {
         test.assertValues(1, 2, 0)
         cs.addCity(CityComboInfo.create(1000, "tests", 20))
         test.assertValues(1, 3, 0)
-        cs.addCity(CityComboInfo.create(5100, "tests", 21))
+        cs.addCity(CityComboInfo.create(5100, "tests", 20))
         test.assertValues(1, 3, 1)
-        cs.addCity(CityComboInfo.create(1000, "tests", 22))
+        cs.addCity(CityComboInfo.create(1000, "tests", 20))
         test.assertValues(1, 3, 1)
     }
 
@@ -89,7 +89,7 @@ class ComboSystemTest {
         cs.addCity(CityComboInfo.create(5200, "tts", 18))
         test.assertValues(2, 4, 1)
         cs.addCity(CityComboInfo.create(1000, "tests", 19))
-        test.assertValues(2, 4, 2)
+        test.assertValues(3, 5, 2)
     }
 
     @Test
@@ -117,6 +117,36 @@ class ComboSystemTest {
 
         cs.addCity(CityComboInfo.create(5200, "tests", 14))
         test.assertValues(1, 2, 0)
+    }
+
+    @Test
+    fun testDiffCountries() {
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 15))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 16))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 17))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 18))
+        test.assertValues(0, 0, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 19))
+        test.assertValues(1, 1, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 20))
+        test.assertValues(1, 2, 0)
+
+        cs.addCity(CityComboInfo.create(5200, "tests", 14))
+        test.assertValues(1, 3, 0)
     }
 
 }
