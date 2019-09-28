@@ -9,6 +9,14 @@ def lifecycle_version = "2.1.0"
 def dagger_version = '2.24'
 
 android {
+    signingConfigs {
+        default_test {
+            storeFile file('/home/alexander/Keystores/letsplaycities.jks')
+            storePassword = file('/home/alexander/Keystores/pass.txt').text
+            keyPassword = file('/home/alexander/Keystores/pass.txt').text
+            keyAlias = 'letsplaycities'
+        }
+    }
     def HOST_LOCAL = "\"192.168.2.244\""
     def HOST_REMOTE = "\"letsplaycities.online\""
 
@@ -21,13 +29,13 @@ android {
         versionCode 221
         versionName "2.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.debug
 
     }
     buildTypes {
         release {
-            minifyEnabled false
-            useProguard false
-//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     flavorDimensions "server"
