@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
 
 def lifecycle_version = "2.1.0"
 def dagger_version = '2.24'
@@ -11,9 +12,10 @@ def dagger_version = '2.24'
 android {
     signingConfigs {
         default_test {
+            def testPass = file('/home/alexander/Keystores/pass.txt').text
             storeFile file('/home/alexander/Keystores/letsplaycities.jks')
-            storePassword = file('/home/alexander/Keystores/pass.txt').text
-            keyPassword = file('/home/alexander/Keystores/pass.txt').text
+            storePassword = testPass
+            keyPassword = testPass
             keyAlias = 'letsplaycities'
         }
     }
@@ -26,8 +28,8 @@ android {
         multiDexEnabled true
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 222
-        versionName "2.2.2"
+        versionCode 223
+        versionName "2.2.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
 
@@ -108,4 +110,6 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
     implementation 'ru.quandastudio.lps:lpsclient:0.2.1'
+
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 }
