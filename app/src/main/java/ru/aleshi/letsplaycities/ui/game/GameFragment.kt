@@ -61,34 +61,42 @@ class GameFragment : Fragment(), GameContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val activity = requireActivity() as MainActivity
-        ViewModelProviders.of(activity)[ConfirmViewModel::class.java].callback.observe(this, Observer {
-            when {
-                it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(R.id.mainMenuFragment, false)
-                it.checkWithResultCode(SURRENDER) -> mGameSession.onSurrender()
-                it.checkWithResultCode(USE_HINT) -> showAd()
-                it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession.onFriendRequestResult(it.result)
-            }
-        })
+        ViewModelProviders.of(activity)[ConfirmViewModel::class.java].callback.observe(
+            this,
+            Observer {
+                when {
+                    it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(
+                        R.id.mainMenuFragment,
+                        false
+                    )
+                    it.checkWithResultCode(SURRENDER) -> mGameSession.onSurrender()
+                    it.checkWithResultCode(USE_HINT) -> showAd()
+                    it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession.onFriendRequestResult(
+                        it.result
+                    )
+                }
+            })
 
         mGameViewModel = ViewModelProviders.of(this)[GameViewModel::class.java]
-        mGameSessionViewModel = ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
-            mGameSession = gameSession!!
+        mGameSessionViewModel =
+            ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
+                mGameSession = gameSession!!
 
-            correctedWord.observe(this@GameFragment, Observer {
-                if (it != null) {
-                    mGameSession.postCorrectedWord(it.first, it.second)
-                    it.first?.let { cityInput.text = null }
-                    correctedWord.value = null
-                }
-            })
-            restart.observe(this@GameFragment, Observer {
-                if (it) {
-                    stopGame()
-                    startGame()
-                    restart.value = false
-                }
-            })
-        }
+                correctedWord.observe(this@GameFragment, Observer {
+                    if (it != null) {
+                        mGameSession.postCorrectedWord(it.first, it.second)
+                        it.first?.let { cityInput.text = null }
+                        correctedWord.value = null
+                    }
+                })
+                restart.observe(this@GameFragment, Observer {
+                    if (it) {
+                        stopGame()
+                        startGame()
+                        restart.value = false
+                    }
+                })
+            }
         mAdapter = GameAdapter(activity)
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
@@ -140,12 +148,16 @@ class GameFragment : Fragment(), GameContract.View {
             mRewardedVideoAd.show()
         } else {
             loadRewardedVideoAd()
-            Toast.makeText(requireContext(), R.string.internet_unavailable, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.internet_unavailable, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
     private fun loadRewardedVideoAd() {
-        mRewardedVideoAd.loadAd(requireContext().getString(R.string.rewarded_ad_id), AdRequest.Builder().build())
+        mRewardedVideoAd.loadAd(
+            requireContext().getString(R.string.rewarded_ad_id),
+            AdRequest.Builder().build()
+        )
     }
 
     override fun getGamePreferences(): GamePreferences = lpsApplication.gamePreferences
@@ -162,8 +174,17 @@ class GameFragment : Fragment(), GameContract.View {
         gameTimer.text = time
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return DataBindingUtil.inflate<FragmentGameBinding>(inflater, R.layout.fragment_game, container, false).apply {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return DataBindingUtil.inflate<FragmentGameBinding>(
+            inflater,
+            R.layout.fragment_game,
+            container,
+            false
+        ).apply {
             viewModel = mGameViewModel
             mBinding = this
         }.root
@@ -213,7 +234,12 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     private fun setupCityListeners(activity: Activity) {
-        textInputLayout.setStartIconOnClickListener { SpeechRecognitionHelper.speech(this, activity) }
+        textInputLayout.setStartIconOnClickListener {
+            SpeechRecognitionHelper.speech(
+                this,
+                activity
+            )
+        }
         textInputLayout.setEndIconOnClickListener { submit() }
         cityInput.setOnEditorActionListener { _, actionId, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_DONE)
@@ -260,12 +286,19 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun showFriendRequestDialog(name: String) {
         val msg = getString(R.string.confirm_friend_request, name)
-        findNavController().navigate(GameFragmentDirections.showConfimationDialog(NEW_FRIEND_REQUEST, msg, null))
+        findNavController().navigate(
+            GameFragmentDirections.showConfimationDialog(
+                NEW_FRIEND_REQUEST,
+                msg,
+                null
+            )
+        )
     }
 
     private fun hideKeyboard() {
         val activity = requireActivity()
-        val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputManager =
+            activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         activity.currentFocus?.run {
             inputManager.hideSoftInputFromWindow(windowToken, HIDE_NOT_ALWAYS)
         }
@@ -289,7 +322,14 @@ class GameFragment : Fragment(), GameContract.View {
         val nav = findNavController()
         disposable.add(Completable.timer(100, TimeUnit.MILLISECONDS)
             .repeatUntil { nav.currentDestination!!.id == R.id.gameFragment }
-            .subscribe { nav.navigate(GameFragmentDirections.showGameResultDialog(result, score)) })
+            .subscribe {
+                nav.navigate(
+                    GameFragmentDirections.showGameResultDialog(
+                        result,
+                        score
+                    )
+                )
+            })
     }
 
     private fun startGame() {
@@ -323,7 +363,13 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun showUserMenu(isFriend: Boolean, name: String, userId: Int) {
-        findNavController().navigate(GameFragmentDirections.showUserContextDialog(isFriend, name, userId))
+        findNavController().navigate(
+            GameFragmentDirections.showUserContextDialog(
+                isFriend,
+                name,
+                userId
+            )
+        )
     }
 
     override fun showError(err: Throwable) {
@@ -367,7 +413,10 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun showCorrectionDialog(word: String, errorMsg: String) {
-        findNavController().navigate(GameFragmentDirections.showCorrectionTipsDialog(word, errorMsg))
+        findNavController().apply {
+            if (R.id.gameFragment == currentDestination?.id ?: 0)
+                navigate(GameFragmentDirections.showCorrectionTipsDialog(word, errorMsg))
+        }
     }
 
     private fun setMessagingLayout(isMessagingMode: Boolean) {
