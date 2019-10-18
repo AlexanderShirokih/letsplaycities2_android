@@ -1,7 +1,6 @@
 package ru.aleshi.letsplaycities.base.dictionary
 
 import com.google.gson.Gson
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -28,7 +27,7 @@ class DictionaryUpdater(val mGson: Gson) {
     }
 
     companion object {
-        private val HOST = "http://${BuildConfig.HOST}:80"
+        private const val HOST = "http://${BuildConfig.HOST}:8080"
     }
 
     private var inProgress = false
@@ -63,14 +62,13 @@ class DictionaryUpdater(val mGson: Gson) {
             .subscribe(listener::onProgress, { listener.onError() }, listener::onEnd)
     }
 
-    private fun fetchLastDataVersion(): Maybe<Int> {
+    private fun fetchLastDataVersion(): Single<Int> {
         val url = URL("$HOST/update")
 
         return Single.just(url)
             .subscribeOn(Schedulers.io())
             .map { it.openConnection() }
             .doOnSuccess { it.connect() }
-            .filter { it.contentLength > 0 }
             .map { InputStreamReader(BufferedInputStream(url.openStream(), 64)) }
             .map { mGson.fromJson(it, UpdateRequest::class.java) }
             .map { it.dictionary.version }
