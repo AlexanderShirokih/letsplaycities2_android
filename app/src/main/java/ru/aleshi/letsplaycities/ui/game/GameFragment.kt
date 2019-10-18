@@ -39,6 +39,7 @@ import ru.aleshi.letsplaycities.base.game.GameContract
 import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.network.NetworkUtils
+import ru.aleshi.letsplaycities.network.NetworkUtils.handleError
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
@@ -73,13 +74,17 @@ class GameFragment : Fragment(), GameContract.View {
                     it.checkWithResultCode(USE_HINT) -> showAd()
                     it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession.onFriendRequestResult(
                         it.result
-                    )
+                    ).doOnError { err -> handleError(err, this) }.subscribe()
                 }
             })
 
         mGameViewModel = ViewModelProviders.of(this)[GameViewModel::class.java]
         mGameSessionViewModel =
             ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
+                if (gameSession == null) {
+                    showInfo(getString(R.string.game_session_is_null_error))
+                    findNavController().popBackStack()
+                }
                 mGameSession = gameSession!!
 
                 correctedWord.observe(this@GameFragment, Observer {
@@ -275,8 +280,12 @@ class GameFragment : Fragment(), GameContract.View {
 
         if (message.isNotBlank()) {
             mGameSession.sendMessage(message)
-            messageInput.text = null
-            setMessagingLayout(false)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    messageInput.text = null
+                    setMessagingLayout(false)
+                }.doOnError { err -> handleError(err, this) }
+                .subscribe()
         }
     }
 
@@ -373,7 +382,7 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun showError(err: Throwable) {
-        NetworkUtils.handleError(err, this)
+        handleError(err, this)
     }
 
     override fun updateLabel(info: String, position: Position) {

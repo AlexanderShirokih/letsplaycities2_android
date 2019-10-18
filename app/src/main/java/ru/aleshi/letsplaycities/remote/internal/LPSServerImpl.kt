@@ -1,7 +1,9 @@
 package ru.aleshi.letsplaycities.remote.internal
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import ru.quandastudio.lpsclient.core.LPSClientMessage
 import ru.quandastudio.lpsclient.core.LPSMessage
 import ru.quandastudio.lpsclient.model.PlayerData
@@ -63,9 +65,19 @@ class LPSServerImpl @Inject constructor(
         _listener.onMessage(readMessage())
     }
 
-    private fun writeMessage(msg: LPSMessage) = message.write(connection.getOutputStream(), msg)
+    private fun writeMessage(msg: LPSMessage) {
+        Completable.fromAction {
+            message.write(connection.getOutputStream(), msg)
+        }.subscribeOn(Schedulers.io()).subscribe()
+    }
 
-    private fun readMessage() = message.read(connection.getInputStream())
+    private fun readMessage(): LPSClientMessage {
+        return Single.fromCallable {
+            message.read(connection.getInputStream())
+        }.observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .blockingGet()
+    }
 
     private fun writePlayResponse(playerData: PlayerData) {
         writeMessage(

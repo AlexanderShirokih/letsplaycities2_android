@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.base.game
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import io.reactivex.Completable
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.dictionary.Dictionary
@@ -38,13 +39,13 @@ interface GameContract {
         fun useHint()
         fun onSurrender()
         fun postCorrectedWord(word: String?, errorMsg: String?)
-        fun sendMessage(message: String)
+        fun sendMessage(message: String) : Completable
         fun correct(word: String, errorMsg: String)
         fun dictionary(): Dictionary
         fun needsShowMenu(position: Position)
-        fun sendFriendRequest()
-        fun onFriendRequestResult(isAccepted: Boolean)
-        fun banUser(userId: Int)
+        fun sendFriendRequest() : Completable
+        fun onFriendRequestResult(isAccepted: Boolean) : Completable
+        fun banUser(userId: Int) : Completable
     }
 
 }

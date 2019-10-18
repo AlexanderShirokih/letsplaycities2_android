@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.base.player
 import android.content.Context
 import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.utils.Utils
@@ -18,12 +19,21 @@ class Android(name: String) : User(PlayerData.Factory().create(name), canUseQuic
             .delay(1500, TimeUnit.MILLISECONDS)
             .filter { mEstimatedMoves-- > 0 }
             .flatMap { gameSession.dictionary().getRandomWord(it, false) }
-            .subscribe(::sendCity, {}, { gameSession.onSurrender() })
+            .observeOn(Schedulers.io())
+            .flatMapCompletable(::sendCity)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError { gameSession.onSurrender() }
+            .subscribe()
         )
     }
 
     override fun getAvatar(context: Context): Maybe<Drawable> {
-        return Maybe.fromCallable { Utils.loadDrawable(gameSession.view.context(), R.drawable.ic_android_big) }
+        return Maybe.fromCallable {
+            Utils.loadDrawable(
+                gameSession.view.context(),
+                R.drawable.ic_android_big
+            )
+        }
     }
 
     override fun reset() {

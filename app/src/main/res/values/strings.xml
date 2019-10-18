@@ -251,6 +251,8 @@
     <string name="friends_request_accepted">Игрок %1$s добавлен в друзья</string>
     <string name="friends_request_denied">Заявка отклонена!</string>
     <string name="multiplier">&#xD7;%1$.1f</string>
+    <string name="game_session_is_null_error">Ошибка создания игровой сессии. Попробуйте снова.</string>
+    <string name="unk_error">Произошла неизвестная ошибка. ERR:  %1$s</string>
 
     <string-array name="hints">
         <item>Добро Пожаловать в игру!</item>

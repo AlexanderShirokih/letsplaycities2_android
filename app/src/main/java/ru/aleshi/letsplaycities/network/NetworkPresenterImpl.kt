@@ -109,9 +109,7 @@ class NetworkPresenterImpl @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext { mView?.updateInfo(R.string.waiting_for_friend) }
                 .observeOn(Schedulers.io())
-                .doOnNext { println("Ready to send request") }
                 .flatMap { mNetworkRepository.sendFriendRequestResult(true, oppId) }
-                .doOnComplete { println("Sended!") }
                 .flatMapMaybe { mNetworkRepository.connectToFriend() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ play(userData, oppData = it.first, youStarter = it.second) }, {

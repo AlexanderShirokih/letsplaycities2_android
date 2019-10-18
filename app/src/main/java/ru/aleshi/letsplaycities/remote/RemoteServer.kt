@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.remote
 
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.subjects.ReplaySubject
@@ -26,13 +27,17 @@ class RemoteServer @Inject constructor(private val mRemoteRepository: RemoteRepo
         mRemoteRepository.disconnect()
     }
 
-    override fun broadcastResult(city: String) {
-        mRemoteRepository.sendWord(WordResult.RECEIVED, city)
-        result.onNext(WordResult.ACCEPTED to city)
+    override fun broadcastResult(city: String): Completable {
+        return Completable.fromAction {
+            mRemoteRepository.sendWord(WordResult.RECEIVED, city)
+            result.onNext(WordResult.ACCEPTED to city)
+        }
     }
 
-    override fun broadcastMessage(message: String) {
-        mRemoteRepository.sendMessage(message)
+    override fun broadcastMessage(message: String): Completable {
+        return Completable.fromAction {
+            mRemoteRepository.sendMessage(message)
+        }
     }
 
     override val leave: Maybe<Boolean>

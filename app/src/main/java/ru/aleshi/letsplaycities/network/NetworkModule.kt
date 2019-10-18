@@ -4,11 +4,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Single
-import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.ui.ActivityScope
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.core.NetworkClient
-import javax.inject.Singleton
 
 @Module
 abstract class NetworkModule {

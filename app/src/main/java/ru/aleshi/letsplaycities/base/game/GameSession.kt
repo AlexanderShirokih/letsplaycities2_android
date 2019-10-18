@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.addTo
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
@@ -138,11 +139,10 @@ class GameSession private constructor(
             view.showInfo(view.context().getString(R.string.kicked_by_user))
     }
 
-    override fun banUser(userId: Int) = mServer.banUser(userId)
+    override fun banUser(userId: Int): Completable = mServer.banUser(userId)
 
-    override fun onFriendRequestResult(isAccepted: Boolean) {
+    override fun onFriendRequestResult(isAccepted: Boolean): Completable =
         mServer.sendFriendAcceptance(isAccepted)
-    }
 
 
     private fun showToastAndDisconnect(stringID: Int, timeUp: Boolean) {
@@ -161,7 +161,7 @@ class GameSession private constructor(
                     .subscribe { dic ->
                         setDifficulty(dic)
                         dictionaryUpdater.checkForUpdates(prefs, dic, view.downloadingListener())
-                            ?.run { disposable.add(this) }
+                            ?.addTo(disposable)
                     })
         }
     }
@@ -226,11 +226,11 @@ class GameSession private constructor(
         view.updateLabel(user.info, position)
     }
 
-    fun onCitySended(city: String, player: User) {
-        if (player == currentPlayer) {
+    fun onCitySent(city: String, player: User): Completable {
+        return if (player == currentPlayer) {
             dispatchCityResult(city, player, false)
             mServer.broadcastResult(city)
-        }
+        } else Completable.complete()
     }
 
     private fun handleWordResult(result: WordResult, city: String) {
@@ -356,9 +356,9 @@ class GameSession private constructor(
             postCorrectedWord(null, errorMsg)
     }
 
-    override fun sendMessage(message: String) {
+    override fun sendMessage(message: String): Completable {
         view.putMessage(message, getPlayer().position)
-        mServer.broadcastMessage(message)
+        return mServer.broadcastMessage(message)
     }
 
     private fun getCurrentAsPlayer(): Player? {
@@ -384,9 +384,7 @@ class GameSession private constructor(
         }
     }
 
-    override fun sendFriendRequest() {
-        mServer.sendFriendRequest()
-    }
+    override fun sendFriendRequest(): Completable = mServer.sendFriendRequest()
 
     override fun dictionary(): Dictionary = mDictionary!!
 }

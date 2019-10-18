@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base.game
 
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.GamePreferences
@@ -9,9 +10,11 @@ class LocalServer(private val gamePreferences: GamePreferences) : BaseServer() {
 
     private var result: PublishSubject<Pair<WordResult, String>> = PublishSubject.create()
 
-    override fun broadcastResult(city: String) {
+    override fun broadcastResult(city: String): Completable {
         // We trust our local users
-        result.onNext(WordResult.ACCEPTED to city)
+        return Completable.fromAction {
+            result.onNext(WordResult.ACCEPTED to city)
+        }
     }
 
     override fun getWordsResult(): Observable<Pair<WordResult, String>> = result

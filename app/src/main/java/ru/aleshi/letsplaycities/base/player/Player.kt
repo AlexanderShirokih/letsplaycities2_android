@@ -81,8 +81,21 @@ class Player(playerData: PlayerData) : User(playerData, hasUserInput = true) {
                 )
             )
             Dictionary.CityResult.OK -> {
-                onSuccess()
                 sendCity(data.first)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        onSuccess()
+                    }.subscribe(
+                        {
+                        },
+                        { err ->
+                            gameSession.notify(
+                                gameSession.view.context().getString(
+                                    R.string.unk_error,
+                                    err.message
+                                )
+                            )
+                        })
             }
         }
     }

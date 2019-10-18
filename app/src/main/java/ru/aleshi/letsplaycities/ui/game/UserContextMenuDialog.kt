@@ -7,15 +7,23 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.network.NetworkUtils.handleError
 
 class UserContextMenuDialog : DialogFragment() {
 
     private lateinit var gameSessionViewModel: GameSessionViewModel
 
+    private val disposable = CompositeDisposable()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        gameSessionViewModel = ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java]
+        gameSessionViewModel =
+            ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java]
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -37,16 +45,38 @@ class UserContextMenuDialog : DialogFragment() {
             .create()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.clear()
+    }
+
     private fun sendFriendRequest() {
         gameSessionViewModel.gameSession?.let {
+            val activity = requireActivity()
             it.sendFriendRequest()
-            Toast.makeText(requireActivity(), R.string.new_friend_request, Toast.LENGTH_LONG).show()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Toast.makeText(activity, R.string.new_friend_request, Toast.LENGTH_LONG).show()
+                }, { err -> handleError(err, this) })
         }
     }
 
     private fun banPlayer(login: String, userId: Int) {
-        gameSessionViewModel.gameSession?.banUser(userId)
-        Toast.makeText(requireActivity(), getString(R.string.user_banned, login), Toast.LENGTH_SHORT).show()
-        findNavController().popBackStack(R.id.gameFragment, true)
+        val activity = requireActivity()
+        gameSessionViewModel.gameSession
+            ?.banUser(userId)
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.doAfterTerminate { findNavController().popBackStack(R.id.gameFragment, true) }
+            ?.subscribe(
+                {
+                    Toast.makeText(
+                        activity,
+                        getString(R.string.user_banned, login),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }, { t -> handleError(t, this) }
+            )
+            ?.addTo(disposable)
     }
 }

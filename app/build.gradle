@@ -109,7 +109,7 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
-    implementation 'ru.quandastudio.lps:lpsclient:0.2.1'
+    implementation 'ru.quandastudio.lps:lpsclient:0.2.3'
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 }

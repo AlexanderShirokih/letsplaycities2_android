@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.network
 
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import ru.aleshi.letsplaycities.base.game.BaseServer
@@ -8,14 +9,16 @@ import ru.quandastudio.lpsclient.core.LPSMessage
 import ru.quandastudio.lpsclient.model.WordResult
 import javax.inject.Inject
 
-class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) : BaseServer() {
+class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) :
+    BaseServer() {
 
     override fun getWordsResult(): Observable<Pair<WordResult, String>> {
         return mNetworkRepository.getWords().map { it.result to it.word }
     }
 
     override fun getInputMessages(): Observable<String> {
-        return mNetworkRepository.getMessages().map { if (it.isSystemMsg) "[СИСТЕМА] " else "" + it.msg }
+        return mNetworkRepository.getMessages()
+            .map { if (it.isSystemMsg) "[СИСТЕМА] " else "" + it.msg }
     }
 
     companion object {
@@ -26,32 +29,30 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
         mNetworkRepository.disconnect()
     }
 
-    override fun broadcastResult(city: String) {
+    override fun broadcastResult(city: String) =
         mNetworkRepository.sendWord(city)
-    }
 
     override fun getTimeLimit(): Long = NETWORK_TIMER
 
-    override fun broadcastMessage(message: String) =
+    override fun broadcastMessage(message: String): Completable =
         mNetworkRepository.sendMessage(message)
 
     override val leave: Maybe<Boolean> = mNetworkRepository.getLeave().map { it.leaved }
 
     override val timeout: Maybe<LPSMessage> = mNetworkRepository.getTimeout()
 
-    override val friendsRequest: Observable<LPSMessage.FriendRequest> = mNetworkRepository.getFriendsRequest()
+    override val friendsRequest: Observable<LPSMessage.FriendRequest> =
+        mNetworkRepository.getFriendsRequest()
 
-    override fun sendFriendRequest() {
+    override fun sendFriendRequest(): Completable =
         mNetworkRepository.sendFriendRequest()
-    }
 
-    override fun sendFriendAcceptance(accepted: Boolean) {
+    override fun sendFriendAcceptance(accepted: Boolean): Completable =
         mNetworkRepository.sendFriendAcceptance(accepted)
-    }
 
-    override fun banUser(userId: Int) {
+    override fun banUser(userId: Int): Completable =
         mNetworkRepository.banUser(userId)
-    }
+
 
     override val kick: Maybe<Boolean> = mNetworkRepository.getKick().map { it.isBannedBySystem }
 }

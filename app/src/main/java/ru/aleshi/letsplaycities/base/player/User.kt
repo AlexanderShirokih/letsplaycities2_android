@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.base.player
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameSession
@@ -29,9 +30,8 @@ abstract class User(
 
     abstract fun onBeginMove(firstChar: Char?)
 
-    fun sendCity(city: String) {
-        gameSession.onCitySended(city, this)
-    }
+    fun sendCity(city: String): Completable =
+        gameSession.onCitySent(city, this)
 
     open fun onUserInput(userInput: String, onSuccess: () -> Unit) = Unit
 

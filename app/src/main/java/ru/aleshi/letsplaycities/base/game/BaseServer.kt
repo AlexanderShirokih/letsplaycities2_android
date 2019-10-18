@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base.game
 
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import ru.quandastudio.lpsclient.core.LPSMessage
@@ -11,18 +12,18 @@ abstract class BaseServer {
 
     open fun getInputMessages(): Observable<String> = Observable.empty()
 
-    open fun broadcastMessage(message: String) = Unit
+    open fun broadcastMessage(message: String): Completable = Completable.complete()
 
-    abstract fun broadcastResult(city: String)
+    abstract fun broadcastResult(city: String) : Completable
 
     abstract fun getTimeLimit(): Long
 
-    open fun sendFriendRequest() = Unit
+    open fun sendFriendRequest(): Completable = Completable.complete()
 
-    open fun sendFriendAcceptance(accepted: Boolean) = Unit
+    open fun sendFriendAcceptance(accepted: Boolean): Completable = Completable.complete()
     open fun dispose() = Unit
 
-    open fun banUser(userId: Int) = Unit
+    open fun banUser(userId: Int): Completable = Completable.complete()
 
     open val leave: Maybe<Boolean> = Maybe.never()
 
