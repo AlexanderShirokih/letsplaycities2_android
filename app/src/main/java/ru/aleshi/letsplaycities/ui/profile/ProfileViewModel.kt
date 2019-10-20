@@ -44,6 +44,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             } else {
                 disposable = Utils.loadAvatar(File(avatar).toUri())
                     .map { BitmapDrawable(context.resources, it) }
+                    .onErrorReturnItem(context.resources.getDrawable(R.drawable.ic_player) as BitmapDrawable)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this.avatar::set)
             }

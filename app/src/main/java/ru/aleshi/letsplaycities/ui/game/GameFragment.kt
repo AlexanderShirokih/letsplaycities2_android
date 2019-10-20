@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
@@ -38,7 +39,6 @@ import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.game.GameContract
 import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
-import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.network.NetworkUtils.handleError
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
@@ -83,7 +83,12 @@ class GameFragment : Fragment(), GameContract.View {
             ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
                 if (gameSession == null) {
                     showInfo(getString(R.string.game_session_is_null_error))
-                    findNavController().popBackStack()
+                    Crashlytics.log("Game session is null!")
+                    try {
+                        getActivity()?.supportFragmentManager?.popBackStack()
+                    } catch (e: Exception) {
+                        Crashlytics.logException(e)
+                    }
                 }
                 mGameSession = gameSession!!
 
@@ -290,7 +295,10 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     private fun scrollRecyclerView() {
-        recyclerView.scrollToPosition(mAdapter.itemCount - 1)
+        if (recyclerView != null)
+            recyclerView.scrollToPosition(mAdapter.itemCount - 1)
+        else
+            Crashlytics.log("Can't scroll because recyclerView is null!")
     }
 
     override fun showFriendRequestDialog(name: String) {

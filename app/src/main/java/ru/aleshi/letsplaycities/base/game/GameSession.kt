@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities.base.game
 
 import android.content.Context
+import com.crashlytics.android.Crashlytics
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -252,14 +253,18 @@ class GameSession private constructor(
 
     private fun dispatchCityResult(city: String, player: User?, hasErrors: Boolean) {
         Completable.fromAction {
-            if (player != null) view.putCity(
-                city,
-                mDictionary?.getCountryCode(city) ?: 0,
-                player.position
-            )
+            if (player != null)
+                view.putCity(
+                    city,
+                    mDictionary?.getCountryCode(city) ?: 0,
+                    player.position
+                )
             else {
                 view.updateCity(city, hasErrors)
-                mDictionary!!.applyCity(city)
+                if (mDictionary == null)
+                    Crashlytics.log("Error dispatching city result. city=$city, player=$player, hasErrors=$hasErrors")
+                else
+                    mDictionary!!.applyCity(city)
             }
         }
             .subscribeOn(AndroidSchedulers.mainThread())

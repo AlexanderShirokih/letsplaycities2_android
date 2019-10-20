@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities.ui.profile
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
@@ -25,11 +26,16 @@ class LoginProfileFragment : Fragment(R.layout.fragment_profile_login) {
         SocialNetworkManager.registerCallback(object : SocialNetworkLoginListener {
             override fun onLoggedIn(data: AuthData) {
                 GameAuthDataFactory.GameSaveProvider(gamePrefs).save(data)
-                findNavController().popBackStack()
+                Handler().postDelayed({
+                    findNavController().popBackStack()
+                }, 1000)
             }
 
-            override fun onError() =
-                Snackbar.make(requireView(), R.string.auth_error, Snackbar.LENGTH_LONG).show()
+            override fun onError() {
+                Handler().postDelayed({
+                    Snackbar.make(requireView(), R.string.auth_error, Snackbar.LENGTH_LONG).show()
+                }, 100)
+            }
         })
     }
 

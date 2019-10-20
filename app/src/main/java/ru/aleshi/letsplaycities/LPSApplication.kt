@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities
 
 import androidx.multidex.MultiDexApplication
+import com.crashlytics.android.Crashlytics
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -29,5 +30,6 @@ class LPSApplication : MultiDexApplication(), HasAndroidInjector {
             .inject(this)
 
         SocialNetworkManager.init(this, ServiceType.VK)
+        Crashlytics.getInstance()
     }
 }

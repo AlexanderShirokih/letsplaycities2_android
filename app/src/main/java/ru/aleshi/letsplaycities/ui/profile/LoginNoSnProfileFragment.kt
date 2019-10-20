@@ -77,6 +77,7 @@ class LoginNoSnProfileFragment : Fragment() {
         prefs.getLastAvatarUri()?.run {
             Utils.loadAvatar(File(this).toUri())
                 .map { BitmapDrawable(resources, it) }
+                .onErrorReturnItem(resources.getDrawable(R.drawable.ic_player) as BitmapDrawable)
                 .subscribe(mProfileViewModel.avatar::set)
         }
     }
