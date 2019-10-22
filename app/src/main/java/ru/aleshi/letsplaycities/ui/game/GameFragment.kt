@@ -31,6 +31,7 @@ import com.google.android.gms.ads.reward.RewardedVideoAd
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
@@ -52,7 +53,7 @@ class GameFragment : Fragment(), GameContract.View {
     private lateinit var mBinding: FragmentGameBinding
     private lateinit var mGameViewModel: GameViewModel
     private lateinit var mGameSessionViewModel: GameSessionViewModel
-    private lateinit var mGameSession: GameContract.Presenter
+    private var mGameSession: GameContract.Presenter? = null
     private lateinit var mAdapter: GameAdapter
     private lateinit var mRewardedVideoAd: RewardedVideoAd
 
@@ -70,31 +71,22 @@ class GameFragment : Fragment(), GameContract.View {
                         R.id.mainMenuFragment,
                         false
                     )
-                    it.checkWithResultCode(SURRENDER) -> mGameSession.onSurrender()
+                    it.checkWithResultCode(SURRENDER) -> mGameSession?.onSurrender()
                     it.checkWithResultCode(USE_HINT) -> showAd()
-                    it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession.onFriendRequestResult(
+                    it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession?.onFriendRequestResult(
                         it.result
-                    ).doOnError { err -> handleError(err, this) }.subscribe()
+                    )?.subscribe({}, { err -> handleError(err, this) })
                 }
             })
 
         mGameViewModel = ViewModelProviders.of(this)[GameViewModel::class.java]
         mGameSessionViewModel =
             ViewModelProviders.of(activity)[GameSessionViewModel::class.java].apply {
-                if (gameSession == null) {
-                    showInfo(getString(R.string.game_session_is_null_error))
-                    Crashlytics.log("Game session is null!")
-                    try {
-                        getActivity()?.supportFragmentManager?.popBackStack()
-                    } catch (e: Exception) {
-                        Crashlytics.logException(e)
-                    }
-                }
-                mGameSession = gameSession!!
+                mGameSession = gameSession
 
                 correctedWord.observe(this@GameFragment, Observer {
                     if (it != null) {
-                        mGameSession.postCorrectedWord(it.first, it.second)
+                        mGameSession?.postCorrectedWord(it.first, it.second)
                         it.first?.let { cityInput.text = null }
                         correctedWord.value = null
                     }
@@ -147,7 +139,7 @@ class GameFragment : Fragment(), GameContract.View {
             }
         }
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(activity).apply {
-            rewardedVideoAdListener = TipsListener(::loadRewardedVideoAd, mGameSession::useHint)
+            rewardedVideoAdListener = TipsListener(::loadRewardedVideoAd, mGameSession!!::useHint)
         }
         if (!mRewardedVideoAd.isLoaded)
             loadRewardedVideoAd()
@@ -204,6 +196,17 @@ class GameFragment : Fragment(), GameContract.View {
         val activity = requireActivity()
         (activity as MainActivity).setToolbarVisibility(false)
 
+        if (mGameSession == null) {
+            showInfo(getString(R.string.game_session_is_null_error))
+            Crashlytics.log("Game session is null!")
+            try {
+                getActivity()?.supportFragmentManager?.popBackStack()
+            } catch (e: Exception) {
+                Crashlytics.logException(e)
+            }
+            return
+        }
+
         checkForFirstLaunch()
         setupCityListeners(activity)
         setupMessageListeners()
@@ -213,8 +216,8 @@ class GameFragment : Fragment(), GameContract.View {
         btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
         btnHelp.setOnClickListener { showConfirmationDialog(USE_HINT, R.string.use_hint) }
         btnMsg.setOnClickListener { setMessagingLayout(messageInputLayout.visibility != View.VISIBLE) }
-        avatarLeft.setOnClickListener { mGameSession.needsShowMenu(Position.LEFT) }
-        avatarRight.setOnClickListener { mGameSession.needsShowMenu(Position.RIGHT) }
+        avatarLeft.setOnClickListener { mGameSession?.needsShowMenu(Position.LEFT) }
+        avatarRight.setOnClickListener { mGameSession?.needsShowMenu(Position.RIGHT) }
 
         recyclerView.apply {
             adapter = mAdapter
@@ -270,12 +273,12 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         SpeechRecognitionHelper.onActivityResult(requestCode, resultCode, data) {
-            mGameSession.submit(it) {}
+            mGameSession?.submit(it) {} ?: false
         }
     }
 
     private fun submit() {
-        mGameSession.submit(cityInput.text.toString()) {
+        mGameSession?.submit(cityInput.text.toString()) {
             cityInput.text = null
         }
     }
@@ -284,13 +287,14 @@ class GameFragment : Fragment(), GameContract.View {
         val message = messageInput.text!!.toString()
 
         if (message.isNotBlank()) {
-            mGameSession.sendMessage(message)
+            mGameSession!!.sendMessage(message)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     messageInput.text = null
                     setMessagingLayout(false)
-                }.doOnError { err -> handleError(err, this) }
-                .subscribe()
+                }
+                .subscribe({}, { err -> handleError(err, this) })
+                .addTo(disposable)
         }
     }
 
@@ -350,14 +354,14 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     private fun startGame() {
-        mGameSession.onAttachView(this)
+        mGameSession?.onAttachView(this)
         mAdapter.clear()
     }
 
     private fun stopGame() {
         hideKeyboard()
         disposable.clear()
-        mGameSession.onStop()
+        mGameSession?.onStop()
     }
 
     override fun onStart() {
@@ -372,7 +376,7 @@ class GameFragment : Fragment(), GameContract.View {
 
     override fun onDetach() {
         super.onDetach()
-        mGameSession.onDetachView()
+        mGameSession?.onDetachView()
     }
 
     override fun showInfo(msg: String) {
