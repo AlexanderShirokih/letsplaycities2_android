@@ -20,7 +20,7 @@ android {
         }
     }
     def HOST_LOCAL = "\"192.168.2.244\""
-    def HOST_REMOTE = "\"letsplaycities.online\""
+    def HOST_REMOTE = "\"194.87.111.204\""
 
     compileSdkVersion 29
     defaultConfig {
