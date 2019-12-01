@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.ui.game
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -59,6 +60,9 @@ class GameFragment : Fragment(), GameContract.View {
 
     private var mClickSound: MediaPlayer? = null
     private val disposable: CompositeDisposable = CompositeDisposable()
+    private val screenReceiver = ScreenReceiver {
+        mGameSession?.onSurrender()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,7 +109,15 @@ class GameFragment : Fragment(), GameContract.View {
         }
         if (getGamePreferences().isSoundEnabled()) {
             mClickSound = MediaPlayer.create(activity, R.raw.click)
+            screenReceiver.sound = MediaPlayer.create(activity, R.raw.notification)
         }
+
+        // Register receiver for handling screen power off events
+        activity.registerReceiver(screenReceiver,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_SCREEN_ON)
+            })
     }
 
     override fun downloadingListener(): DictionaryUpdater.DownloadingListener {
@@ -233,6 +245,8 @@ class GameFragment : Fragment(), GameContract.View {
             }
             setHasFixedSize(true)
         }
+
+        startGame()
     }
 
     private fun checkForFirstLaunch() {
@@ -364,18 +378,10 @@ class GameFragment : Fragment(), GameContract.View {
         mGameSession?.onStop()
     }
 
-    override fun onStart() {
-        super.onStart()
-        startGame()
-    }
-
-    override fun onStop() {
-        stopGame()
-        super.onStop()
-    }
-
     override fun onDetach() {
+        stopGame()
         super.onDetach()
+        requireActivity().unregisterReceiver(screenReceiver)
         mGameSession?.onDetachView()
     }
 
