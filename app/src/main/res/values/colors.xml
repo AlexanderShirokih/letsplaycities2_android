@@ -25,6 +25,11 @@
     <color name="whtColorPrimaryDark">#5F5F5F</color>
     <color name="wht_window_bg">#ffffff</color>
 
+    <!-- Dark theme -->
+    <color name="drkColorPrimary">#bb86fc</color>
+    <color name="drkColorPrimaryDark">#E4E4E4</color>
+    <color name="drk_window_bg">#121212</color>
+
     <!-- Russia theme -->
     <color name="rusColorPrimary">#1565C0</color>
     <color name="rusColorPrimaryDark">#0011ff</color>

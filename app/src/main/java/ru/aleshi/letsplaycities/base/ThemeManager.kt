@@ -11,6 +11,7 @@ object ThemeManager {
         Theme(3, R.style.GrStyleTheme, null),
         Theme(4, R.style.WhiteStyleTheme, null),
         Theme(5, R.style.GeoStyleTheme, null),
+        Theme(6, R.style.DarkStyleTheme, null),
         Theme(647, R.style.RusStyleTheme, "rus"),
         Theme(85444, R.style.UkrStyleTheme, "ukr"),
         Theme(5844672, R.style.FrStyleTheme, "fr"),

@@ -9,6 +9,7 @@
     <attr name="itemMsgMe" format="reference"/>
     <attr name="itemMsgOther" format="reference"/>
     <attr name="fgSpanColor" format="color|reference"/>
+    <attr name="avatarBorderColor" format="color|reference"/>
 
     <!-- Default app theme (Yellow) -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -26,6 +27,7 @@
         <item name="fgSpanColor">@color/fg_span_color</item>
         <item name="scoreColor">?android:textColor</item>
         <item name="cityInputColor">@android:color/white</item>
+        <item name="avatarBorderColor">?colorPrimaryDark</item>
 
         <item name="android:textColor">#2E2E2E</item>
         <item name="android:textColorHint">#2E2E2E</item>
@@ -60,6 +62,7 @@
         <item name="android:layout_width">80dp</item>
         <item name="android:layout_height">80dp</item>
 
+        <item name="civ_border_color">#0f0</item>
         <item name="civ_border_width">4dp</item>
         <item name="civ_shadow">true</item>
         <item name="civ_shadow_radius">4</item>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DarkStyleTheme" parent="AppTheme">
+        <item name="colorAccent">@color/drkColorPrimary</item>
+        <item name="colorPrimary">@color/drkColorPrimary</item>
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="colorSecondary">@android:color/black</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorSurface">#1e1e1e</item>
+        <item name="colorOnSurface">@android:color/white</item>
+        <item name="colorOnBackground">@android:color/white</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="android:windowBackground">@color/drk_window_bg</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorHint">@color/drkColorPrimaryDark</item>
+        <item name="itemBgMe">@drawable/drk_bg_other</item>
+        <item name="itemBgOther">@drawable/drk_bg_other</item>
+        <item name="itemMsgMe">@drawable/drk_msg_bg</item>
+        <item name="itemMsgOther">@drawable/drk_msg_bg</item>
+        <item name="cityInputColor">#fff</item>
+        <item name="fgSpanColor">#fff</item>
+        <item name="avatarBorderColor">#fff</item>
+    </style>
+
+</resources>

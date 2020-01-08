@@ -13,7 +13,7 @@ object Bindings {
     fun setUseBorder(circularImageView: CircularImageView, useBorder: Boolean) {
         val color = resolveColor(
             circularImageView.context,
-            if (useBorder) R.attr.colorPrimaryDark else R.attr.colorOnPrimary
+            if (useBorder) R.attr.avatarBorderColor else R.attr.colorOnPrimary
         )
         circularImageView.borderColor = color
         circularImageView.shadowColor = color
