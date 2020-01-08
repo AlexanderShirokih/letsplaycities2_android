@@ -84,7 +84,7 @@ class BlackListFragment : Fragment() {
 
     private fun buildBlackList() {
         mGamePlayerDataFactory.load(mApplication.gamePreferences)?.let { userData ->
-            mNetworkRepository = NetworkRepository(NetworkClient(AndroidBase64Provider,false, BuildConfig.HOST), NetworkUtils.getToken()).apply {
+            mNetworkRepository = NetworkRepository(NetworkClient(AndroidBase64Provider,false, NetworkClient.ConnectionType.WebSocket, BuildConfig.HOST), NetworkUtils.getToken()).apply {
                 mDisposable.addAll(
                     login(userData)
                         .observeOn(AndroidSchedulers.mainThread())

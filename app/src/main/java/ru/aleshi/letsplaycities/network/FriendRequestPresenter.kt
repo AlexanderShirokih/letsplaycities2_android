@@ -16,7 +16,7 @@ class FriendRequestPresenter(private val mView: FriendRequestContract.View) :
         GamePlayerDataFactory(GameAuthDataFactory())
             .load(mView.gamePreferences())?.let { userData ->
                 NetworkRepository(
-                    NetworkClient(AndroidBase64Provider, false, BuildConfig.HOST),
+                    NetworkClient(AndroidBase64Provider, false, NetworkClient.ConnectionType.WebSocket, BuildConfig.HOST),
                     NetworkUtils.getToken()
                 ).apply {
                     login(userData)

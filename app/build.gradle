@@ -76,19 +76,19 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.google.android.material:material:1.1.0-alpha10'
+    implementation 'com.google.android.material:material:1.2.0-alpha03'
     implementation 'com.mikhaellopez:circularimageview:4.0.1'
-    implementation 'com.android.billingclient:billing:2.0.1'
+    implementation 'com.android.billingclient:billing:2.1.0'
 
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
-    implementation 'com.google.android.gms:play-services-ads-lite:18.2.0'
+    implementation 'com.google.android.gms:play-services-ads-lite:18.3.0'
     implementation 'com.vk:androidsdk:2.1.1'
     implementation 'com.facebook.android:facebook-login:4.42.0'
     implementation 'ru.ok:odnoklassniki-android-sdk:2.1.8'
 
 
-    implementation 'com.google.firebase:firebase-core:17.2.0'
-    implementation 'com.google.firebase:firebase-messaging:20.0.0'
+    implementation 'com.google.firebase:firebase-core:17.2.1'
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
@@ -109,7 +109,8 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
-    implementation 'ru.quandastudio.lps:lpsclient:0.2.3'
+    implementation "ru.quandastudio.lps:lpsclient:0.3.0"
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+
 }
