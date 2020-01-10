@@ -1,28 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
-        <variable name="dialog" type="ru.aleshi.letsplaycities.ui.network.ChangeModeDialog"/>
+
+        <variable
+                name="dialog"
+                type="ru.aleshi.letsplaycities.ui.network.ChangeModeDialog" />
     </data>
 
-    <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="vertical"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-    android:padding="10dp">
+            android:orientation="vertical"
+            android:padding="10dp">
 
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 android:text="@string/dialog_change_mode_title"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
 
         <RadioGroup
-                android:onCheckedChanged="@{dialog::onModeChanged}"
                 android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" >
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/btn_by_points"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/scoring_by_points"
+                    android:textColor="?android:attr/textColor"/>
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/btn_by_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/scoring_by_time"
+                    android:textColor="?android:attr/textColor"/>
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/btn_by_surr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/scoring_by_surr"
+                    android:textColor="?android:attr/textColor"/>
+        </RadioGroup>
 
         <TextView
                 android:id="@+id/dcm_desc"
@@ -30,6 +54,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
-                android:text="@{dialog.description}"/>
+                android:text="@{dialog.description}" />
     </LinearLayout>
 </layout>

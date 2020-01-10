@@ -47,10 +47,14 @@
         <item>Проверка обновлений словаря</item>
     </string-array>
 
+    <string name="scoring_by_points">По очкам</string>
+    <string name="scoring_by_time">По времени</string>
+    <string name="scoring_by_surr">До сдачи</string>
+
     <string-array name="scoring">
-        <item>По очкам</item>
-        <item>По времени</item>
-        <item>До сдачи</item>
+        <item>@string/scoring_by_points</item>
+        <item>@string/scoring_by_time</item>
+        <item>@string/scoring_by_surr</item>
     </string-array>
 
     <string-array name="timing">

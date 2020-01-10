@@ -6,7 +6,7 @@
         <item name="colorPrimary">@color/drkColorPrimary</item>
         <item name="colorPrimaryDark">@android:color/black</item>
         <item name="colorSecondary">@android:color/black</item>
-        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorSurface">#1e1e1e</item>
         <item name="colorOnSurface">@android:color/white</item>
         <item name="colorOnBackground">@android:color/white</item>

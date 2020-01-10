@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -37,7 +38,7 @@ class CorrectionTipsDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
-        return AlertDialog.Builder(activity)
+        return MaterialAlertDialogBuilder(activity)
             .setTitle(R.string.searching_words)
             .setView(DialogCorrectionTipsBinding.inflate(LayoutInflater.from(activity)).apply {
                 dialog = this@CorrectionTipsDialog
