@@ -28,8 +28,8 @@ android {
         multiDexEnabled true
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 240
-        versionName "2.4.0"
+        versionCode 250
+        versionName "2.5.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
 
@@ -109,7 +109,9 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
-    implementation "ru.quandastudio.lps:lpsclient:0.3.0"
+    implementation "ru.quandastudio.lps:lpsclient:0.3.1"
+
+    implementation "tech.gusavila92:java-android-websocket-client:1.2.3"
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
