@@ -33,6 +33,15 @@
             tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_history"
+            app:layout_constraintBottom_toTopOf="@id/btnFriends"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnFriends"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -79,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="btnConnect,btnFriends"
+            app:constraint_referenced_ids="btnConnect,btnFriends,btnHistory"
             tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Group

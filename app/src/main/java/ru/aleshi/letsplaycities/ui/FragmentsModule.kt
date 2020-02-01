@@ -12,6 +12,7 @@ import ru.aleshi.letsplaycities.ui.friends.FriendsFragment
 import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkClientFromNetworkFragmentModule
+import ru.aleshi.letsplaycities.ui.network.history.HistoryFragment
 import ru.aleshi.letsplaycities.ui.remote.MultiplayerFragment
 import ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment
 
@@ -33,6 +34,10 @@ abstract class FragmentsModule {
     @ActivityScope
     @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientModule::class])
     abstract fun contributeFriendsFragment(): FriendsFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientModule::class])
+    abstract fun contributeHistoryFragment(): HistoryFragment
 
     @ActivityScope
     @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientModule::class])

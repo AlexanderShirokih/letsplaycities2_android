@@ -61,6 +61,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         mNetworkPresenter.onAttachView(this)
 
         btnFriends.setOnClickListener { findNavController().navigate(R.id.start_friends_fragment) }
+        btnHistory.setOnClickListener { findNavController().navigate(R.id.start_history_fragment) }
         btnConnect.setOnClickListener { mNetworkPresenter.onConnect(getVersionInfo()) }
         btnCancel.setOnClickListener { mNetworkPresenter.onCancel() }
     }
@@ -96,8 +97,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     override fun getGamePreferences(): GamePreferences = mGamePreferences
 
-    override fun onCancel()
-    {
+    override fun onCancel() {
         setLoadingLayout(false)
         setupLayout(true)
     }

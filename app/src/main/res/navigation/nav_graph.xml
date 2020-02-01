@@ -257,6 +257,9 @@
             <action
                     android:id="@+id/actionManageProfile"
                     app:destination="@id/profileManager" />
+            <action
+                    android:id="@+id/start_history_fragment"
+                    app:destination="@id/historyFragment" />
         </fragment>
         <fragment
                 android:id="@+id/friendsFragment"
@@ -271,6 +274,11 @@
                 android:id="@+id/changeModeDialog"
                 android:name="ru.aleshi.letsplaycities.ui.network.ChangeModeDialog"
                 android:label="ChangeModeDialog" />
+        <fragment
+                android:id="@+id/historyFragment"
+                android:name="ru.aleshi.letsplaycities.ui.network.history.HistoryFragment"
+                android:label="@string/history_title"
+                tools:layout="@layout/fragment_history" />
     </navigation>
     <navigation
             android:id="@+id/profileManager"

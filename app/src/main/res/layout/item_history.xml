@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="2dp"
+        android:descendantFocusability="blocksDescendants"
+        app:cardBackgroundColor="?attr/colorSurface">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+        <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/iv_picture"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="7dp"
+                android:src="@drawable/ic_player"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@tools:sample/avatars" />
+
+        <ImageView
+                android:id="@+id/iconFriends"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_friends"
+                android:tint="?attr/colorAccent"
+                app:layout_constraintBottom_toBottomOf="@id/iv_picture"
+                app:layout_constraintEnd_toEndOf="@id/iv_picture" />
+
+        <TextView
+                android:id="@+id/item_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_picture"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@tools:sample/full_names" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvStartTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                app:drawableTint="?attr/colorOnBackground"
+                android:drawableStart="@drawable/ic_time_small"
+                android:drawablePadding="2dp"
+                app:layout_constraintStart_toStartOf="@id/item_name"
+                app:layout_constraintTop_toBottomOf="@id/item_name"
+                tools:text="Сегодня, 14:30" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                app:drawableTint="?attr/colorOnBackground"
+                android:drawableStart="@drawable/ic_timer_small"
+                android:drawablePadding="2dp"
+                app:layout_constraintStart_toEndOf="@id/tvStartTime"
+                app:layout_constraintTop_toBottomOf="@id/item_name"
+                tools:text="14:30" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvWordsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                app:drawableTint="?attr/colorOnBackground"
+                android:drawableStart="@drawable/ic_star_small"
+                android:drawablePadding="2dp"
+                app:layout_constraintStart_toEndOf="@id/tvDuration"
+                app:layout_constraintTop_toBottomOf="@id/item_name"
+                tools:text="14 слов" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
