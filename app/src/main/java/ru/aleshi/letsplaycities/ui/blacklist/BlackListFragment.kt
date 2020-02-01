@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -91,7 +92,7 @@ class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
     }
 
     private fun setListVisibility(visible: Boolean) {
-        recyclerView.visibility = if (visible) View.VISIBLE else View.INVISIBLE
-        blacklist_placeholder.visibility = if (visible) View.INVISIBLE else View.VISIBLE
+        recyclerView.isVisible = visible
+        blacklist_placeholder.isVisible = !visible
     }
 }
