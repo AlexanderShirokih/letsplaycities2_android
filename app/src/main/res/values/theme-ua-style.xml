@@ -6,9 +6,9 @@
         <item name="colorPrimary">@color/ukrColorPrimary</item>
         <item name="colorPrimaryDark">@color/ukrColorPrimaryDark</item>
         <item name="colorSecondary">@color/ukrColorPrimary</item>
-        <item name="colorOnBackground">@android:color/white</item>
+        <item name="colorOnBackground">@android:color/black</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@android:color/black</item>
         <item name="android:windowBackground">@drawable/bg_kiev</item>
         <item name="fgSpanColor">@color/rus_fg_span_color</item>
         <item name="itemBgMe">@drawable/ukr_bg_me</item>
