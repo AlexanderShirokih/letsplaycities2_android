@@ -4,53 +4,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import dagger.android.support.AndroidSupportInjection
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
-import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.player.GamePlayerDataFactory
-import ru.aleshi.letsplaycities.network.NetworkUtils
-import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
-import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
+import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.FriendInfo
-import javax.inject.Inject
 
-class FriendsFragment : Fragment(), FriendsItemListener {
+class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(), FriendsItemListener {
     companion object {
         private const val REQUEST_CODE_SELECT_ITEM = 1
         private const val REQUEST_CODE_REMOVE_ITEM = 2
     }
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    @Inject
-    lateinit var mNetworkRepository: NetworkRepository
-    @Inject
-    lateinit var mGamePlayerDataFactory: GamePlayerDataFactory
-
-    private lateinit var mApplication: LPSApplication
     private lateinit var mAdapter: FriendsListAdapter
     private lateinit var mSelectedFriendsInfo: FriendInfo
-    private val mDisposable: CompositeDisposable = CompositeDisposable()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidSupportInjection.inject(this)
-        super.onCreate(savedInstanceState)
-        mApplication = lpsApplication
-        ViewModelProviders.of(
-            requireActivity(),
-            viewModelFactory
-        )[ConfirmViewModel::class.java].callback.observe(this,
+    override fun onCreate(viewModelProvider: ViewModelProvider) {
+        viewModelProvider[ConfirmViewModel::class.java].callback.observe(this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.result && ::mSelectedFriendsInfo.isInitialized) {
                     when (request.resultCode) {
@@ -111,43 +90,18 @@ class FriendsFragment : Fragment(), FriendsItemListener {
         )
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        mGamePlayerDataFactory.load(mApplication.gamePreferences)?.let { userData ->
-            mDisposable.addAll(
-                mNetworkRepository.login(userData)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ requestFriendsList() }, ::handleError)
-            )
-        }
-    }
+    override fun onStartRequest(networkRepository: NetworkRepository): Single<ArrayList<FriendInfo>> =
+        networkRepository.getFriendsList()
 
-    override fun onStop() {
-        super.onStop()
-        mDisposable.dispose()
-        mNetworkRepository.disconnect()
-    }
-
-    private fun requestFriendsList() {
-        mDisposable.addAll(
-            mNetworkRepository.getFriendsList()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(::populateList, ::handleError)
-        )
-    }
-
-    private fun populateList(list: ArrayList<FriendInfo>) {
-        mAdapter.updateItems(list)
-        if (list.isNotEmpty()) {
+    override fun onDataFetched(result: ArrayList<FriendInfo>) {
+        mAdapter.updateItems(result)
+        if (result.isNotEmpty()) {
             recyclerView.visibility = View.VISIBLE
             placeholder.visibility = View.GONE
         } else {
             recyclerView.visibility = View.GONE
             placeholder.visibility = View.VISIBLE
         }
-    }
-
-    private fun handleError(t: Throwable) {
-        NetworkUtils.handleError(t, this)
     }
 
 }
