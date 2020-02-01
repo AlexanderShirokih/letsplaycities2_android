@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_blacklist.view.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.ui.BasicListAdapter
+import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
 import ru.quandastudio.lpsclient.model.BlackListItem
 
-class BlackListAdapter(private val onItemClickListener: OnItemClickListener) :
-    RecyclerView.Adapter<BlackListAdapter.BlackListViewHolder>() {
-
-    private var list: MutableList<BlackListItem> = mutableListOf()
+class BlackListAdapter(private val onItemClickListener: OnRemovableItemClickListener<BlackListItem>) :
+    BasicListAdapter<BlackListItem, BlackListAdapter.BlackListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlackListViewHolder {
         val view =
@@ -19,32 +19,19 @@ class BlackListAdapter(private val onItemClickListener: OnItemClickListener) :
         val holder = BlackListViewHolder(view)
         view.btn_remove.setOnClickListener {
             if (holder.adapterPosition != RecyclerView.NO_POSITION)
-                onItemClickListener.onRemove(list[holder.adapterPosition], holder.adapterPosition)
+                onItemClickListener.onRemoveItemClicked(
+                    getItem(holder.adapterPosition),
+                    holder.adapterPosition
+                )
         }
         return holder
     }
 
-    override fun getItemCount() = list.size
+    class BlackListViewHolder(private val view: View) :
+        BasicListAdapter.ViewHolder<BlackListItem>(view) {
 
-    override fun onBindViewHolder(holder: BlackListViewHolder, position: Int) {
-        holder.bind(list[position])
-    }
-
-    fun remove(pos: Int) {
-        list.removeAt(pos)
-        notifyItemRemoved(pos)
-    }
-
-    fun updateItems(newList: List<BlackListItem>) {
-        list.clear()
-        list.addAll(newList)
-        notifyDataSetChanged()
-    }
-
-    class BlackListViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-
-        fun bind(s: BlackListItem) {
-            view.item_name.text = s.login
+        override fun bind(item: BlackListItem) {
+            view.item_name.text = item.login
         }
 
     }

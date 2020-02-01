@@ -14,12 +14,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.FriendInfo
 
-class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(), FriendsItemListener {
+class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
+    OnRemovableItemClickListener<FriendInfo> {
     companion object {
         private const val REQUEST_CODE_SELECT_ITEM = 1
         private const val REQUEST_CODE_REMOVE_ITEM = 2
@@ -66,9 +68,9 @@ class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(), Frie
         }
     }
 
-    override fun onFriendsItemClicked(friendsInfo: FriendInfo) {
-        mSelectedFriendsInfo = friendsInfo
-        val msg = resources.getString(R.string.invite_friend, friendsInfo.login)
+    override fun onItemClicked(item: FriendInfo) {
+        mSelectedFriendsInfo = item
+        val msg = resources.getString(R.string.invite_friend, item.login)
         findNavController().navigate(
             FriendsFragmentDirections.showConfimationDialog(
                 REQUEST_CODE_SELECT_ITEM,
@@ -78,9 +80,9 @@ class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(), Frie
         )
     }
 
-    override fun onRemoveFriendsItem(friendsInfo: FriendInfo) {
-        mSelectedFriendsInfo = friendsInfo
-        val msg = resources.getString(R.string.remove_from_friends, friendsInfo.login)
+    override fun onRemoveItemClicked(item: FriendInfo, position: Int) {
+        mSelectedFriendsInfo = item
+        val msg = resources.getString(R.string.remove_from_friends, item.login)
         findNavController().navigate(
             FriendsFragmentDirections.showConfimationDialog(
                 REQUEST_CODE_REMOVE_ITEM,

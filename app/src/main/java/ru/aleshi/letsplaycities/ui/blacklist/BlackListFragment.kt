@@ -12,6 +12,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.NetworkRepository
@@ -32,8 +33,8 @@ class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
                 callback = null
             }
         })
-        mAdapter = BlackListAdapter(object : OnItemClickListener {
-            override fun onRemove(item: BlackListItem, pos: Int) {
+        mAdapter = BlackListAdapter(object : OnRemovableItemClickListener<BlackListItem> {
+            override fun onRemoveItemClicked(item: BlackListItem, position: Int) {
                 showConfirmDialog(
                     requireContext().getString(
                         R.string.remove_from_blacklist,
@@ -43,7 +44,7 @@ class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
                     mNetworkRepository.removeFromBanList(item.userId)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            mAdapter.remove(pos)
+                            mAdapter.removeAt(position)
                             setListVisibility(mAdapter.itemCount != 0)
                         }
                 }
