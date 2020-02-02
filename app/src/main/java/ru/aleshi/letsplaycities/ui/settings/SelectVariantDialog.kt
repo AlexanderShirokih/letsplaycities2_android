@@ -4,7 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.NumberPicker
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SelectVariantDialog : DialogFragment() {
@@ -37,7 +37,7 @@ class SelectVariantDialog : DialogFragment() {
     }
 
     private fun postSelectedItem(position: Int, value: Int) {
-        ViewModelProviders.of(requireActivity())[SettingsViewModel::class.java].selectedItem.value =
+        ViewModelProvider(requireActivity())[SettingsViewModel::class.java].selectedItem.value =
             position to value
     }
 }

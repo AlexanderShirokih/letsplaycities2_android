@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_profile_login_no_sn.*
@@ -27,7 +27,7 @@ class LoginNoSnProfileFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mGamePreferences = (requireContext().applicationContext as LPSApplication).gamePreferences
-        mProfileViewModel = ViewModelProviders.of(requireActivity())[ProfileViewModel::class.java]
+        mProfileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
     }
 
     override fun onCreateView(

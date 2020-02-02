@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -35,7 +34,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
         super.onCreate(savedInstanceState)
         mApplication = lpsApplication
         onCreate(
-            ViewModelProviders.of(
+            ViewModelProvider(
                 requireActivity(),
                 viewModelFactory
             )

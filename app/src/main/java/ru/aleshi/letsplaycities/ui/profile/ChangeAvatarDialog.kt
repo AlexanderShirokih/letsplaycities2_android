@@ -10,7 +10,7 @@ import android.provider.MediaStore
 import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.R
@@ -28,7 +28,7 @@ class ChangeAvatarDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mProfileViewModel = ViewModelProviders.of(requireActivity())[ProfileViewModel::class.java]
+        mProfileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

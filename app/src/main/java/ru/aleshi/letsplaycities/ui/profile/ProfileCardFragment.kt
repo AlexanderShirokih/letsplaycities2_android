@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
@@ -22,7 +22,7 @@ class ProfileCardFragment : DialogFragment() {
         mGamePreferences = (requireContext().applicationContext as LPSApplication).gamePreferences
 
         mProfileViewModel =
-            ViewModelProviders.of(requireActivity())[ProfileViewModel::class.java]
+            ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
     }
 
     override fun onResume() {

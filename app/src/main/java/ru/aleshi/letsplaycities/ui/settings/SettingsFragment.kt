@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,7 +25,7 @@ class SettingsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         prefs = (requireContext().applicationContext as LPSApplication).gamePreferences
-        ViewModelProviders.of(requireActivity())[SettingsViewModel::class.java].selectedItem.observe(this, Observer {
+        ViewModelProvider(requireActivity())[SettingsViewModel::class.java].selectedItem.observe(this, Observer {
             prefs.putSettingValue(it.first, it.second)
             adapter.updateItem(it.first, it.second)
         })

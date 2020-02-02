@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.databinding.DialogGameResultBinding
@@ -49,7 +49,7 @@ class GameResultDialog : DialogFragment() {
             SelectedItem.REPLAY -> {
                 val nav = findNavController()
                 if (!nav.popBackStack(R.id.networkFragment, false)) {
-                    ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].restart.value = true
+                    ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].restart.value = true
                     nav.navigate(R.id.back_to_game_fragment)
                 }
             }

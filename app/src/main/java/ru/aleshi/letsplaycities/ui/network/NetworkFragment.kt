@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -33,7 +33,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     private val mGamePreferences: GamePreferences by lazy { lpsApplication.gamePreferences }
     private val mFriendsViewModel: FriendsViewModel by lazy {
-        ViewModelProviders.of(requireActivity())[FriendsViewModel::class.java]
+        ViewModelProvider(requireActivity())[FriendsViewModel::class.java]
     }
     private var mLastConnectionTime: Long = 0
     private val reconnectionDelay = 5
@@ -83,7 +83,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     }
 
     override fun onStartGame(session: GameSession) {
-        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession =
+        ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =
             session
         mGameSound?.start()
         findNavController().navigate(R.id.start_game_fragment)

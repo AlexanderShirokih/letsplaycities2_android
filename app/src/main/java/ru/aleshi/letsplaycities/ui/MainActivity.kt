@@ -5,12 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.games.Games
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -20,6 +23,7 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.ThemeManager
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import javax.inject.Inject
+
 
 class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
@@ -46,6 +50,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
         )
         MobileAds.initialize(this)
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
+        buildApiClient()
         checkForFirebaseNotifications(intent)
     }
 
@@ -70,6 +75,18 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
         else
             supportActionBar?.hide()
     }
+
+    private fun buildApiClient() {
+        val apiClient = GoogleApiClient.Builder(this)
+            .addApi(Games.API)
+            .addScope(Games.SCOPE_GAMES)
+            .enableAutoManage(this) {
+                Log.e("MainActivity", "Could not connect to Play games services")
+                finish()
+            }.build()
+//        Games.getLeaderboardsClient(this, apiClient)
+    }
+
 
     private fun checkForFirebaseNotifications(intent: Intent) {
         intent.extras?.let { data ->

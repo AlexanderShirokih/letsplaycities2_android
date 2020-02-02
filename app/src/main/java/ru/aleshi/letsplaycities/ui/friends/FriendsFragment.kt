@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
@@ -41,7 +40,7 @@ class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
                 if (request.result && ::mSelectedFriendsInfo.isInitialized) {
                     when (request.resultCode) {
                         REQUEST_CODE_SELECT_ITEM -> {
-                            ViewModelProviders.of(requireActivity())[FriendsViewModel::class.java].friendsInfo.postValue(
+                            ViewModelProvider(requireActivity())[FriendsViewModel::class.java].friendsInfo.postValue(
                                 mSelectedFriendsInfo
                             )
                             findNavController().popBackStack(R.id.networkFragment, false)

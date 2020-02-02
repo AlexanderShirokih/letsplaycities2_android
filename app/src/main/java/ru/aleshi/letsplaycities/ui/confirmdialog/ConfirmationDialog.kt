@@ -4,7 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import ru.aleshi.letsplaycities.R
 
 class ConfirmationDialog : DialogFragment() {
@@ -13,7 +13,7 @@ class ConfirmationDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        confirmViewModel = ViewModelProviders.of(requireActivity())[ConfirmViewModel::class.java]
+        confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

@@ -4,7 +4,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -40,7 +40,7 @@ class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices
     }
 
     override fun onStartGame(gameSession: GameSession) {
-        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession =
+        ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =
             gameSession
         mGameSound?.start()
         findNavController().navigate(R.id.start_game_fragment)

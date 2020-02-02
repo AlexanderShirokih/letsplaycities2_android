@@ -8,7 +8,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils.makeInAnimation
 import android.view.animation.AnimationUtils.makeOutAnimation
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
@@ -102,7 +102,7 @@ class MainMenuFragment : Fragment() {
                 Android(getString(R.string.android))
             )
 
-        ViewModelProviders.of(requireActivity())[GameSessionViewModel::class.java].gameSession =
+        ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =
             mGameSessionBuilder
                 .users(players)
                 .server(mLocalServer)

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
@@ -21,9 +21,7 @@ class ViewProfileFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mGamePreferences = (requireContext().applicationContext as LPSApplication).gamePreferences
-
-        mProfileViewModel =
-            ViewModelProviders.of(requireActivity())[ProfileViewModel::class.java]
+        mProfileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
     }
 
     fun onLogout(view: View) {
