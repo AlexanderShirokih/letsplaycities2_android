@@ -19,6 +19,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.dialog_waiting.view.*
+import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import java.io.File
@@ -135,5 +136,8 @@ object Utils {
             }
         }.show()
     }
+
+
+    fun getPictureUrl(userId: Int) = "http://${BuildConfig.HOST}/user/${userId}/picture"
 
 }

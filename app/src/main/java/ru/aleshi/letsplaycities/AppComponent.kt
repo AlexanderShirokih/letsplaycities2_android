@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities
 
+import com.squareup.picasso.Picasso
 import dagger.BindsInstance
 import dagger.Component
 import ru.aleshi.letsplaycities.base.game.GameModule
@@ -13,6 +14,9 @@ interface AppComponent {
     interface Builder {
         @BindsInstance
         fun application(application: LPSApplication): Builder
+
+        @BindsInstance
+        fun picasso(picasso: Picasso): Builder
 
         fun build(): AppComponent
     }

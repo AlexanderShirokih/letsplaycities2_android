@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.squareup.picasso.Picasso
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_friends.*
@@ -20,6 +21,7 @@ import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.FriendInfo
+import javax.inject.Inject
 
 class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
     OnRemovableItemClickListener<FriendInfo> {
@@ -28,6 +30,8 @@ class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
         private const val REQUEST_CODE_REMOVE_ITEM = 2
     }
 
+    @Inject
+    lateinit var mPicasso: Picasso
     private lateinit var mAdapter: FriendsListAdapter
     private lateinit var mSelectedFriendsInfo: FriendInfo
 
@@ -61,7 +65,7 @@ class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
     ): View? {
         return inflater.inflate(R.layout.fragment_friends, container, false).apply {
             recyclerView.run {
-                mAdapter = FriendsListAdapter(this@FriendsFragment)
+                mAdapter = FriendsListAdapter(mPicasso, this@FriendsFragment)
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = mAdapter
                 setHasFixedSize(true)

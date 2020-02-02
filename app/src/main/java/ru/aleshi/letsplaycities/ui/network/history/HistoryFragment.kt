@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.squareup.picasso.Picasso
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
@@ -15,12 +16,15 @@ import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.HistoryInfo
+import javax.inject.Inject
 
 class HistoryFragment : BasicNetworkFetchFragment<List<HistoryInfo>>(),
     OnRemovableItemClickListener<HistoryInfo> {
 
     private lateinit var mAdapter: HistoryListAdapter
 
+    @Inject
+    lateinit var mPicasso: Picasso
 
     override fun onCreate(viewModelProvider: ViewModelProvider) {
     }
@@ -32,7 +36,7 @@ class HistoryFragment : BasicNetworkFetchFragment<List<HistoryInfo>>(),
     ): View? {
         return inflater.inflate(R.layout.fragment_history, container, false).apply {
             recyclerView.run {
-                mAdapter = HistoryListAdapter(this@HistoryFragment)
+                mAdapter = HistoryListAdapter(mPicasso, this@HistoryFragment)
                 layoutManager = LinearLayoutManager(requireContext())
                 adapter = mAdapter
                 setHasFixedSize(true)

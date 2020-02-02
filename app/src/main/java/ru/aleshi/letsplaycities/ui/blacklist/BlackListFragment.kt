@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.squareup.picasso.Picasso
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_blacklist.*
@@ -18,6 +19,7 @@ import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.BlackListItem
+import javax.inject.Inject
 
 class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
 
@@ -25,6 +27,9 @@ class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
     private val requestCodeConfirmRemoving = 9352
     private lateinit var confirmViewModel: ConfirmViewModel
     private var callback: (() -> Unit)? = null
+
+    @Inject
+    lateinit var mPicasso: Picasso
 
     override fun onCreate(viewModelProvider: ViewModelProvider) {
         confirmViewModel = viewModelProvider[ConfirmViewModel::class.java]
@@ -34,7 +39,7 @@ class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
                 callback = null
             }
         })
-        mAdapter = BlackListAdapter(object : OnRemovableItemClickListener<BlackListItem> {
+        mAdapter = BlackListAdapter(mPicasso, object : OnRemovableItemClickListener<BlackListItem> {
             override fun onRemoveItemClicked(item: BlackListItem, position: Int) {
                 showConfirmDialog(
                     requireContext().getString(
