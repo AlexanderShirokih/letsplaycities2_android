@@ -5,15 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.games.Games
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -21,6 +18,8 @@ import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.ThemeManager
+import ru.aleshi.letsplaycities.social.Google
+import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import javax.inject.Inject
 
@@ -50,7 +49,6 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
         )
         MobileAds.initialize(this)
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
-        buildApiClient()
         checkForFirebaseNotifications(intent)
     }
 
@@ -58,6 +56,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
         super.onResume()
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(mFriendRequestReceiver, IntentFilter("fm_request"))
+        buildApiClient()
     }
 
     override fun onPause() {
@@ -77,14 +76,8 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
     }
 
     private fun buildApiClient() {
-        val apiClient = GoogleApiClient.Builder(this)
-            .addApi(Games.API)
-            .addScope(Games.SCOPE_GAMES)
-            .enableAutoManage(this) {
-                Log.e("MainActivity", "Could not connect to Play games services")
-                finish()
-            }.build()
-//        Games.getLeaderboardsClient(this, apiClient)
+        val google = (ServiceType.GL.network as Google)
+        google.signIn(this)
     }
 
 
