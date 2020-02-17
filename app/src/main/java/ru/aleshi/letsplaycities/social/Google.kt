@@ -4,15 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.*
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.games.Games
-import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.AuthType
-
 
 class Google : ISocialNetwork() {
     companion object {
@@ -26,23 +20,22 @@ class Google : ISocialNetwork() {
     private var fromSilent = false
 
     override fun onInitialize(context: Context) {
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        //725939428380-erg4fr1c9ba7qqmhleh3ktjnck9gt5du.apps.googleusercontent.com
         mGoogleSignInOptions =
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestId()
                 .requestProfile()
-                .requestScopes(Games.SCOPE_GAMES)
                 .requestIdToken("725939428380-a1370ah3l6bjcio0hg2jgt8kvb9kuhmj.apps.googleusercontent.com")
                 .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(context, mGoogleSignInOptions)
+
     }
 
     override fun onLogin(activity: Activity) {
         mGoogleSignInAccount = GoogleSignIn.getLastSignedInAccount(activity)
         if (mGoogleSignInAccount != null) {
-            onLoggedIn(activity, mGoogleSignInAccount!!)
+            onLoggedIn(mGoogleSignInAccount!!)
         } else {
+            mGoogleSignInClient = GoogleSignIn.getClient(activity, mGoogleSignInOptions)
             // Build a GoogleSignInClient with the options specified by gso.
             val signInIntent = mGoogleSignInClient.signInIntent
             activity.startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -51,7 +44,7 @@ class Google : ISocialNetwork() {
 
     //TODO: Test w\o Game.Scope
     //TODO: Add SignIn button to layout
-    fun authSignIn(activity: Activity) {
+    fun signIn(activity: Activity) {
         initialize(activity)
         mGoogleSignInAccount = GoogleSignIn.getLastSignedInAccount(activity)
         if (!GoogleSignIn.hasPermissions(mGoogleSignInAccount, *mGoogleSignInOptions.scopeArray)) {
@@ -61,6 +54,7 @@ class Google : ISocialNetwork() {
                     Log.d("TAG", "Logged In from SILENT")
                 } else {
                     //TODO: Test
+                    Log.d("TAG", "Logged from silent")
                     fromSilent = true
                     val signInIntent = mGoogleSignInClient.signInIntent
                     activity.startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -69,19 +63,19 @@ class Google : ISocialNetwork() {
         }
     }
 
-    private fun onLoggedIn(activity: Activity, account: GoogleSignInAccount) {
-        val accessToken = account.idToken!!
-        val login = account.displayName
-        val uid = account.id
-        val picture = account.photoUrl
-
-        SocialUtils.saveAvatar(activity, picture!!) {
-            val info = AuthData(login!!, uid!!, AuthType.Google, accessToken)
-            callback?.onLoggedIn(info)
-        }
+    private fun onLoggedIn(account: GoogleSignInAccount) {
+        callback?.onLoggedIn(
+            SocialAccountData(
+                snUID = account.id!!,
+                login = account.displayName!!,
+                accessToken = account.idToken!!,
+                networkType = AuthType.Google,
+                pictureUri = account.photoUrl!!
+            )
+        )
     }
 
-    override fun onLoggedIn(activity: Activity, access_token: String) {
+    override fun onLoggedIn(activity: Activity, accessToken: String) {
 
     }
 
@@ -95,13 +89,20 @@ class Google : ISocialNetwork() {
             return false
         val task = GoogleSignIn.getSignedInAccountFromIntent(data)
         try {
+            Log.d("TAG", "isSucc={${task.isSuccessful}, taskEX=${task.exception}")
             if (task.isSuccessful) {
                 mGoogleSignInAccount = task.getResult(ApiException::class.java)
                 // Signed in successfully, show authenticated UI.
                 if (!fromSilent)
-                    onLoggedIn(activity, mGoogleSignInAccount!!)
-            } else
+                    onLoggedIn(mGoogleSignInAccount!!)
+            } else {
+                Log.d(
+                    "TAG",
+                    "ex=${GoogleSignInStatusCodes.getStatusCodeString((task.exception as ApiException).statusCode)}"
+                )
+                task.exception?.printStackTrace()
                 onError()
+            }
         } catch (e: ApiException) {
             onError()
             // The ApiException status code indicates the detailed failure reason.

@@ -1,9 +1,14 @@
 package ru.aleshi.letsplaycities.ui
 
 import android.content.Context
+import android.net.Uri
 import android.util.TypedValue
+import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.mikhaellopez.circularimageview.CircularImageView
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.NetworkPolicy
+import com.squareup.picasso.Picasso
 import ru.aleshi.letsplaycities.R
 
 object Bindings {
@@ -23,5 +28,18 @@ object Bindings {
         val outValue = TypedValue()
         context.theme.resolveAttribute(attr, outValue, true)
         return outValue.data
+    }
+
+    //@BindingAdapter({"bind:imageUrl"})
+    @BindingAdapter("playerImageUri")
+    @JvmStatic
+    fun setPlayerImageUri(imageView: ImageView, playerImageUri: Uri) {
+        Picasso.get()
+            .load(playerImageUri)
+            .placeholder(R.drawable.ic_player)
+            .error(R.drawable.ic_player)
+            .networkPolicy(NetworkPolicy.NO_CACHE)
+            .memoryPolicy(MemoryPolicy.NO_CACHE)
+            .into(imageView)
     }
 }

@@ -11,11 +11,8 @@ import com.vk.api.sdk.requests.VKRequest
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
-import ru.aleshi.letsplaycities.ui.MainActivity
-import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.AuthType
 
 class VKontakte : ISocialNetwork() {
@@ -43,16 +40,16 @@ class VKontakte : ISocialNetwork() {
 
     override fun onLogin(activity: Activity) = VK.login(activity)
 
-    override fun onLoggedIn(activity: Activity, access_token: String) {
+    override fun onLoggedIn(activity: Activity, accessToken: String) {
         disposable.add(Observable.fromCallable { VK.executeSync(VKUsersRequest()) }
             .subscribeOn(Schedulers.single())
-            .flatMap {
-                Observable.zip(
-                    Observable.just(it),
-                    SocialUtils.updateAvatar(activity as MainActivity, it.photo),
-                    BiFunction<VKUser, String, AuthData> { user, _ ->
-                        AuthData(user.login, user.id.toString(), AuthType.Vkontakte, access_token)
-                    }
+            .map { user->
+                SocialAccountData(
+                    snUID = user.id.toString(),
+                    login = user.login,
+                    accessToken = accessToken,
+                    networkType = AuthType.Vkontakte,
+                    pictureUri = user.photo
                 )
             }
             .observeOn(AndroidSchedulers.mainThread())

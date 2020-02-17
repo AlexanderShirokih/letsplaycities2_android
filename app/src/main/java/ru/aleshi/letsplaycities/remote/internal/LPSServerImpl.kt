@@ -8,19 +8,19 @@ import ru.quandastudio.lpsclient.core.LPSClientMessage
 import ru.quandastudio.lpsclient.core.LPSMessage
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.WordResult
+import ru.quandastudio.lpsclient.model.util.Utils
 import java.io.IOException
 import java.io.InterruptedIOException
 import javax.inject.Inject
 
 class LPSServerImpl @Inject constructor(
-    private val playerData: Single<PlayerData>,
+    private val playerData: PlayerData,
     private val connection: Connection,
     private val message: MessagePipe
 ) :
     Thread("LPS-Server"), LPSServer {
 
     private val disposable = CompositeDisposable()
-    private lateinit var cachedPlayerData: PlayerData
     private lateinit var _listener: LPSServer.ConnectionListener
 
 
@@ -36,14 +36,13 @@ class LPSServerImpl @Inject constructor(
 
     override fun run() {
         try {
-            cachedPlayerData = playerData.blockingGet()
             connection.connect(LOCAL_PORT)
 
             readClientLoginRequest()
             writeLoginResponse()
             readPlayRequest()
 
-            writePlayResponse(cachedPlayerData)
+            writePlayResponse(playerData)
 
             while (connection.isClientConnected()) {
                 readClientMessage()
@@ -79,6 +78,8 @@ class LPSServerImpl @Inject constructor(
             .blockingGet()
     }
 
+    //TODO: Now we can't read avatars from local server
+
     private fun writePlayResponse(playerData: PlayerData) {
         writeMessage(
             LPSMessage.LPSPlayMessage(
@@ -88,10 +89,10 @@ class LPSServerImpl @Inject constructor(
                 clientVersion = playerData.clientVersion,
                 clientBuild = playerData.clientBuild,
                 isFriend = true,
-                oppUid = playerData.authData.userID,
-                snUID = playerData.authData.snUID,
-                authType = playerData.authData.snType
-            ).setAvatar(playerData.avatar)
+                oppUid = playerData.authData.credentials.userId,
+                authType = playerData.authData.snType,
+                pictureHash = null
+            )
         )
     }
 
@@ -107,8 +108,7 @@ class LPSServerImpl @Inject constructor(
         writeMessage(
             LPSMessage.LPSLoggedIn(
                 newerBuild = 1,
-                userId = 1,
-                accHash = "-remote-"
+                picHash = Utils.md5("empty")
             )
         )
     }
@@ -139,7 +139,7 @@ class LPSServerImpl @Inject constructor(
         writeMessage(LPSMessage.LPSMsgMessage(message, false))
     }
 
-    override fun getPlayerData() = cachedPlayerData
+    override fun getPlayerData() = playerData
 
     companion object {
         const val LOCAL_NETWORK_IP = "192.168.43.1"

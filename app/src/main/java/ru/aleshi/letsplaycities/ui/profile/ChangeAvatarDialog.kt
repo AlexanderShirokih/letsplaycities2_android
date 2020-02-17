@@ -3,18 +3,14 @@ package ru.aleshi.letsplaycities.ui.profile
 import android.app.Activity.RESULT_OK
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 
 class ChangeAvatarDialog : DialogFragment() {
@@ -33,16 +29,9 @@ class ChangeAvatarDialog : DialogFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK) {
-            processData(data!!.data!!)
+            mProfileViewModel.avatarUri.set(data!!.data!!)
+            //TODO: Resize avatar and save URI as nativeAvatarPath
         }
-    }
-
-    private fun processData(data: Uri) {
-        disposable = Utils.loadAvatar(data)
-            .map { BitmapDrawable(resources, it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doAfterTerminate { requireDialog().dismiss() }
-            .subscribe(mProfileViewModel.avatar::set)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

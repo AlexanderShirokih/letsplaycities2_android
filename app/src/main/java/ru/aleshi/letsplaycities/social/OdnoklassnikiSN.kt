@@ -7,18 +7,14 @@ import androidx.core.net.toUri
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
-import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.ok.android.sdk.ContextOkListener
 import ru.ok.android.sdk.Odnoklassniki
 import ru.ok.android.sdk.OkRequestMode
 import ru.ok.android.sdk.util.OkAuthType
 import ru.ok.android.sdk.util.OkScope
-import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.AuthType
-
 
 class OdnoklassnikiSN : ISocialNetwork() {
 
@@ -43,7 +39,7 @@ class OdnoklassnikiSN : ISocialNetwork() {
         )
     }
 
-    override fun onLoggedIn(activity: Activity, access_token: String) {
+    override fun onLoggedIn(activity: Activity, accessToken: String) {
         disposable.add(Observable.fromCallable {
             odnoklassniki.request(
                 "users.getCurrentUser",
@@ -54,17 +50,19 @@ class OdnoklassnikiSN : ISocialNetwork() {
             .subscribeOn(Schedulers.single())
             .filter { it.isNotEmpty() }
             .map { JSONObject(it) }
-            .flatMap {
-                Observable.zip(
-                    Observable.just(it),
-                    SocialUtils.updateAvatar(activity as MainActivity, it.getString("pic_3").toUri()),
-                    BiFunction<JSONObject, String, AuthData> { user, _ ->
-                        AuthData(user.getString("name"), user.getString("uid"), AuthType.Odnoklassniki, access_token)
-                    }
+            .map { user ->
+                SocialAccountData(
+                    snUID = user.getString("uid"),
+                    login = user.getString("name"),
+                    accessToken = accessToken,
+                    networkType = AuthType.Odnoklassniki,
+                    pictureUri = user.getString("pic_3").toUri()
                 )
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ callback?.onLoggedIn(it) }, { it.printStackTrace(); callback?.onError() })
+            .subscribe(
+                { callback?.onLoggedIn(it) },
+                { it.printStackTrace(); callback?.onError() })
         )
     }
 
@@ -74,14 +72,22 @@ class OdnoklassnikiSN : ISocialNetwork() {
         super.onLogout()
     }
 
-    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
         if (odnoklassniki.isActivityRequestOAuth(requestCode)) {
             // process OAUTH sign-in response
-            odnoklassniki.onAuthActivityResult(requestCode, resultCode, data, ContextOkListener(activity,
-                onSuccess = { _, json -> onLoggedIn(activity, json.getString("access_token")) },
-                onError = { _, _ -> onError() },
-                onCancel = { _, _ -> Unit }
-            ))
+            odnoklassniki.onAuthActivityResult(requestCode,
+                resultCode,
+                data,
+                ContextOkListener(activity,
+                    onSuccess = { _, json -> onLoggedIn(activity, json.getString("access_token")) },
+                    onError = { _, _ -> onError() },
+                    onCancel = { _, _ -> Unit }
+                ))
         }
         return false
     }

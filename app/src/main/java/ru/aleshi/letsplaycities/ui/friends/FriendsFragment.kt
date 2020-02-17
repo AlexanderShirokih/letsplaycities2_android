@@ -4,25 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
+import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
-import ru.quandastudio.lpsclient.NetworkRepository
+import ru.quandastudio.lpsclient.core.LpsApi
 import ru.quandastudio.lpsclient.model.FriendInfo
 import javax.inject.Inject
 
-class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
+class FriendsFragment : BasicNetworkFetchFragment<FriendInfo>(),
     OnRemovableItemClickListener<FriendInfo> {
     companion object {
         private const val REQUEST_CODE_SELECT_ITEM = 1
@@ -34,8 +34,11 @@ class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
     private lateinit var mAdapter: FriendsListAdapter
     private lateinit var mSelectedFriendsInfo: FriendInfo
 
-    override fun onCreate(viewModelProvider: ViewModelProvider) {
-        viewModelProvider[ConfirmViewModel::class.java].callback.observe(this,
+    override fun onCreate(sharedViewModelFactory: ViewModelFactory) {
+        ViewModelProvider(
+            requireActivity(),
+            sharedViewModelFactory
+        )[ConfirmViewModel::class.java].callback.observe(this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.result && ::mSelectedFriendsInfo.isInitialized) {
                     when (request.resultCode) {
@@ -46,10 +49,17 @@ class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
                             findNavController().popBackStack(R.id.networkFragment, false)
                         }
                         REQUEST_CODE_REMOVE_ITEM -> {
-                            mNetworkRepository.let { rep ->
-                                rep.deleteFriend(mSelectedFriendsInfo.userId)
+                            withApi {
+                                it.deleteFriend(mSelectedFriendsInfo.userId)
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { mAdapter.removeItem(mSelectedFriendsInfo) }
+                                    .subscribe({ mAdapter.removeItem(mSelectedFriendsInfo) }
+                                        ,
+                                        { error ->
+                                            NetworkUtils.showErrorSnackbar(
+                                                error,
+                                                this@FriendsFragment
+                                            )
+                                        })
                             }
                         }
                     }
@@ -96,14 +106,9 @@ class FriendsFragment : BasicNetworkFetchFragment<ArrayList<FriendInfo>>(),
         )
     }
 
-    override fun onStartRequest(networkRepository: NetworkRepository): Single<ArrayList<FriendInfo>> =
-        networkRepository.getFriendsList()
+    override fun onStartRequest() = LpsApi::getFriendsList
 
-    override fun onDataFetched(result: ArrayList<FriendInfo>) {
-        mAdapter.updateItems(result)
-        val res = result.isNotEmpty()
-        recyclerView.isVisible = res
-        placeholder.isVisible = !res
-    }
+    override fun onRequestView() =
+        ViewDataHolder(mAdapter, placeholder, recyclerView, loadingProgress, R.string.no_friends)
 
 }

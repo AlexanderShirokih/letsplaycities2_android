@@ -35,7 +35,7 @@ class ViewProfileFragment : Fragment() {
             findNavController().popBackStack()
         else {
             mVisited = true
-            if (!mGamePreferences.isLoggedFromAnySN())
+            if (!mGamePreferences.isLoggedIn())
                 findNavController().navigate(R.id.actionLogin)
         }
     }

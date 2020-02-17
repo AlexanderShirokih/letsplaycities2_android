@@ -100,24 +100,28 @@ class GameSession private constructor(
         disposable.addAll(
             mServer.getWordsResult()
                 .subscribe({ handleWordResult(it.first, it.second) }, { view::showError })
-            , mServer.getInputMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(
+            ,
+            mServer.getInputMessages().observeOn(AndroidSchedulers.mainThread()).subscribe(
                 ::onInputMessage,
                 view::showError
             )
 
-            , mServer.leave.observeOn(AndroidSchedulers.mainThread()).subscribe({ leaved ->
+            ,
+            mServer.leave.observeOn(AndroidSchedulers.mainThread()).subscribe({ leaved ->
                 if (leaved) showToastAndDisconnect(R.string.player_leaved, false)
                 else showToastAndDisconnect(R.string.opp_disconnect, false)
             }, view::showError, {
                 showToastAndDisconnect(R.string.lost_connection, false)
             })
 
-            , mServer.timeout.observeOn(AndroidSchedulers.mainThread()).subscribe({
+            ,
+            mServer.timeout.observeOn(AndroidSchedulers.mainThread()).subscribe({
                 showToastAndDisconnect(R.string.time_out, true)
             }, view::showError)
 
-            , mServer.friendsRequest.observeOn(AndroidSchedulers.mainThread()).subscribe({
-                when (it) {
+            ,
+            mServer.friendsRequest.observeOn(AndroidSchedulers.mainThread()).subscribe({ request: LPSMessage.FriendRequest ->
+                when (request) {
                     LPSMessage.FriendRequest.NEW_REQUEST -> view.showFriendRequestDialog(getOpp().name)
                     LPSMessage.FriendRequest.ACCEPTED -> view.showInfo(
                         view.context().getString(
@@ -219,7 +223,7 @@ class GameSession private constructor(
 
     private fun applyUserView(user: User) {
         updateLabel(user, user.position)
-        disposable.add(user.getAvatar(view.context())
+        disposable.add(user.pictureSource.imageBitmap
             .subscribe { view.updateAvatar(it, user.position) })
     }
 
@@ -384,7 +388,7 @@ class GameSession private constructor(
                 view.showUserMenu(
                     playerData.isFriend,
                     playerData.authData.login,
-                    playerData.authData.userID
+                    playerData.authData.credentials.userId
                 )
         }
     }

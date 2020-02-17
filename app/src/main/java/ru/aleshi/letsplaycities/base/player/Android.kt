@@ -1,16 +1,19 @@
 package ru.aleshi.letsplaycities.base.player
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.utils.Utils
+import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.quandastudio.lpsclient.model.PlayerData
 import java.util.concurrent.TimeUnit
 
-class Android(name: String) : User(PlayerData.Factory().create(name), canUseQuickTime = false) {
+class Android(context: Context, name: String) : User(
+    PictureSource(context, placeholder = R.drawable.ic_android_big),
+    PlayerData.SimpleFactory().create(name), canUseQuickTime = false
+) {
+
     private var mEstimatedMoves: Int = 1
 
     override fun onBeginMove(firstChar: Char?) {
@@ -25,15 +28,6 @@ class Android(name: String) : User(PlayerData.Factory().create(name), canUseQuic
             .doOnError { gameSession.onSurrender() }
             .subscribe()
         )
-    }
-
-    override fun getAvatar(context: Context): Maybe<Drawable> {
-        return Maybe.fromCallable {
-            Utils.loadDrawable(
-                gameSession.view.context(),
-                R.drawable.ic_android_big
-            )
-        }
     }
 
     override fun reset() {

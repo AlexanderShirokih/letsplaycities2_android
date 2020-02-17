@@ -324,6 +324,7 @@
     <string name="request_dialog_msg">%1$s приглашает Вас сыграть в города.\nПринять заявку?</string>
     <string name="accept">Принять</string>
     <string name="decline">Отклонить</string>
+    <string name="sending_result">Отправка ответа…</string>
 
     <!-- ViewProfileFragment -->
     <string name="profile">Профиль</string>
@@ -332,4 +333,14 @@
     <!-- WaitingForDevicesFragment -->
     <string name="error_err">Произошла ошибка: %1$s</string>
 
+    <!-- ? : BasicNetworkFetchFragment -->
+    <string name="loading_data">Загрузка данных…</string>
+    <string name="error_loading_data">Не удалось загрузить данные</string>
+
+    <!-- Authorization ViewModel -->
+    <string name="fetching_token">Получение токена…</string>
+    <string name="authorization">Авторизация…</string>
+    <string name="exec_picture">Обработка аватарки…</string>
+    <string name="uploading_picture">Обновление аватарки профиля…</string>
+    <string name="comlpeted">Завершено</string>
 </resources>

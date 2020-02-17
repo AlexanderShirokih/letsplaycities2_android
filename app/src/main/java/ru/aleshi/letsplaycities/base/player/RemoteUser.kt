@@ -1,18 +1,12 @@
 package ru.aleshi.letsplaycities.base.player
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import io.reactivex.Maybe
-import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.utils.Utils
+import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.quandastudio.lpsclient.model.PlayerData
 
 
-class RemoteUser(playerData: PlayerData) : User(playerData) {
-
-    override fun getAvatar(context: Context): Maybe<Drawable> =
-        Utils.loadAvatar(context, playerData.avatar, R.drawable.ic_player_big)
-
+class RemoteUser(context: Context, playerData: PlayerData) :
+    User(PictureSource(context), playerData) {
 
     override fun onBeginMove(firstChar: Char?) {
         // Word broadcasts by NetworkServer

@@ -12,7 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.network.NetworkUtils.handleError
+import ru.aleshi.letsplaycities.network.NetworkUtils.showErrorSnackbar
 
 class UserContextMenuDialog : DialogFragment() {
 
@@ -58,7 +58,7 @@ class UserContextMenuDialog : DialogFragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Toast.makeText(activity, R.string.new_friend_request, Toast.LENGTH_LONG).show()
-                }, { err -> handleError(err, this) })
+                }, { err -> showErrorSnackbar(err, this) })
         }
     }
 
@@ -75,7 +75,7 @@ class UserContextMenuDialog : DialogFragment() {
                         getString(R.string.user_banned, login),
                         Toast.LENGTH_SHORT
                     ).show()
-                }, { t -> handleError(t, this) }
+                }, { t -> showErrorSnackbar(t, this) }
             )
             ?.addTo(disposable)
     }

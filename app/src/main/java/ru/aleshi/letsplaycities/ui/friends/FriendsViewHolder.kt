@@ -17,7 +17,7 @@ class FriendsViewHolder(private val picasso: Picasso, view: View) : BasicListAda
             value += itemView.context.getString(R.string.request)
         }
         itemView.item_name.text = value
-        picasso.load(Utils.getPictureUrl(item.userId)).placeholder(R.drawable.ic_player)
+        picasso.load(Utils.getPictureUrl(item.userId, item.pictureHash)).placeholder(R.drawable.ic_player)
             .error(R.drawable.ic_player)
             .into(itemView.iv_friends_item)
     }

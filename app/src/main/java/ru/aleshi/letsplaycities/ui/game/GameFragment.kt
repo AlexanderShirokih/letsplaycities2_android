@@ -41,7 +41,7 @@ import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.game.GameContract
 import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
-import ru.aleshi.letsplaycities.network.NetworkUtils.handleError
+import ru.aleshi.letsplaycities.network.NetworkUtils.showErrorSnackbar
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
@@ -79,7 +79,7 @@ class GameFragment : Fragment(), GameContract.View {
                     it.checkWithResultCode(USE_HINT) -> showAd()
                     it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession?.onFriendRequestResult(
                         it.result
-                    )?.subscribe({}, { err -> handleError(err, this) })
+                    )?.subscribe({}, { err -> showErrorSnackbar(err, this) })
                 }
             })
 
@@ -307,7 +307,7 @@ class GameFragment : Fragment(), GameContract.View {
                     messageInput.text = null
                     setMessagingLayout(false)
                 }
-                .subscribe({}, { err -> handleError(err, this) })
+                .subscribe({}, { err -> showErrorSnackbar(err, this) })
                 .addTo(disposable)
         }
     }
@@ -400,7 +400,7 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun showError(err: Throwable) {
-        handleError(err, this)
+        showErrorSnackbar(err, this)
     }
 
     override fun updateLabel(info: String, position: Position) {

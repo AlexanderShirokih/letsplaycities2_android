@@ -7,8 +7,7 @@ import io.reactivex.subjects.ReplaySubject
 import ru.aleshi.letsplaycities.remote.internal.LPSProtocolError
 import ru.aleshi.letsplaycities.remote.internal.LPSServer
 import ru.quandastudio.lpsclient.core.LPSClientMessage
-import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.WordResult
+import ru.quandastudio.lpsclient.model.*
 import java.util.concurrent.TimeUnit
 
 open class RemoteRepository constructor(var server: LPSServer) : LPSServer.ConnectionListener {
@@ -50,10 +49,14 @@ open class RemoteRepository constructor(var server: LPSServer) : LPSServer.Conne
             .filter { it is LPSClientMessage.LPSLogIn }
             .cast(LPSClientMessage.LPSLogIn::class.java)
             .map {
-                it.getPlayerData().apply {
-                    isFriend = true
-                    allowSendUID = true
-                }
+                PlayerData(
+                    authData = AuthData(it.login, AuthType.Native, Credentials(it.uid, it.hash)),
+                    isFriend = true,
+                    canReceiveMessages = it.canReceiveMessages,
+                    clientBuild = it.clientBuild,
+                    clientVersion = it.clientVersion,
+                    pictureHash = null
+                )
             }
             .firstElement()
             .doOnSubscribe {

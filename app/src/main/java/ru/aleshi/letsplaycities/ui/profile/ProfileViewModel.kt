@@ -2,18 +2,16 @@ package ru.aleshi.letsplaycities.ui.profile
 
 import android.app.Application
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import androidx.core.net.toUri
 import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
-import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.model.AuthType
 import java.io.File
 
@@ -21,7 +19,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     private var disposable: Disposable? = null
 
-    val avatar: ObservableField<Drawable> = ObservableField()
+    val avatarUri: ObservableField<Uri> = ObservableField(Uri.EMPTY)
 
     val login: ObservableField<String> = ObservableField()
 
@@ -34,19 +32,15 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     fun loadCurrentProfile() {
         val context = getApplication<LPSApplication>()
         val prefs = context.gamePreferences
-        if (prefs.isLoggedFromAnySN()) {
-            val authData = GameAuthDataFactory().loadFromPreferences(prefs)
+        val authData = GameAuthDataFactory(context).load()
+        if (authData.credentials.isValid()) {
             login.set(authData.login)
             authType.set(context.getDrawableFromResource(getAuthResourceByAuthType(authData.snType)))
             val avatar = prefs.getAvatarPath()
             if (avatar == null) {
                 loadDefaultAvatar()
             } else {
-                disposable = Utils.loadAvatar(File(avatar).toUri())
-                    .map { BitmapDrawable(context.resources, it) }
-                    .onErrorReturnItem(context.resources.getDrawable(R.drawable.ic_player) as BitmapDrawable)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this.avatar::set)
+                avatarUri.set(File(avatar).toUri())
             }
         } else {
             login.set(context.getString(R.string.profile_not_authorized))
@@ -56,7 +50,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun loadDefaultAvatar() {
-        avatar.set(getApplication<LPSApplication>().getDrawableFromResource(R.drawable.ic_player))
+        avatarUri.set(Uri.EMPTY)
     }
 
     private fun getAuthResourceByAuthType(type: AuthType): Int {

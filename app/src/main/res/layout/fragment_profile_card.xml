@@ -14,10 +14,10 @@
             android:id="@+id/profileCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:cardBackgroundColor="?attr/colorSurface"
             app:cardCornerRadius="8dp"
             app:cardElevation="4dp"
-            app:cardMaxElevation="8dp"
-            app:cardBackgroundColor="?attr/colorSurface">
+            app:cardMaxElevation="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
@@ -32,12 +32,12 @@
                     android:id="@+id/avatar"
                     android:layout_width="45dp"
                     android:layout_height="45dp"
-                    android:src="@{ profile.avatar }"
                     android:transitionName="transition_avatar"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.2"
+                    app:playerImageUri="@{profile.avatarUri}"
                     tools:src="@tools:sample/avatars"
                     tools:targetApi="lollipop" />
 

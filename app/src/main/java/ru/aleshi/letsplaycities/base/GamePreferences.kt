@@ -82,9 +82,12 @@ class GamePreferences(context: Context) {
 
     fun getSettingsValues(): IntArray {
         val array = settings_defaults.copyOf(settings_defaults.size)
-        for (i in 0 until settings_defaults.size) {
+        for (i in settings_defaults.indices) {
             array[i] =
-                if (settings_pref_keys[i] == KEY_NULL) 0 else prefs.getInt(settings_pref_keys[i], settings_defaults[i])
+                if (settings_pref_keys[i] == KEY_NULL) 0 else prefs.getInt(
+                    settings_pref_keys[i],
+                    settings_defaults[i]
+                )
         }
         return array
     }
@@ -112,8 +115,8 @@ class GamePreferences(context: Context) {
         prefs.edit().putString(KEY_SCR, encoded).apply()
     }
 
-    fun getString(key: String, def: String?): String? {
-        return prefs.getString(key, def)
+    fun getString(key: String, def: String): String {
+        return prefs.getString(key, def)!!
     }
 
     fun getInt(key: String, def: Int): Int {
@@ -130,23 +133,22 @@ class GamePreferences(context: Context) {
         return !shown
     }
 
-    fun isLoggedFromAnySN(): Boolean {
-        return prefs.getString("sn_uid", null) != null
+    fun isLoggedIn(): Boolean {
+        return prefs.getInt("user_id", 0) != 0
     }
 
     fun logout() {
         prefs.edit {
             remove("avatar_path")
             remove("sn_login")
-            remove("sn_uid")
             remove("sn_name")
-            remove("hash")
             remove("user_id")
             remove("acc_tkn")
+            // Legacy data
+            remove("sn_uid")
+            remove("hash")
         }
     }
-
-    fun getLogin(): String = prefs.getString("sn_login", "User")!!
 
     fun removeAvatarPath() {
         prefs.edit {

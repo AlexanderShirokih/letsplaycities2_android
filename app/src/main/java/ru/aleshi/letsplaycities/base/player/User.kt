@@ -1,15 +1,14 @@
 package ru.aleshi.letsplaycities.base.player
 
-import android.content.Context
-import android.graphics.drawable.Drawable
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.game.Position
+import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.quandastudio.lpsclient.model.PlayerData
 
 abstract class User(
+    internal val pictureSource: PictureSource,
     internal val playerData: PlayerData,
     internal val hasUserInput: Boolean = false,
     internal val canUseQuickTime: Boolean = true
@@ -34,8 +33,6 @@ abstract class User(
         gameSession.onCitySent(city, this)
 
     open fun onUserInput(userInput: String, onSuccess: () -> Unit) = Unit
-
-    abstract fun getAvatar(context: Context): Maybe<Drawable>
 
     open fun reset() {
         score = 0

@@ -13,9 +13,11 @@ import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkClientFromNetworkFragmentModule
 import ru.aleshi.letsplaycities.ui.network.history.HistoryFragment
-import ru.aleshi.letsplaycities.ui.remote.MultiplayerFragment
+import ru.aleshi.letsplaycities.ui.profile.LoginNoSnProfileFragment
+import ru.aleshi.letsplaycities.ui.profile.LoginProfileFragment
 import ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment
 
+//TODO: Create common component with NetworkModule
 @Module
 abstract class FragmentsModule {
 
@@ -42,4 +44,13 @@ abstract class FragmentsModule {
     @ActivityScope
     @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientModule::class])
     abstract fun contributeBlackListFragment(): BlackListFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [NetworkModule::class])
+    abstract fun contributeFriendRequestDialog(): FriendRequestDialog
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [NetworkModule::class])
+    abstract fun contributeLoginProfileFragment(): LoginProfileFragment
+
 }

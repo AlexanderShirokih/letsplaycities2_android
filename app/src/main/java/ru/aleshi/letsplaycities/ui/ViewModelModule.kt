@@ -7,6 +7,7 @@ import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.IntoMap
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
+import ru.aleshi.letsplaycities.ui.network.NetworkFetchViewModel
 import kotlin.reflect.KClass
 
 @Module
@@ -24,5 +25,10 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ConfirmViewModel::class)
     internal abstract fun confirmViewModel(viewModel: ConfirmViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(NetworkFetchViewModel::class)
+    internal abstract fun fetchViewModel(viewModel: NetworkFetchViewModel) : ViewModel
 
 }

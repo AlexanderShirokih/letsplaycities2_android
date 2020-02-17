@@ -7,7 +7,6 @@ import com.facebook.*
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.AuthType
 
 class Facebook : ISocialNetwork() {
@@ -27,15 +26,13 @@ class Facebook : ISocialNetwork() {
 
                 val accessToken = AccessToken.getCurrentAccessToken()
                 if (accessToken != null && !accessToken.isExpired) {
-                    val login = currentProfile.name
-                    val userID = currentProfile.id
-
-                    val picture = currentProfile.getProfilePictureUri(128, 128)
-
-                    SocialUtils.saveAvatar(activity, picture) {
-                        val info = AuthData(login, userID, AuthType.Facebook, accessToken.token)
-                        callback?.onLoggedIn(info)
-                    }
+                    callback?.onLoggedIn(SocialAccountData(
+                        snUID = currentProfile.id,
+                        login = currentProfile.name,
+                        accessToken = accessToken.token,
+                        networkType = AuthType.Facebook,
+                        pictureUri = currentProfile.getProfilePictureUri(128, 128)
+                    ))
                 }
             }
         }
@@ -57,12 +54,17 @@ class Facebook : ISocialNetwork() {
         loginManager.logInWithReadPermissions(activity, listOf("public_profile"))
     }
 
-    override fun onLoggedIn(activity: Activity, access_token: String) {
+    override fun onLoggedIn(activity: Activity, accessToken: String) {
 
     }
 
 
-    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
         return callbackManager!!.onActivityResult(requestCode, resultCode, data)
     }
 

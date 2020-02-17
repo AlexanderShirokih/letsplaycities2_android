@@ -4,41 +4,44 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
+import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
-import ru.quandastudio.lpsclient.NetworkRepository
+import ru.quandastudio.lpsclient.core.LpsApi
 import ru.quandastudio.lpsclient.model.BlackListItem
 import javax.inject.Inject
 
-class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
+class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
 
     private lateinit var mAdapter: BlackListAdapter
     private val requestCodeConfirmRemoving = 9352
-    private lateinit var confirmViewModel: ConfirmViewModel
     private var callback: (() -> Unit)? = null
 
     @Inject
     lateinit var mPicasso: Picasso
 
-    override fun onCreate(viewModelProvider: ViewModelProvider) {
-        confirmViewModel = viewModelProvider[ConfirmViewModel::class.java]
-        confirmViewModel.callback.observe(this, Observer<ConfirmViewModel.Request> { request ->
-            if (request.resultCode == requestCodeConfirmRemoving && request.result) {
-                callback?.invoke()
-                callback = null
-            }
-        })
+    override fun onCreate(sharedViewModelFactory: ViewModelFactory) {
+        ViewModelProvider(
+            requireActivity(),
+            sharedViewModelFactory
+        )[ConfirmViewModel::class.java].callback.observe(
+            this,
+            Observer<ConfirmViewModel.Request> { request ->
+                if (request.resultCode == requestCodeConfirmRemoving && request.result) {
+                    callback?.invoke()
+                    callback = null
+                }
+            })
         mAdapter = BlackListAdapter(mPicasso, object : OnRemovableItemClickListener<BlackListItem> {
             override fun onRemoveItemClicked(item: BlackListItem, position: Int) {
                 showConfirmDialog(
@@ -47,12 +50,16 @@ class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
                         item.login
                     )
                 ) {
-                    mNetworkRepository.removeFromBanList(item.userId)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            mAdapter.removeAt(position)
-                            setListVisibility(mAdapter.itemCount != 0)
-                        }
+                    withApi {
+                        it.deleteFromBlacklist(item.userId)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                mAdapter.removeAt(position)
+                                setListVisibility(mAdapter.itemCount != 0)
+                            }, { error ->
+                                NetworkUtils.showErrorSnackbar(error, this@BlackListFragment)
+                            })
+                    }
                 }
             }
         })
@@ -76,14 +83,7 @@ class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
         super.onViewCreated(view, savedInstanceState)
     }
 
-
-    override fun onStartRequest(networkRepository: NetworkRepository): Single<List<BlackListItem>> =
-        networkRepository.getBlackList()
-
-    override fun onDataFetched(result: List<BlackListItem>) {
-        mAdapter.updateItems(result)
-        setListVisibility(result.isNotEmpty())
-    }
+    override fun onStartRequest() = LpsApi::getBlackList
 
     private fun showConfirmDialog(msg: String, callback: () -> Unit) {
         this.callback = callback
@@ -96,8 +96,12 @@ class BlackListFragment : BasicNetworkFetchFragment<List<BlackListItem>>() {
         )
     }
 
-    private fun setListVisibility(visible: Boolean) {
-        recyclerView.isVisible = visible
-        blacklist_placeholder.isVisible = !visible
-    }
+    override fun onRequestView() =
+        ViewDataHolder(
+            mAdapter,
+            placeholder,
+            recyclerView,
+            loadingProgress,
+            R.string.empty_black_list
+        )
 }

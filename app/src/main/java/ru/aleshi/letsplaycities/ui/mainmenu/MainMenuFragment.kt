@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.squareup.picasso.Picasso
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
 import ru.aleshi.letsplaycities.BuildConfig
@@ -31,6 +32,9 @@ class MainMenuFragment : Fragment() {
 
     @Inject
     lateinit var mLocalServer: LocalServer
+
+    @Inject
+    lateinit var mPicasso: Picasso
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -91,15 +95,17 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun startGame(navController: NavController, hasLocalOpponents: Boolean) {
+        val context = requireContext()
+        val resources = context.resources
         val players: Array<User> = if (hasLocalOpponents)
             arrayOf(
-                Player("${getString(R.string.player)} 1"),
-                Player("${getString(R.string.player)} 2")
+                Player(resources, mPicasso, "${getString(R.string.player)} 1"),
+                Player(resources, mPicasso, "${getString(R.string.player)} 2")
             )
         else
             arrayOf(
-                Player(getString(R.string.player)),
-                Android(getString(R.string.android))
+                Player(resources, mPicasso, getString(R.string.player)),
+                Android(context, getString(R.string.android))
             )
 
         ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =

@@ -62,7 +62,7 @@ class MultiplayerFragment : Fragment(R.layout.fragment_multiplayer) {
 
     override fun onResume() {
         super.onResume()
-        lpsApplication.gamePreferences.isLoggedFromAnySN().run {
+        lpsApplication.gamePreferences.isLoggedIn().run {
             create.isEnabled = this
             connect.isEnabled = this
         }

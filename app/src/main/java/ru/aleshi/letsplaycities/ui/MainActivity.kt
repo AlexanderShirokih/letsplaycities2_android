@@ -50,13 +50,13 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
         MobileAds.initialize(this)
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
         checkForFirebaseNotifications(intent)
+        buildApiClient()
     }
 
     override fun onResume() {
         super.onResume()
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(mFriendRequestReceiver, IntentFilter("fm_request"))
-        buildApiClient()
     }
 
     override fun onPause() {
@@ -76,8 +76,8 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
     }
 
     private fun buildApiClient() {
-        val google = (ServiceType.GL.network as Google)
-        google.signIn(this)
+//        val google = (ServiceType.GL.network as Google)
+//        google.signIn(this)
     }
 
 

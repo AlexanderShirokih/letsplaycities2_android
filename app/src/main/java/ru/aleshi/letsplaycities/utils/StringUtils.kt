@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.utils
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
@@ -53,8 +54,8 @@ object StringUtils {
         return ret
     }
 
-    fun formatDate(time: Long): String {
-        val date = Date(time)
+    fun formatDate(time: Timestamp): String {
+        val date = Date(time.time)
         val todayCalendar = Calendar.getInstance()
         val calendar = Calendar.getInstance().apply { this.time = date }
 

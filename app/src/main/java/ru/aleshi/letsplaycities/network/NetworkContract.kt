@@ -23,10 +23,10 @@ interface NetworkContract {
 
     interface Presenter {
         fun onAttachView(view: View)
-        fun onConnectToFriendGame(versionInfo: Pair<String, Int>, oppId: Int)
-        fun onConnect(versionInfo: Pair<String, Int>)
+        fun onConnectToFriendGame(versionInfo: VersionInfo, oppId: Int)
+        fun onConnect(versionInfo: VersionInfo)
         fun onCancel()
-        fun onFriendsInfo(versionInfo: Pair<String, Int>): Observer<in FriendInfo>
+        fun onFriendsInfo(versionInfo: VersionInfo): Observer<in FriendInfo>
         fun onDispose()
     }
 }

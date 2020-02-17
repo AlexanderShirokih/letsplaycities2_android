@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_history.view.*
-import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.ui.BasicListAdapter
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
@@ -23,8 +22,7 @@ class HistoryListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.item_history, parent, false)
-        val holder = HistoryViewHolder(picasso, view)
-        return holder
+        return HistoryViewHolder(picasso, view)
     }
 
     class HistoryViewHolder(private val picasso: Picasso, view: View) :
@@ -32,10 +30,12 @@ class HistoryListAdapter(
         override fun bind(item: HistoryInfo) {
             itemView.iconFriends.isVisible = item.isFriend
             itemView.item_name.text = item.login
-            itemView.tvStartTime.text = StringUtils.formatDate(item.startTime)
+            itemView.tvStartTime.text = StringUtils.formatDate(item.creationDate)
             itemView.tvDuration.text = StringUtils.timeFormat(item.duration * 1000L)
             itemView.tvWordsCount.text = StringUtils.formatWordsCount(item.wordsCount)
-            picasso.load(Utils.getPictureUrl(item.userId)).placeholder(R.drawable.ic_player)
+
+            picasso.load(Utils.getPictureUrl(item.userId, item.pictureHash))
+                .placeholder(R.drawable.ic_player)
                 .error(R.drawable.ic_player)
                 .into(itemView.iv_picture)
         }

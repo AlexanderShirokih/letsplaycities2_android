@@ -10,6 +10,6 @@ class NetworkClientModule {
 
     @Provides
     fun provideNetworkClient(): NetworkClient =
-        NetworkClient(AndroidBase64Provider, false, NetworkClient.ConnectionType.WebSocket, BuildConfig.HOST)
+        NetworkClient(false, NetworkClient.ConnectionType.WebSocket, BuildConfig.HOST)
 
 }

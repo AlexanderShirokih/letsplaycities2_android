@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.fragment_network.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
+import ru.aleshi.letsplaycities.network.VersionInfo
 import ru.aleshi.letsplaycities.network.NetworkContract
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
@@ -76,10 +77,13 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         Toast.makeText(requireContext(), getString(msgId, login ?: ""), Toast.LENGTH_LONG).show()
     }
 
-    private fun getVersionInfo(): Pair<String, Int> {
+    private fun getVersionInfo(): VersionInfo {
         val context = requireContext()
         val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        return pInfo.versionName to PackageInfoCompat.getLongVersionCode(pInfo).toInt()
+        return VersionInfo(
+            pInfo.versionName,
+            PackageInfoCompat.getLongVersionCode(pInfo).toInt()
+        )
     }
 
     override fun onStartGame(session: GameSession) {
@@ -90,7 +94,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     }
 
     override fun handleError(throwable: Throwable) =
-        NetworkUtils.handleError(throwable, this@NetworkFragment)
+        NetworkUtils.showErrorSnackbar(throwable, this@NetworkFragment)
 
     override fun showMessage(msgResId: Int) =
         Snackbar.make(requireView(), msgResId, Snackbar.LENGTH_LONG).show()
@@ -119,7 +123,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         arguments?.let { args ->
             val nfa = NetworkFragmentArgs.fromBundle(args)
             if ("fm_game" == nfa.action) {
-                if (mGamePreferences.isLoggedFromAnySN()) {
+                if (mGamePreferences.isLoggedIn()) {
                     setLoadingLayout(true)
                     mNetworkPresenter.onConnectToFriendGame(getVersionInfo(), nfa.oppId)
                 } else

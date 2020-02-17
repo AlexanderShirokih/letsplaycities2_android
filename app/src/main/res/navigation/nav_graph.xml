@@ -316,6 +316,7 @@
                 android:id="@+id/changeAvatarDialog2"
                 android:name="ru.aleshi.letsplaycities.ui.profile.ChangeAvatarDialog"
                 android:label="ChangeAvatarDialog" />
+
     </navigation>
     <navigation
             android:id="@+id/remoteNav"
