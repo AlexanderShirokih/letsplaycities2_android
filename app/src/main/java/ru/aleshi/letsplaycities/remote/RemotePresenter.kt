@@ -4,7 +4,6 @@ import android.content.Context
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.RemoteUser
@@ -55,8 +54,7 @@ class RemotePresenter @Inject constructor(
             Player(
                 context.resources,
                 picasso,
-                playerData,
-                (context.applicationContext as LPSApplication).gamePreferences
+                playerData
             ),
             RemoteUser(context, oppData)
         )

@@ -7,11 +7,12 @@ import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.quandastudio.lpsclient.model.PlayerData
+import ru.quandastudio.lpsclient.model.VersionInfo
 import java.util.concurrent.TimeUnit
 
-class Android(context: Context, name: String) : User(
+class Android(context: Context, name: String, versionInfo: VersionInfo) : User(
     PictureSource(context, placeholder = R.drawable.ic_android_big),
-    PlayerData.SimpleFactory().create(name), canUseQuickTime = false
+    PlayerData.SimpleFactory().create(name, versionInfo), canUseQuickTime = false
 ) {
 
     private var mEstimatedMoves: Int = 1

@@ -19,6 +19,7 @@ import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.core.LpsApi
+import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.FriendInfo
 import javax.inject.Inject
 
@@ -106,7 +107,7 @@ class FriendsFragment : BasicNetworkFetchFragment<FriendInfo>(),
         )
     }
 
-    override fun onStartRequest() = LpsApi::getFriendsList
+    override fun onStartRequest() = LpsRepository::getFriendsList
 
     override fun onRequestView() =
         ViewDataHolder(mAdapter, placeholder, recyclerView, loadingProgress, R.string.no_friends)

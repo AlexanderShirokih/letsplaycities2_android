@@ -342,5 +342,5 @@
     <string name="authorization">Авторизация…</string>
     <string name="exec_picture">Обработка аватарки…</string>
     <string name="uploading_picture">Обновление аватарки профиля…</string>
-    <string name="comlpeted">Завершено</string>
+    <string name="error_upd_avatar">Не удалось обработать аватарку</string>
 </resources>

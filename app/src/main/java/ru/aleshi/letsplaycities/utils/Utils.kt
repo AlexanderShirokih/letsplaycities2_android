@@ -1,15 +1,23 @@
 package ru.aleshi.letsplaycities.utils
 
 import android.app.Activity
+import android.graphics.Bitmap
+import android.net.Uri
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import com.squareup.picasso.Picasso
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.dialog_waiting.view.*
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
+import java.io.File
+import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 
 object Utils {
@@ -17,62 +25,39 @@ object Utils {
     val Fragment.lpsApplication
         get() = requireContext().applicationContext as LPSApplication
 
-    fun getPictureUrl(userId: Int, hash: String?) = if (hash == null) null else
-        "${getServerBaseUrl()}user/${userId}/picture?hash=${hash}"
+    fun getPictureUri(userId: Int, hash: String?): Uri? = if (hash == null) null else
+        Uri.parse("${getServerBaseUrl()}user/${userId}/picture?hash=${hash}")
 
     fun getServerBaseUrl(): String {
-        return "http://${BuildConfig.HOST}/"
+        return "http://${BuildConfig.HOST}:8080/"
     }
 
-//    fun resizeAndSave(context: Context, data: Uri): Observable<String> {
-//        val filesDir = context.filesDir
-//
-//        return loadAvatar(data)
-//            .onErrorReturnItem((context.resources.getDrawable(R.drawable.ic_player) as BitmapDrawable).bitmap)
-//            .switchMap { saveAvatar(filesDir, it) }
-//    }
+    fun createThumbnail(filesDir: File, uri: Uri): Single<Uri> =
+        Single.just(uri)
+            .observeOn(Schedulers.computation())
+            .flatMap(::loadResized)
+            .map {
+                val outputFile = File(filesDir, "img.png")
+                FileOutputStream(outputFile).apply {
+                    it.compress(Bitmap.CompressFormat.PNG, 0, this)
+                    close()
+                }
+                outputFile.toUri()
+            }
 
-//    fun saveAvatar(
-//        filesDir: File,
-//        bitmap: Bitmap,
-//        saveFileName: String = "0.png"
-//    ): Observable<String> {
-//        return Observable.just(bitmap)
-//            .subscribeOn(Schedulers.io())
-//            .map {
-//                saveToLocalStorage(filesDir, saveFileName, it)
-//            }
-//    }
-
-//    fun loadAvatar(src: Uri): Observable<Bitmap> {
-//        return Observable.just(src)
-//            .subscribeOn(Schedulers.io())
-//            .map {
-//                Picasso.get()
-//                    .load(it)
-//                    .networkPolicy(NetworkPolicy.NO_CACHE)
-//                    .memoryPolicy(MemoryPolicy.NO_CACHE)
-//                    .resize(0, 128)
-//                    .get()
-//            }
-//    }
-
-//    private fun saveToLocalStorage(filesDir: File, saveFileName: String, bitmap: Bitmap): String {
-//        val ava = File(filesDir, "avatars")
-//        if (!ava.exists()) {
-//            ava.mkdir()
-//        }
-//        return try {
-//            val file = File(ava, saveFileName)
-//            val fos = FileOutputStream(file)
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
-//            file.absolutePath
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            ""
-//        }
-//
-//    }
+    private fun loadResized(uri: Uri): Single<Bitmap> =
+        Single.create {
+            try {
+                it.onSuccess(
+                    Picasso.get()
+                        .load(uri)
+                        .resize(0, 128)
+                        .get()
+                )
+            } catch (e: Exception) {
+                it.tryOnError(e)
+            }
+        }
 
     fun showWaitingForConnectionDialog(
         reconnectionDelay: Int,

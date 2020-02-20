@@ -1,12 +1,14 @@
 package ru.aleshi.letsplaycities.base.player
 
 import ru.aleshi.letsplaycities.LPSApplication
+import ru.quandastudio.lpsclient.core.CredentialsProvider
 import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.AuthType
 import ru.quandastudio.lpsclient.model.Credentials
 import javax.inject.Inject
 
-class GameAuthDataFactory @Inject constructor(application: LPSApplication) : AuthData.SaveProvider {
+class GameAuthDataFactory @Inject constructor(application: LPSApplication) : CredentialsProvider(),
+    AuthData.SaveProvider {
 
     private val prefs = application.gamePreferences
 
@@ -27,4 +29,6 @@ class GameAuthDataFactory @Inject constructor(application: LPSApplication) : Aut
 
         return AuthData(login, AuthType.from(snName), Credentials(userID, accessHash))
     }
+
+    override fun loadCredentials(): Credentials = load().credentials
 }

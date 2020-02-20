@@ -5,15 +5,16 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
-import androidx.core.net.toUri
 import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
+import ru.aleshi.letsplaycities.utils.Event
+import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.model.AuthType
-import java.io.File
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -25,23 +26,25 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     val authType: ObservableField<Drawable> = ObservableField()
 
+    val nativeEvents =  MutableLiveData<Event<Unit>>()
+
     init {
         loadDefaultAvatar()
     }
 
+    fun updatePictureHash(userId: Int, newHash: String?) {
+        avatarUri.set(Utils.getPictureUri(userId, newHash))
+        getApplication<LPSApplication>().gamePreferences.pictureHash = newHash
+
+    }
+
     fun loadCurrentProfile() {
         val context = getApplication<LPSApplication>()
-        val prefs = context.gamePreferences
         val authData = GameAuthDataFactory(context).load()
         if (authData.credentials.isValid()) {
             login.set(authData.login)
             authType.set(context.getDrawableFromResource(getAuthResourceByAuthType(authData.snType)))
-            val avatar = prefs.getAvatarPath()
-            if (avatar == null) {
-                loadDefaultAvatar()
-            } else {
-                avatarUri.set(File(avatar).toUri())
-            }
+            updatePictureHash(authData.credentials.userId, context.gamePreferences.pictureHash)
         } else {
             login.set(context.getString(R.string.profile_not_authorized))
             authType.set(context.getDrawableFromResource(getAuthResourceByAuthType(AuthType.Native)))

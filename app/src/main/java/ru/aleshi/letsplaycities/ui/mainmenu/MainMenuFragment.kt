@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.squareup.picasso.Picasso
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
+import ru.aleshi.letsplaycities.AppVersionInfo
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.game.GameSession
@@ -24,17 +25,22 @@ import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
+import ru.quandastudio.lpsclient.model.VersionInfo
 import javax.inject.Inject
 
 class MainMenuFragment : Fragment() {
     @Inject
-    lateinit var mGameSessionBuilder: GameSession.GameSessionBuilder
+    lateinit var gameSessionBuilder: GameSession.GameSessionBuilder
 
     @Inject
-    lateinit var mLocalServer: LocalServer
+    lateinit var localServer: LocalServer
 
     @Inject
-    lateinit var mPicasso: Picasso
+    lateinit var picasso: Picasso
+
+    @Inject
+    @AppVersionInfo
+    lateinit var versionInfo: VersionInfo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -99,19 +105,19 @@ class MainMenuFragment : Fragment() {
         val resources = context.resources
         val players: Array<User> = if (hasLocalOpponents)
             arrayOf(
-                Player(resources, mPicasso, "${getString(R.string.player)} 1"),
-                Player(resources, mPicasso, "${getString(R.string.player)} 2")
+                Player(resources, picasso, "${getString(R.string.player)} 1", versionInfo),
+                Player(resources, picasso, "${getString(R.string.player)} 2", versionInfo)
             )
         else
             arrayOf(
-                Player(resources, mPicasso, getString(R.string.player)),
-                Android(context, getString(R.string.android))
+                Player(resources, picasso, getString(R.string.player), versionInfo),
+                Android(context, getString(R.string.android), versionInfo)
             )
 
         ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =
-            mGameSessionBuilder
+            gameSessionBuilder
                 .users(players)
-                .server(mLocalServer)
+                .server(localServer)
                 .build()
 
         navController.navigate(R.id.start_game_fragment)

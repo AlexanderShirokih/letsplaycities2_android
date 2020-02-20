@@ -9,15 +9,20 @@ import ru.aleshi.letsplaycities.ui.ActivityScope
 import ru.aleshi.letsplaycities.ui.network.FbToken
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.NetworkRepository
+import ru.quandastudio.lpsclient.core.CredentialsProvider
 import ru.quandastudio.lpsclient.core.LpsApi
+import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.core.NetworkClient
-import ru.quandastudio.lpsclient.model.Credentials
 
 @Module
 abstract class NetworkModule {
 
     @Binds
     abstract fun networkPresenter(presenter: NetworkPresenterImpl): NetworkContract.Presenter
+
+    @ActivityScope
+    @Binds
+    abstract fun credentialsProvider(providerImpl: GameAuthDataFactory): CredentialsProvider
 
     @Module
     companion object {
@@ -37,14 +42,8 @@ abstract class NetworkModule {
 
         @JvmStatic
         @Provides
-        fun provideCredentials(authDataFactory: GameAuthDataFactory): Credentials {
-            return authDataFactory.load().credentials
-        }
-
-        @JvmStatic
-        @Provides
-        fun apiClient(credentials: Credentials): LpsApi {
-            return LpsApi.create(Utils.getServerBaseUrl(), credentials)
+        fun apiRepsoitory(credentials: CredentialsProvider) : LpsRepository {
+            return LpsRepository(LpsApi.create(Utils.getServerBaseUrl(), credentials))
         }
     }
 }

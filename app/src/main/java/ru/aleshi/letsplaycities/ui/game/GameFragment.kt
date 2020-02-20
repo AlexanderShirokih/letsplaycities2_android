@@ -139,15 +139,15 @@ class GameFragment : Fragment(), GameContract.View {
         adView.loadAd(AdRequest.Builder().build())
         adView.adListener = object : AdListener() {
             override fun onAdClosed() {
-                adView.visibility = View.GONE
+                adView?.visibility = View.GONE
             }
 
             override fun onAdLoaded() {
-                adView.visibility = View.VISIBLE
+                adView?.visibility = View.VISIBLE
             }
 
             override fun onAdFailedToLoad(error: Int) {
-                adView.visibility = View.GONE
+                adView?.visibility = View.GONE
             }
         }
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(activity).apply {

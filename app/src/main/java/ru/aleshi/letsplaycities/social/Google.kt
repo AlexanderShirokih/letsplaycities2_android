@@ -42,8 +42,6 @@ class Google : ISocialNetwork() {
         }
     }
 
-    //TODO: Test w\o Game.Scope
-    //TODO: Add SignIn button to layout
     fun signIn(activity: Activity) {
         initialize(activity)
         mGoogleSignInAccount = GoogleSignIn.getLastSignedInAccount(activity)
@@ -51,11 +49,8 @@ class Google : ISocialNetwork() {
             mGoogleSignInClient.silentSignIn().addOnCompleteListener(activity) { task ->
                 if (task.isSuccessful) {
                     mGoogleSignInAccount = task.result
-                    Log.d("TAG", "Logged In from SILENT")
-                } else {
-                    //TODO: Test
-                    Log.d("TAG", "Logged from silent")
-                    fromSilent = true
+               } else {
+                   fromSilent = true
                     val signInIntent = mGoogleSignInClient.signInIntent
                     activity.startActivityForResult(signInIntent, RC_SIGN_IN)
                 }
@@ -89,17 +84,12 @@ class Google : ISocialNetwork() {
             return false
         val task = GoogleSignIn.getSignedInAccountFromIntent(data)
         try {
-            Log.d("TAG", "isSucc={${task.isSuccessful}, taskEX=${task.exception}")
             if (task.isSuccessful) {
                 mGoogleSignInAccount = task.getResult(ApiException::class.java)
                 // Signed in successfully, show authenticated UI.
                 if (!fromSilent)
                     onLoggedIn(mGoogleSignInAccount!!)
             } else {
-                Log.d(
-                    "TAG",
-                    "ex=${GoogleSignInStatusCodes.getStatusCodeString((task.exception as ApiException).statusCode)}"
-                )
                 task.exception?.printStackTrace()
                 onError()
             }

@@ -53,9 +53,8 @@ open class RemoteRepository constructor(var server: LPSServer) : LPSServer.Conne
                     authData = AuthData(it.login, AuthType.Native, Credentials(it.uid, it.hash)),
                     isFriend = true,
                     canReceiveMessages = it.canReceiveMessages,
-                    clientBuild = it.clientBuild,
-                    clientVersion = it.clientVersion,
-                    pictureHash = null
+                    versionInfo = VersionInfo(it.clientVersion, it.clientBuild),
+                    pictureHash = it.picHash
                 )
             }
             .firstElement()

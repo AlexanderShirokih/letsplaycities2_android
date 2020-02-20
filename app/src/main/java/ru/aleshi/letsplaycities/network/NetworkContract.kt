@@ -1,15 +1,15 @@
 package ru.aleshi.letsplaycities.network
 
 import androidx.lifecycle.Observer
-import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
-import ru.quandastudio.lpsclient.model.FriendModeResult
+import ru.aleshi.letsplaycities.ui.profile.ProfileViewModel
 import ru.quandastudio.lpsclient.model.FriendInfo
+import ru.quandastudio.lpsclient.model.FriendModeResult
 
 interface NetworkContract {
 
     interface View {
-        fun getGamePreferences(): GamePreferences
+        fun getProfileViewModel(): ProfileViewModel
         fun setupLayout(isLoggedIn: Boolean)
         fun checkForWaiting(task: () -> Unit)
         fun notifyAboutUpdates()
@@ -23,10 +23,10 @@ interface NetworkContract {
 
     interface Presenter {
         fun onAttachView(view: View)
-        fun onConnectToFriendGame(versionInfo: VersionInfo, oppId: Int)
-        fun onConnect(versionInfo: VersionInfo)
+        fun onConnectToFriendGame(oppId: Int)
+        fun onConnect()
         fun onCancel()
-        fun onFriendsInfo(versionInfo: VersionInfo): Observer<in FriendInfo>
+        fun onFriendsInfo(): Observer<in FriendInfo>
         fun onDispose()
     }
 }

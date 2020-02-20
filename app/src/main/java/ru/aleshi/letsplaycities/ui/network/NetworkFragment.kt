@@ -5,7 +5,6 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -15,13 +14,13 @@ import kotlinx.android.synthetic.main.fragment_network.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
-import ru.aleshi.letsplaycities.network.VersionInfo
 import ru.aleshi.letsplaycities.network.NetworkContract
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.friends.FriendsViewModel
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
+import ru.aleshi.letsplaycities.ui.profile.ProfileViewModel
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.quandastudio.lpsclient.model.FriendModeResult
@@ -33,9 +32,11 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     lateinit var mNetworkPresenter: NetworkContract.Presenter
 
     private val mGamePreferences: GamePreferences by lazy { lpsApplication.gamePreferences }
-    private val mFriendsViewModel: FriendsViewModel by lazy {
-        ViewModelProvider(requireActivity())[FriendsViewModel::class.java]
-    }
+    private val viewModelProvider: ViewModelProvider by lazy { ViewModelProvider(requireActivity()) }
+
+    private val mFriendsViewModel: FriendsViewModel
+        get() = viewModelProvider[FriendsViewModel::class.java]
+
     private var mLastConnectionTime: Long = 0
     private val reconnectionDelay = 5
     private var mGameSound: MediaPlayer? = null
@@ -45,7 +46,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         super.onCreate(savedInstanceState)
         mFriendsViewModel.friendsInfo.observe(
             this@NetworkFragment,
-            mNetworkPresenter.onFriendsInfo(getVersionInfo())
+            mNetworkPresenter.onFriendsInfo()
         )
         if (mGamePreferences.isSoundEnabled()) {
             mGameSound = MediaPlayer.create(activity, R.raw.begin)
@@ -63,7 +64,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
         btnFriends.setOnClickListener { findNavController().navigate(R.id.start_friends_fragment) }
         btnHistory.setOnClickListener { findNavController().navigate(R.id.start_history_fragment) }
-        btnConnect.setOnClickListener { mNetworkPresenter.onConnect(getVersionInfo()) }
+        btnConnect.setOnClickListener { mNetworkPresenter.onConnect() }
         btnCancel.setOnClickListener { mNetworkPresenter.onCancel() }
     }
 
@@ -75,15 +76,6 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
             FriendModeResult.NOT_FRIEND -> R.string.not_friend
         }
         Toast.makeText(requireContext(), getString(msgId, login ?: ""), Toast.LENGTH_LONG).show()
-    }
-
-    private fun getVersionInfo(): VersionInfo {
-        val context = requireContext()
-        val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        return VersionInfo(
-            pInfo.versionName,
-            PackageInfoCompat.getLongVersionCode(pInfo).toInt()
-        )
     }
 
     override fun onStartGame(session: GameSession) {
@@ -99,8 +91,6 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     override fun showMessage(msgResId: Int) =
         Snackbar.make(requireView(), msgResId, Snackbar.LENGTH_LONG).show()
 
-    override fun getGamePreferences(): GamePreferences = mGamePreferences
-
     override fun onCancel() {
         setLoadingLayout(false)
         setupLayout(true)
@@ -108,6 +98,9 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     override fun notifyAboutUpdates() =
         Snackbar.make(requireView(), R.string.new_version_available, Snackbar.LENGTH_SHORT).show()
+
+    override fun getProfileViewModel(): ProfileViewModel =
+        viewModelProvider[ProfileViewModel::class.java]
 
     override fun setupLayout(isLoggedIn: Boolean) {
         group_connect.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
@@ -125,7 +118,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
             if ("fm_game" == nfa.action) {
                 if (mGamePreferences.isLoggedIn()) {
                     setLoadingLayout(true)
-                    mNetworkPresenter.onConnectToFriendGame(getVersionInfo(), nfa.oppId)
+                    mNetworkPresenter.onConnectToFriendGame(nfa.oppId)
                 } else
                     Toast.makeText(
                         requireContext(),

@@ -7,7 +7,9 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import ru.aleshi.letsplaycities.AppVersionInfo
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.NetworkUser
@@ -17,18 +19,22 @@ import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.FriendInfo
 import ru.quandastudio.lpsclient.model.PlayerData
+import ru.quandastudio.lpsclient.model.VersionInfo
 import javax.inject.Inject
 
 /**
  * This class handles onConnect events and initiates login process
  */
 class NetworkPresenterImpl @Inject constructor(
+    @AppVersionInfo
+    private val versionInfo: VersionInfo,
     private val mGameSessionBuilder: GameSession.GameSessionBuilder,
     private val mNetworkServer: NetworkServer,
     private val mNetworkRepository: NetworkRepository,
     private val mAuthDataFactory: GameAuthDataFactory,
     private val mPicasso: Picasso,
-    private val mContext: Context
+    private val mContext: Context,
+    private val gamePreferences: GamePreferences
 ) : NetworkContract.Presenter {
 
     private lateinit var mAuthData: AuthData
@@ -43,45 +49,32 @@ class NetworkPresenterImpl @Inject constructor(
      */
     override fun onAttachView(view: NetworkContract.View) {
         mView = view
-        val prefs = view.getGamePreferences()
-        val isLoggedIn = prefs.isLoggedIn()
-        if (isLoggedIn) {
-            mAuthData = mAuthDataFactory.load()
-        }
-        view.setupLayout(isLoggedIn)
+        mAuthData = mAuthDataFactory.load()
+        view.setupLayout(gamePreferences.isLoggedIn())
     }
 
     /**
      * Called when received request to start game in friend mode.
-     * @param versionInfo version of the application(Pair<versionName, versionCode>)
      * @param oppId ID of the opponent you want to play with
      */
-    override fun onConnectToFriendGame(versionInfo: VersionInfo, oppId: Int) {
-        createPlayerData(versionInfo) {
-            startFriendGame(it, oppId)
-        }
+    override fun onConnectToFriendGame(oppId: Int) {
+        startFriendGame(createPlayerData(), oppId)
     }
 
     /**
-     * Called when user touched connect button.
-     * @param versionInfo version of the application(Pair<versionName, versionCode>)
+     * Called when user touched the connect button.
      */
-    override fun onConnect(versionInfo: VersionInfo) {
-        createPlayerData(versionInfo) {
-            startGame(it, null)
-        }
+    override fun onConnect() {
+        startGame(createPlayerData(), null)
     }
 
     /**
      * Called when user wants to start game in friend mode.
-     * @param versionInfo version of the application(Pair<versionName, versionCode>)
      */
-    override fun onFriendsInfo(versionInfo: VersionInfo): Observer<in FriendInfo> {
+    override fun onFriendsInfo(): Observer<in FriendInfo> {
         return Observer { friendInfo ->
-            friendInfo?.run {
-                createPlayerData(versionInfo) { playerData ->
-                    startGame(playerData, friendInfo)
-                }
+            friendInfo?.apply {
+                startGame(createPlayerData(), friendInfo)
             }
         }
     }
@@ -105,26 +98,15 @@ class NetworkPresenterImpl @Inject constructor(
     }
 
     /**
-     * Creates PlayerData with given versionInfo
-     * and callback which takes newly created data.
-     * @param versionInfo class containing version of the application(versionName, versionCode)
-     * @param supplier callback with newly created data
+     * Creates new PlayerData/
      */
-    private fun createPlayerData(
-        versionInfo: VersionInfo,
-        supplier: (playerData: PlayerData) -> Unit
-    ) {
-        mView?.let {
-            supplier(
-                PlayerData(
-                    authData = mAuthData,
-                    clientVersion = versionInfo.versionName,
-                    clientBuild = versionInfo.versionCode,
-                    canReceiveMessages = it.getGamePreferences().canReceiveMessages()
-                )
-            )
-        }
-    }
+    private fun createPlayerData() =
+        PlayerData(
+            authData = mAuthData,
+            versionInfo = versionInfo,
+            canReceiveMessages = gamePreferences.canReceiveMessages(),
+            pictureHash = gamePreferences.pictureHash
+        )
 
     /**
      * Starts friend-game login sequence
@@ -201,7 +183,9 @@ class NetworkPresenterImpl @Inject constructor(
             .doOnNext {
                 mView?.let { view ->
                     view.updateInfo(R.string.waiting_for_opp)
-                    if (it.newerBuild > userData.clientBuild)
+                    view.getProfileViewModel()
+                        .updatePictureHash(userData.authData.credentials.userId, it.picHash)
+                    if (it.newerBuild > userData.versionInfo.versionCode)
                         view.notifyAboutUpdates()
                 }
             }
@@ -224,7 +208,7 @@ class NetworkPresenterImpl @Inject constructor(
                 mContext,
                 oppData
             ) else NetworkUser(mContext.resources, oppData, mPicasso),
-            Player(mContext.resources, mPicasso, playerData, mView?.getGamePreferences())
+            Player(mContext.resources, mPicasso, playerData)
         ).apply {
             if (youStarter)
                 reverse()

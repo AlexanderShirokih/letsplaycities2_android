@@ -5,8 +5,6 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.squareup.picasso.MemoryPolicy
-import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -14,30 +12,39 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.social.SocialAccountData
 import ru.aleshi.letsplaycities.social.SocialNetworkLoginListener
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.FetchState
 import ru.aleshi.letsplaycities.ui.network.FbToken
-import ru.quandastudio.lpsclient.AuthorizationException
-import ru.quandastudio.lpsclient.core.LpsApi
-import ru.quandastudio.lpsclient.model.*
+import ru.quandastudio.lpsclient.core.CredentialsProvider
+import ru.quandastudio.lpsclient.core.LpsRepository
+import ru.quandastudio.lpsclient.model.AuthData
+import ru.quandastudio.lpsclient.model.Credentials
+import ru.quandastudio.lpsclient.model.SignUpRequest
+import ru.quandastudio.lpsclient.model.SignUpResponse
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 class AuthorizationViewModel @Inject constructor(
-    private val api: LpsApi,
+    private val apiRepo: LpsRepository,
     private val authDataFactory: GameAuthDataFactory,
+    private val credentialsProvider: CredentialsProvider,
+    private val gamePreferences: GamePreferences,
     @FbToken private val firebaseToken: Single<String>
 ) : ViewModel() {
 
     private val mState = MutableLiveData<FetchState>()
-
+    private val _loading = MutableLiveData(false)
     private val disposable = CompositeDisposable()
 
     val state: LiveData<FetchState>
         get() = mState
+
+    val loading: LiveData<Boolean>
+        get() = _loading
 
     /**
      * Call to register social network callback and start authorization sequence
@@ -46,22 +53,24 @@ class AuthorizationViewModel @Inject constructor(
     fun registerCallback() {
         SocialNetworkManager.registerCallback(object : SocialNetworkLoginListener {
             override fun onLoggedIn(data: SocialAccountData) {
-                disposable.add(processAuthorizationSequence(data)
-                    .doOnSubscribe { mState.postValue(FetchState.LoadingState) }
-                    .doOnSuccess { mState.postValue(FetchState.DataState(R.string.comlpeted)) }
-                    .subscribe({ resp ->
-                        authDataFactory.save(
-                            AuthData(
-                                login = resp.name,
-                                snType = resp.authType,
-                                credentials = Credentials(
-                                    userId = resp.userId,
-                                    hash = resp.accHash
+                disposable.add(
+                    processAuthorizationSequence(data)
+                        .doOnSubscribe { _loading.postValue(true) }
+                        .doFinally { _loading.postValue(false) }
+                        .subscribe({ resp ->
+                            authDataFactory.save(
+                                AuthData(
+                                    login = resp.name,
+                                    snType = resp.authType,
+                                    credentials = Credentials(
+                                        userId = resp.userId,
+                                        hash = resp.accHash
+                                    )
                                 )
                             )
-                        )
-                        mState.postValue(FetchState.FinishState)
-                    }, { err -> mState.postValue(FetchState.ErrorState(err)) })
+                            gamePreferences.pictureHash = resp.picHash
+                            mState.postValue(FetchState.FinishState)
+                        }, { err -> mState.postValue(FetchState.ErrorState(err)) })
                 )
             }
 
@@ -74,12 +83,15 @@ class AuthorizationViewModel @Inject constructor(
     /**
      * Begins authorization sequence which authorize user on server and uploads avatar to it
      * @param data authorization data with social network info
-     * @return any error if something went wrong
+     * @return Completable with any error if something went wrong
      */
     private fun processAuthorizationSequence(data: SocialAccountData): Single<SignUpResponse> =
         processAvatar(data.pictureUri)
-            .zipWith(signUp(data)) { pic: Pair<ByteArray, String>, resp: SignUpResponse ->
-                Triple(pic.first, pic.second, resp)
+            .flatMap {
+                Single.just(it)
+                    .zipWith(signUp(data)) { pic: Pair<ByteArray, String>, resp: SignUpResponse ->
+                        Triple(pic.first, pic.second, resp)
+                    }
             }
             .flatMap { t ->
                 if (t.second.isNotEmpty() && t.second != t.third.picHash) {
@@ -98,6 +110,7 @@ class AuthorizationViewModel @Inject constructor(
         Single.just(FetchState.DataState(R.string.fetching_token))
             .doOnSuccess(mState::postValue)
             .flatMap { firebaseToken }
+            .observeOn(Schedulers.io())
             .map { token ->
                 SignUpRequest(
                     snUID = data.snUID,
@@ -108,13 +121,14 @@ class AuthorizationViewModel @Inject constructor(
                 )
             }
             .doOnSuccess { mState.postValue(FetchState.DataState(R.string.authorization)) }
-            .observeOn(Schedulers.io())
-            .flatMap(api::signUp)
-            .flatMap {
-                if (it.error != null)
-                    Single.error(AuthorizationException(it.error!!))
-                else
-                    Single.just(it.data!!)
+            .flatMap(apiRepo::signUp)
+            .doOnSuccess { resp ->
+                credentialsProvider.update(
+                    Credentials(
+                        userId = resp.userId,
+                        hash = resp.accHash
+                    )
+                )
             }
 
     /**
@@ -126,12 +140,10 @@ class AuthorizationViewModel @Inject constructor(
     private fun uploadAvatar(picture: ByteArray, hash: String) =
         Single.just(FetchState.DataState(R.string.uploading_picture))
             .doOnSuccess(mState::postValue)
-            .observeOn(Schedulers.io())
-            .flatMap { api.updatePicture("png", hash, picture) }
-            .flatMap(MessageWrapper<String>::toSingle)
+            .flatMap { apiRepo.updatePicture("png", hash, picture) }
 
     /**
-     * Used to load image by given URI, then calculate MD5
+     * Used to load image by given URI, then calculates MD5
      * @param uri image URI
      * @return Loaded image with its MD5 hash or pair of empty array and string if something went wrong
      */
@@ -149,16 +161,20 @@ class AuthorizationViewModel @Inject constructor(
      * @param uri image URI
      * @return Loaded and resized to 128x128px image or empty if unable to load image
      */
-    private fun loadAndResize(uri: Uri) = Maybe.fromCallable {
-        Picasso.get()
-            .load(uri)
-            .networkPolicy(NetworkPolicy.NO_CACHE)
-            .memoryPolicy(MemoryPolicy.NO_CACHE)
-            .resize(0, 128)
-            .get()
-    }
-        .subscribeOn(Schedulers.io())
-        .observeOn(Schedulers.io())
+    private fun loadAndResize(uri: Uri) =
+        Maybe.create<Bitmap> {
+            try {
+                it.onSuccess(
+                    Picasso.get()
+                        .load(uri)
+                        .resize(0, 128)
+                        .get()
+                )
+            } catch (e: Exception) {
+                it.tryOnError(e)
+            }
+        }
+            .subscribeOn(Schedulers.io())
 
     /**
      * Used to compress bitmap image to PNG format

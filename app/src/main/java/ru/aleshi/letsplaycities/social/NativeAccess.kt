@@ -4,13 +4,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.base.player.DeviceId
 import ru.quandastudio.lpsclient.model.AuthType
 
 class NativeAccess : ISocialNetwork() {
-
-    //TODO: Remove this
-    internal var userLogin: String = "User"
 
     override fun onInitialize(context: Context) {}
 
@@ -19,13 +17,14 @@ class NativeAccess : ISocialNetwork() {
     }
 
     override fun onLoggedIn(activity: Activity, accessToken: String) {
+        val prefs = (activity.application as LPSApplication).gamePreferences
         callback?.onLoggedIn(
             SocialAccountData(
                 snUID = DeviceId(activity).toString(),
-                login = userLogin,
+                login = prefs.lastNativeLogin,
                 accessToken = accessToken,
                 networkType = AuthType.Native,
-                pictureUri = Uri.EMPTY
+                pictureUri = Uri.parse(prefs.lastAvatarUri)
             )
         )
     }
@@ -37,11 +36,4 @@ class NativeAccess : ISocialNetwork() {
         data: Intent?
     ): Boolean = false
 
-    companion object {
-        //TODO: Remove this
-        fun login(login: String, activity: Activity) {
-            (ServiceType.NV.network as NativeAccess).userLogin = login
-            SocialNetworkManager.login(ServiceType.NV, activity)
-        }
-    }
 }

@@ -40,10 +40,10 @@ class DictionaryUpdater(val mGson: Gson) {
         if (inProgress) return null
         val updPeriod = gamePreferences.getDictionaryUpdatePeriod()
         if (updPeriod > 0) {
-            val lastTime = gamePreferences.getDictionaryUpdateDate()
+            val lastTime = gamePreferences.dictionaryUpdateDate
             val now = System.currentTimeMillis()
             if (now - lastTime > TimeUnit.HOURS.toMillis(updPeriod)) {
-                gamePreferences.setDictionaryUpdateDate(now)
+                gamePreferences.dictionaryUpdateDate = now
                 return checkForUpdates(dictionary, listener)
             }
         }

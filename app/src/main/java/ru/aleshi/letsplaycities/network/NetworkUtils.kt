@@ -41,12 +41,12 @@ object NetworkUtils {
     }
 
     fun getToken(): Single<String> {
-        return Single.create {
+        return Single.create<String> {
             FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
                 //174 chars
                 if (task.isSuccessful)
                     it.onSuccess(task.result!!.token)
-                else it.onError(LPSException("Cannot get firebase token"))
+                else it.tryOnError(LPSException("Cannot fetch firebase token"))
             }
         }
     }

@@ -6,8 +6,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.annotation.DrawableRes
-import com.squareup.picasso.MemoryPolicy
-import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import io.reactivex.Observable
@@ -17,7 +15,6 @@ class PicassoPictureSource(
     resources: Resources,
     picasso: Picasso,
     path: Uri?, @DrawableRes placeholder: Int,
-    noCache: Boolean = false,
     fitSize: Boolean = false
 ) :
 
@@ -32,9 +29,6 @@ class PicassoPictureSource(
                 .placeholder(placeholder)
                 .error(placeholder)
                 .apply {
-                    if (noCache)
-                        networkPolicy(NetworkPolicy.NO_CACHE)
-                            .memoryPolicy(MemoryPolicy.NO_CACHE)
                     if (fitSize)
                         resize(0, 128)
                 }
@@ -58,9 +52,7 @@ class PicassoPictureSource(
                     }
                 })
         }) {
-    /* TODO:
-     * Check avatar loading in network mode
-     */
+
     constructor(
         resources: Resources,
         picasso: Picasso,
@@ -68,7 +60,7 @@ class PicassoPictureSource(
     ) : this(
         resources,
         picasso,
-        Uri.parse(Utils.getPictureUrl(userId, pictureHash)),
+        Utils.getPictureUri(userId, pictureHash),
         placeholder
     )
 

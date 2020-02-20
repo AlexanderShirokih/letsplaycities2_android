@@ -33,7 +33,7 @@ object Bindings {
     //@BindingAdapter({"bind:imageUrl"})
     @BindingAdapter("playerImageUri")
     @JvmStatic
-    fun setPlayerImageUri(imageView: ImageView, playerImageUri: Uri) {
+    fun setPlayerImageUri(imageView: ImageView, playerImageUri: Uri?) {
         Picasso.get()
             .load(playerImageUri)
             .placeholder(R.drawable.ic_player)

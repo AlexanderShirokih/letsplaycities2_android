@@ -3,14 +3,19 @@ package ru.aleshi.letsplaycities.ui.profile
 import android.app.Activity.RESULT_OK
 import android.app.Dialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import io.reactivex.disposables.Disposable
+import androidx.navigation.fragment.findNavController
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 
 class ChangeAvatarDialog : DialogFragment() {
@@ -19,7 +24,7 @@ class ChangeAvatarDialog : DialogFragment() {
         private const val SELECT_PICTURE = 142
     }
 
-    private var disposable: Disposable? = null
+    private var disposable = CompositeDisposable()
     private lateinit var mProfileViewModel: ProfileViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,9 +34,27 @@ class ChangeAvatarDialog : DialogFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK) {
-            mProfileViewModel.avatarUri.set(data!!.data!!)
-            //TODO: Resize avatar and save URI as nativeAvatarPath
+            processAvatar(data!!.data!!)
         }
+    }
+
+    private fun processAvatar(uri: Uri) {
+        disposable.add(
+            Utils.createThumbnail(requireContext().filesDir, uri)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(mProfileViewModel.avatarUri::set)
+                .subscribe({
+                    lpsApplication.gamePreferences.lastAvatarUri = it.toString()
+                    findNavController().popBackStack()
+                }
+                    , {
+                        Toast.makeText(
+                            requireContext(),
+                            R.string.error_upd_avatar,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    })
+        )
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -66,6 +89,6 @@ class ChangeAvatarDialog : DialogFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        disposable?.dispose()
+        disposable.clear()
     }
 }

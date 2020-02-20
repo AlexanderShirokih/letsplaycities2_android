@@ -1,7 +1,6 @@
 package ru.aleshi.letsplaycities.base.player
 
 import android.content.res.Resources
-import androidx.core.net.toUri
 import com.squareup.picasso.Picasso
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -13,32 +12,33 @@ import ru.aleshi.letsplaycities.base.dictionary.Dictionary
 import ru.aleshi.letsplaycities.base.game.PicassoPictureSource
 import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.quandastudio.lpsclient.model.PlayerData
-import java.io.File
+import ru.quandastudio.lpsclient.model.VersionInfo
 
 class Player(
     resources: Resources,
     picasso: Picasso,
-    playerData: PlayerData,
-    val prefs: GamePreferences?
+    playerData: PlayerData
 ) :
     User(
         PicassoPictureSource(
-            resources,
-            picasso,
-            path = prefs?.getAvatarPath()?.also { File(it) }?.toUri(),
-            placeholder = R.drawable.ic_player_big,
-            noCache = true,
-            fitSize = true
+            resources = resources,
+            picasso = picasso,
+            userId = playerData.authData.credentials.userId,
+            pictureHash = playerData.pictureHash,
+            placeholder = R.drawable.ic_player_big
         ),
         playerData, hasUserInput = true
     ) {
 
-    constructor(resources: Resources, picasso: Picasso, name: String) : this(
+    constructor(
+        resources: Resources,
+        picasso: Picasso,
+        name: String,
+        versionInfo: VersionInfo
+    ) : this(
         resources,
         picasso,
-        //TODO: Why we can't pass normal playerData?
-        PlayerData.SimpleFactory().create(name),
-        null
+        PlayerData.SimpleFactory().create(name, versionInfo)
     )
 
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()

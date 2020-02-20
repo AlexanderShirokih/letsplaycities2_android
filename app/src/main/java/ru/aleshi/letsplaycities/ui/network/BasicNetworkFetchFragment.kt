@@ -17,11 +17,9 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.ui.BasicListAdapter
 import ru.aleshi.letsplaycities.ui.FetchState
 import ru.aleshi.letsplaycities.ui.ViewModelFactory
-import ru.quandastudio.lpsclient.core.LpsApi
+import ru.quandastudio.lpsclient.core.LpsRepository
 import javax.inject.Inject
 
-// TODO: Test without network
-// TODO: History fragment: test when no logged in
 abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
 
     @Inject
@@ -58,7 +56,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
         @StringRes val emptyViewPlaceholder: Int
     )
 
-    protected fun withApi(action: (api: LpsApi) -> Disposable) {
+    protected fun withApi(action: (api: LpsRepository) -> Disposable) {
         networkFetchViewModel.withApi(action)
     }
 
@@ -69,7 +67,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
         networkFetchViewModel.fetchData(onStartRequest())
     }
 
-    abstract fun onStartRequest(): (api: LpsApi) -> Maybe<List<FetchDataType>>
+    abstract fun onStartRequest(): (apiRepo: LpsRepository) -> Maybe<List<FetchDataType>>
 
     protected open fun onLoading() {
         setListVisibility(visible = false, showLoading = true)

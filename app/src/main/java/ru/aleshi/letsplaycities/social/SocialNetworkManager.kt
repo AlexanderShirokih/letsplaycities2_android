@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.quandastudio.lpsclient.core.CredentialsProvider
 
 
 object SocialNetworkManager {
@@ -30,8 +31,9 @@ object SocialNetworkManager {
             serviceType.network.initialize(context)
     }
 
-    fun logout(prefs: GamePreferences) {
+    fun logout(prefs: GamePreferences, credentialsProvider: CredentialsProvider) {
         prefs.logout()
+        credentialsProvider.invalidate()
 
         ServiceType.values().forEach {
             if (it.network.isInitialized)

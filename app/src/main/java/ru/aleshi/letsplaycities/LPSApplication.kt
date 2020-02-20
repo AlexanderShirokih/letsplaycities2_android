@@ -38,7 +38,8 @@ class LPSApplication : MultiDexApplication(), HasAndroidInjector {
             .build()
             .inject(this)
         SocialNetworkManager.init(this, ServiceType.VK)
-        Crashlytics.getInstance()
+        if (!BuildConfig.DEBUG)
+            Crashlytics.getInstance()
     }
 
     private fun initPicasso(context: Context): Picasso {

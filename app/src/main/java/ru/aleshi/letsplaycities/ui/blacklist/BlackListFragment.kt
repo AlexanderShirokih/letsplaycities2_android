@@ -18,6 +18,7 @@ import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.core.LpsApi
+import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.BlackListItem
 import javax.inject.Inject
 
@@ -83,7 +84,7 @@ class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
         super.onViewCreated(view, savedInstanceState)
     }
 
-    override fun onStartRequest() = LpsApi::getBlackList
+    override fun onStartRequest() = LpsRepository::getBlackList
 
     private fun showConfirmDialog(msg: String, callback: () -> Unit) {
         this.callback = callback

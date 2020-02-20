@@ -16,4 +16,5 @@ abstract class AppModule {
 
     @Binds
     abstract fun lpsApplication(application: LPSApplication): Application
+
 }

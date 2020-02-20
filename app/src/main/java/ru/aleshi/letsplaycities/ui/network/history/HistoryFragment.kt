@@ -15,6 +15,7 @@ import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
 import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.core.LpsApi
+import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.HistoryInfo
 import javax.inject.Inject
 
@@ -47,7 +48,7 @@ class HistoryFragment : BasicNetworkFetchFragment<HistoryInfo>(),
 
     }
 
-    override fun onStartRequest() = LpsApi::getHistoryList
+    override fun onStartRequest() = LpsRepository::getHistoryList
 
     override fun onRequestView() =
         ViewDataHolder(mAdapter, placeholder, recyclerView, loadingProgress, R.string.no_history)

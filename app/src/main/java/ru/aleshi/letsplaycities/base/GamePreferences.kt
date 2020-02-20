@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.base
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import android.util.Base64
 import androidx.core.content.edit
 
@@ -139,51 +140,40 @@ class GamePreferences(context: Context) {
 
     fun logout() {
         prefs.edit {
-            remove("avatar_path")
             remove("sn_login")
             remove("sn_name")
             remove("user_id")
             remove("acc_tkn")
+            remove("commited")
+            remove("pic_hash")
             // Legacy data
             remove("sn_uid")
             remove("hash")
+            remove("avatar_path")
         }
     }
 
     fun removeAvatarPath() {
         prefs.edit {
-            remove("avatar_path")
             remove("last_avatar_uri")
         }
     }
 
-    fun setAvatarPath(avatar: String) {
-        prefs.edit().putString("avatar_path", avatar).apply()
-    }
-
-    fun getAvatarPath(): String? {
-        return prefs.getString("avatar_path", null)
-    }
-
-    fun getLastNativeLogin(): String? {
-        return prefs.getString("last_login", null)
-    }
-
-    fun updateLastNativeLogin(login: String) {
-        prefs.edit {
+    var lastNativeLogin: String
+        get() = prefs.getString("last_login", "")!!
+        set(login) = prefs.edit {
             putString("last_login", login)
         }
-    }
 
-    fun getLastAvatarUri(): String? {
-        return prefs.getString("last_avatar_uri", null)
-    }
-
-    fun updateLastAvatarUri(uri: String) {
-        prefs.edit {
+    var lastAvatarUri: String
+        get() = prefs.getString("last_avatar_uri", Uri.EMPTY.toString())!!
+        set(uri) = prefs.edit(true) {
             putString("last_avatar_uri", uri)
         }
-    }
+
+    var pictureHash: String?
+        get() = prefs.getString("pic_hash", null)
+        set(hash) = prefs.edit(true) { putString("pic_hash", hash) }
 
     fun canReceiveMessages(): Boolean {
         return prefs.getInt(KEY_MSG, 1) != 0
@@ -226,13 +216,9 @@ class GamePreferences(context: Context) {
         }
     }
 
-    fun getDictionaryUpdateDate(): Long {
-        return prefs.getLong(KEY_LAST_UPDATE, 0)
-    }
-
-    fun setDictionaryUpdateDate(time: Long) {
-        prefs.edit { putLong(KEY_LAST_UPDATE, time) }
-    }
+    var dictionaryUpdateDate: Long
+        get() = prefs.getLong(KEY_LAST_UPDATE, 0)
+        set(time) = prefs.edit { putLong(KEY_LAST_UPDATE, time) }
 
     fun isFirstLaunch(): Boolean {
         val isFirst = prefs.getBoolean(F_LAUNCH, true)
@@ -244,4 +230,5 @@ class GamePreferences(context: Context) {
     fun getDifficulty(): Int {
         return prefs.getInt(KEY_DIFF, 0) + 1
     }
+
 }

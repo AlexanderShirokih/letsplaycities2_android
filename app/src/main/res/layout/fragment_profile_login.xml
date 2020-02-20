@@ -86,7 +86,7 @@
                     android:id="@+id/socialButtonsGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="btnGl,btnVk,btnOk,btnFb,btnLoginNoSn" />
+                    app:constraint_referenced_ids="btnGl,btnVk,btnOk,btnFb,btnLoginNoSn,sn_desc" />
 
             <ProgressBar
                     android:id="@+id/loadingProgress"
@@ -106,10 +106,10 @@
                     app:layout_constraintTop_toBottomOf="@id/loadingProgress" />
 
             <androidx.constraintlayout.widget.Group
-                    android:visibility="gone"
                     android:id="@+id/loadingGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     app:constraint_referenced_ids="loadingProgress,authorizationLabel" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

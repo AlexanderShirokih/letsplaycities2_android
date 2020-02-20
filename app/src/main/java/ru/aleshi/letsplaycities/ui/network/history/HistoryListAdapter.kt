@@ -34,7 +34,7 @@ class HistoryListAdapter(
             itemView.tvDuration.text = StringUtils.timeFormat(item.duration * 1000L)
             itemView.tvWordsCount.text = StringUtils.formatWordsCount(item.wordsCount)
 
-            picasso.load(Utils.getPictureUrl(item.userId, item.pictureHash))
+            picasso.load(Utils.getPictureUri(item.userId, item.pictureHash))
                 .placeholder(R.drawable.ic_player)
                 .error(R.drawable.ic_player)
                 .into(itemView.iv_picture)

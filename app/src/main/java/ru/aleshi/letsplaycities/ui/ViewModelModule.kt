@@ -8,6 +8,7 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkFetchViewModel
+import ru.aleshi.letsplaycities.ui.profile.AuthorizationViewModel
 import kotlin.reflect.KClass
 
 @Module
@@ -31,4 +32,9 @@ abstract class ViewModelModule {
     @ViewModelKey(NetworkFetchViewModel::class)
     internal abstract fun fetchViewModel(viewModel: NetworkFetchViewModel) : ViewModel
 
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AuthorizationViewModel::class)
+    internal abstract fun authViewModel(viewModel: AuthorizationViewModel) : ViewModel
 }

@@ -78,20 +78,18 @@ class LPSServerImpl @Inject constructor(
             .blockingGet()
     }
 
-    //TODO: Now we can't read avatars from local server
-
     private fun writePlayResponse(playerData: PlayerData) {
         writeMessage(
             LPSMessage.LPSPlayMessage(
                 youStarter = false,
                 canReceiveMessages = playerData.canReceiveMessages,
                 login = playerData.authData.login,
-                clientVersion = playerData.clientVersion,
-                clientBuild = playerData.clientBuild,
+                clientVersion = playerData.versionInfo.versionName,
+                clientBuild = playerData.versionInfo.versionCode,
                 isFriend = true,
                 oppUid = playerData.authData.credentials.userId,
                 authType = playerData.authData.snType,
-                pictureHash = null
+                pictureHash = playerData.pictureHash
             )
         )
     }
@@ -115,7 +113,7 @@ class LPSServerImpl @Inject constructor(
 
     private fun readClientLoginRequest() {
         val loginMsg = readMessage() as LPSClientMessage.LPSLogIn
-        if (4 != loginMsg.version)
+        if (5 != loginMsg.version)
             throw LPSProtocolError("Incompatible protocol versions(4 != ${loginMsg.version})! Please, upgrade your application")
 
         _listener.onMessage(loginMsg)
