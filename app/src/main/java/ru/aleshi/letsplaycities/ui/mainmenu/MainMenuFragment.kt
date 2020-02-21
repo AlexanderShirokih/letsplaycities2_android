@@ -101,17 +101,15 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun startGame(navController: NavController, hasLocalOpponents: Boolean) {
-        val context = requireContext()
-        val resources = context.resources
         val players: Array<User> = if (hasLocalOpponents)
             arrayOf(
-                Player(resources, picasso, "${getString(R.string.player)} 1", versionInfo),
-                Player(resources, picasso, "${getString(R.string.player)} 2", versionInfo)
+                Player(picasso, "${getString(R.string.player)} 1", versionInfo),
+                Player(picasso, "${getString(R.string.player)} 2", versionInfo)
             )
         else
             arrayOf(
-                Player(resources, picasso, getString(R.string.player), versionInfo),
-                Android(context, getString(R.string.android), versionInfo)
+                Player(picasso, getString(R.string.player), versionInfo),
+                Android(picasso, getString(R.string.android), versionInfo)
             )
 
         ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =

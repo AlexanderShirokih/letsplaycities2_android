@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
@@ -29,6 +28,7 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.reward.RewardedVideoAd
+import com.squareup.picasso.RequestCreator
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -411,10 +411,10 @@ class GameFragment : Fragment(), GameContract.View {
         }
     }
 
-    override fun updateAvatar(image: Drawable, position: Position) {
+    override fun updateAvatar(imageRequest: RequestCreator, position: Position) {
         when (position) {
-            Position.LEFT -> mGameViewModel.avatarLeft.set(image)
-            Position.RIGHT -> mGameViewModel.avatarRight.set(image)
+            Position.LEFT -> mGameViewModel.imageLeft.set(imageRequest)
+            Position.RIGHT -> mGameViewModel.imageRight.set(imageRequest)
             else -> Unit
         }
     }

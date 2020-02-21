@@ -1,6 +1,6 @@
 package ru.aleshi.letsplaycities.base.player
 
-import android.content.Context
+import com.squareup.picasso.Picasso
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -10,9 +10,10 @@ import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.VersionInfo
 import java.util.concurrent.TimeUnit
 
-class Android(context: Context, name: String, versionInfo: VersionInfo) : User(
-    PictureSource(context, placeholder = R.drawable.ic_android_big),
-    PlayerData.SimpleFactory().create(name, versionInfo), canUseQuickTime = false
+class Android(picasso: Picasso, name: String, versionInfo: VersionInfo) : User(
+    PlayerData.SimpleFactory().create(name, versionInfo),
+    PictureSource(picasso, R.drawable.ic_android_big),
+    canUseQuickTime = false
 ) {
 
     private var mEstimatedMoves: Int = 1

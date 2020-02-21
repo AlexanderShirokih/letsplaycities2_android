@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.network
 
-import android.content.Context
 import androidx.lifecycle.Observer
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
@@ -33,7 +32,6 @@ class NetworkPresenterImpl @Inject constructor(
     private val mNetworkRepository: NetworkRepository,
     private val mAuthDataFactory: GameAuthDataFactory,
     private val mPicasso: Picasso,
-    private val mContext: Context,
     private val gamePreferences: GamePreferences
 ) : NetworkContract.Presenter {
 
@@ -207,11 +205,11 @@ class NetworkPresenterImpl @Inject constructor(
      */
     private fun play(playerData: PlayerData, oppData: PlayerData, youStarter: Boolean) {
         val users = arrayOf(
-            if (mNetworkRepository.isLocal) RemoteUser(
-                mContext,
-                oppData
-            ) else NetworkUser(mContext.resources, oppData, mPicasso),
-            Player(mContext.resources, mPicasso, playerData)
+            if (mNetworkRepository.isLocal)
+                RemoteUser(oppData, mPicasso)
+            else
+                NetworkUser(oppData, mPicasso),
+            Player(playerData, mPicasso)
         ).apply {
             if (youStarter)
                 reverse()

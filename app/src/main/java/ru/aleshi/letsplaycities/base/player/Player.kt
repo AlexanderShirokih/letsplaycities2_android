@@ -1,44 +1,42 @@
 package ru.aleshi.letsplaycities.base.player
 
-import android.content.res.Resources
 import com.squareup.picasso.Picasso
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.dictionary.Dictionary
-import ru.aleshi.letsplaycities.base.game.PicassoPictureSource
+import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.aleshi.letsplaycities.utils.StringUtils
+import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.VersionInfo
 
 class Player(
-    resources: Resources,
-    picasso: Picasso,
-    playerData: PlayerData
+    playerData: PlayerData,
+    picasso: Picasso
 ) :
     User(
-        PicassoPictureSource(
-            resources = resources,
+        playerData,
+        PictureSource(
             picasso = picasso,
-            userId = playerData.authData.credentials.userId,
-            pictureHash = playerData.pictureHash,
+            uri = Utils.getPictureUri(
+                playerData.authData.credentials.userId,
+                playerData.pictureHash
+            ),
             placeholder = R.drawable.ic_player_big
         ),
-        playerData, hasUserInput = true
+        hasUserInput = true
     ) {
 
     constructor(
-        resources: Resources,
         picasso: Picasso,
         name: String,
         versionInfo: VersionInfo
     ) : this(
-        resources,
-        picasso,
-        PlayerData.SimpleFactory().create(name, versionInfo)
+        PlayerData.SimpleFactory().create(name, versionInfo),
+        picasso
     )
 
     private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()

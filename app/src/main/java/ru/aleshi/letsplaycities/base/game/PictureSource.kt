@@ -1,22 +1,24 @@
 package ru.aleshi.letsplaycities.base.game
 
-import android.content.Context
-import android.graphics.drawable.Drawable
-import android.os.Build
+import android.net.Uri
 import androidx.annotation.DrawableRes
-import io.reactivex.Observable
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.RequestCreator
 import ru.aleshi.letsplaycities.R
 
 open class PictureSource(
-    val imageBitmap: Observable<Drawable>
+    val imageRequest: RequestCreator
 ) {
-    constructor(context: Context) : this(context, R.drawable.ic_player_big)
+    constructor(picasso: Picasso) : this(picasso, R.drawable.ic_player_big)
 
-    @Suppress("DEPRECATION")
-    constructor(context: Context, @DrawableRes placeholder: Int) : this(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            Observable.just(context.resources.getDrawable(placeholder, context.theme))
+    constructor(picasso: Picasso, @DrawableRes placeholder: Int) : this(picasso.load(placeholder))
+
+    constructor(picasso: Picasso, uri: Uri, @DrawableRes placeholder: Int) : this(picasso.run {
+        if (uri == Uri.EMPTY)
+            load(placeholder)
         else
-            Observable.just(context.resources.getDrawable(placeholder))
-    )
+            load(uri)
+    }
+        .placeholder(placeholder)
+        .error(placeholder))
 }

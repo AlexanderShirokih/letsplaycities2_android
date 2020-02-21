@@ -1,7 +1,7 @@
 package ru.aleshi.letsplaycities.base.game
 
 import android.content.Context
-import android.graphics.drawable.Drawable
+import com.squareup.picasso.RequestCreator
 import io.reactivex.Completable
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
@@ -15,7 +15,7 @@ interface GameContract {
         fun showInfo(msg: String)
         fun showError(err: Throwable)
         fun updateLabel(info: String, position: Position)
-        fun updateAvatar(image: Drawable, position: Position)
+        fun updateAvatar(imageRequest: RequestCreator, position: Position)
         fun context(): Context
         fun putMessage(message: String, position: Position)
         fun putCity(city: String, countryCode: Short, position: Position)

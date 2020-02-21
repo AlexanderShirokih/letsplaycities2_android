@@ -8,8 +8,8 @@ import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.quandastudio.lpsclient.model.PlayerData
 
 abstract class User(
-    internal val pictureSource: PictureSource,
     internal val playerData: PlayerData,
+    internal val pictureSource: PictureSource,
     internal val hasUserInput: Boolean = false,
     internal val canUseQuickTime: Boolean = true
 ) {

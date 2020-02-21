@@ -223,8 +223,7 @@ class GameSession private constructor(
 
     private fun applyUserView(user: User) {
         updateLabel(user, user.position)
-        disposable.add(user.pictureSource.imageBitmap
-            .subscribe { view.updateAvatar(it, user.position) })
+        view.updateAvatar(user.pictureSource.imageRequest, user.position)
     }
 
     private fun updateLabel(user: User, position: Position) {

@@ -18,8 +18,6 @@ import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.ThemeManager
-import ru.aleshi.letsplaycities.social.Google
-import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import javax.inject.Inject
 

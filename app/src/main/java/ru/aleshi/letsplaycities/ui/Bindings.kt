@@ -9,6 +9,7 @@ import com.mikhaellopez.circularimageview.CircularImageView
 import com.squareup.picasso.MemoryPolicy
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.RequestCreator
 import ru.aleshi.letsplaycities.R
 
 object Bindings {
@@ -41,4 +42,11 @@ object Bindings {
             .memoryPolicy(MemoryPolicy.NO_CACHE)
             .into(imageView)
     }
+
+    @BindingAdapter("imageRequest")
+    @JvmStatic
+    fun setPlayerImageUri(imageView: ImageView, imageRequest: RequestCreator) {
+        imageRequest.into(imageView)
+    }
+
 }
