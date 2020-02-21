@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui.friends
+package ru.aleshi.letsplaycities.ui.network.friends
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,7 +18,6 @@ import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
 import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
-import ru.quandastudio.lpsclient.core.LpsApi
 import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.FriendInfo
 import javax.inject.Inject

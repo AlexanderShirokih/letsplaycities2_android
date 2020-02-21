@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui.friends
+package ru.aleshi.letsplaycities.ui.network.friends
 
 import android.view.View
 import com.squareup.picasso.Picasso

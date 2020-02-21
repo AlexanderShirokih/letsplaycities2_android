@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui.friends
+package ru.aleshi.letsplaycities.ui.network.friends
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

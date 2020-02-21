@@ -263,7 +263,7 @@
         </fragment>
         <fragment
                 android:id="@+id/friendsFragment"
-                android:name="ru.aleshi.letsplaycities.ui.friends.FriendsFragment"
+                android:name="ru.aleshi.letsplaycities.ui.network.friends.FriendsFragment"
                 android:label="@string/friends_title"
                 tools:layout="@layout/fragment_friends">
             <action

@@ -8,12 +8,11 @@ import ru.aleshi.letsplaycities.network.NetworkClientModule
 import ru.aleshi.letsplaycities.network.NetworkModule
 import ru.aleshi.letsplaycities.remote.RemoteModule
 import ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment
-import ru.aleshi.letsplaycities.ui.friends.FriendsFragment
+import ru.aleshi.letsplaycities.ui.network.friends.FriendsFragment
 import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkClientFromNetworkFragmentModule
 import ru.aleshi.letsplaycities.ui.network.history.HistoryFragment
-import ru.aleshi.letsplaycities.ui.profile.LoginNoSnProfileFragment
 import ru.aleshi.letsplaycities.ui.profile.LoginProfileFragment
 import ru.aleshi.letsplaycities.ui.profile.ViewProfileFragment
 import ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment

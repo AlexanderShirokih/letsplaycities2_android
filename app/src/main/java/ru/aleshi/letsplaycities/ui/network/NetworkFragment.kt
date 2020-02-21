@@ -19,7 +19,7 @@ import ru.aleshi.letsplaycities.network.NetworkContract
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.MainActivity
-import ru.aleshi.letsplaycities.ui.friends.FriendsViewModel
+import ru.aleshi.letsplaycities.ui.network.friends.FriendsViewModel
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.ui.profile.ProfileViewModel
 import ru.aleshi.letsplaycities.utils.Utils
