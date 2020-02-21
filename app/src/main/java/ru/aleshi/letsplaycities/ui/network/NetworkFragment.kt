@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -93,17 +94,14 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     override fun onCancel() {
         setLoadingLayout(false)
-        setupLayout(true)
     }
-
-    override fun notifyAboutUpdates() =
-        Snackbar.make(requireView(), R.string.new_version_available, Snackbar.LENGTH_SHORT).show()
 
     override fun getProfileViewModel(): ProfileViewModel =
         viewModelProvider[ProfileViewModel::class.java]
 
-    override fun setupLayout(isLoggedIn: Boolean) {
-        group_connect.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+    override fun setupLayout(isLoggedIn: Boolean, isLocal: Boolean) {
+        btnConnect.isVisible = isLoggedIn
+        group_social.isVisible = isLoggedIn && !isLocal
     }
 
     override fun onStop() {
@@ -154,7 +152,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     private fun setLoadingLayout(isLoadingLayout: Boolean) {
         groupLoading.visibility = if (isLoadingLayout) View.VISIBLE else View.GONE
         root.findViewById<View>(R.id.fragment).isEnabled = !isLoadingLayout
-        setupLayout(false)
+        setupLayout(false, isLocal = false)
     }
 
     override fun updateInfo(infoMsgId: Int) {

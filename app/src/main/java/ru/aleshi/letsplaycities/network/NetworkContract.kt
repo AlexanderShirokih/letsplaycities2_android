@@ -10,9 +10,8 @@ interface NetworkContract {
 
     interface View {
         fun getProfileViewModel(): ProfileViewModel
-        fun setupLayout(isLoggedIn: Boolean)
+        fun setupLayout(isLoggedIn: Boolean, isLocal: Boolean)
         fun checkForWaiting(task: () -> Unit)
-        fun notifyAboutUpdates()
         fun showMessage(msgResId: Int)
         fun handleError(throwable: Throwable)
         fun onCancel()

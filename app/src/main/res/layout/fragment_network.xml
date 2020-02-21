@@ -84,12 +84,12 @@
             app:layout_constraintTop_toBottomOf="@+id/infoTv" />
 
     <androidx.constraintlayout.widget.Group
-            android:id="@+id/group_connect"
+            android:id="@+id/group_social"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="btnConnect,btnFriends,btnHistory"
-            tools:visibility="visible" />
+            app:constraint_referenced_ids="btnFriends,btnHistory"
+            tools:visibility="visible"/>
 
     <androidx.constraintlayout.widget.Group
             android:id="@+id/groupLoading"

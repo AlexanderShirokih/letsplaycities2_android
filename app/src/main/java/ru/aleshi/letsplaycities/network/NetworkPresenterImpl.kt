@@ -50,7 +50,7 @@ class NetworkPresenterImpl @Inject constructor(
     override fun onAttachView(view: NetworkContract.View) {
         mView = view
         mAuthData = mAuthDataFactory.load()
-        view.setupLayout(gamePreferences.isLoggedIn())
+        view.setupLayout(gamePreferences.isLoggedIn(), mNetworkRepository.isLocal)
     }
 
     /**
@@ -86,7 +86,10 @@ class NetworkPresenterImpl @Inject constructor(
     override fun onCancel() {
         mNetworkRepository.disconnect()
         onDispose()
-        mView?.onCancel()
+        mView?.apply {
+            onCancel()
+            setupLayout(true, mNetworkRepository.isLocal)
+        }
     }
 
     /**
@@ -186,7 +189,7 @@ class NetworkPresenterImpl @Inject constructor(
                     view.getProfileViewModel()
                         .updatePictureHash(userData.authData.credentials.userId, it.picHash)
                     if (it.newerBuild > userData.versionInfo.versionCode)
-                        view.notifyAboutUpdates()
+                        view.showMessage(R.string.new_version_available)
                 }
             }
             .observeOn(Schedulers.io())
