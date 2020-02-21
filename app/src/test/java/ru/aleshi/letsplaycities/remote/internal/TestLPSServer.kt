@@ -6,16 +6,21 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
+import ru.aleshi.letsplaycities.BuildConfig
 import ru.quandastudio.lpsclient.core.LPSClientMessage
 import ru.quandastudio.lpsclient.core.LPSMessage
 import ru.quandastudio.lpsclient.model.AuthType
 import ru.quandastudio.lpsclient.model.PlayerData
+import ru.quandastudio.lpsclient.model.VersionInfo
 import ru.quandastudio.lpsclient.model.WordResult
 
 class TestLPSServer {
 
-    private fun createPlayerData(): Single<PlayerData> =
-        Single.fromCallable { PlayerData.Factory().create("TestData") }
+    private fun createPlayerData(): PlayerData =
+            PlayerData.SimpleFactory().create(
+                "TestData",
+                VersionInfo(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+            )
 
     private lateinit var lpsServer: LPSServer
     private lateinit var connection: TestConnection
@@ -41,19 +46,8 @@ class TestLPSServer {
         connection
             .write(
                 LPSClientMessage.LPSLogIn(
-                    version = 4,
-                    login = "TestClient",
-                    snUID = "test-snuio",
-                    authType = AuthType.Native,
-                    canReceiveMessages = false,
-                    clientBuild = 10,
-                    clientVersion = "test",
-                    accToken = "tkn",
-                    allowSendUID = false,
-                    firebaseToken = "fb",
-                    uid = 1,
-                    hash = null,
-                    avatar = null
+                    pd = createPlayerData(),
+                    fbToken = ""
                 )
             )
 
@@ -66,8 +60,6 @@ class TestLPSServer {
         loginMsg as LPSMessage.LPSLoggedIn
 
         assertEquals(loginMsg.newerBuild, 1)
-        assertEquals(loginMsg.userId, 1)
-        assertEquals(loginMsg.accHash, "-remote-")
 
         connection
             .write(
@@ -85,11 +77,10 @@ class TestLPSServer {
         assertFalse(playMsg.youStarter)
         assertEquals(playMsg.canReceiveMessages, playerData.canReceiveMessages)
         assertEquals(playMsg.login, playerData.authData.login)
-        assertEquals(playMsg.clientVersion, playerData.clientVersion)
-        assertEquals(playMsg.clientBuild, playerData.clientBuild)
+        assertEquals(playMsg.clientVersion, playerData.versionInfo.versionName)
+        assertEquals(playMsg.clientBuild, playerData.versionInfo.versionCode)
         assertEquals(playMsg.isFriend, true)
-        assertEquals(playMsg.oppUid, playerData.authData.userID)
-        assertEquals(playMsg.snUID, playerData.authData.snUID)
+        assertEquals(playMsg.oppUid, playerData.authData.credentials.userId)
         assertEquals(playMsg.authType, playerData.authData.snType)
     }
 

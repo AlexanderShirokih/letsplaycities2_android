@@ -9,6 +9,6 @@ interface MessagePipe {
 
     fun write(outputStream: OutputStream, msg: LPSMessage)
 
-    fun read(inputStream: InputStream): LPSClientMessage
+    fun read(inputStream: InputStream): LPSClientMessage?
 
 }

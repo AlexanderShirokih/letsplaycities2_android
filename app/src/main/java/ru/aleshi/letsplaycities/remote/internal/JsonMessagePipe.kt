@@ -18,7 +18,7 @@ class JsonMessagePipe @Inject constructor(private val jsonMessage: JsonMessage) 
         }
     }
 
-    override fun read(inputStream: InputStream): LPSClientMessage {
+    override fun read(inputStream: InputStream): LPSClientMessage? {
         val reader = JsonMessageReader(inputStream.bufferedReader())
         val data = reader.read()
         return jsonMessage.readClientMessage(data)

@@ -27,21 +27,25 @@ class SocketConnection @Inject constructor() : Connection {
     override fun close() {
         try {
             serverSocket?.close()
+            serverSocket = null
         } catch (e: IOException) {
             e.printStackTrace()
         }
         try {
             clientSocket?.close()
+            clientSocket = null
         } catch (e: IOException) {
             e.printStackTrace()
         }
         try {
             input?.close()
+            input = null
         } catch (e: IOException) {
             e.printStackTrace()
         }
         try {
             output?.close()
+            output = null
         } catch (e: IOException) {
             e.printStackTrace()
         }

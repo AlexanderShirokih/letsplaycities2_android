@@ -5,9 +5,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
+import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.remote.internal.LPSServer
 import ru.quandastudio.lpsclient.core.LPSClientMessage
 import ru.quandastudio.lpsclient.model.PlayerData
+import ru.quandastudio.lpsclient.model.VersionInfo
 import ru.quandastudio.lpsclient.model.WordResult
 import java.util.concurrent.TimeUnit
 
@@ -70,11 +72,8 @@ class RemoteRepositoryTest {
                 repository
                     .onMessage(
                         LPSClientMessage.LPSLogIn(
-                            pd = PlayerData.Factory().create("Test"),
-                            fbToken = "",
-                            userId = 1,
-                            hash = "",
-                            avatar = null
+                            pd = PlayerData.SimpleFactory().create("Test", VersionInfo(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)),
+                            fbToken = ""
                         )
                     )
             }

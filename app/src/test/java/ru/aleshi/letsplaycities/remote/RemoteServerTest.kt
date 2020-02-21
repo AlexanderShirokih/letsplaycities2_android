@@ -35,13 +35,12 @@ class RemoteServerTest {
 
     @Test
     fun getWordsResult() {
-        remoteServer.broadcastResult("Word")
+        remoteServer.broadcastResult("Word").blockingAwait()
 
         val test = remoteServer.getWordsResult().test()
 
         test.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
         test.assertNoErrors()
-            .assertValueCount(1)
             .assertValue { it == WordResult.ACCEPTED to "Word" }
     }
 
@@ -66,14 +65,14 @@ class RemoteServerTest {
 
     @Test
     fun broadcastResult() {
-        remoteServer.broadcastResult("test")
+        remoteServer.broadcastResult("test").blockingAwait()
 
         verify(server, times(1)).sendCity(WordResult.RECEIVED, "test")
     }
 
     @Test
     fun broadcastMessage() {
-        remoteServer.broadcastMessage("Hello message")
+        remoteServer.broadcastMessage("Hello message").blockingAwait()
 
         verify(server, times(1)).sendMessage("Hello message")
     }
