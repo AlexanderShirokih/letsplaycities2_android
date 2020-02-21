@@ -12,8 +12,8 @@ def dagger_version = '2.26'
 android {
     signingConfigs {
         default_test {
-            def testPass = file('/home/alexander/Keystores/pass.txt').text
-            storeFile file('/home/alexander/Keystores/letsplaycities.jks')
+            def testPass = file(project.properties["store_pass"] as String).text
+            storeFile file(project.properties["store_file"] as String)
             storePassword = testPass
             keyPassword = testPass
             keyAlias = 'letsplaycities'
@@ -85,7 +85,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     implementation 'com.google.android.gms:play-services-ads-lite:18.3.0'
-    implementation 'com.google.android.gms:play-services-games:19.0.0'
+//    implementation 'com.google.android.gms:play-services-games:19.0.0'
 
     implementation 'com.vk:androidsdk:2.2.1'
     implementation 'com.facebook.android:facebook-login:5.15.1'
