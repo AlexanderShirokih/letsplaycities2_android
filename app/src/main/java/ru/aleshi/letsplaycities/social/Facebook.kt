@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import com.facebook.*
-import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import ru.quandastudio.lpsclient.model.AuthType
@@ -23,17 +22,6 @@ class Facebook : ISocialNetwork() {
         object : ProfileTracker() {
             override fun onCurrentProfileChanged(oldProfile: Profile?, currentProfile: Profile) {
                 stopTracking()
-
-                val accessToken = AccessToken.getCurrentAccessToken()
-                if (accessToken != null && !accessToken.isExpired) {
-                    callback?.onLoggedIn(SocialAccountData(
-                        snUID = currentProfile.id,
-                        login = currentProfile.name,
-                        accessToken = accessToken.token,
-                        networkType = AuthType.Facebook,
-                        pictureUri = currentProfile.getProfilePictureUri(128, 128)
-                    ))
-                }
             }
         }
 
@@ -55,7 +43,19 @@ class Facebook : ISocialNetwork() {
     }
 
     override fun onLoggedIn(activity: Activity, accessToken: String) {
-
+        val currentProfile = Profile.getCurrentProfile()
+        if (currentProfile == null)
+            callback?.onError()
+        else
+            callback?.onLoggedIn(
+                SocialAccountData(
+                    snUID = currentProfile.id,
+                    login = currentProfile.name,
+                    accessToken = accessToken,
+                    networkType = AuthType.Facebook,
+                    pictureUri = currentProfile.getProfilePictureUri(128, 128)
+                )
+            )
     }
 
 
