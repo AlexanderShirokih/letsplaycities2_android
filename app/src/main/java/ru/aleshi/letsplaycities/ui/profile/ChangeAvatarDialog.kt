@@ -44,7 +44,7 @@ class ChangeAvatarDialog : DialogFragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess(mProfileViewModel.avatarUri::set)
                 .subscribe({
-                    lpsApplication.gamePreferences.lastAvatarUri = it.toString()
+                    lpsApplication.gamePreferences.lastAvatarUri = it
                     findNavController().popBackStack()
                 }
                     , {

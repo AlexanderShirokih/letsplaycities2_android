@@ -3,7 +3,6 @@ package ru.aleshi.letsplaycities.social
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.base.player.DeviceId
 import ru.quandastudio.lpsclient.model.AuthType
@@ -24,7 +23,7 @@ class NativeAccess : ISocialNetwork() {
                 login = prefs.lastNativeLogin,
                 accessToken = accessToken,
                 networkType = AuthType.Native,
-                pictureUri = Uri.parse(prefs.lastAvatarUri)
+                pictureUri = prefs.lastAvatarUri
             )
         )
     }

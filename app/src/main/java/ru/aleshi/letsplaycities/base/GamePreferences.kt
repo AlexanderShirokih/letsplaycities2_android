@@ -165,10 +165,10 @@ class GamePreferences(context: Context) {
             putString("last_login", login)
         }
 
-    var lastAvatarUri: String
-        get() = prefs.getString("last_avatar_uri", Uri.EMPTY.toString())!!
+    var lastAvatarUri: Uri
+        get() = prefs.getString("last_avatar_uri", null)?.run { Uri.parse(this) } ?: Uri.EMPTY
         set(uri) = prefs.edit(true) {
-            putString("last_avatar_uri", uri)
+            putString("last_avatar_uri", uri.toString())
         }
 
     var pictureHash: String?

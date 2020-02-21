@@ -162,18 +162,22 @@ class AuthorizationViewModel @Inject constructor(
      * @return Loaded and resized to 128x128px image or empty if unable to load image
      */
     private fun loadAndResize(uri: Uri) =
-        Maybe.create<Bitmap> {
-            try {
-                it.onSuccess(
-                    Picasso.get()
-                        .load(uri)
-                        .resize(0, 128)
-                        .get()
-                )
-            } catch (e: Exception) {
-                it.tryOnError(e)
+        Maybe.just(uri)
+            .filter { it != Uri.EMPTY }
+            .flatMap {
+                Maybe.create<Bitmap> {
+                    try {
+                        it.onSuccess(
+                            Picasso.get()
+                                .load(uri)
+                                .resize(0, 128)
+                                .get()
+                        )
+                    } catch (e: Exception) {
+                        it.tryOnError(e)
+                    }
+                }
             }
-        }
             .subscribeOn(Schedulers.io())
 
     /**

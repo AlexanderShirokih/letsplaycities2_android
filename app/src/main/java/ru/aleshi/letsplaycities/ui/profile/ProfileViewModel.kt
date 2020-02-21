@@ -20,7 +20,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     private var disposable: Disposable? = null
 
-    val avatarUri: ObservableField<Uri> = ObservableField(Uri.EMPTY)
+    val avatarUri: ObservableField<Uri> = ObservableField()
 
     val login: ObservableField<String> = ObservableField()
 

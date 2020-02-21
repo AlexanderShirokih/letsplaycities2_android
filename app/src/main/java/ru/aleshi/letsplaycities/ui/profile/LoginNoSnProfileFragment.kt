@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.ui.profile
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -56,7 +55,7 @@ class LoginNoSnProfileFragment : Fragment() {
 
     private fun populateFields(root: View, prefs: GamePreferences) {
         root.messageInputField.setText(prefs.lastNativeLogin)
-        profileViewModel.avatarUri.set(Uri.parse(prefs.lastAvatarUri))
+        profileViewModel.avatarUri.set(prefs.lastAvatarUri)
     }
 
 }

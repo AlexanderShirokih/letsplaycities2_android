@@ -30,12 +30,11 @@ object Bindings {
         return outValue.data
     }
 
-    //@BindingAdapter({"bind:imageUrl"})
     @BindingAdapter("playerImageUri")
     @JvmStatic
-    fun setPlayerImageUri(imageView: ImageView, playerImageUri: Uri?) {
+    fun setPlayerImageUri(imageView: ImageView, playerImageUri: Uri) {
         Picasso.get()
-            .load(playerImageUri)
+            .load(if (playerImageUri == Uri.EMPTY) null else playerImageUri)
             .placeholder(R.drawable.ic_player)
             .error(R.drawable.ic_player)
             .networkPolicy(NetworkPolicy.NO_CACHE)

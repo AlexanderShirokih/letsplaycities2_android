@@ -25,7 +25,7 @@ object Utils {
     val Fragment.lpsApplication
         get() = requireContext().applicationContext as LPSApplication
 
-    fun getPictureUri(userId: Int, hash: String?): Uri? = if (hash == null) null else
+    fun getPictureUri(userId: Int, hash: String?): Uri = if (hash == null) Uri.EMPTY else
         Uri.parse("${getServerBaseUrl()}user/${userId}/picture?hash=${hash}")
 
     fun getServerBaseUrl(): String {
