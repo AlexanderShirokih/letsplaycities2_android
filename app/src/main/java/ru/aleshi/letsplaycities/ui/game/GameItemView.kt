@@ -46,29 +46,29 @@ class GameItemView @JvmOverloads constructor(context: Context, attrs: AttributeS
         })
     }
 
-    fun bind(item: GameItem) = bind(item, ThemeManager.getCurrentTheme(context))
+    fun bind(entityWrapper: GameEntityWrapper) = bind(entityWrapper, ThemeManager.getCurrentTheme(context))
 
-    fun bind(item: GameItem, theme: Theme) {
+    fun bind(entityWrapper: GameEntityWrapper, theme: Theme) {
         val typedValue = context.obtainStyledAttributes(
             theme.themeId, intArrayOf(
                 R.attr.fgSpanColor,
-                if (item.isMessage)
-                    if (item.position == Position.LEFT) R.attr.itemMsgMe else R.attr.itemMsgOther
+                if (entityWrapper.isMessage)
+                    if (entityWrapper.position == Position.LEFT) R.attr.itemMsgMe else R.attr.itemMsgOther
                 else
-                    if (item.position == Position.LEFT) R.attr.itemBgMe else R.attr.itemBgOther
+                    if (entityWrapper.position == Position.LEFT) R.attr.itemBgMe else R.attr.itemBgOther
             )
         )
 
-        city.text = item.getSpannableString(typedValue.getColorOrThrow(0))
+        city.text = entityWrapper.getSpannableString(typedValue.getColorOrThrow(0))
 
-        (this as LinearLayout).gravity = if (item.position == Position.LEFT) Gravity.START else Gravity.END
+        (this as LinearLayout).gravity = if (entityWrapper.position == Position.LEFT) Gravity.START else Gravity.END
 
         itemContainer.setBackgroundResource(typedValue.getResourceIdOrThrow(1))
 
-        if (!item.isMessage)
-            when (item.status) {
+        if (!entityWrapper.isMessage)
+            when (entityWrapper.status) {
                 CityStatus.OK ->
-                    FlagDrawablesManager.getBitmapFor(context, item.countryCode)?.run {
+                    FlagDrawablesManager.getBitmapFor(context, entityWrapper.countryCode)?.run {
                         wordIcon.setImageBitmap(this)
                     }
                 CityStatus.WAITING ->
@@ -76,7 +76,7 @@ class GameItemView @JvmOverloads constructor(context: Context, attrs: AttributeS
                 CityStatus.ERROR ->
                     wordIcon.setImageResource(R.drawable.ic_word_error)
             }
-        wordIcon.visibility = if (item.isMessage) View.GONE else View.VISIBLE
+        wordIcon.visibility = if (entityWrapper.isMessage) View.GONE else View.VISIBLE
 
         typedValue.recycle()
     }

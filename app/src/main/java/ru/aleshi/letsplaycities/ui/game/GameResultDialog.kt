@@ -10,12 +10,26 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.game.GameViewModel
 import ru.aleshi.letsplaycities.databinding.DialogGameResultBinding
 
+/**
+ * Dialog that presents game results.
+ * Has three options:
+ * - Share game results
+ * - Replay
+ * - Go to menu
+ */
 class GameResultDialog : DialogFragment() {
 
+    /**
+     * Identifies game buttons
+     */
     enum class SelectedItem { SHARE, REPLAY, MENU }
 
+    /**
+     * Called when dialog starts
+     */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
         val score = GameResultDialogArgs.fromBundle(requireArguments()).score
@@ -38,6 +52,10 @@ class GameResultDialog : DialogFragment() {
             .create()
     }
 
+    /**
+     * Called by view binding when button clicked.
+     * @param item button that was clicked
+     */
     fun onClick(item: SelectedItem) {
         requireDialog().dismiss()
         when (item) {
@@ -49,18 +67,24 @@ class GameResultDialog : DialogFragment() {
             SelectedItem.REPLAY -> {
                 val nav = findNavController()
                 if (!nav.popBackStack(R.id.networkFragment, false)) {
-                    ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].restart.value = true
+                    ViewModelProvider(requireParentFragment())[GameViewModel::class.java].restart()
                     nav.navigate(R.id.back_to_game_fragment)
                 }
             }
         }
     }
 
+    /**
+     * Creates and starts share action
+     */
     private fun startShareIntent(score: Int) {
         val c = requireContext()
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, c.getString(R.string.share_msg, score, c.getString(R.string.app_name)))
+            putExtra(
+                Intent.EXTRA_TEXT,
+                c.getString(R.string.share_msg, score, c.getString(R.string.app_name))
+            )
         }
         val chooser = Intent.createChooser(intent, c.getString(R.string.share_with))
         chooser.resolveActivity(c.packageManager)?.let {

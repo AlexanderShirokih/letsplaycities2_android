@@ -260,7 +260,6 @@
     <string name="friends_request_accepted">Игрок %1$s добавлен в друзья</string>
     <string name="friends_request_denied">Заявка отклонена!</string>
     <string name="multiplier">&#xD7;%1$.1f</string>
-    <string name="game_session_is_null_error">Ошибка создания игровой сессии. Попробуйте снова.</string>
     <string name="unk_error">Произошла неизвестная ошибка. ERR:  %1$s</string>
 
     <string-array name="hints">
@@ -311,7 +310,6 @@
         Google\"
     </string>
     <string name="tell_city">Назовите город</string>
-    <string name="loading_dictionary">Загрузка обновления словаря</string>
     <string name="loading_dictionary_error">Не удалось обновить словарь</string>
     <string name="loading_dictionary_completed">Обновление словаря загружено!</string>
     <string name="already_friend">Игрок уже у Вас в друзьях</string>

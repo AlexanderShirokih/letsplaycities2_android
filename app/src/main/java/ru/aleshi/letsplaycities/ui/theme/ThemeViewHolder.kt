@@ -6,8 +6,10 @@ import androidx.core.content.res.getResourceIdOrThrow
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_theme.view.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.game.GameEntity
 import ru.aleshi.letsplaycities.base.game.Position
-import ru.aleshi.letsplaycities.ui.game.GameItem
+import ru.aleshi.letsplaycities.ui.game.CityStatus
+import ru.aleshi.letsplaycities.ui.game.GameEntityWrapper
 
 class ThemeViewHolder(private val listener: ThemeItemClickListener, private val view: View) :
     RecyclerView.ViewHolder(view) {
@@ -19,7 +21,8 @@ class ThemeViewHolder(private val listener: ThemeItemClickListener, private val 
         view.sampleGameView1.bind(createGameItem(view, 0), namedTheme.theme)
         view.sampleGameView2.bind(createGameItem(view, 1), namedTheme.theme)
         view.sampleGameView3.bind(createGameItem(view, 2), namedTheme.theme)
-        view.btn_unlock.visibility = if (namedTheme.theme.isFreeOrAvailable()) View.GONE else View.VISIBLE
+        view.btn_unlock.visibility =
+            if (namedTheme.theme.isFreeOrAvailable()) View.GONE else View.VISIBLE
         view.btn_unlock.setOnClickListener {
             if (adapterPosition != RecyclerView.NO_POSITION)
                 listener.onUnlock(namedTheme)
@@ -48,13 +51,16 @@ class ThemeViewHolder(private val listener: ThemeItemClickListener, private val 
         typedValue.recycle()
     }
 
-    private fun createGameItem(view: View, index: Int): GameItem {
+    private fun createGameItem(view: View, index: Int): GameEntityWrapper {
         val sampleCities = view.resources.getStringArray(R.array.sampleCities)
         val sampleCitiesCountryCode = view.resources.getIntArray(R.array.sampleCitiesCountryCode)
-        return GameItem(
-            sampleCities[index],
-            sampleCitiesCountryCode[index].toShort(),
-            if (index % 2 == 0) Position.RIGHT else Position.LEFT
+        return GameEntityWrapper(
+            GameEntity.CityInfo(
+                city = sampleCities[index],
+                countryCode = sampleCitiesCountryCode[index].toShort(),
+                position = if (index % 2 == 0) Position.RIGHT else Position.LEFT,
+                status = CityStatus.OK
+            )
         )
     }
 }

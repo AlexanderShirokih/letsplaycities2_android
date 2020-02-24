@@ -30,7 +30,7 @@ object SpeechRecognitionHelper {
         }
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, onResult: (result: String) -> Boolean) {
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, onResult: (result: String) -> Unit) {
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK) {
             val matches = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as List<String>
             if (matches.isNotEmpty()) {

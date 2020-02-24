@@ -3,22 +3,36 @@ package ru.aleshi.letsplaycities.network
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
-import ru.aleshi.letsplaycities.base.game.BaseServer
+import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.base.player.UserIdIdentity
+import ru.aleshi.letsplaycities.base.server.BaseServer
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
+import ru.aleshi.letsplaycities.base.server.ResultWithMessage
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.core.LPSMessage
-import ru.quandastudio.lpsclient.model.WordResult
 import javax.inject.Inject
 
 class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) :
     BaseServer() {
 
-    override fun getWordsResult(): Observable<Pair<WordResult, String>> {
-        return mNetworkRepository.getWords().map { it.result to it.word }
+    override fun getWordsResult(): Observable<ResultWithCity> {
+        return mNetworkRepository.getWords().map {
+            ResultWithCity(
+                wordResult = it.result,
+                city = it.word,
+                identity = UserIdIdentity(it.ownerId)
+            )
+        }
     }
 
-    override fun getInputMessages(): Observable<String> {
+    override fun getIncomingMessages(): Observable<ResultWithMessage> {
         return mNetworkRepository.getMessages()
-            .map { if (it.isSystemMsg) "[СИСТЕМА] " else "" + it.msg }
+            .map {
+                ResultWithMessage(
+                    message = if (it.isSystemMsg) "[СИСТЕМА] " else "" + it.msg,
+                    identity = UserIdIdentity(it.ownerId)
+                )
+            }
     }
 
     companion object {
@@ -29,12 +43,12 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
         mNetworkRepository.disconnect()
     }
 
-    override fun broadcastResult(city: String) =
+    override fun sendCity(city: String, sender: User): Completable =
         mNetworkRepository.sendWord(city)
 
     override fun getTimeLimit(): Long = NETWORK_TIMER
 
-    override fun broadcastMessage(message: String): Completable =
+    override fun sendMessage(message: String, sender: User): Completable =
         mNetworkRepository.sendMessage(message)
 
     override val leave: Maybe<Boolean> = mNetworkRepository.getLeave().map { it.leaved }
@@ -44,11 +58,14 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
     override val friendsRequest: Observable<LPSMessage.FriendRequest> =
         mNetworkRepository.getFriendsRequest()
 
-    override fun sendFriendRequest(): Completable =
-        mNetworkRepository.sendFriendRequest()
+    /**
+     * Sends friends request from current player to [userId].
+     */
+    override fun sendFriendRequest(userId: Int): Completable =
+        mNetworkRepository.sendFriendRequest(userId)
 
-    override fun sendFriendAcceptance(accepted: Boolean): Completable =
-        mNetworkRepository.sendFriendAcceptance(accepted)
+    override fun sendFriendAcceptance(accepted: Boolean, userId: Int): Completable =
+        mNetworkRepository.sendFriendAcceptance(accepted, userId)
 
     override fun banUser(userId: Int): Completable =
         mNetworkRepository.banUser(userId)

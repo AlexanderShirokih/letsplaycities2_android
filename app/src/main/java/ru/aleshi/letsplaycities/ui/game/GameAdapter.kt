@@ -3,39 +3,58 @@ package ru.aleshi.letsplaycities.ui.game
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import ru.aleshi.letsplaycities.base.game.GameEntity
 import ru.aleshi.letsplaycities.base.game.Position
 
 class GameAdapter(val context: Context) : RecyclerView.Adapter<GameItemViewHolder>() {
 
-    private val mItems: MutableList<GameItem> = mutableListOf()
+    private val mEntityWrappers: MutableList<GameEntityWrapper> = mutableListOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = GameItemViewHolder(GameItemView(context))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        GameItemViewHolder(GameItemView(context))
 
-    override fun getItemCount(): Int = mItems.size
+    override fun getItemCount(): Int = mEntityWrappers.size
 
     override fun onBindViewHolder(holder: GameItemViewHolder, position: Int) {
-        holder.bind(mItems[position])
+        holder.bind(mEntityWrappers[position])
     }
 
     fun addCity(city: String, countryCode: Short, position: Position) {
-        mItems.add(GameItem(city, position, CityStatus.WAITING, countryCode = countryCode))
-        notifyItemInserted(mItems.size - 1)
+        mEntityWrappers.add(
+            GameEntityWrapper(
+                GameEntity.CityInfo(
+                    city = city,
+                    position = position,
+                    status = CityStatus.WAITING,
+                    countryCode = countryCode
+                )
+            )
+        )
+        notifyItemInserted(mEntityWrappers.size - 1)
     }
 
-    fun updateCity(city: String, hasErrors: Boolean) {
-        val index = mItems.indexOfFirst { it.content == city }
+    fun updateCity(cityInfo: GameEntity.CityInfo) {
+        val index =
+            mEntityWrappers.indexOfFirst { it.gameEntity is GameEntity.CityInfo && it.gameEntity.city == cityInfo.city }
         if (index > -1) {
-            mItems[index].status = if (hasErrors) CityStatus.ERROR else CityStatus.OK
+            mEntityWrappers[index] = GameEntityWrapper(cityInfo)
             notifyItemChanged(index)
         }
     }
 
     fun addMessage(message: String, position: Position) {
-        mItems.add(GameItem(message, position, CityStatus.OK, true))
+        mEntityWrappers.add(
+            GameEntityWrapper(
+                GameEntity.MessageInfo(
+                    message = message,
+                    position = position
+                )
+            )
+        )
     }
 
     fun clear() {
-        mItems.clear()
+        mEntityWrappers.clear()
         notifyDataSetChanged()
     }
 

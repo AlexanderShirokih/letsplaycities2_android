@@ -27,7 +27,6 @@ import javax.inject.Inject
 class NetworkPresenterImpl @Inject constructor(
     @AppVersionInfo
     private val versionInfo: VersionInfo,
-    private val mGameSessionBuilder: GameSession.GameSessionBuilder,
     private val mNetworkServer: NetworkServer,
     private val mNetworkRepository: NetworkRepository,
     private val mAuthDataFactory: GameAuthDataFactory,
@@ -215,12 +214,7 @@ class NetworkPresenterImpl @Inject constructor(
                 reverse()
         }
 
-        mView?.onStartGame(
-            mGameSessionBuilder
-                .server(mNetworkServer)
-                .users(users)
-                .build()
-        )
+        mView?.onStartGame(GameSession(users, mNetworkServer))
     }
 
 }

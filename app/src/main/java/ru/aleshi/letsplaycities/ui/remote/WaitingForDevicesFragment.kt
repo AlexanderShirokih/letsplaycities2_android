@@ -40,8 +40,9 @@ class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices
     }
 
     override fun onStartGame(gameSession: GameSession) {
-        ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =
+        ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].setGameSession(
             gameSession
+        )
         mGameSound?.start()
         findNavController().navigate(R.id.start_game_fragment)
     }

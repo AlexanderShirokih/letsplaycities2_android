@@ -7,23 +7,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.network.NetworkUtils.showErrorSnackbar
+import ru.aleshi.letsplaycities.base.game.GameViewModel
 
 class UserContextMenuDialog : DialogFragment() {
 
-    private lateinit var gameSessionViewModel: GameSessionViewModel
-
-    private val disposable = CompositeDisposable()
+    private lateinit var gameViewModel: GameViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        gameSessionViewModel =
-            ViewModelProvider(requireActivity())[GameSessionViewModel::class.java]
+        gameViewModel = ViewModelProvider(requireParentFragment())[GameViewModel::class.java]
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -35,7 +28,7 @@ class UserContextMenuDialog : DialogFragment() {
                     // Ban
                     0 -> banPlayer(args.name, args.userId)
                     // Friends
-                    1 -> if (!args.isFriend) sendFriendRequest() else Toast.makeText(
+                    1 -> if (!args.isFriend) sendFriendRequest(args.userId) else Toast.makeText(
                         requireContext(),
                         R.string.already_friend,
                         Toast.LENGTH_SHORT
@@ -45,38 +38,29 @@ class UserContextMenuDialog : DialogFragment() {
             .create()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        disposable.clear()
-    }
 
-    private fun sendFriendRequest() {
-        gameSessionViewModel.gameSession?.let {
-            val activity = requireActivity()
-            it.sendFriendRequest()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    Toast.makeText(activity, R.string.new_friend_request, Toast.LENGTH_LONG).show()
-                }, { err -> showErrorSnackbar(err, this) })
+    /**
+     * Sends friend request to [userId].
+     * @param userId id of user that we want to add to friends
+     */
+    private fun sendFriendRequest(userId: Int) {
+        gameViewModel.sendFriendRequest(userId) {
+            Toast.makeText(requireActivity(), R.string.new_friend_request, Toast.LENGTH_LONG).show()
         }
     }
 
+    /**
+     * Sends ban message to [userId]. After successful sending this message game will be stopped
+     * and pop back parent view.
+     */
     private fun banPlayer(login: String, userId: Int) {
-        val activity = requireActivity()
-        gameSessionViewModel.gameSession
-            ?.banUser(userId)
-            ?.observeOn(AndroidSchedulers.mainThread())
-            ?.doAfterTerminate { findNavController().popBackStack(R.id.gameFragment, true) }
-            ?.subscribe(
-                {
-                    Toast.makeText(
-                        activity,
-                        getString(R.string.user_banned, login),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }, { t -> showErrorSnackbar(t, this) }
-            )
-            ?.addTo(disposable)
+        gameViewModel.banUser(userId) {
+            Toast.makeText(
+                requireActivity(),
+                getString(R.string.user_banned, login),
+                Toast.LENGTH_SHORT
+            ).show()
+            findNavController().popBackStack(R.id.gameFragment, true)
+        }
     }
 }

@@ -101,20 +101,20 @@ class ScoreManager(
             ScoringType.LAST_MOVE -> 0
         }
 
-        gameSession.currentPlayer.increaseScore(points)
+        gameSession.currentUser?.increaseScore(points)
 
         saveStats()
     }
 
     private fun checkCombos(deltaTime: Long, word: String) {
-        val current = gameSession.currentPlayer
+        val current = gameSession.currentUser!!
 
         Completable.fromAction {
             current.comboSystem.addCity(
                 CityComboInfo.create(
                     deltaTime,
                     word,
-                    gameSession.dictionary().getCountryCode(word)
+                    gameSession.game.getCountryCode(word)
                 )
             )
         }
@@ -173,15 +173,15 @@ class ScoreManager(
         saveStats()
 
         if (timeIsUp) {
-            val next = gameSession.nextPlayer
+            val next = gameSession.nextUser
             if (mode == GameMode.MODE_NET) {
                 updWinsForNetMode(next)
-                return context.getString(R.string.timeup, next.name, gameSession.currentPlayer.name)
+                return context.getString(R.string.timeup, next.name, gameSession.currentUser!!.name)
             }
             return context.getString(
                 R.string.timeup,
                 next.name,
-                StringUtils.formatName(gameSession.currentPlayer.name)
+                StringUtils.formatName(gameSession.currentUser!!.name)
             )
         }
 
@@ -192,17 +192,17 @@ class ScoreManager(
             }
 
             //Всегда побеждает тот, кто ожидает ответа
-            val next = gameSession.nextPlayer
+            val next = gameSession.nextUser
             updWinsForNetMode(next)
             return context.getString(R.string.win, next.name)
         } else {
 
-            if (gameSession.players.all { it.score == gameSession.players.first().score }) {
+            if (gameSession.users.all { it.score == gameSession.users.first().score }) {
                 return context.getString(R.string.draw)
             }
 
 
-            val winner = gameSession.players.maxBy { it.score }!!
+            val winner = gameSession.users.maxBy { it.score }!!
             updWinsForNetMode(winner)
 
             return context.getString(R.string.win, winner.name)
@@ -219,9 +219,9 @@ class ScoreManager(
         saveStats()
     }
 
-    private fun currentIsPlayer() = gameSession.currentPlayer is Player
+    private fun currentIsPlayer() = gameSession.currentUser is Player
 
     private fun getPlayer(): User {
-        return gameSession.players.first { it is Player }
+        return gameSession.users.first { it is Player }
     }
 }

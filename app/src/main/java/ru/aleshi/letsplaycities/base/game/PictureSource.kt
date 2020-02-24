@@ -13,7 +13,10 @@ open class PictureSource(
 
     constructor(picasso: Picasso, @DrawableRes placeholder: Int) : this(picasso.load(placeholder))
 
-    constructor(picasso: Picasso, uri: Uri, @DrawableRes placeholder: Int) : this(picasso.run {
+    constructor(
+        picasso: Picasso,
+        uri: Uri, @DrawableRes placeholder: Int = R.drawable.ic_player_big
+    ) : this(picasso.run {
         if (uri == Uri.EMPTY)
             load(placeholder)
         else

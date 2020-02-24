@@ -2,12 +2,13 @@ package ru.aleshi.letsplaycities.ui
 
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-import ru.aleshi.letsplaycities.base.dictionary.DictionaryModule
 import ru.aleshi.letsplaycities.base.game.GameModule
+import ru.aleshi.letsplaycities.base.mainmenu.MainMenuModule
 import ru.aleshi.letsplaycities.network.NetworkClientModule
 import ru.aleshi.letsplaycities.network.NetworkModule
 import ru.aleshi.letsplaycities.remote.RemoteModule
 import ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment
+import ru.aleshi.letsplaycities.ui.game.GameFragment
 import ru.aleshi.letsplaycities.ui.network.friends.FriendsFragment
 import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkFragment
@@ -22,8 +23,12 @@ import ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment
 abstract class FragmentsModule {
 
     @ActivityScope
-    @ContributesAndroidInjector(modules = [GameModule::class, DictionaryModule::class])
+    @ContributesAndroidInjector(modules = [ViewBindingsModule::class, MainMenuModule::class])
     abstract fun contributeMainMenuFragment(): MainMenuFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [GameModule::class])
+    abstract fun contributeGameFragment(): GameFragment
 
     @ActivityScope
     @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientFromNetworkFragmentModule::class])

@@ -5,7 +5,8 @@
     <data>
         <import type="android.view.View"/>
         <import type="ru.aleshi.letsplaycities.R"/>
-        <variable name="viewModel" type="ru.aleshi.letsplaycities.ui.game.GameViewModel"/>
+        <import type="ru.aleshi.letsplaycities.base.game.Position"/>
+        <variable name="viewModel" type="ru.aleshi.letsplaycities.base.game.GameViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -92,7 +93,7 @@
                 app:imageRequest="@{viewModel.imageLeft}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/view"
-                app:useBorder="@{viewModel.isLeftActive}"/>
+                app:useBorder="@{viewModel.currentPosition == Position.LEFT }"/>
 
         <com.mikhaellopez.circularimageview.CircularImageView
                 style="@style/GameAvatarView"
@@ -102,7 +103,7 @@
                 app:imageRequest="@{viewModel.imageRight}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/view"
-                app:useBorder="@{!viewModel.isLeftActive}"/>
+                app:useBorder="@{viewModel.currentPosition == Position.RIGHT }"/>
 
         <TextView
                 android:id="@+id/scoreLeft"

@@ -1,47 +1,102 @@
 package ru.aleshi.letsplaycities.base.player
 
-import io.reactivex.Completable
+import io.reactivex.Maybe
+import io.reactivex.Observable
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
-import ru.aleshi.letsplaycities.base.game.GameSession
-import ru.aleshi.letsplaycities.base.game.Position
-import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.combos.ComboSystemView
+import ru.aleshi.letsplaycities.base.game.*
 import ru.quandastudio.lpsclient.model.PlayerData
 
+/**
+ * Base class that keeps users data and defines user behaviour.
+ * @property playerData users data model class
+ * @property pictureSource represents users picture
+ */
 abstract class User(
-    internal val playerData: PlayerData,
-    internal val pictureSource: PictureSource,
-    internal val hasUserInput: Boolean = false,
-    internal val canUseQuickTime: Boolean = true
+    private val playerData: PlayerData,
+    private val pictureSource: PictureSource
 ) {
 
-    lateinit var gameSession: GameSession
-    lateinit var comboSystem: ComboSystem
+    /**
+     * Delegate for user credentials
+     */
+    val credentials = playerData.authData.credentials
 
-    var score: Int = 0
+    /**
+     * Delegate for user name
+     */
+    val name = playerData.authData.login
 
+    /**
+     * Current user position
+     */
     var position: Position = Position.UNKNOWN
+        private set
 
-    val name: String
-        get() = playerData.authData.login
+    /**
+     * System that can calculate score multiplier
+     */
+    lateinit var comboSystem: ComboSystem
+        private set
 
+    /**
+     * Facade for access game fields and methods such as game dictionary
+     */
+    protected lateinit var game: GameFacade
+
+    /**
+     * Returns `true` is this user allows to receive messages from other users, `false` otherwise
+     */
+    val isMessagesAllowed = playerData.canReceiveMessages
+
+    /**
+     * User score points
+     */
+    var score: Int = 0
+        private set
+
+    /**
+     * Formatted string representation of score and user name
+     */
     val info: String
         get() = if (score == 0) name else "$name: $score"
 
-    abstract fun onBeginMove(firstChar: Char?)
-
-    fun sendCity(city: String): Completable =
-        gameSession.onCitySent(city, this)
-
-    open fun onUserInput(userInput: String, onSuccess: () -> Unit) = Unit
-
-    open fun reset() {
+    /**
+     * Called by system when game starts to initialize internal state.
+     */
+    fun init(comboSystemView: ComboSystemView, position: Position, game: GameFacade) {
+        this.game = game
+        this.position = position
+        this.comboSystem = onInit(comboSystemView)
         score = 0
     }
 
-    fun isMessagesAllowed() = playerData.canReceiveMessages
+    /**
+     * Called internally when game starts to initialize internal state.
+     */
+    internal abstract fun onInit(comboSystemView: ComboSystemView): ComboSystem
 
-    open fun needsShowMenu() = false
+    /**
+     * Called by system when users turn begins
+     * @param firstChar first letter of that the city should begin.
+     * Will be [Char.MIN_VALUE] if it's should be the first word in game.
+     * @return [Maybe] with word response or [Maybe.empty] if [User] can't give response.
+     */
+    internal abstract fun onMakeMove(firstChar: Char): Maybe<String>
 
+    /**
+     * Called by system when user enters an input.
+     * Subclasses should override this method to receive keyboard events from user.
+     * @return [Maybe.empty] when user can't handle input. [Maybe] with [WordCheckingResult] when
+     * user handles the input.
+     */
+    open fun onUserInput(userInput: String): Observable<WordCheckingResult> = Observable.empty()
+
+    /**
+     * Called by system to increase score points.
+     * @param [points] amount of points to be increased. [points] will be multiplied
+     * by current combo multiplier.
+     */
     fun increaseScore(points: Int) {
         score += (points * comboSystem.multiplier).toInt()
     }

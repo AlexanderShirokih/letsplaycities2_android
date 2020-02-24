@@ -48,7 +48,7 @@ class RemoteServerTest {
     fun getInputMessages() {
         repository.onMessage(LPSClientMessage.LPSMsg("test"))
 
-        val test = remoteServer.getInputMessages().test()
+        val test = remoteServer.getIncomingMessages().test()
 
         test.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
         test.assertNoErrors()

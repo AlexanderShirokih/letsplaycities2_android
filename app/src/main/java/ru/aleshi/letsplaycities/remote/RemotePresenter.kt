@@ -11,7 +11,6 @@ import javax.inject.Inject
 
 class RemotePresenter @Inject constructor(
     private val remoteRepository: RemoteRepository,
-    private val gameSessionBuilder: GameSession.GameSessionBuilder,
     private val remoteServer: RemoteServer,
     private val picasso: Picasso
 ) : RemoteContract.Presenter {
@@ -53,12 +52,7 @@ class RemotePresenter @Inject constructor(
             RemoteUser(oppData, picasso)
         )
 
-        view.onStartGame(
-            gameSessionBuilder
-                .server(remoteServer)
-                .users(users)
-                .build()
-        )
+        view.onStartGame(GameSession(users, remoteServer))
     }
 
     override fun onStop() {
