@@ -1,0 +1,6 @@
+before|0|after
+alter|1|alter-native
+alter-native|1|alter
+incomplete|2|incomplete-name
+not_a_city|3|description for not_a_city
+region|4|!

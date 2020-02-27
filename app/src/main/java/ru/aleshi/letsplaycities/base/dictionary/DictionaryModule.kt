@@ -6,6 +6,7 @@ import dagger.Provides
 import io.reactivex.Single
 import ru.aleshi.letsplaycities.GsonModule
 import ru.aleshi.letsplaycities.base.GamePreferences
+import javax.inject.Singleton
 
 @Module(includes = [GsonModule::class])
 class DictionaryModule {
@@ -23,4 +24,7 @@ class DictionaryModule {
     @Provides
     fun dictionary(factory: DictionaryFactory): Single<DictionaryService> = factory.load()
 
+    @Provides
+    @Singleton
+    fun cache() = DictionaryFactory.Cache()
 }

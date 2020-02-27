@@ -25,7 +25,7 @@ interface DictionaryService {
 
     /**
      * Returns random word from database starting at [firstChar].
-     * @return [Maybe] of random city or [ru.aleshi.letsplaycities.base.NoWordsLeftException] if there are no available words
+     * @return [Maybe] of random city or [Maybe.empty] if there are no available words
      * starting at [firstChar]
      */
     fun getRandomWord(firstChar: Char): Maybe<String>
@@ -41,6 +41,11 @@ interface DictionaryService {
      * @return correction variants for [city].
      */
     fun getCorrectionVariants(city: String): Single<List<String>>
+
+    /**
+     * Marks [city] as already used
+     */
+    fun markUsed(city: String)
 
     /**
      * Used to clean up all resources used by dictionary.

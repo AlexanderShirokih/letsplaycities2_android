@@ -56,7 +56,6 @@ class ExclusionsServiceImpl(
      */
     class Exclusion(var type: ExclusionType, var thing: String)
 
-
     override fun checkForExclusion(city: String): String {
         if (countries.contains(city))
             return String.format(
