@@ -19,6 +19,20 @@ android {
             keyAlias = 'letsplaycities'
         }
     }
+
+    sourceSets {
+        test {
+            resources.srcDirs += ['sampledata']
+        }
+        androidTest {
+            resources.srcDirs += ['sampledata']
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     def HOST_LOCAL = "\"192.168.2.244\""
     def HOST_REMOTE = "\"194.87.111.204\""
 
@@ -79,7 +93,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.google.android.material:material:1.2.0-alpha04'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
     implementation 'com.mikhaellopez:circularimageview:4.0.1'
     implementation 'com.android.billingclient:billing:2.1.0'
 
@@ -116,4 +130,12 @@ dependencies {
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'ru.aleshi.lps:lps-client:0.4.4.1'
 
+    // For JDK9+
+    kapt 'javax.xml.bind:jaxb-api:2.3.1'
+    kapt 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    kapt 'com.sun.xml.bind:jaxb-impl:2.3.2'
+    annotationProcessor 'javax.xml.bind:jaxb-api:2.3.1'
+    annotationProcessor 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    annotationProcessor 'com.sun.xml.bind:jaxb-impl:2.3.2'
+    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
 }

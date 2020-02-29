@@ -110,13 +110,14 @@ class TestLPSServer {
     fun testReceiveWord() {
         testLogIn()
 
-        lpsServer.sendCity(WordResult.ACCEPTED, "city")
+        lpsServer.sendCity(WordResult.ACCEPTED, "city", 10)
 
         val cityMsg = connection.reader()
 
         cityMsg as LPSMessage.LPSWordMessage
 
         assertEquals(cityMsg.result, WordResult.ACCEPTED)
+        assertEquals(cityMsg.ownerId, 10)
         assertEquals(cityMsg.word, "city")
     }
 
@@ -124,13 +125,14 @@ class TestLPSServer {
     fun testReceiveMessage() {
         testLogIn()
 
-        lpsServer.sendMessage("Test")
+        lpsServer.sendMessage("Test", 10)
 
         val cityMsg = connection.reader()
 
         cityMsg as LPSMessage.LPSMsgMessage
 
         assertEquals(cityMsg.msg, "Test")
+        assertEquals(cityMsg.ownerId, 10)
         assertFalse(cityMsg.isSystemMsg)
     }
 }

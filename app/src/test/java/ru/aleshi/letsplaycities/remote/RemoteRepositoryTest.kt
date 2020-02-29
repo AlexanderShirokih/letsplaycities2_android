@@ -88,19 +88,19 @@ class RemoteRepositoryTest {
 
     @Test
     fun sendWord() {
-        repository.sendWord(WordResult.ACCEPTED, "word")
+        repository.sendWord(WordResult.ACCEPTED, "word", 10)
 
         verify(server, times(1))
-            .sendCity(WordResult.ACCEPTED, "word")
+            .sendCity(WordResult.ACCEPTED, "word" ,10)
         verifyNoMoreInteractions(server)
     }
 
     @Test
     fun sendMessage() {
-        repository.sendMessage("Hello world")
+        repository.sendMessage("Hello world", 10)
 
         verify(server, times(1))
-            .sendMessage("Hello world")
+            .sendMessage("Hello world", 10)
         verifyNoMoreInteractions(server)
     }
 }
