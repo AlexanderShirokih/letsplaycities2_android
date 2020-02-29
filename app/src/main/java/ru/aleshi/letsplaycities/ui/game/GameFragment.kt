@@ -67,27 +67,7 @@ class GameFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        val activity = requireActivity() as MainActivity
-        ViewModelProvider(activity)[ConfirmViewModel::class.java].callback.observe(
-            this,
-            Observer {
-                when {
-                    it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(
-                        R.id.mainMenuFragment,
-                        false
-                    )
-//                    it.checkWithResultCode(SURRENDER) -> mGameSession?.onSurrender()
-                    it.checkWithResultCode(USE_HINT) -> showAd()
-//                    it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession?.onFriendRequestResult(it.result
-//                    )?.subscribe({}, { err -> showErrorSnackbar(err, this) })
-                }
-            })
-
-        gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
-        gameSessionViewModel =
-            ViewModelProvider(activity)[GameSessionViewModel::class.java].apply {
-                gameViewModel.startGame(gameSession.value!!.peekContent())
-            }
+        val activity = requireActivity()
         mAdapter = GameAdapter(activity)
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
@@ -103,6 +83,30 @@ class GameFragment : Fragment() {
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_SCREEN_ON)
             })
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        ViewModelProvider(this)[ConfirmViewModel::class.java].callback.observe(
+            viewLifecycleOwner,
+            Observer {
+                when {
+                    it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(
+                        R.id.mainMenuFragment,
+                        false
+                    )
+//                    it.checkWithResultCode(SURRENDER) -> mGameSession?.onSurrender()
+                    it.checkWithResultCode(USE_HINT) -> showAd()
+//                    it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession?.onFriendRequestResult(it.result
+//                    )?.subscribe({}, { err -> showErrorSnackbar(err, this) })
+                }
+            })
+
+        gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
+        gameSessionViewModel =
+            ViewModelProvider(requireParentFragment())[GameSessionViewModel::class.java].apply {
+                gameViewModel.startGame(gameSession.value!!.peekContent())
+            }
     }
 
 //

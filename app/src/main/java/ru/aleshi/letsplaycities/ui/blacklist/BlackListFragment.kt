@@ -14,10 +14,8 @@ import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
-import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
-import ru.quandastudio.lpsclient.core.LpsApi
 import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.BlackListItem
 import javax.inject.Inject
@@ -31,11 +29,8 @@ class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
     @Inject
     lateinit var mPicasso: Picasso
 
-    override fun onCreate(sharedViewModelFactory: ViewModelFactory) {
-        ViewModelProvider(
-            requireActivity(),
-            sharedViewModelFactory
-        )[ConfirmViewModel::class.java].callback.observe(
+    override fun onCreate() {
+        ViewModelProvider(this)[ConfirmViewModel::class.java].callback.observe(
             this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.resultCode == requestCodeConfirmRemoving && request.result) {

@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
-import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.core.LpsRepository
@@ -34,16 +33,13 @@ class FriendsFragment : BasicNetworkFetchFragment<FriendInfo>(),
     private lateinit var mAdapter: FriendsListAdapter
     private lateinit var mSelectedFriendsInfo: FriendInfo
 
-    override fun onCreate(sharedViewModelFactory: ViewModelFactory) {
-        ViewModelProvider(
-            requireActivity(),
-            sharedViewModelFactory
-        )[ConfirmViewModel::class.java].callback.observe(this,
+    override fun onCreate() {
+        ViewModelProvider(this)[ConfirmViewModel::class.java].callback.observe(this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.result && ::mSelectedFriendsInfo.isInitialized) {
                     when (request.resultCode) {
                         REQUEST_CODE_SELECT_ITEM -> {
-                            ViewModelProvider(requireActivity())[FriendsViewModel::class.java].friendsInfo.postValue(
+                            ViewModelProvider(requireParentFragment())[FriendsViewModel::class.java].friendsInfo.postValue(
                                 mSelectedFriendsInfo
                             )
                             findNavController().popBackStack(R.id.networkFragment, false)

@@ -6,7 +6,6 @@ import dagger.Binds
 import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.IntoMap
-import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkFetchViewModel
 import ru.aleshi.letsplaycities.ui.profile.AuthorizationViewModel
 import kotlin.reflect.KClass
@@ -21,11 +20,6 @@ abstract class ViewModelModule {
 
     @Binds
     internal abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ConfirmViewModel::class)
-    internal abstract fun confirmViewModel(viewModel: ConfirmViewModel): ViewModel
 
     @Binds
     @IntoMap

@@ -16,8 +16,10 @@ import ru.quandastudio.lpsclient.core.CredentialsProvider
 import javax.inject.Inject
 
 class ViewProfileFragment : Fragment() {
-    private lateinit var mGamePreferences: GamePreferences
     private lateinit var mProfileViewModel: ProfileViewModel
+
+    @Inject
+    lateinit var gamePreferences: GamePreferences
 
     @Inject
     lateinit var credentialsProvider: CredentialsProvider
@@ -31,7 +33,7 @@ class ViewProfileFragment : Fragment() {
     }
 
     fun onLogout(view: View) {
-        SocialNetworkManager.logout(mGamePreferences, credentialsProvider)
+        SocialNetworkManager.logout(gamePreferences, credentialsProvider)
         findNavController().navigate(R.id.actionLogin)
     }
 
@@ -41,7 +43,7 @@ class ViewProfileFragment : Fragment() {
             findNavController().popBackStack()
         else {
             mVisited = true
-            if (!mGamePreferences.isLoggedIn())
+            if (!gamePreferences.isLoggedIn())
                 findNavController().navigate(R.id.actionLogin)
         }
     }

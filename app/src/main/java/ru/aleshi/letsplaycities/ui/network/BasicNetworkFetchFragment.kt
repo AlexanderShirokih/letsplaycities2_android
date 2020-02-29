@@ -32,7 +32,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        onCreate(viewModelFactory)
+        onCreate()
         networkFetchViewModel =
             ViewModelProvider(this, viewModelFactory)[NetworkFetchViewModel::class.java]
         networkFetchViewModel.state.observe(this@BasicNetworkFetchFragment) { state ->
@@ -46,7 +46,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
         }
     }
 
-    abstract fun onCreate(sharedViewModelFactory: ViewModelFactory)
+    abstract fun onCreate()
 
     class ViewDataHolder<FetchDataType>(
         val adapter: BasicListAdapter<FetchDataType, *>,

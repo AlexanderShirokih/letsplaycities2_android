@@ -34,7 +34,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     @Inject
     lateinit var prefs: GamePreferences
 
-    private val viewModelProvider: ViewModelProvider by lazy { ViewModelProvider(requireActivity()) }
+    private val viewModelProvider: ViewModelProvider by lazy { ViewModelProvider(this) }
 
     private val mFriendsViewModel: FriendsViewModel
         get() = viewModelProvider[FriendsViewModel::class.java]
@@ -81,7 +81,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     }
 
     override fun onStartGame(session: GameSession) {
-        ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].setGameSession(
+        viewModelProvider[GameSessionViewModel::class.java].setGameSession(
             session
         )
         mGameSound?.start()
