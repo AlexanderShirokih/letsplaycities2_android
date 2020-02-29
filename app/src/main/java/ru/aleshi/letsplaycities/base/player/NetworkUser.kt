@@ -18,7 +18,7 @@ class NetworkUser(playerData: PlayerData, picasso: Picasso) : User(
     playerData,
     PictureSource(
         picasso,
-        Utils.getPictureUri(
+        Utils.getPictureURI(
             playerData.authData.credentials.userId,
             playerData.pictureHash
         )

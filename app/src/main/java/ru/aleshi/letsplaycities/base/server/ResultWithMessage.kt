@@ -7,4 +7,4 @@ import ru.aleshi.letsplaycities.base.player.UserIdentity
  * @param message incoming message
  * @param identity owner of this message
  */
-class ResultWithMessage(val message: String, val identity: UserIdentity)
+data class ResultWithMessage(val message: String, val identity: UserIdentity)

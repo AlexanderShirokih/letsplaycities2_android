@@ -4,7 +4,7 @@ package ru.aleshi.letsplaycities.base.player
  * Compares users by [userId]
  * @param userId user ID to be compared with
  */
-class UserIdIdentity(val userId: Int) : UserIdentity {
+data class UserIdIdentity(val userId: Int) : UserIdentity {
 
     /**
      * Returns `true` is [user] userID equals with [userId], `false` otherwise

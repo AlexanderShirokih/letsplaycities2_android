@@ -9,8 +9,7 @@
         android:paddingLeft="20dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="start"
-        android:orientation="vertical">
+        android:gravity="start">
 
     <ru.aleshi.letsplaycities.ui.view.RoundedImageView
             android:id="@+id/avatar"

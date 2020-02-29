@@ -9,4 +9,4 @@ import ru.quandastudio.lpsclient.model.WordResult
  * @param city city
  * @param identity owner of this word
  */
-class ResultWithCity(val wordResult: WordResult, val city: String, val identity: UserIdentity)
+data class ResultWithCity(val wordResult: WordResult, val city: String, val identity: UserIdentity)
