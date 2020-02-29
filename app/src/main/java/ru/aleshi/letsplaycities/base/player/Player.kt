@@ -4,6 +4,7 @@ import com.squareup.picasso.Picasso
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
@@ -18,23 +19,35 @@ import ru.quandastudio.lpsclient.model.VersionInfo
 
 /**
  * Represents logic of user controlled player.
- * @param picasso [Picasso] instance
  * @param playerData [PlayerData] model class that contains info about user
+ * @param pictureSource represents users picture
  */
 class Player(
     playerData: PlayerData,
-    picasso: Picasso
+    pictureSource: PictureSource
 ) :
     User(
         playerData,
+        pictureSource
+    ) {
+
+    /**
+     * @param picasso [Picasso] instance
+     * @param playerData [PlayerData] model class that contains info about user
+     */
+    constructor(
+        playerData: PlayerData,
+        picasso: Picasso
+    ) : this(
+        playerData,
         PictureSource(
             picasso = picasso,
-            uri = Utils.getPictureUri(
+            uri = Utils.getPictureURI(
                 playerData.authData.credentials.userId,
                 playerData.pictureHash
             )
         )
-    ) {
+    )
 
     /**
      * Constructor used for local games.
@@ -54,7 +67,7 @@ class Player(
     /**
      * [PublishSubject] that will emit user input if it completes all checking.
      */
-    private val userInputSubject = PublishSubject.create<String>()
+    private val userInputSubject = BehaviorSubject.create<String>()
 
     /**
      * Saved first letter of the last word
@@ -66,7 +79,7 @@ class Player(
 
     override fun onMakeMove(firstChar: Char): Maybe<String> {
         mFirstChar = firstChar
-        return userInputSubject.singleElement()
+        return userInputSubject.firstElement()
     }
 
     override fun onUserInput(userInput: String): Observable<WordCheckingResult> {
@@ -74,9 +87,12 @@ class Player(
         return Observable.just(input)
             .filter { it.isNotEmpty() }
             .filter { mFirstChar == Char.MIN_VALUE || it[0] == mFirstChar }
-            .flatMap { checkForExclusions(input, game).ambWith { checkInDatabase(input, game) } }
-            .concatMap { checkForCorrections(it, game) }
-            .doOnNext { if (it is WordCheckingResult.Accepted) userInputSubject.onNext(it.word) }
+            .flatMap { checkForExclusions(input, game).switchIfEmpty(checkInDatabase(input, game)) }
+            .flatMap { checkForCorrections(it, game) }
+            .doOnNext {
+                if (it is WordCheckingResult.Accepted)
+                    userInputSubject.onNext(it.word)
+            }
     }
 
     /**
@@ -141,13 +157,14 @@ class Player(
         game: GameFacade
     ): Observable<WordCheckingResult> =
         if (currentResult is WordCheckingResult.OriginalNotFound) {
-            game.getCorrections(currentResult.word)
-                .flatMapObservable {
-                    if (it.isEmpty())
-                        Observable.just(WordCheckingResult.NotFound)
-                    else
-                        Observable.just(WordCheckingResult.Corrections(it))
-                }
+            Observable.concatArray(Observable.just(currentResult),
+                game.getCorrections(currentResult.word)
+                    .flatMapObservable {
+                        if (it.isEmpty())
+                            Observable.just(WordCheckingResult.NotFound)
+                        else
+                            Observable.just(WordCheckingResult.Corrections(it))
+                    })
         } else
-            Observable.empty()
+            Observable.just(currentResult)
 }

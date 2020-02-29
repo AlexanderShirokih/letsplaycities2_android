@@ -12,20 +12,26 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Represents logic of Android player.
- * @param picasso [Picasso] instance
- * @param versionInfo application [VersionInfo] instance
- * @param name localized Android name
+ * @param playerData [PlayerData] model class that contains info about user
+ * @param pictureSource represents android's picture
  */
-class Android(picasso: Picasso, name: String, versionInfo: VersionInfo) :
-    User(
+class Android(playerData: PlayerData, pictureSource: PictureSource) :
+    User(playerData, pictureSource) {
+
+    /**
+     * @param picasso [Picasso] instance
+     * @param versionInfo application [VersionInfo] instance
+     * @param name localized Android name
+     */
+    constructor(picasso: Picasso, name: String, versionInfo: VersionInfo) : this(
         PlayerData.SimpleFactory().create(name, versionInfo),
         PictureSource(picasso, R.drawable.ic_android_big)
-    ) {
+    )
 
     /**
      * Count of moves before Android surrenders
      */
-    private var estimatedMoves: Int = 1
+    internal var estimatedMoves: Int = 1
 
     override fun onInit(comboSystemView: ComboSystemView): ComboSystem {
         val diff = game.difficulty - 1

@@ -1,76 +1,91 @@
 package ru.aleshi.letsplaycities.base.player
 
-import com.nhaarman.mockitokotlin2.any
-import com.squareup.picasso.Picasso
+import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Maybe
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
+import org.junit.runner.RunWith
+import org.mockito.Mock
 import org.mockito.Mockito.mock
+import org.mockito.junit.MockitoJUnitRunner
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameFacade
+import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.game.Position
+import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.VersionInfo
 
 /**
  * Test for [Android]
  */
+
+@RunWith(MockitoJUnitRunner::class)
 class AndroidTest {
 
-    private lateinit var picasso: Picasso
+    @Mock
+    lateinit var pictureSource: PictureSource
 
     private lateinit var gameFacade: GameFacade
 
+    private lateinit var android: Android
+
     @Before
     fun setUp() {
-        picasso = mock(Picasso::class.java)
         gameFacade = mock(GameFacade::class.java)
 
-        Mockito.`when`(gameFacade.getRandomWord('j')).thenReturn(Maybe.just("jump"))
+        whenever(gameFacade.difficulty).thenReturn(1)
 
-        Mockito.`when`(gameFacade.getRandomWord('n')).thenReturn(Maybe.empty())
+        doAnswer { inv ->
+            when (inv.arguments[0] as Char) {
+                'j' -> Maybe.just("jump")
+                else -> Maybe.empty()
+            }
+        }.`when`(gameFacade).getRandomWord(any())
+
+        android = Android(
+            PlayerData.SimpleFactory().create("android", VersionInfo("0", 0)),
+            pictureSource
+        ).apply {
+            init(ComboSystem.DefaultSystemView, Position.UNKNOWN, gameFacade)
+        }
     }
 
     @Test
     fun onMakeMoveGeneratesRandomWord() {
-        val android = Android(picasso, "android", VersionInfo("", 0))
-        android.init(ComboSystem.DefaultSystemView, gameFacade)
         android.onMakeMove('j')
             .test()
+            .await()
             .assertNoErrors()
-            .assertTimeout()
             .assertValue { v -> v.startsWith('j') }
             .dispose()
     }
 
     @Test
     fun onMakeMoveGeneratesWhenNoWord() {
-        val android = Android(picasso, "android", VersionInfo("", 0))
-        android.init(ComboSystem.DefaultSystemView, gameFacade)
         android.onMakeMove('n')
-            .test()
+            .test().await()
             .assertNoErrors()
-            .assertTimeout()
             .assertComplete()
             .dispose()
     }
 
     @Test
     fun onMakeMoveOnEstimateMovesGone() {
-        val android = mock(Android::class.java)
-        //Mock init method, because by default estimated moves initializes is 1
-        Mockito.`when`(android.onInit(any()))
-            .thenReturn(ComboSystem(false, ComboSystem.DefaultSystemView))
+        android.estimatedMoves = 1
 
         // Make first move
         android.onMakeMove('j')
             .test()
+            .await()
+            .assertValueCount(1)
             .assertNoErrors()
-            .assertTimeout()
             .dispose()
 
         //And surrender on next
         android.onMakeMove('j')
             .test()
+            .await()
+            .assertNoValues()
             .assertNoErrors()
             .assertComplete()
             .dispose()
