@@ -18,6 +18,7 @@ import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import java.io.File
 import java.io.FileOutputStream
+import java.net.URI
 import java.util.concurrent.TimeUnit
 
 object Utils {
@@ -25,8 +26,24 @@ object Utils {
     val Fragment.lpsApplication
         get() = requireContext().applicationContext as LPSApplication
 
-    fun getPictureUri(userId: Int, hash: String?): Uri = if (hash == null) Uri.EMPTY else
-        Uri.parse("${getServerBaseUrl()}user/${userId}/picture?hash=${hash}")
+    /**
+     * Created [Uri] to user image.
+     * @param userId userID of user that image URI should be created
+     * @param hash image hash of user or `null` if hash not present
+     * @return [Uri] containing path to user's picture or [Uri.EMPTY] if [hash] is not present
+     * @see getPictureURI
+     */
+    fun getPictureUri(userId: Int, hash: String?): Uri =
+        getPictureURI(userId, hash)?.run { toString().toUri() } ?: Uri.EMPTY
+
+    /**
+     * Creates [URI] to user image.
+     * @param userId userID of user that image URI should be created
+     * @param hash image hash of user or `null` if hash not present
+     * @return [URI] containing path to user's picture or `null` if [hash] is not present
+     */
+    fun getPictureURI(userId: Int, hash: String?): URI? = if (hash == null) null else
+        URI.create("${getServerBaseUrl()}user/${userId}/picture?hash=${hash}")
 
     fun getServerBaseUrl(): String {
         return "http://${BuildConfig.HOST}:8080/"

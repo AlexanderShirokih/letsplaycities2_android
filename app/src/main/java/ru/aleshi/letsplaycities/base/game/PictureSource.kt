@@ -1,10 +1,11 @@
 package ru.aleshi.letsplaycities.base.game
 
-import android.net.Uri
 import androidx.annotation.DrawableRes
+import androidx.core.net.toUri
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 import ru.aleshi.letsplaycities.R
+import java.net.URI
 
 open class PictureSource(
     val imageRequest: RequestCreator
@@ -15,13 +16,9 @@ open class PictureSource(
 
     constructor(
         picasso: Picasso,
-        uri: Uri, @DrawableRes placeholder: Int = R.drawable.ic_player_big
-    ) : this(picasso.run {
-        if (uri == Uri.EMPTY)
-            load(placeholder)
-        else
-            load(uri)
-    }
-        .placeholder(placeholder)
-        .error(placeholder))
+        uri: URI?, @DrawableRes placeholder: Int = R.drawable.ic_player_big
+    ) : this(
+        (uri?.run { picasso.load(toString().toUri()) } ?: picasso.load(placeholder))
+            .placeholder(placeholder)
+            .error(placeholder))
 }
