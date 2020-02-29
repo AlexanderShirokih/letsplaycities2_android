@@ -1,15 +1,17 @@
 package ru.aleshi.letsplaycities.ui.profile
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_profile_login_no_sn.*
 import kotlinx.android.synthetic.main.fragment_profile_login_no_sn.view.*
-import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.databinding.FragmentProfileLoginNoSnBinding
@@ -24,8 +26,8 @@ class LoginNoSnProfileFragment : Fragment() {
     private lateinit var profileViewModel: ProfileViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        mGamePreferences = (requireContext().applicationContext as LPSApplication).gamePreferences
         profileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
     }
 
@@ -55,7 +57,7 @@ class LoginNoSnProfileFragment : Fragment() {
 
     private fun populateFields(root: View, prefs: GamePreferences) {
         root.messageInputField.setText(prefs.lastNativeLogin)
-        profileViewModel.avatarUri.set(prefs.lastAvatarUri)
+        profileViewModel.avatarUri.set(prefs.lastAvatarUri?.toString()?.toUri() ?: Uri.EMPTY)
     }
 
 }

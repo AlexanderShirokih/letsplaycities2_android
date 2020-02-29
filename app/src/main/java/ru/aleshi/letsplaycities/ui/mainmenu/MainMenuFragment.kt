@@ -14,17 +14,19 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.mainmenu.MainMenuContract
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
-import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import javax.inject.Inject
 
 class MainMenuFragment : Fragment(), MainMenuContract.MainMenuView {
 
     @Inject
     lateinit var presenter: MainMenuContract.MainMenuPresenter
+    @Inject
+    lateinit var prefs: GamePreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -53,7 +55,7 @@ class MainMenuFragment : Fragment(), MainMenuContract.MainMenuView {
     }
 
     private fun checkRateDialog() {
-        lpsApplication.gamePreferences.checkForRateDialogLaunch {
+        prefs.checkForRateDialogLaunch {
             findNavController().navigate(R.id.showRateDialog)
         }
     }

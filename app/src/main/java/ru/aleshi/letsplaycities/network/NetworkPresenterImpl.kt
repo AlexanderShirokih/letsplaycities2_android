@@ -9,6 +9,7 @@ import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.AppVersionInfo
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.NetworkUser
@@ -214,7 +215,7 @@ class NetworkPresenterImpl @Inject constructor(
                 reverse()
         }
 
-        mView?.onStartGame(GameSession(users, mNetworkServer))
+        mView?.onStartGame(GameSession(users, mNetworkServer, GameMode.MODE_NET))
     }
 
 }

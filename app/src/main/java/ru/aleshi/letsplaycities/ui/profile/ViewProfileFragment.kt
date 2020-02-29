@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
-import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.databinding.FragmentProfileViewBinding
@@ -28,7 +27,6 @@ class ViewProfileFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        mGamePreferences = (requireContext().applicationContext as LPSApplication).gamePreferences
         mProfileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
     }
 

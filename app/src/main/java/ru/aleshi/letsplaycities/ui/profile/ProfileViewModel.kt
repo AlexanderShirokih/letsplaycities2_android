@@ -26,7 +26,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     val authType: ObservableField<Drawable> = ObservableField()
 
-    val nativeEvents =  MutableLiveData<Event<Unit>>()
+    val nativeEvents = MutableLiveData<Event<Unit>>()
 
     init {
         loadDefaultAvatar()
@@ -40,7 +40,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     fun loadCurrentProfile() {
         val context = getApplication<LPSApplication>()
-        val authData = GameAuthDataFactory(context).load()
+        val authData = GameAuthDataFactory(context.gamePreferences).load()
         if (authData.credentials.isValid()) {
             login.set(authData.login)
             authType.set(context.getDrawableFromResource(getAuthResourceByAuthType(authData.snType)))

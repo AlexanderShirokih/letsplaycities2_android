@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities.base.mainmenu
 
 import ru.aleshi.letsplaycities.base.PlayerKind
+import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.server.BaseServer
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.User
@@ -26,7 +27,13 @@ class MainMenuPresenter @Inject constructor(
         else
             arrayOf(player.get(), android.get())
 
-        view.startGame(GameSession(players, server))
+        view.startGame(
+            GameSession(
+                players,
+                server,
+                if (hasLocalOpponents) GameMode.MODE_PVP else GameMode.MODE_PVA
+            )
+        )
     }
 
 }

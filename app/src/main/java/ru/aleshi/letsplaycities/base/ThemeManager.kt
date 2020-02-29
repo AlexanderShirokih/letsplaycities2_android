@@ -1,10 +1,15 @@
 package ru.aleshi.letsplaycities.base
 
-import android.content.Context
-import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 
 object ThemeManager {
+
+    private const val KEY_THEME = "token"
+
+    data class ThemeWithSignature(val token: String?, val sig: String?) {
+        fun isValid() = token != null && sig != null
+    }
+
     val themes = arrayOf(
         Theme(1, R.style.AppTheme, null),
         Theme(2, R.style.VkStyleTheme, null),
@@ -20,16 +25,10 @@ object ThemeManager {
     )
     private val DEFAULT_THEME = themes[4]
 
-    fun applyTheme(context: Context) {
-        val theme = getCurrentTheme(context)
-        if (theme.isFreeOrAvailable())
-            context.setTheme(theme.themeId)
-    }
-
-    private fun getThemeById(requestedStid: Int, applicationContext: LPSApplication): Theme {
+    private fun getThemeById(requestedStid: Int, prefs: GamePreferences): Theme {
         for (theme in themes) {
             if (theme.stid == requestedStid) {
-                checkAvailableFor(theme, applicationContext)
+                checkAvailableFor(theme, prefs)
                 if (theme.isFreeOrAvailable())
                     return theme
             }
@@ -37,36 +36,34 @@ object ThemeManager {
         return DEFAULT_THEME
     }
 
-    fun checkAvailable(app: LPSApplication) {
+    fun checkAvailable(prefs: GamePreferences) {
         for (theme in themes) {
-            checkAvailableFor(theme, app)
+            checkAvailableFor(theme, prefs)
         }
     }
 
-    private fun checkAvailableFor(theme: Theme, app: LPSApplication) {
+    private fun checkAvailableFor(theme: Theme, prefs: GamePreferences) {
         if (!theme.isFree()) {
-            theme.isAvail =
-                app.gamePreferences.getThemeWithSignature(theme).isValid() && SignatureChecker.check(app) == "Y"
+            theme.isAvail = getThemeWithSignature(prefs, theme).isValid()
         }
     }
 
-    fun getCurrentTheme(context: Context): Theme {
-        val app = context.applicationContext as LPSApplication
+    fun getCurrentTheme(prefs: GamePreferences): Theme {
         return getThemeById(
-            app.gamePreferences.getThemeId(DEFAULT_THEME.stid),
-            app
+            prefs.getInt(KEY_THEME, DEFAULT_THEME.stid),
+            prefs
         )
     }
 
-    fun getCurrentThemeName(context: Context): String {
-        val theme = getCurrentTheme(context)
+    fun getCurrentThemeName(prefs: GamePreferences, themeNames: Array<String>): String {
+        val theme = getCurrentTheme(prefs)
         if (theme.isFreeOrAvailable()) {
             val index = themes.indexOf(theme)
             if (index != -1) {
-                return context.resources.getStringArray(R.array.themes)[index]
+                return themeNames[index]
             }
         }
-        return context.resources.getStringArray(R.array.themes)[0]
+        return themeNames[0]
     }
 
     private fun getThemeBySKU(productId: String): Theme {
@@ -85,21 +82,59 @@ object ThemeManager {
         return themes.mapNotNull { it.sku }.toList()
     }
 
-    fun switchTheme(theme: Theme, app: LPSApplication) {
-        app.gamePreferences.putThemeId(theme.stid)
 
-        applyTheme(app)
+    /**
+     * Saves current theme id to preferences.
+     * @param prefs application preferences instance
+     * @param theme theme to be saved
+     */
+    fun saveCurrentTheme(prefs: GamePreferences, theme: Theme) {
+        prefs.putInt(KEY_THEME, theme.stid)
     }
 
-    fun putTheme(app: LPSApplication, productId: String, purchaseToken: String, signature: String) {
+    fun putTheme(
+        prefs: GamePreferences,
+        productId: String,
+        purchaseToken: String,
+        signature: String
+    ) {
         getThemeBySKU(productId).run {
             isAvail = true
-            app.gamePreferences.putThemeWithSignature(
+            putThemeWithSignature(
+                prefs,
                 this,
-                GamePreferences.ThemeWithSignature(purchaseToken, signature)
+                ThemeWithSignature(purchaseToken, signature)
             )
         }
-        applyTheme(app)
+    }
+
+    /**
+     * Loads theme [theme] from preferences
+     * @param theme theme to be loaded
+     * @return loaded [ThemeWithSignature]
+     */
+    private fun getThemeWithSignature(prefs: GamePreferences, theme: Theme): ThemeWithSignature {
+        return ThemeWithSignature(
+            prefs.getString("thm:${theme.sku}", null),
+            prefs.getString("sig:${theme.sku}", null)
+        )
+    }
+
+    /**
+     * Saves theme [theme] to preferences.
+     * @param theme theme to be saved
+     * @param themeWithSignature [ThemeWithSignature] instance to be saved
+     */
+    private fun putThemeWithSignature(
+        prefs: GamePreferences,
+        theme: Theme,
+        themeWithSignature: ThemeWithSignature
+    ) {
+        prefs.edit {
+            putString("thm:${theme.sku}", themeWithSignature.token)
+            putString("sig:${theme.sku}", themeWithSignature.sig)
+            putInt(KEY_THEME, theme.stid)
+        }
     }
 
 }

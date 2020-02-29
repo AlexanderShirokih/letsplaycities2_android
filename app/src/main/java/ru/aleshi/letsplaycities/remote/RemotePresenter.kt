@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.remote
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.RemoteUser
@@ -52,7 +53,7 @@ class RemotePresenter @Inject constructor(
             RemoteUser(oppData, picasso)
         )
 
-        view.onStartGame(GameSession(users, remoteServer))
+        view.onStartGame(GameSession(users, remoteServer, GameMode.MODE_MUL))
     }
 
     override fun onStop() {

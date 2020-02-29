@@ -19,11 +19,10 @@ import ru.aleshi.letsplaycities.network.NetworkContract
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.MainActivity
-import ru.aleshi.letsplaycities.ui.network.friends.FriendsViewModel
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
+import ru.aleshi.letsplaycities.ui.network.friends.FriendsViewModel
 import ru.aleshi.letsplaycities.ui.profile.ProfileViewModel
 import ru.aleshi.letsplaycities.utils.Utils
-import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import ru.quandastudio.lpsclient.model.FriendModeResult
 import javax.inject.Inject
 
@@ -32,7 +31,9 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     @Inject
     lateinit var mNetworkPresenter: NetworkContract.Presenter
 
-    private val mGamePreferences: GamePreferences by lazy { lpsApplication.gamePreferences }
+    @Inject
+    lateinit var prefs: GamePreferences
+
     private val viewModelProvider: ViewModelProvider by lazy { ViewModelProvider(requireActivity()) }
 
     private val mFriendsViewModel: FriendsViewModel
@@ -49,7 +50,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
             this@NetworkFragment,
             mNetworkPresenter.onFriendsInfo()
         )
-        if (mGamePreferences.isSoundEnabled()) {
+        if (prefs.isSoundEnabled()) {
             mGameSound = MediaPlayer.create(activity, R.raw.begin)
         }
     }
@@ -58,7 +59,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         val activity = requireActivity() as MainActivity
         activity.setToolbarVisibility(true)
 
-        if (mGamePreferences.isChangeModeDialogRequested()) {
+        if (prefs.isChangeModeDialogRequested()) {
             findNavController().navigate(R.id.showChangeModeDialog)
         }
         mNetworkPresenter.onAttachView(this)
@@ -115,7 +116,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         arguments?.let { args ->
             val nfa = NetworkFragmentArgs.fromBundle(args)
             if ("fm_game" == nfa.action) {
-                if (mGamePreferences.isLoggedIn()) {
+                if (prefs.isLoggedIn()) {
                     setLoadingLayout(true)
                     mNetworkPresenter.onConnectToFriendGame(nfa.oppId)
                 } else

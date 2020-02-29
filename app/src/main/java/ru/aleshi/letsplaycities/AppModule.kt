@@ -9,7 +9,7 @@ import ru.aleshi.letsplaycities.base.BaseModule
 import ru.aleshi.letsplaycities.platform.Platform
 import ru.aleshi.letsplaycities.ui.MainActivityModule
 
-@Module(includes = [AndroidInjectionModule::class, Platform::class, MainActivityModule::class, BaseModule::class])
+@Module(includes = [AndroidInjectionModule::class, MainActivityModule::class, BaseModule::class])
 abstract class AppModule {
 
     @Binds

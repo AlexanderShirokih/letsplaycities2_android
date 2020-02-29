@@ -10,28 +10,36 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_settings.*
-import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.ThemeManager
 import ru.aleshi.letsplaycities.ui.MainActivity
-
+import javax.inject.Inject
 
 class SettingsFragment : Fragment() {
-    private lateinit var prefs: GamePreferences
+
+    @Inject
+    lateinit var prefs: GamePreferences
     private lateinit var adapter: SettingsListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        prefs = (requireContext().applicationContext as LPSApplication).gamePreferences
-        ViewModelProvider(requireActivity())[SettingsViewModel::class.java].selectedItem.observe(this, Observer {
-            prefs.putSettingValue(it.first, it.second)
-            adapter.updateItem(it.first, it.second)
-        })
+        ViewModelProvider(requireActivity())[SettingsViewModel::class.java].selectedItem.observe(
+            this,
+            Observer {
+                prefs.putSettingValue(it.first, it.second)
+                adapter.updateItem(it.first, it.second)
+            })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 
@@ -88,7 +96,12 @@ class SettingsFragment : Fragment() {
         val values = arrayOfNulls<Array<String>>(11)
 
         values[0] = arrayOf(resources.getString(R.string.hint_addcity))
-        values[1] = arrayOf(ThemeManager.getCurrentThemeName(requireContext()))
+        values[1] = arrayOf(
+            ThemeManager.getCurrentThemeName(
+                prefs,
+                requireContext().resources.getStringArray(R.array.themes)
+            )
+        )
         values[2] = resources.getStringArray(R.array.diff_names)
         values[3] = resources.getStringArray(R.array.scoring)
         values[4] = resources.getStringArray(R.array.timing)
@@ -101,7 +114,7 @@ class SettingsFragment : Fragment() {
 
         val items = mutableListOf<SettingsItem>()
 
-        for (index in 0 until names.size) {
+        for (index in names.indices) {
             items.add(SettingsItem(defaults[index], names[index], values[index]!!))
         }
         SettingsItem.disabledVariantName = onOff[0]

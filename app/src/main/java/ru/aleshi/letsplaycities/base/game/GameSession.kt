@@ -18,7 +18,8 @@ import ru.quandastudio.lpsclient.model.WordResult
 
 class GameSession(
     val users: Array<User>,
-    val server: BaseServer
+    val server: BaseServer,
+    val gameMode: GameMode
 ) {
 
     /**

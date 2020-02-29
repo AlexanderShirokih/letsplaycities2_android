@@ -17,6 +17,8 @@ import ru.aleshi.letsplaycities.ui.network.history.HistoryFragment
 import ru.aleshi.letsplaycities.ui.profile.LoginProfileFragment
 import ru.aleshi.letsplaycities.ui.profile.ViewProfileFragment
 import ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment
+import ru.aleshi.letsplaycities.ui.settings.SettingsFragment
+import ru.aleshi.letsplaycities.ui.theme.ThemeFragment
 
 //TODO: Create common component with NetworkModule
 @Module
@@ -61,4 +63,12 @@ abstract class FragmentsModule {
     @ActivityScope
     @ContributesAndroidInjector(modules = [NetworkModule::class])
     abstract fun contributeViewProfileFragment(): ViewProfileFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeThemeFragment(): ThemeFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeSettingsFragment(): SettingsFragment
 }

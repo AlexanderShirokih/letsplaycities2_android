@@ -17,10 +17,10 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.ThemeManager
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
+import ru.aleshi.letsplaycities.utils.Utils
 import javax.inject.Inject
-
 
 class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
+
+    @Inject
+    lateinit var prefs: GamePreferences
 
     private val mFriendRequestReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) =
@@ -37,7 +40,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-        ThemeManager.applyTheme(this)
+        Utils.applyTheme(prefs, this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)

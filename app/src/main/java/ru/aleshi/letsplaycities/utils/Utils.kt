@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities.utils
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.LayoutInflater
@@ -16,6 +17,8 @@ import kotlinx.android.synthetic.main.dialog_waiting.view.*
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.ThemeManager
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
@@ -45,10 +48,17 @@ object Utils {
     fun getPictureURI(userId: Int, hash: String?): URI? = if (hash == null) null else
         URI.create("${getServerBaseUrl()}user/${userId}/picture?hash=${hash}")
 
+    /**
+     * Returns base server URL string
+     */
     fun getServerBaseUrl(): String {
         return "http://${BuildConfig.HOST}:8080/"
     }
 
+    /**
+     * Loads picture from [uri], then resizes it 128x128px and
+     * saves to [filesDir]/img.png
+     */
     fun createThumbnail(filesDir: File, uri: Uri): Single<Uri> =
         Single.just(uri)
             .observeOn(Schedulers.computation())
@@ -62,6 +72,10 @@ object Utils {
                 outputFile.toUri()
             }
 
+    /**
+     * Loads image from [uri].
+     * @return [Single] with loaded image [Bitmap]
+     */
     private fun loadResized(uri: Uri): Single<Bitmap> =
         Single.create {
             try {
@@ -75,6 +89,15 @@ object Utils {
                 it.tryOnError(e)
             }
         }
+
+    /**
+     * Applies theme saved in preferences to the application.
+     */
+    fun applyTheme(prefs: GamePreferences, context: Context) {
+        val theme = ThemeManager.getCurrentTheme(prefs)
+        if (theme.isFreeOrAvailable())
+            context.setTheme(theme.themeId)
+    }
 
     fun showWaitingForConnectionDialog(
         reconnectionDelay: Int,

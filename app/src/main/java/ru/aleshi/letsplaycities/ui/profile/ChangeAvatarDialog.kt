@@ -17,6 +17,7 @@ import io.reactivex.disposables.CompositeDisposable
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
+import java.net.URI
 
 class ChangeAvatarDialog : DialogFragment() {
 
@@ -44,7 +45,7 @@ class ChangeAvatarDialog : DialogFragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess(mProfileViewModel.avatarUri::set)
                 .subscribe({
-                    lpsApplication.gamePreferences.lastAvatarUri = it
+                    lpsApplication.gamePreferences.lastAvatarUri = URI.create(it.toString())
                     findNavController().popBackStack()
                 }
                     , {

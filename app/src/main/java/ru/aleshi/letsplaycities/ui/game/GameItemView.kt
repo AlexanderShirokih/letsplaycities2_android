@@ -11,12 +11,17 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.res.getColorOrThrow
 import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.setMargins
+import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.Theme
 import ru.aleshi.letsplaycities.base.ThemeManager
 import ru.aleshi.letsplaycities.base.game.Position
 
-class GameItemView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+class GameItemView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) :
     LinearLayout(context, attrs, defStyleAttr) {
 
     private val itemContainer: LinearLayout
@@ -33,20 +38,30 @@ class GameItemView @JvmOverloads constructor(context: Context, attrs: AttributeS
             orientation = HORIZONTAL
             gravity = Gravity.CENTER
 
-            addView(wordIcon, MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-                setMargins(convertToPx(6f))
-            })
-            addView(city, MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-                marginStart = convertToPx(2f)
-            })
+            addView(
+                wordIcon,
+                MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                    setMargins(convertToPx(6f))
+                })
+            addView(
+                city,
+                MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                    marginStart = convertToPx(2f)
+                })
         }
 
-        addView(itemContainer, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-            setMargins(convertToPx(4f))
-        })
+        addView(
+            itemContainer,
+            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                setMargins(convertToPx(4f))
+            })
     }
 
-    fun bind(entityWrapper: GameEntityWrapper) = bind(entityWrapper, ThemeManager.getCurrentTheme(context))
+    fun bind(entityWrapper: GameEntityWrapper) = bind(
+        entityWrapper, ThemeManager.getCurrentTheme(
+            (context.applicationContext as LPSApplication).gamePreferences
+        )
+    )
 
     fun bind(entityWrapper: GameEntityWrapper, theme: Theme) {
         val typedValue = context.obtainStyledAttributes(
@@ -61,7 +76,8 @@ class GameItemView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         city.text = entityWrapper.getSpannableString(typedValue.getColorOrThrow(0))
 
-        (this as LinearLayout).gravity = if (entityWrapper.position == Position.LEFT) Gravity.START else Gravity.END
+        (this as LinearLayout).gravity =
+            if (entityWrapper.position == Position.LEFT) Gravity.START else Gravity.END
 
         itemContainer.setBackgroundResource(typedValue.getResourceIdOrThrow(1))
 
@@ -82,6 +98,10 @@ class GameItemView @JvmOverloads constructor(context: Context, attrs: AttributeS
     }
 
     private fun convertToPx(value: Float) =
-        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()
+        TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            value,
+            resources.displayMetrics
+        ).toInt()
 
 }

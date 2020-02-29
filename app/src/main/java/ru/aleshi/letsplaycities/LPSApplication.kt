@@ -17,7 +17,6 @@ import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import javax.inject.Inject
 
-
 class LPSApplication : MultiDexApplication(), HasAndroidInjector {
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
@@ -25,9 +24,8 @@ class LPSApplication : MultiDexApplication(), HasAndroidInjector {
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
-    val gamePreferences: GamePreferences by lazy {
-        GamePreferences(this)
-    }
+    @Inject
+    lateinit var gamePreferences: GamePreferences
 
     override fun onCreate() {
         super.onCreate()
@@ -62,6 +60,5 @@ class LPSApplication : MultiDexApplication(), HasAndroidInjector {
             } else response
         }.cache(Cache(context.cacheDir, 2 * 1024 * 1024)).build()
     }
-
 
 }
