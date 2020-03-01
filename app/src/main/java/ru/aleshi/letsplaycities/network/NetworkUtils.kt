@@ -2,8 +2,6 @@ package ru.aleshi.letsplaycities.network
 
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.iid.FirebaseInstanceId
-import io.reactivex.Single
 import ru.aleshi.letsplaycities.R
 import ru.quandastudio.lpsclient.AuthorizationException
 import ru.quandastudio.lpsclient.LPSException
@@ -38,17 +36,6 @@ object NetworkUtils {
                 }
             })
             .show()
-    }
-
-    fun getToken(): Single<String> {
-        return Single.create<String> {
-            FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
-                //174 chars
-                if (task.isSuccessful)
-                    it.onSuccess(task.result!!.token)
-                else it.tryOnError(LPSException("Cannot fetch firebase token"))
-            }
-        }
     }
 
 }

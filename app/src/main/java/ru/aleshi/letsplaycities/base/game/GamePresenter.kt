@@ -9,8 +9,8 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.plusAssign
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
-import ru.aleshi.letsplaycities.base.dictionary.DictionaryServiceImpl
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryService
+import ru.aleshi.letsplaycities.base.dictionary.DictionaryServiceImpl
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.dictionary.ExclusionsService
 import ru.aleshi.letsplaycities.utils.StringUtils
@@ -19,7 +19,6 @@ import javax.inject.Inject
 
 /**
  * Presenter which is responsible for controlling game logic.
- * @param viewModel associated ViewModel instance
  * @param dictionary game [DictionaryServiceImpl]
  * @param prefs default [GamePreferences]
  * @param comboSystemView the view implementations of [ComboSystemView]
@@ -27,7 +26,6 @@ import javax.inject.Inject
  */
 //TODO: Test comboSystemView binding with two players
 class GamePresenter @Inject constructor(
-    private val viewModel: GameContract.ViewModel,
     private val dictionary: Single<DictionaryService>,
     private val exclusions: Single<ExclusionsService>,
     private val prefs: GamePreferences,
@@ -39,6 +37,11 @@ class GamePresenter @Inject constructor(
      * Disposable for clearing all subscribes
      */
     private val disposable = CompositeDisposable()
+
+    /**
+     * Linked View-Model instance
+     */
+    private lateinit var viewModel: GameContract.ViewModel
 
     /**
      * Reference to loaded dictionary
@@ -64,7 +67,8 @@ class GamePresenter @Inject constructor(
     /**
      * Used to start the game. Initializes all data. After all updates view to GameState.Started
      */
-    override fun start(session: GameSession) {
+    override fun start(viewModel: GameContract.ViewModel, session: GameSession) {
+        this.viewModel = viewModel
         disposable +=
             Completable.fromAction { viewModel.updateState(GameState.CheckingForUpdates) }
                 .andThen(checkForUpdates())
@@ -86,6 +90,7 @@ class GamePresenter @Inject constructor(
      * Called internally on start to init all users
      */
     private fun initPlayers() {
+        comboSystemView.init()
         disposable += session.start(
             comboSystemView,
             _dictionary,
@@ -164,9 +169,9 @@ class GamePresenter @Inject constructor(
     }
 
     /**
-     * Used to restart game timer to time limit defined in server.
-     * If server time limit it `0`, timer won't be started.
-     * Called when game starts and before every move begins.
+     * Used to restart game timer to the time limit defined in the server.
+     * If server time limit is `0`, timer won't be started.
+     * Called when game starts and every time before move begins.
      */
     private fun resetTimer() {
         val timeLimit = session.server.getTimeLimit()

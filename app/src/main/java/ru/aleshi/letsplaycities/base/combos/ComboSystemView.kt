@@ -7,4 +7,6 @@ interface ComboSystemView {
     fun addBadge(comboType: ComboType) {}
 
     fun updateBadge(comboType: ComboType, multiplier: Float) {}
+
+    fun init() {}
 }

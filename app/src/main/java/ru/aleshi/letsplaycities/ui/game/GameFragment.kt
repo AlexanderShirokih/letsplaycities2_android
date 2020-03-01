@@ -24,7 +24,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import com.crashlytics.android.Crashlytics
-import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.reward.RewardedVideoAd
@@ -58,6 +57,9 @@ class GameFragment : Fragment() {
     @Inject
     lateinit var prefs: GamePreferences
 
+    @Inject
+    lateinit var viewModelFactory: GameViewModelFactory
+
     private var mClickSound: MediaPlayer? = null
     private val disposable: CompositeDisposable = CompositeDisposable()
     private val screenReceiver = ScreenReceiver {
@@ -83,6 +85,7 @@ class GameFragment : Fragment() {
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_SCREEN_ON)
             })
+        gameViewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -102,35 +105,15 @@ class GameFragment : Fragment() {
                 }
             })
 
-        gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
         gameSessionViewModel =
             ViewModelProvider(requireParentFragment())[GameSessionViewModel::class.java].apply {
                 gameViewModel.startGame(gameSession.value!!.peekContent())
             }
     }
 
-//
-//    override fun comboSystemView(): ComboSystemView {
-//        val view = layoutInflater.inflate(R.layout.combo_badge, badgeRoot, false)
-//        badgeRoot.addView(view)
-//        return ComboBadgeView(view)
-//    }
-
     private fun setupAds(activity: Activity) {
         adView.loadAd(AdRequest.Builder().build())
-        adView.adListener = object : AdListener() {
-            override fun onAdClosed() {
-                adView?.visibility = View.GONE
-            }
-
-            override fun onAdLoaded() {
-                adView?.visibility = View.VISIBLE
-            }
-
-            override fun onAdFailedToLoad(error: Int) {
-                adView?.visibility = View.GONE
-            }
-        }
+        adView.adListener = AdListenerHelper(adView)
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(activity).apply {
             rewardedVideoAdListener = TipsListener(::loadRewardedVideoAd) {
                 /*mGameSession::useHint*/

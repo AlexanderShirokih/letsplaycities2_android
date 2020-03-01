@@ -23,7 +23,7 @@ import javax.inject.Inject
 abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
 
     @Inject
-    protected lateinit var viewModelFactory: ViewModelFactory
+    protected lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var networkFetchViewModel: NetworkFetchViewModel
 

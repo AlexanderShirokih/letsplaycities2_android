@@ -134,7 +134,7 @@ abstract class GamePreferences {
      * @param commit if `true` value will saved immediately (synchronously), `false` - applied
      * asynchronously.
      */
-    abstract fun edit(commit: Boolean = false, editor: Editor.(e: Editor) -> Unit)
+    abstract fun edit(commit: Boolean = false, editor: Editor.() -> Unit)
 
     /**
      * Loads settings values from preferences

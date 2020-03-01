@@ -20,7 +20,7 @@ import javax.inject.Inject
 class FriendRequestDialog : DialogFragment() {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var requestViewModel: FriendRequestViewModel
 

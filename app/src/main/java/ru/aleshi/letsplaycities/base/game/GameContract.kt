@@ -45,9 +45,10 @@ interface GameContract {
     interface Presenter {
         /**
          * Call to begin game sequence.
+         * @param viewModel ViewModel Instance
          * @param session current [GameSession] instance
          */
-        fun start(session: GameSession)
+        fun start(viewModel: ViewModel, session: GameSession)
 
         /**
          * Call to send input from user to players.

@@ -50,7 +50,7 @@ class GameViewModel @Inject constructor(
      * Call from UI to start game
      */
     fun startGame(gameSession: GameSession) {
-        presenter.start(gameSession)
+        presenter.start(this, gameSession)
     }
 
     /*

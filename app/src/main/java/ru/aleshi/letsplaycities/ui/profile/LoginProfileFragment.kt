@@ -16,13 +16,12 @@ import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.FetchState
 import ru.aleshi.letsplaycities.ui.MainActivity
-import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import javax.inject.Inject
 
 class LoginProfileFragment : Fragment(R.layout.fragment_profile_login) {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)

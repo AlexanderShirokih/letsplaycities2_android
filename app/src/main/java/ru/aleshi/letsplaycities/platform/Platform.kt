@@ -2,16 +2,19 @@ package ru.aleshi.letsplaycities.platform
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.iid.FirebaseInstanceId
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import ru.aleshi.letsplaycities.FileProvider
-import ru.aleshi.letsplaycities.Localization
-import ru.aleshi.letsplaycities.R
+import io.reactivex.Single
+import ru.aleshi.letsplaycities.*
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.dictionary.ExclusionsServiceImpl
 import ru.aleshi.letsplaycities.base.scoring.CityStatDatabaseHelper
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
+import ru.aleshi.letsplaycities.ui.network.FbToken
+import ru.quandastudio.lpsclient.LPSException
+import ru.quandastudio.lpsclient.model.VersionInfo
 import javax.inject.Singleton
 
 /**
@@ -34,7 +37,22 @@ class Platform {
     }
 
     @Provides
+    @FbToken
+    fun token(): Single<String> = Single.create<String> {
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            //174 chars
+            if (task.isSuccessful)
+                it.onSuccess(task.result!!.token)
+            else it.tryOnError(LPSException("Cannot fetch firebase token"))
+        }
+    }
+
+    @AppVersionInfo
+    @Provides
+    fun versionInfo() = VersionInfo(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+
     @Singleton
+    @Provides
     fun sharedPreferences(context: Context): SharedPreferences =
         context.getSharedPreferences("letsplaycities", Context.MODE_PRIVATE)
 

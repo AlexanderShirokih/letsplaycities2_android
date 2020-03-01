@@ -91,10 +91,10 @@ class SharedGamePreferences @Inject constructor(val prefs: SharedPreferences) : 
      * @param commit if `true` value will saved immediately (synchronously), `false` - applied
      * asynchronously.
      */
-    override fun edit(commit: Boolean, editor: Editor.(e: Editor) -> Unit) {
+    override fun edit(commit: Boolean, editor: Editor.() -> Unit) {
         @SuppressLint("CommitPrefEdits")
         val preferencesEditor = SharedPreferencesEditor(prefs.edit())
-        editor(preferencesEditor, preferencesEditor)
+        editor(preferencesEditor)
         preferencesEditor.flush(commit)
     }
 

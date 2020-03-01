@@ -5,11 +5,10 @@ import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.android.AndroidInjectionModule
-import ru.aleshi.letsplaycities.base.BaseModule
-import ru.aleshi.letsplaycities.platform.Platform
+import ru.aleshi.letsplaycities.base.game.GameModule
 import ru.aleshi.letsplaycities.ui.MainActivityModule
 
-@Module(includes = [AndroidInjectionModule::class, MainActivityModule::class, BaseModule::class])
+@Module(includes = [AndroidInjectionModule::class, MainActivityModule::class])
 abstract class AppModule {
 
     @Binds
@@ -17,6 +16,5 @@ abstract class AppModule {
 
     @Binds
     abstract fun lpsApplication(application: LPSApplication): Application
-
 
 }

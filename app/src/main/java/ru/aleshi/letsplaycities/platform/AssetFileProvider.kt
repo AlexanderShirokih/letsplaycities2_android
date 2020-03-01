@@ -6,11 +6,12 @@ import ru.aleshi.letsplaycities.FileProvider
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import javax.inject.Inject
 
 /**
  * Provides access to asset folder
  */
-class AssetFileProvider(context: Context) : FileProvider {
+class AssetFileProvider @Inject constructor(context: Context) : FileProvider {
 
     private val assetManager: AssetManager = context.assets
 
