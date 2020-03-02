@@ -14,7 +14,6 @@ import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.dictionary.CityResult
 import ru.aleshi.letsplaycities.base.game.GameFacade
 import ru.aleshi.letsplaycities.base.game.PictureSource
-import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.base.game.WordCheckingResult
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.VersionInfo
@@ -62,7 +61,7 @@ class PlayerTest {
             PlayerData.SimpleFactory().create("player", VersionInfo("0", 0)),
             pictureSource
         ).apply {
-            init(ComboSystem.DefaultSystemView, Position.UNKNOWN, gameFacade)
+            init(ComboSystem.DefaultSystemView, gameFacade)
         }
     }
 
@@ -107,17 +106,15 @@ class PlayerTest {
     @Test
     fun onUserInputWhenNoWord() {
         p.onUserInput("noword").test().await()
-            .assertValueCount(2)
-            .assertValueAt(0) { v -> v is WordCheckingResult.OriginalNotFound }
-            .assertValueAt(1) { v -> v is WordCheckingResult.NotFound }
+            .assertValueCount(1)
+            .assertValue { v -> v is WordCheckingResult.NotFound }
     }
 
     @Test
     fun onUserInputWhenCorrectionsAvailable() {
         p.onUserInput("correction").test().await()
-            .assertValueCount(2)
-            .assertValueAt(0) { v -> v is WordCheckingResult.OriginalNotFound }
-            .assertValueAt(1) { v -> v is WordCheckingResult.Corrections && v.corrections.contains("correctionAvail") }
+            .assertValueCount(1)
+            .assertValue { v -> v is WordCheckingResult.Corrections && v.corrections.contains("correctionAvail") }
     }
 
 }

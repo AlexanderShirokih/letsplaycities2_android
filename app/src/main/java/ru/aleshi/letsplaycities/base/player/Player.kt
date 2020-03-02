@@ -117,7 +117,7 @@ class Player(
     /**
      * Checks current [city] in game database.
      * @return [Observable] of [WordCheckingResult.Accepted] if [city] was found in database and
-     * can be used, [WordCheckingResult.OriginalNotFound] if [city] was't found in database,
+     * can be used, [WordCheckingResult.NotFound] if [city] was't found in database,
      * [WordCheckingResult.AlreadyUsed] if word already used before.
      */
     private fun checkInDatabase(city: String, game: GameFacade): Observable<WordCheckingResult> {
@@ -128,7 +128,7 @@ class Player(
                     CityResult.CITY_NOT_FOUND -> Single.error<WordCheckingResult>(
                         CityNotFoundException(word)
                     )
-                    CityResult.ALREADY_USED -> Single.just(WordCheckingResult.AlreadyUsed)
+                    CityResult.ALREADY_USED -> Single.just(WordCheckingResult.AlreadyUsed(city))
                     else -> Single.just(WordCheckingResult.Accepted(word))
                 }
             }
@@ -139,7 +139,7 @@ class Player(
             .onErrorResumeNext { t: Throwable ->
                 if (t is CityNotFoundException)
                     Single.just(
-                        WordCheckingResult.OriginalNotFound(t.city)
+                        WordCheckingResult.NotFound(t.city)
                     )
                 else
                     Single.error<WordCheckingResult>(t)
@@ -147,7 +147,7 @@ class Player(
     }
 
     /**
-     * If previous result was [WordCheckingResult.OriginalNotFound] this function will search corrections
+     * If previous result was [WordCheckingResult.NotFound] this function will search corrections
      * and emit [WordCheckingResult.Corrections] if corrections was found or [WordCheckingResult.NotFound]
      * if corrections if not available.
      * For any other states will emit [Observable.empty].
@@ -155,16 +155,16 @@ class Player(
     private fun checkForCorrections(
         currentResult: WordCheckingResult,
         game: GameFacade
-    ): Observable<WordCheckingResult> =
-        if (currentResult is WordCheckingResult.OriginalNotFound) {
-            Observable.concatArray(Observable.just(currentResult),
-                game.getCorrections(currentResult.word)
-                    .flatMapObservable {
-                        if (it.isEmpty())
-                            Observable.just(WordCheckingResult.NotFound)
-                        else
-                            Observable.just(WordCheckingResult.Corrections(it))
-                    })
+    ): Observable<WordCheckingResult> {
+        return if (currentResult is WordCheckingResult.NotFound) {
+            game.getCorrections(currentResult.word)
+                .flatMapObservable {
+                    if (it.isEmpty())
+                        Observable.just(WordCheckingResult.NotFound(currentResult.word))
+                    else
+                        Observable.just(WordCheckingResult.Corrections(it))
+                }
         } else
             Observable.just(currentResult)
+    }
 }

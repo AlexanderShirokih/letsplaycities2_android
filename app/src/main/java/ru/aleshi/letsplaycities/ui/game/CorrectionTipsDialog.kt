@@ -18,19 +18,18 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_correction_tips.*
 import kotlinx.android.synthetic.main.dialog_correction_tips.view.*
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.game.GameViewModel
-import ru.aleshi.letsplaycities.base.game.WordCheckingResult
 import ru.aleshi.letsplaycities.databinding.DialogCorrectionTipsBinding
 import ru.aleshi.letsplaycities.utils.StringUtils
 
 /**
  * Dialog for selecting correction variants and waiting until they were loaded
  */
+
 class CorrectionTipsDialog : DialogFragment() {
 
     val isSearching: ObservableBoolean = ObservableBoolean(true)
 
-    private lateinit var gameViewModel: GameViewModel
+    private lateinit var correctionViewModel: CorrectionViewModel
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
@@ -52,28 +51,33 @@ class CorrectionTipsDialog : DialogFragment() {
             .create()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        gameViewModel = ViewModelProvider(requireParentFragment())[GameViewModel::class.java]
-        gameViewModel.wordState.observe(this) { state ->
-            when (state) {
-                //We started with this state, so we don't need do something
-                is WordCheckingResult.OriginalNotFound -> Unit
-                //We have a corrections, so pass them to adapter
-                is WordCheckingResult.Corrections -> recyclerView.adapter =
-                    CorrectionTipsAdapter(state.corrections) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        correctionViewModel = ViewModelProvider(
+            requireParentFragment()
+        )[CorrectionViewModel::class.java]
+        correctionViewModel.corrections.observe(this) { correctionsList ->
+            //We have corrections, so pass them to adapter
+            if (correctionsList.isNotEmpty()) {
+                isSearching.set(false)
+                requireDialog().recyclerView.adapter =
+                    CorrectionTipsAdapter(correctionsList) {
                         //Re-run processing city with corrected word
-                        gameViewModel.processCityInput(it)
+                        findNavController().navigateUp()
+                        correctionViewModel.processCityInput(it)
                     }
-                else -> findNavController().navigateUp()
-            }
+            } else
+                findNavController().navigateUp()
         }
     }
 
     /**
      * RecyclerView adapter that holds correction variants
      */
-    class CorrectionTipsAdapter(val list: List<String>, val onClick: (item: String) -> Unit) :
+    class CorrectionTipsAdapter(
+        private val list: List<String>,
+        private val onClick: (item: String) -> Unit
+    ) :
         RecyclerView.Adapter<CorrectionItemViewHolder>() {
 
         /**

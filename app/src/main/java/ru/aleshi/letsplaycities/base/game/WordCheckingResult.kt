@@ -7,9 +7,9 @@ package ru.aleshi.letsplaycities.base.game
 sealed class WordCheckingResult {
 
     /**
-     * Used when input city has already used.
+     * Used when input [word] has already used.
      */
-    object AlreadyUsed : WordCheckingResult()
+    class AlreadyUsed(val word: String) : WordCheckingResult()
 
     /**
      * Used when input city is an exclusion and can't be applied.
@@ -17,19 +17,14 @@ sealed class WordCheckingResult {
     class Exclusion(val description: String) : WordCheckingResult()
 
     /**
-     * Used when input [word] not found in the database.
-     */
-    class OriginalNotFound(val word: String) : WordCheckingResult()
-
-    /**
-     * Used after state [OriginalNotFound] and contains available corrections for current input
+     * Used after state [NotFound] and contains available corrections for current input
      */
     class Corrections(val corrections: List<String>) : WordCheckingResult()
 
     /**
-     * Used after state [OriginalNotFound] when no corrections available.
+     * Used when no corrections available.
      */
-    object NotFound : WordCheckingResult()
+    class NotFound(val word: String) : WordCheckingResult()
 
     /**
      * Used when input [word] can applied without any corrections.
