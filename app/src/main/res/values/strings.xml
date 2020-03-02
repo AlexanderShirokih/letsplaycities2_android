@@ -341,4 +341,9 @@
     <string name="exec_picture">Обработка аватарки…</string>
     <string name="uploading_picture">Обновление аватарки профиля…</string>
     <string name="error_upd_avatar">Не удалось обработать аватарку</string>
+
+    <!-- GameStateNotifier -->
+    <string name="checking_for_updates">Проверка обновлений словаря…</string>
+    <string name="updating_dictionary">Обновление словаря %d%%</string>
+    <string name="loading_dictionary">Загрузка словаря</string>
 </resources>

@@ -186,18 +186,12 @@
                     app:popUpTo="@id/gameFragment"
                     app:popUpToInclusive="false" />
         </dialog>
+
         <dialog
                 android:id="@+id/correctionTipsDialog"
                 android:name="ru.aleshi.letsplaycities.ui.game.CorrectionTipsDialog"
                 android:label="CorrectionTipsDialog"
-                tools:layout="@layout/dialog_correction_tips">
-            <argument
-                    android:name="word"
-                    app:argType="string" />
-            <argument
-                    android:name="errorMsg"
-                    app:argType="string" />
-        </dialog>
+                tools:layout="@layout/dialog_correction_tips" />
         <dialog
                 android:id="@+id/userContextMenuDialog"
                 android:name="ru.aleshi.letsplaycities.ui.game.UserContextMenuDialog"
