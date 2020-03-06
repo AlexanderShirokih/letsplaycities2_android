@@ -18,6 +18,11 @@ abstract class User(
 ) {
 
     /**
+     * Delegate for image request
+     */
+    val imageRequest = pictureSource.imageRequest
+
+    /**
      * Delegate for user credentials
      */
     val credentials = playerData.authData.credentials
@@ -31,7 +36,7 @@ abstract class User(
      * Current user position
      */
     var position: Position = Position.UNKNOWN
-        private set
+        internal set
 
     /**
      * System that can calculate score multiplier
@@ -64,9 +69,8 @@ abstract class User(
     /**
      * Called by system when game starts to initialize internal state.
      */
-    fun init(comboSystemView: ComboSystemView, position: Position, game: GameFacade) {
+    fun init(comboSystemView: ComboSystemView, game: GameFacade) {
         this.game = game
-        this.position = position
         this.comboSystem = onInit(comboSystemView)
         score = 0
     }

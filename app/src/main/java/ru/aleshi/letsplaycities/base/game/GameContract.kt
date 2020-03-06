@@ -37,6 +37,11 @@ interface GameContract {
          * Called to put game entity (city or message) to the screen.
          */
         fun putGameEntity(entity: GameEntity)
+
+        /**
+         * Call to dispose all resources
+         */
+        fun dispose()
     }
 
     /**
@@ -70,9 +75,10 @@ interface GameContract {
         fun banUser(userId: Int): Completable
 
         /**
-         * Call to dispose stop the game and dispose resources.
+         * Call to dispose resources.
          */
         fun dispose()
+
     }
 
 }

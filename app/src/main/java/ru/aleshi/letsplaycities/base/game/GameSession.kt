@@ -22,6 +22,12 @@ class GameSession(
     val gameMode: GameMode
 ) {
 
+    init {
+        users.forEachIndexed { i, user ->
+            user.position = Position.values()[i]
+        }
+    }
+
     /**
      * Facade containing access to dictionary and other game fields.
      */
@@ -79,12 +85,8 @@ class GameSession(
         errorHandler: (t: Throwable) -> Unit
     ): Disposable {
         this.game = GameFacade(dictionary, exclusions, prefs)
-        users.forEachIndexed { index, user ->
-            user.init(
-                comboSystemView,
-                Position.values()[index],
-                game
-            )
+        users.forEach { user ->
+            user.init(comboSystemView, game)
         }
         return subscribeOnServerEvents(gameEntitySupplier, errorHandler)
     }
@@ -206,28 +208,21 @@ class GameSession(
         users.firstOrNull { userIdentity.isTheSameUser(it) }
 
 
-    private fun findGameMode(): GameMode {
-        return when {
-            users.any { it is Android } -> GameMode.MODE_PVA
-            users.any { it is RemoteUser } -> GameMode.MODE_MUL
-            users.any { it is NetworkUser } -> GameMode.MODE_NET
-            else -> GameMode.MODE_PVP
-        }
-    }
-
     /**
      * Checks whether current game mode local or not
      * @return `true` if current game mode is PVA or PVP, `false` otherwise.
      */
     fun isLocal(): Boolean {
-        val mode = findGameMode()
-        return mode == GameMode.MODE_PVA || mode == GameMode.MODE_PVP
-    }
-/*
-    private fun isMessagesAllowed(): Boolean {
-        return users.all { it.isMessagesAllowed }
+        return gameMode == GameMode.MODE_PVA || gameMode == GameMode.MODE_PVP
     }
 
+    /**
+     * Returns `true` if all users in this game allows sending messages
+     * and current game mode is not local.
+     */
+    fun isMessagesAllowed(): Boolean = !isLocal() && users.all { it.isMessagesAllowed }
+
+/*
     private fun beginNextMove(city: String) {
         scoreManager.moveStarted()
     }

@@ -1,6 +1,8 @@
 package ru.aleshi.letsplaycities.base.player
 
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Maybe
 import org.junit.Before
 import org.junit.Test
@@ -11,7 +13,6 @@ import org.mockito.junit.MockitoJUnitRunner
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameFacade
 import ru.aleshi.letsplaycities.base.game.PictureSource
-import ru.aleshi.letsplaycities.base.game.Position
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.VersionInfo
 
@@ -46,7 +47,7 @@ class AndroidTest {
             PlayerData.SimpleFactory().create("android", VersionInfo("0", 0)),
             pictureSource
         ).apply {
-            init(ComboSystem.DefaultSystemView, Position.UNKNOWN, gameFacade)
+            init(ComboSystem.DefaultSystemView, gameFacade)
         }
     }
 

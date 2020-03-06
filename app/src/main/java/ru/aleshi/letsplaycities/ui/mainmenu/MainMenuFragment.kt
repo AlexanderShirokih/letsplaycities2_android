@@ -128,7 +128,7 @@ class MainMenuFragment : Fragment(), MainMenuContract.MainMenuView {
     }
 
     override fun startGame(gameSession: GameSession) {
-        ViewModelProvider(this)[GameSessionViewModel::class.java].setGameSession(
+        ViewModelProvider(requireParentFragment())[GameSessionViewModel::class.java].setGameSession(
             gameSession
         )
         findNavController().navigate(R.id.start_game_fragment)

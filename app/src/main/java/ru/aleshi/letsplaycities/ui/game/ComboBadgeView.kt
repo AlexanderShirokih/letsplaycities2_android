@@ -7,8 +7,9 @@ import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.combos.ComboType
+import javax.inject.Inject
 
-class ComboBadgeView (private val gameFragment: GameFragment) : ComboSystemView {
+class ComboBadgeView @Inject constructor(private val gameFragment: GameFragment) : ComboSystemView {
 
     private lateinit var quickTv: TextView
     private lateinit var shortTv: TextView

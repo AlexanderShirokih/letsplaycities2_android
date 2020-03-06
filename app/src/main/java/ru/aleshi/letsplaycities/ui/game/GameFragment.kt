@@ -23,9 +23,6 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.reward.RewardedVideoAd
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -38,7 +35,7 @@ import ru.aleshi.letsplaycities.network.NetworkUtils.showErrorSnackbar
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
-import ru.aleshi.letsplaycities.utils.TipsListener
+import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -112,7 +109,7 @@ class GameFragment : Fragment() {
                 gameStateNotifier.showState(state)
             }
             wordState.observe(this@GameFragment, ::handleWordResult)
-            correctionViewModel.linkWordState(wordState, ::processCityInput)
+            correctionViewModel.setCorrectionsList(wordState, ::processCityInput)
         }
     }
 
@@ -229,17 +226,16 @@ class GameFragment : Fragment() {
             is WordCheckingResult.AlreadyUsed -> showInfo(
                 getString(
                     R.string.already_used,
-                    wordResult.word
+                    toTitleCase(wordResult.word)
                 )
             )
             is WordCheckingResult.Exclusion -> showInfo(wordResult.description)
-            is WordCheckingResult.OriginalNotFound -> {
+            is WordCheckingResult.Corrections ->
                 findNavController().navigate(R.id.showCorrectionTipsDialog)
-            }
             is WordCheckingResult.NotFound -> showInfo(
                 getString(
                     R.string.city_not_found,
-                    wordResult.word
+                    toTitleCase(wordResult.word)
                 )
             )
             is WordCheckingResult.Accepted -> cityInput.text = null

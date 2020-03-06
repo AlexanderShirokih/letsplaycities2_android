@@ -8,6 +8,7 @@ import ru.aleshi.letsplaycities.network.NetworkClientModule
 import ru.aleshi.letsplaycities.network.NetworkModule
 import ru.aleshi.letsplaycities.remote.RemoteModule
 import ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment
+import ru.aleshi.letsplaycities.ui.game.CorrectionTipsDialog
 import ru.aleshi.letsplaycities.ui.game.GameFragment
 import ru.aleshi.letsplaycities.ui.game.GameFragmentModule
 import ru.aleshi.letsplaycities.ui.network.friends.FriendsFragment
@@ -71,5 +72,4 @@ abstract class FragmentsModule {
     @ActivityScope
     @ContributesAndroidInjector(modules = [GameModule::class, GameFragmentModule::class])
     abstract fun contributeGameFragment(): GameFragment
-
 }
