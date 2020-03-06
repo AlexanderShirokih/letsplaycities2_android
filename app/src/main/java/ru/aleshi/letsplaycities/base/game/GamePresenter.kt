@@ -69,6 +69,10 @@ class GamePresenter @Inject constructor(
      */
     override fun start(viewModel: GameContract.ViewModel, session: GameSession) {
         this.viewModel = viewModel
+        this.session = session
+
+        comboSystemView.init()
+
         disposable +=
             Completable.fromAction { viewModel.updateState(GameState.CheckingForUpdates) }
                 .andThen(checkForUpdates())
@@ -82,6 +86,7 @@ class GamePresenter @Inject constructor(
                     viewModel.updateState(GameState.Started)
                     initPlayers()
                 }, { err ->
+                    err.printStackTrace()
                     viewModel.updateState(GameState.Error(err))
                 })
     }
@@ -90,7 +95,6 @@ class GamePresenter @Inject constructor(
      * Called internally on start to init all users
      */
     private fun initPlayers() {
-        comboSystemView.init()
         disposable += session.start(
             comboSystemView,
             _dictionary,
@@ -155,8 +159,8 @@ class GamePresenter @Inject constructor(
      * it will set to first user
      */
     private fun switchUser() {
-        session.switchUsers()
         viewModel.switchUser(session.currentUser, session.nextUser)
+        session.switchUsers()
         resetTimer()
         doMove()
     }

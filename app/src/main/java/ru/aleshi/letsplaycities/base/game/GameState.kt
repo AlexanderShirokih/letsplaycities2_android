@@ -6,6 +6,11 @@ package ru.aleshi.letsplaycities.base.game
 sealed class GameState {
 
     /**
+     * Default state before game starts.
+     */
+    object Initial : GameState()
+
+    /**
      * Applied when game start to load dictionary update.
      * Should be applied before [LoadingDictionary] state.
      */

@@ -11,9 +11,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.plusAssign
 import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.ui.ActivityScope
 import ru.aleshi.letsplaycities.ui.game.GameEntityWrapper
 import javax.inject.Inject
 
+@ActivityScope
 class GameViewModel @Inject constructor(
     private val presenter: GameContract.Presenter
 ) : ViewModel(), GameContract.ViewModel {
@@ -30,13 +32,12 @@ class GameViewModel @Inject constructor(
 
     var timer: ObservableField<String> = ObservableField()
 
-    // TODO: Set this variables by injection
     val helpBtnVisible: ObservableBoolean = ObservableBoolean()
     val msgBtnVisible: ObservableBoolean = ObservableBoolean()
 
     private val _currentCities = MutableLiveData<List<GameEntityWrapper>>()
 
-    private val _currentState = MutableLiveData<GameState>()
+    private val _currentState = MutableLiveData<GameState>(GameState.Initial)
 
     private val _wordState = MutableLiveData<WordCheckingResult>()
 
@@ -50,6 +51,26 @@ class GameViewModel @Inject constructor(
      * Call from UI to start game
      */
     fun startGame(gameSession: GameSession) {
+        if (_currentState.value != GameState.Initial)
+            throw GameException("Couldn't start game from state ${_currentState.value}")
+
+        helpBtnVisible.set(gameSession.gameMode == GameMode.MODE_PVA)
+        msgBtnVisible.set(gameSession.isMessagesAllowed())
+
+        gameSession.users.forEach {
+            when (it.position) {
+                Position.LEFT -> {
+                    imageLeft.set(it.imageRequest)
+                    infoLeft.set(it.info)
+                }
+                Position.RIGHT -> {
+                    imageRight.set(it.imageRequest)
+                    infoRight.set(it.info)
+                }
+                else -> Unit
+            }
+        }
+
         presenter.start(this, gameSession)
     }
 
@@ -93,7 +114,7 @@ class GameViewModel @Inject constructor(
     }
 
     fun processMessage(message: String) {
-        // TODO()
+        TODO()
     }
 
     /**
@@ -110,7 +131,7 @@ class GameViewModel @Inject constructor(
      */
     fun restart() {
         //Try this...
-        updateState(GameState.Started)
+        updateState(GameState.Initial)
     }
 
     /**
@@ -127,9 +148,8 @@ class GameViewModel @Inject constructor(
      * @param next user whose turn has come
      */
     override fun switchUser(prev: User?, next: User) {
-        //Update score for previous user
         currentPosition.set(next.position)
-        //TODO
+        prev?.apply { updateInfo(this) }
     }
 
     /**
@@ -139,16 +159,24 @@ class GameViewModel @Inject constructor(
 
     }
 
-    override fun onCleared() {
-        super.onCleared()
+    /**
+     * Called when user leaves the game fragment
+     */
+    override fun dispose() {
         disposable.dispose()
         presenter.dispose()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        dispose()
     }
 
     /**
      * Call to show error in UI
      */
     private fun showError(t: Throwable) {
+        t.printStackTrace()
         _currentState.postValue(GameState.Error(t))
     }
 
@@ -183,6 +211,16 @@ class GameViewModel @Inject constructor(
             .doOnError { err -> showError(err) }
             .subscribe()
             .addTo(disposable)
+    }
+
+    private fun updateInfo(user: User) {
+        when (user.position) {
+            Position.LEFT ->
+                infoLeft.set(user.info)
+            Position.RIGHT ->
+                infoRight.set(user.info)
+            else -> Unit
+        }
     }
 
 }
