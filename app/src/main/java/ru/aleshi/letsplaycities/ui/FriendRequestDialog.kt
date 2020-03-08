@@ -8,6 +8,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import dagger.android.support.AndroidSupportInjection
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
@@ -18,6 +19,8 @@ import javax.inject.Inject
 //TODO: Test
 
 class FriendRequestDialog : DialogFragment() {
+
+    private val args: FriendRequestDialogArgs by navArgs()
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -44,25 +47,20 @@ class FriendRequestDialog : DialogFragment() {
         super.onStart()
         val alertDialog = requireDialog() as AlertDialog
         alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener {
-            requestViewModel.onDecline(
-                requireArguments().getString(
-                    "user_id"
-                )!!.toInt()
-            )
+            requestViewModel.onDecline(args.userId)
         }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val args = requireArguments()
         return AlertDialog.Builder(requireActivity())
             .setTitle(R.string.request_dialog_title)
-            .setMessage(getString(R.string.request_dialog_msg, args.getString("login")))
+            .setMessage(getString(R.string.request_dialog_msg, args.login))
             .setPositiveButton(R.string.accept) { _, _ ->
                 findNavController().navigate(
                     FriendRequestDialogDirections.startNetworkFragment(
                         BuildConfig.HOST,
                         "fm_game",
-                        args.getString("user_id")!!.toInt()
+                        args.userId
                     )
                 )
             }

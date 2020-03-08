@@ -76,6 +76,9 @@
                     android:name="oppId"
                     app:argType="integer" />
         </action>
+        <argument
+                android:name="user_id"
+                app:argType="integer" />
     </dialog>
 
     <action
