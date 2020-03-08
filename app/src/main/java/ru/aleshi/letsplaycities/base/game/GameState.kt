@@ -40,7 +40,6 @@ sealed class GameState {
 
     /**
      * Applies when games finishes by any reason.
-     * @param event reason why game hash finished.
      */
-    class Finish(val event: FinishEvent) : GameState()
+    class Finish(val gameResultMessage: String, val playerScore: Int) : GameState()
 }

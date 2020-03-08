@@ -19,14 +19,18 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_game.*
+import kotlinx.coroutines.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.game.GameState
 import ru.aleshi.letsplaycities.base.game.GameViewModel
 import ru.aleshi.letsplaycities.base.game.WordCheckingResult
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
@@ -92,8 +96,7 @@ class GameFragment : Fragment() {
                     )
                     it.checkWithResultCode(SURRENDER) -> gameViewModel.onPlayerSurrender()
                     it.checkWithResultCode(USE_HINT) -> adManager.showAd()
-//                    it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession?.onFriendRequestResult(it.result
-//                    )?.subscribe({}, { err -> showErrorSnackbar(err, this) })
+//                  it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> gameViewModel.onFriendRequestResult(it.result)
                 }
             })
         viewModelProvider[GameSessionViewModel::class.java].apply {
@@ -102,6 +105,7 @@ class GameFragment : Fragment() {
 
         gameViewModel.apply {
             cities.observe(this@GameFragment, adapter::updateEntities)
+            state.observe(this@GameFragment, ::handleState)
             state.observe(this@GameFragment, gameStateNotifier::showState)
             wordState.observe(this@GameFragment, ::handleWordResult)
             correctionViewModel.setCorrectionsList(wordState, ::processCityInput)
@@ -223,6 +227,12 @@ class GameFragment : Fragment() {
 
     private fun handleWordResult(wordResult: WordCheckingResult) {
         when (wordResult) {
+            is WordCheckingResult.WrongLetter -> showInfo(
+                getString(
+                    R.string.wrong_letter,
+                    wordResult.validLetter.toUpperCase()
+                )
+            )
             is WordCheckingResult.AlreadyUsed -> showInfo(
                 getString(
                     R.string.already_used,
@@ -249,18 +259,19 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun scrollRecyclerView() {
-        recyclerView?.scrollToPosition(adapter.itemCount - 1)
+    private fun handleState(currentState: GameState) {
+        if (currentState is GameState.Finish) {
+            navigateOnDestination(
+                GameFragmentDirections.showGameResultDialog(
+                    currentState.gameResultMessage,
+                    currentState.playerScore
+                )
+            )
+        }
     }
 
-    fun showFriendRequestDialog(name: String) {
-        findNavController().navigate(
-            GameFragmentDirections.showConfimationDialog(
-                NEW_FRIEND_REQUEST,
-                getString(R.string.confirm_friend_request, name),
-                null
-            )
-        )
+    private fun scrollRecyclerView() {
+        recyclerView?.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun hideKeyboard() {
@@ -277,27 +288,20 @@ class GameFragment : Fragment() {
     }
 
     private fun showConfirmationDialog(code: Int, msg: Int) {
-        findNavController().navigate(
-            GameFragmentDirections.showConfimationDialog(
-                code,
-                getString(msg),
-                null
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.gameFragment)
+            navController.navigate(
+                GameFragmentDirections.showConfimationDialog(
+                    code,
+                    getString(msg),
+                    null
+                )
             )
-        )
     }
 
-    fun showGameResults(result: String, score: Int) {
-        findNavController().navigate(
-            GameFragmentDirections.showGameResultDialog(
-                result,
-                score
-            )
-        )
-    }
-
-    private fun stopGame() {
+    override fun onStop() {
+        super.onStop()
         hideKeyboard()
-        gameViewModel.dispose()
     }
 
     override fun onDetach() {
@@ -321,12 +325,35 @@ class GameFragment : Fragment() {
         }
     }
 
+    private fun navigateOnDestination(dir: NavDirections) {
+        lifecycleScope.launch {
+            val nav = findNavController()
+            withContext(Dispatchers.Default) {
+                withTimeout(2000) {
+                    while (nav.currentDestination?.id ?: 0 != R.id.gameFragment)
+                        delay(100)
+                }
+            }
+            nav.navigate(dir)
+        }
+    }
+
     fun showUserMenu(isFriend: Boolean, name: String, userId: Int) {
-        findNavController().navigate(
+        navigateOnDestination(
             GameFragmentDirections.showUserContextDialog(
                 isFriend,
                 name,
                 userId
+            )
+        )
+    }
+
+    fun showFriendRequestDialog(name: String) {
+        navigateOnDestination(
+            GameFragmentDirections.showConfimationDialog(
+                NEW_FRIEND_REQUEST,
+                getString(R.string.confirm_friend_request, name),
+                null
             )
         )
     }

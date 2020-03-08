@@ -49,12 +49,6 @@ class GameSession(
         get() = users[_currentUserIndex]
 
     /**
-     * Returns the next [User] in queue
-     */
-    val nextUser: User
-        get() = users[nextIndex]
-
-    /**
      * Returns previous [User] in queue
      */
     val prevUser: User
@@ -76,6 +70,8 @@ class GameSession(
      * @param game [GameFacade]
      */
     fun start(comboSystemView: ComboSystemView, game: GameFacade) {
+        lastWord = ""
+        _currentUserIndex = 0
         this.game = game
         users.forEach { user -> user.init(comboSystemView, game) }
     }
@@ -143,9 +139,16 @@ class GameSession(
      */
     fun isMessagesAllowed(): Boolean = !isLocal() && users.all { it.isMessagesAllowed }
 
+    /**
+     * Returns [Observable] of messages from all users.
+     */
     fun getIncomingMessages(): Observable<ResultWithMessage> =
         server.getIncomingMessages().filter { isMessagesAllowed() }.mergeWith(playerMessageSubject)
 
+    /**
+     * Returns [Player] among [users].
+     * @throws NoSuchElementException if [Player] wasn't found in [users] list.
+     */
     fun requirePlayer() = users.first { it is Player } as Player
 
     /**
@@ -161,29 +164,6 @@ class GameSession(
             }, view::showError, {
                 showToastAndDisconnect(R.string.lost_connection, false)
             })
-
-    private fun beginNextMove(city: String) {
-        scoreManager.moveStarted()
-    }
-
-    private fun endMove(city: String) {
-        scoreManager.moveEnded(city)
-    }
-
-
-    private fun dispose() {
-        server.dispose()
-        scoreManager.updateScore()
-    }
-
-    private fun finishGame(timeIsUp: Boolean, remote: Boolean) {
-        dispose()
-        val res = mScoreManager.getWinner(timeIsUp, remote)
-        val score = if (findGameMode() == GameMode.MODE_PVP)
-            -1
-        else
-            users.first { it is Player }.score
-        view.showGameResults(res, score)
-    }*/
+*/
 
 }

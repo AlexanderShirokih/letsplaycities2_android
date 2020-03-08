@@ -58,6 +58,7 @@ class GameViewModel @Inject constructor(
         msgBtnVisible.set(gameSession.isMessagesAllowed())
 
         gameSession.users.forEach {
+            it.score = 0
             when (it.position) {
                 Position.LEFT -> {
                     imageLeft.set(it.imageRequest)

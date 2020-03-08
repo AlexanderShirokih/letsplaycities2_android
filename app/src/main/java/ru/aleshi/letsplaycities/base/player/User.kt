@@ -60,7 +60,7 @@ abstract class User(
      * User score points
      */
     var score: Int = 0
-        private set
+        internal set
 
     /**
      * Formatted string representation of score and user name
@@ -74,7 +74,6 @@ abstract class User(
     fun init(comboSystemView: ComboSystemView, game: GameFacade) {
         this.game = game
         this.comboSystem = onInit(comboSystemView)
-        score = 0
     }
 
     /**

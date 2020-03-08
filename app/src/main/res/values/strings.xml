@@ -238,6 +238,7 @@
     <string name="no_history">История игр пуста</string>
 
     <!-- GameFragment -->
+    <string name="wrong_letter">Город должен начинаться на букву "%c" </string>
     <string name="already_used">Город "%1$s" уже был загадан</string>
     <string name="city_not_found">Очень жаль, но нам неизвестен город "%1$s".\nПроверьте правильность написания</string>
     <string name="player">Игрок</string>

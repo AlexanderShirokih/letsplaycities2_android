@@ -7,10 +7,9 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.game.GameViewModel
 import ru.aleshi.letsplaycities.databinding.DialogGameResultBinding
 
 /**
@@ -22,6 +21,8 @@ import ru.aleshi.letsplaycities.databinding.DialogGameResultBinding
  */
 class GameResultDialog : DialogFragment() {
 
+    private val args: GameResultDialogArgs by navArgs()
+
     /**
      * Identifies game buttons
      */
@@ -32,7 +33,7 @@ class GameResultDialog : DialogFragment() {
      */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
-        val score = GameResultDialogArgs.fromBundle(requireArguments()).score
+        val score = args.score
 
         return AlertDialog.Builder(activity)
             .setCancelable(false)
@@ -43,7 +44,7 @@ class GameResultDialog : DialogFragment() {
                     null,
                     false
                 ).apply {
-                    result = GameResultDialogArgs.fromBundle(requireArguments()).result +
+                    result = args.result +
                             if (score > 0) activity.getString(R.string.your_score, score) else ""
                     shareButtonVisible = score != -1
                     fragment = this@GameResultDialog
@@ -63,12 +64,12 @@ class GameResultDialog : DialogFragment() {
                 R.id.mainMenuFragment,
                 false
             )
-            SelectedItem.SHARE -> startShareIntent(GameResultDialogArgs.fromBundle(requireArguments()).score)
+            SelectedItem.SHARE -> startShareIntent(args.score)
             SelectedItem.REPLAY -> {
                 val nav = findNavController()
                 if (!nav.popBackStack(R.id.networkFragment, false)) {
-                    ViewModelProvider(requireParentFragment())[GameViewModel::class.java].restart()
-                    nav.navigate(R.id.back_to_game_fragment)
+                    nav.popBackStack(R.id.gameFragment, true)
+                    nav.navigate(R.id.start_game_fragment)
                 }
             }
         }

@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.base.game
 
-import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -16,6 +15,7 @@ import ru.aleshi.letsplaycities.base.dictionary.DictionaryServiceImpl
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.dictionary.ExclusionsService
 import ru.aleshi.letsplaycities.base.player.UserIdentity
+import ru.aleshi.letsplaycities.base.scoring.ScoreManager
 import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.aleshi.letsplaycities.base.server.ResultWithMessage
 import ru.aleshi.letsplaycities.ui.game.CityStatus
@@ -36,7 +36,8 @@ class GamePresenter @Inject constructor(
     private val exclusions: Single<ExclusionsService>,
     private val prefs: GamePreferences,
     private val dictionaryUpdater: DictionaryUpdater,
-    private val comboSystemView: ComboSystemView
+    private val comboSystemView: ComboSystemView,
+    private val scoreManager: ScoreManager
 ) : GameContract.Presenter {
 
     /**
@@ -78,6 +79,7 @@ class GamePresenter @Inject constructor(
         this.viewModel = viewModel
         this.session = session
 
+        scoreManager.init(session)
         comboSystemView.init()
 
         disposable +=
@@ -96,10 +98,12 @@ class GamePresenter @Inject constructor(
                 }
                 .flatMapObservable { makeMoves().mergeWith(disconnectionSubject) }
                 .firstElement()
+                .map(scoreManager::getWinner)
                 .doFinally(::dispose)
                 .subscribe({
-                    Log.d("TAG", "Finish with reason: $it")
-                    viewModel.updateState(GameState.Finish(it))
+                    val playerScore = if (session.gameMode == GameMode.MODE_PVP) -1
+                    else session.requirePlayer().score
+                    viewModel.updateState(GameState.Finish(it, playerScore))
                 }, { err ->
                     err.printStackTrace()
                     viewModel.updateState(GameState.Error(err))
@@ -175,6 +179,12 @@ class GamePresenter @Inject constructor(
      */
     private fun makeMoves(): Observable<FinishEvent> {
         return session.makeMoveForCurrentUser()
+            .doOnSubscribe { scoreManager.moveStarted() }
+            .flatMap {
+                if (it.isSuccessful())
+                    scoreManager.moveEnded(session.prevUser, it.city).andThen(Observable.just(it))
+                else Observable.just(it)
+            }
             .doOnNext {
                 if (it.isSuccessful()) {
                     _dictionary.markUsed(it.city)

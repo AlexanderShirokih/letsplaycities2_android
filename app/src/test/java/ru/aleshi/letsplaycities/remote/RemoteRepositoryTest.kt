@@ -8,9 +8,7 @@ import org.mockito.Mockito.*
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.remote.internal.LPSServer
 import ru.quandastudio.lpsclient.core.LPSClientMessage
-import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
-import ru.quandastudio.lpsclient.model.WordResult
+import ru.quandastudio.lpsclient.model.*
 import java.util.concurrent.TimeUnit
 
 class RemoteRepositoryTest {
@@ -72,7 +70,11 @@ class RemoteRepositoryTest {
                 repository
                     .onMessage(
                         LPSClientMessage.LPSLogIn(
-                            pd = PlayerData.SimpleFactory().create("Test", VersionInfo(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)),
+                            pd = PlayerData(
+                                AuthData(
+                                    "Test", AuthType.Native, Credentials()
+                                ), VersionInfo(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+                            ),
                             fbToken = ""
                         )
                     )
@@ -91,7 +93,7 @@ class RemoteRepositoryTest {
         repository.sendWord(WordResult.ACCEPTED, "word", 10)
 
         verify(server, times(1))
-            .sendCity(WordResult.ACCEPTED, "word" ,10)
+            .sendCity(WordResult.ACCEPTED, "word", 10)
         verifyNoMoreInteractions(server)
     }
 

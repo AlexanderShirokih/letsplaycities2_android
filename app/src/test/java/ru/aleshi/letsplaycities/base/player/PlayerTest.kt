@@ -18,9 +18,7 @@ import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.aleshi.letsplaycities.base.game.WordCheckingResult
 import ru.aleshi.letsplaycities.base.server.BaseServer
 import ru.aleshi.letsplaycities.base.server.ResultWithCity
-import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
-import ru.quandastudio.lpsclient.model.WordResult
+import ru.quandastudio.lpsclient.model.*
 
 /**
  * Test for [Player]
@@ -77,7 +75,7 @@ class PlayerTest {
 
         p = Player(
             server,
-            PlayerData.SimpleFactory().create("player", VersionInfo("0", 0)),
+            PlayerData(AuthData("player", AuthType.Native, Credentials()), VersionInfo("0", 0)),
             pictureSource
         ).apply {
             init(ComboSystem.DefaultSystemView, gameFacade)
@@ -97,6 +95,22 @@ class PlayerTest {
         p.onUserInput("withEx").test().await()
             .assertValueCount(1)
             .assertValue { v -> v is WordCheckingResult.Exclusion && v.description == "exclusion" }
+    }
+
+    @Test
+    fun onUserInputWhenWrongLetter() {
+        val tester = TestObserver<ResultWithCity>()
+
+        p.onMakeMove('g')
+            .subscribe(tester)
+
+        p.onUserInput("noEx")
+            .test().await()
+            .assertValueCount(1)
+            .assertValue { v -> v is WordCheckingResult.WrongLetter && v.validLetter == 'g' }
+            .assertComplete()
+
+        tester.dispose()
     }
 
     @Test

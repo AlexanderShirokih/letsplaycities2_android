@@ -4,7 +4,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doNothing
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.InjectMocks
@@ -47,7 +46,9 @@ class RemoteServerTest {
 
     @Test
     fun getWordsResult() {
-        val test = remoteServer.sendCity("Word", Player(remoteServer, fakePlayerData, fakePictureSource)).test()
+        val test =
+            remoteServer.sendCity("Word", Player(remoteServer, fakePlayerData, fakePictureSource))
+                .test()
 
         test.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
         test.assertNoErrors()
@@ -62,7 +63,8 @@ class RemoteServerTest {
 
     @Test
     fun getInputMessages() {
-        remoteServer.sendMessage("test", Player(remoteServer, fakePlayerData, fakePictureSource)).blockingAwait()
+        remoteServer.sendMessage("test", Player(remoteServer, fakePlayerData, fakePictureSource))
+            .blockingAwait()
 
         val test = remoteServer.getIncomingMessages().test()
 
@@ -81,21 +83,21 @@ class RemoteServerTest {
 
     @Test
     fun broadcastResult() {
-        remoteServer.sendCity("test", Player(remoteServer, fakePlayerData, fakePictureSource)).blockingLast()
+        remoteServer.sendCity("test", Player(remoteServer, fakePlayerData, fakePictureSource))
+            .blockingLast()
 
         verify(server, times(1)).sendCity(WordResult.RECEIVED, "test", 10)
     }
 
     @Test
     fun broadcastMessage() {
-        remoteServer.sendMessage("Hello message", Player(remoteServer, fakePlayerData, fakePictureSource))
+        remoteServer.sendMessage(
+            "Hello message",
+            Player(remoteServer, fakePlayerData, fakePictureSource)
+        )
             .blockingAwait()
 
         verify(server, times(1)).sendMessage("Hello message", 10)
     }
 
-    @Test
-    fun getTimeLimit() {
-        Assert.assertEquals(remoteServer.getTimeLimit(), 92L)
-    }
 }

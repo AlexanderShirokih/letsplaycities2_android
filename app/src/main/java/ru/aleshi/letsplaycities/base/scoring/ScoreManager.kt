@@ -2,10 +2,10 @@ package ru.aleshi.letsplaycities.base.scoring
 
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import ru.aleshi.letsplaycities.Localization
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.CityComboInfo
+import ru.aleshi.letsplaycities.base.game.FinishEvent
 import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.Player
@@ -23,13 +23,19 @@ import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.V_EMPTY_S
 import ru.aleshi.letsplaycities.utils.StringUtils
 import javax.inject.Inject
 
+/**
+ * Check game winner.
+ * Note, that now it works only for two users.
+ */
 class ScoreManager @Inject constructor(
-    private val gameSession: GameSession,
     private val prefs: GamePreferences,
     private val cityStatDatabaseHelper: CityStatDatabaseHelper,
     @Localization("score_result_names")
     private val results: Map<GameResult, String>
 ) {
+
+    private lateinit var gameSession: GameSession
+
     enum class GameResult {
         TIME_UP,
         WIN,
@@ -56,15 +62,24 @@ class ScoreManager @Inject constructor(
     // Самые длинные города
     private lateinit var groupMostBigCities: ScoringGroup
 
-    private val allGroups: ScoringSet = ScoringGroupsHelper.fromPreferences(prefs)
+    private lateinit var allGroups: ScoringSet
+
     private val scoringType: ScoringType = ScoringType.values()[prefs.getCurrentScoringType()]
     private var lastTime: Long = 0
 
-    init {
-        loadStatGroups()
+    /**
+     * Sets the current session instance and loads scoring data from preferences.
+     */
+    fun init(session: GameSession) {
+        gameSession = session
+        allGroups = ScoringGroupsHelper.fromPreferences(prefs)
+        loadStatGroups ()
         saveStats()
     }
 
+    /**
+     * Initializes group* variables from allGroups
+     */
     private fun loadStatGroups() {
         groupCombo = allGroups.getGroupAt(G_COMBO)
         groupParts = allGroups.getGroupAt(G_PARTS)
@@ -74,79 +89,90 @@ class ScoreManager @Inject constructor(
         groupMostBigCities = allGroups.getGroupAt(G_BIG_CITIES)
     }
 
+    /**
+     * Saves statistics in preferences.
+     */
     private fun saveStats() {
         prefs.putScoring(allGroups.storeStatsGroups())
     }
 
+    /**
+     * Call when move starts
+     */
     fun moveStarted() {
-        //for by_time, save time
+        // For by_time, save time
         lastTime = System.currentTimeMillis()
     }
 
-    fun moveEnded(word: String): Disposable {
+    /**
+     * Call when move ends
+     */
+    fun moveEnded(current: User, word: String): Completable {
         val deltaTime = System.currentTimeMillis() - lastTime
 
         if (gameSession.gameMode == GameMode.MODE_NET)
             groupOnline.findField(F_TIME).add(deltaTime.toInt() / 1000)
 
-        val disposable = mostChecker(word).subscribe()
-
         lastTime += deltaTime
 
-        val points = when (scoringType) {
-            ScoringType.BY_SCORE -> {
-                checkCombos(deltaTime, word)
-                word.length
-            }
-            ScoringType.BY_TIME -> {
-                checkCombos(deltaTime, word)
-                val dt = ((40000 - deltaTime.toInt()) / 2000)
-                2 + if (dt > 0) dt else 0
-            }
-            ScoringType.LAST_MOVE -> 0
-        }
-
-        gameSession.currentUser.increaseScore(points)
-
-        saveStats()
-
-        return disposable
-    }
-
-    private fun checkCombos(deltaTime: Long, word: String) {
-        val current = gameSession.currentUser
-
-        Completable.fromAction {
-            current.comboSystem.addCity(
-                CityComboInfo.create(
-                    deltaTime,
-                    word,
-                    gameSession.game.getCountryCode(word)
-                )
-            )
-        }
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .andThen(Completable.fromAction {
-                if (currentIsPlayer()) {
-                    current.comboSystem.activeCombosList.forEach {
-                        groupCombo.child[it.key.ordinal].max(it.value)
+        return mostChecker(word).andThen(
+            Completable.fromAction {
+                val points = when (scoringType) {
+                    ScoringType.LAST_MOVE -> 0
+                    ScoringType.BY_SCORE -> word.length
+                    ScoringType.BY_TIME -> {
+                        val dt = ((40000 - deltaTime.toInt()) / 2000)
+                        2 + if (dt > 0) dt else 0
                     }
                 }
-            })
-            .subscribe()
+
+                current.increaseScore(points)
+                saveStats()
+            }
+        ).andThen(checkCombos(current, deltaTime, word))
     }
 
+    /**
+     * Updates combos for [current] user.
+     * @param deltaTime move duration
+     * @param word current user's new word
+     */
+    private fun checkCombos(current: User, deltaTime: Long, word: String) =
+        if (scoringType == ScoringType.LAST_MOVE)
+            Completable.complete()
+        else
+            Completable.fromAction {
+                current.comboSystem.addCity(
+                    CityComboInfo.create(
+                        deltaTime,
+                        word,
+                        gameSession.game.getCountryCode(word)
+                    )
+                )
+            }
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .andThen(Completable.fromAction {
+                    if (isCurrentIsPlayer()) {
+                        current.comboSystem.activeCombosList.forEach {
+                            groupCombo.child[it.key.ordinal].max(it.value)
+                        }
+                    }
+                })
+
+    /**
+     * Checks stats fro most-category (most biggest cities, most frequent cities)
+     */
     private fun mostChecker(word: String): Completable {
-        return if (!currentIsPlayer())
+        return if (!isCurrentIsPlayer())
             Completable.complete()
         else
             Completable.fromAction {
                 //Most biggest cities
-                val wlen = word.length
+                val wordLength = word.length
                 for (i in groupMostBigCities.child.indices) {
                     val f = groupMostBigCities.child[i]
                     if (f.hasValue() && f.value() != V_EMPTY_S) {
-                        if (wlen > f.value().length) {
+                        if (wordLength > f.value().length) {
                             //Shift
                             for (j in groupMostBigCities.child.size - 1 downTo i + 1)
                                 groupMostBigCities.child[j].set(groupMostBigCities.child[j - 1].value())
@@ -164,52 +190,46 @@ class ScoreManager @Inject constructor(
                 .doOnComplete { saveStats() }
     }
 
-
-    //onGameEnded
-    fun updateScore() {
-        getWinner(timeIsUp = false, remote = false)
-    }
-
-    fun getWinner(timeIsUp: Boolean, remote: Boolean): String {
+    /**
+     * Call when the game ends. Returns winning message.
+     */
+    fun getWinner(finishEvent: FinishEvent): String {
         val mode = gameSession.gameMode
+        val me = gameSession.requirePlayer()
 
         groupParts.main.increase()
         groupParts.child[mode.ordinal].increase()
-
-        val me = getPlayer()
 
         groupHighScores.main.max(me.score)
         groupHighScores.child[mode.ordinal].max(me.score)
 
         saveStats()
 
-        if (timeIsUp) {
-            val next = gameSession.nextUser
-            if (mode == GameMode.MODE_NET) {
-                updWinsForNetMode(next)
-                return String.format(
+        if (finishEvent.reason == FinishEvent.Reason.TimeOut) {
+            return if (mode == GameMode.MODE_NET) {
+                updWinsForNetMode(gameSession.prevUser)
+                String.format(
                     results.getValue(GameResult.TIME_UP),
-                    next.name,
-                    gameSession.currentUser.name
+                    gameSession.prevUser.name,
+                    finishEvent.target.name
                 )
-            }
-            return String.format(
+            } else String.format(
                 results.getValue(GameResult.TIME_UP),
-                next.name,
-                StringUtils.formatName(gameSession.currentUser.name)
+                gameSession.prevUser.name,
+                StringUtils.formatName(finishEvent.target.name)
             )
         }
 
         if (scoringType == ScoringType.LAST_MOVE) {
-            if (remote) {
-                updWinsForNetMode(getPlayer())
+            if (finishEvent.reason == FinishEvent.Reason.Disconnected) {
+                updWinsForNetMode(gameSession.requirePlayer())
                 return results.getValue(GameResult.WIN_BY_REMOTE)
             }
 
-            //Всегда побеждает тот, кто ожидает ответа
-            val next = gameSession.nextUser
-            updWinsForNetMode(next)
-            return String.format(results.getValue(GameResult.WIN), next.name)
+            // Всегда побеждает тот, кто ожидает ответа
+            val prev = gameSession.prevUser
+            updWinsForNetMode(prev)
+            return String.format(results.getValue(GameResult.WIN), prev.name)
         } else {
 
             if (gameSession.users.all { it.score == gameSession.users.first().score }) {
@@ -217,6 +237,7 @@ class ScoreManager @Inject constructor(
             }
 
             val winner = gameSession.users.maxBy { it.score }!!
+
             updWinsForNetMode(winner)
 
             return String.format(results.getValue(GameResult.WIN), winner.name)
@@ -225,7 +246,7 @@ class ScoreManager @Inject constructor(
 
     private fun updWinsForNetMode(winner: User) {
         if (gameSession.gameMode == GameMode.MODE_NET) {
-            if (getPlayer() == winner)
+            if (gameSession.requirePlayer() == winner)
                 groupOnline.findField(F_WINS).increase()
             else
                 groupOnline.findField(F_LOSE).increase()
@@ -233,9 +254,6 @@ class ScoreManager @Inject constructor(
         saveStats()
     }
 
-    private fun currentIsPlayer() = gameSession.currentUser is Player
+    private fun isCurrentIsPlayer() = gameSession.currentUser is Player
 
-    private fun getPlayer(): User {
-        return gameSession.users.first { it is Player }
-    }
 }

@@ -14,8 +14,7 @@ import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameFacade
 import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.aleshi.letsplaycities.base.game.SurrenderException
-import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
+import ru.quandastudio.lpsclient.model.*
 
 /**
  * Test for [Android]
@@ -45,7 +44,7 @@ class AndroidTest {
         }.`when`(gameFacade).getRandomWord(any())
 
         android = Android(
-            PlayerData.SimpleFactory().create("android", VersionInfo("0", 0)),
+            PlayerData(AuthData("android", AuthType.Native, Credentials()), VersionInfo("0", 0)),
             pictureSource
         ).apply {
             init(ComboSystem.DefaultSystemView, gameFacade)

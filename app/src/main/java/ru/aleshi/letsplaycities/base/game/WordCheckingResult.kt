@@ -12,6 +12,11 @@ sealed class WordCheckingResult {
     class AlreadyUsed(val word: String) : WordCheckingResult()
 
     /**
+     * Used when input word starts with different letter then [validLetter].
+     */
+    class WrongLetter(val validLetter: Char) : WordCheckingResult()
+
+    /**
      * Used when input city is an exclusion and can't be applied.
      */
     class Exclusion(val description: String) : WordCheckingResult()

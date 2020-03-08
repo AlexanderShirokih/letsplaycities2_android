@@ -80,11 +80,28 @@ class Player(
         val input = StringUtils.formatCity(userInput)
         return Observable.just(input)
             .filter { it.isNotEmpty() }
-            .filter { mFirstChar == Char.MIN_VALUE || it[0] == mFirstChar }
-            .flatMap { checkForExclusions(input, game).switchIfEmpty(checkInDatabase(input, game)) }
+            .flatMap {
+                checkFirstLetterMatches(input).switchIfEmpty(
+                    checkForExclusions(input, game).switchIfEmpty(
+                        checkInDatabase(
+                            input,
+                            game
+                        )
+                    )
+                )
+            }
             .flatMap { checkForCorrections(it, game) }
             .doOnNext { userInputSubject.onNext(it) }
     }
+
+    /**
+     * Checks that [userInput] starts with [mFirstChar]
+     */
+    private fun checkFirstLetterMatches(userInput: String): Observable<WordCheckingResult> =
+        if (mFirstChar == Char.MIN_VALUE || mFirstChar == userInput[0])
+            Observable.empty()
+        else
+            Observable.just(WordCheckingResult.WrongLetter(mFirstChar))
 
     /**
      * Checks current [word] for exclusions.
