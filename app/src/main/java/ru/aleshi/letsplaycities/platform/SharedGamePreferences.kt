@@ -76,7 +76,9 @@ class SharedGamePreferences @Inject constructor(val prefs: SharedPreferences) : 
      * @param key parameter key
      */
     override fun getBase64(key: String): String? =
-        prefs.getString(key, null)?.run { String(Base64.decode(this, Base64.DEFAULT)) }
+        prefs.getString(key, null)?.run {
+            String(Base64.decode(this, Base64.DEFAULT))
+        }
 
     /**
      * Encodes string to Base64 and store it to preferences.
@@ -84,7 +86,7 @@ class SharedGamePreferences @Inject constructor(val prefs: SharedPreferences) : 
      * @param value to be encoded and saved to prefs
      */
     override fun putBase64(key: String, value: String) =
-        putString(key, Base64.encodeToString(key.toByteArray(), Base64.DEFAULT))
+        putString(key, Base64.encodeToString(value.toByteArray(), Base64.DEFAULT))
 
     /**
      * Opens editor for putting parameters in a single batch
