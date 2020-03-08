@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base.game
 
+import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -7,12 +8,17 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryService
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryServiceImpl
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
 import ru.aleshi.letsplaycities.base.dictionary.ExclusionsService
+import ru.aleshi.letsplaycities.base.player.UserIdentity
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
+import ru.aleshi.letsplaycities.base.server.ResultWithMessage
+import ru.aleshi.letsplaycities.ui.game.CityStatus
 import ru.aleshi.letsplaycities.utils.StringUtils
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -63,6 +69,7 @@ class GamePresenter @Inject constructor(
      */
     private var gameTimerDisposable: Disposable? = null
 
+    private val disconnectionSubject = PublishSubject.create<FinishEvent>()
 
     /**
      * Used to start the game. Initializes all data. After all updates view to GameState.Started
@@ -82,28 +89,21 @@ class GamePresenter @Inject constructor(
                 .doOnSuccess { _dictionary = it; it.difficulty = prefs.getDifficulty().toByte() }
                 .flatMap { exclusions }
                 .doOnSuccess { _exclusions = it }
-                .subscribe({
+                .doOnSuccess {
                     viewModel.updateState(GameState.Started)
-                    initPlayers()
+                    session.start(comboSystemView, GameFacade(_dictionary, _exclusions, prefs))
+                    updateUserViewAndResetTimer(true)
+                }
+                .flatMapObservable { makeMoves().mergeWith(disconnectionSubject) }
+                .firstElement()
+                .doFinally(::dispose)
+                .subscribe({
+                    Log.d("TAG", "Finish with reason: $it")
+                    viewModel.updateState(GameState.Finish(it))
                 }, { err ->
                     err.printStackTrace()
                     viewModel.updateState(GameState.Error(err))
                 })
-    }
-
-    /**
-     * Called internally on start to init all users
-     */
-    private fun initPlayers() {
-        disposable += session.start(
-            comboSystemView,
-            _dictionary,
-            _exclusions,
-            prefs,
-            viewModel::putGameEntity,
-            ::onError
-        )
-        switchUser()
     }
 
     /**
@@ -112,7 +112,22 @@ class GamePresenter @Inject constructor(
      * not yet defined or can't make move.
      */
     override fun onUserInput(input: String): Observable<WordCheckingResult> =
-        session.onUserInput(input)
+        session.sendPlayersInput(input)
+
+    override fun onMessage(message: String): Completable =
+        session.sendPlayersMessage(message)
+
+    override fun onSurrender() {
+        disconnectionSubject.onNext(
+            FinishEvent(
+                session.requirePlayer(),
+                FinishEvent.Reason.Surrender
+            )
+        )
+        disconnectionSubject.onComplete()
+    }
+
+    override fun onPlayerHint(): Completable = session.useHintForPlayer()
 
     /**
      * Sends friend request to [userId] over game server.
@@ -126,14 +141,6 @@ class GamePresenter @Inject constructor(
      * @param userId id of user that we want to ban
      */
     override fun banUser(userId: Int): Completable = session.server.banUser(userId)
-
-    /**
-     * Error handling function. Disposes all subscribes and shows error on UI.
-     */
-    private fun onError(t: Throwable) {
-        dispose()
-        viewModel.updateState(GameState.Error(t))
-    }
 
     /**
      * Call [DictionaryUpdater.checkForUpdates] to fetch updates from server.
@@ -158,18 +165,61 @@ class GamePresenter @Inject constructor(
      * Used to switch from current user to next. If current user wasn't set before,
      * it will set to first user
      */
-    private fun switchUser() {
-        viewModel.switchUser(session.currentUser, session.nextUser)
-        session.switchUsers()
+    private fun updateUserViewAndResetTimer(newGame: Boolean = false) {
+        viewModel.switchUser(if (newGame) null else session.prevUser, session.currentUser)
         resetTimer()
-        doMove()
     }
 
     /**
      * Called to begin start turn for current user.
      */
-    private fun doMove() {
-        disposable += session.beginMove(viewModel::putGameEntity).subscribe()
+    private fun makeMoves(): Observable<FinishEvent> {
+        return session.makeMoveForCurrentUser()
+            .doOnNext {
+                if (it.isSuccessful()) {
+                    _dictionary.markUsed(it.city)
+                    updateUserViewAndResetTimer()
+                }
+            }
+            .map(::translateWordsResult)
+            .mergeWith(session.getIncomingMessages().map(::translateMessageResult))
+            .doOnNext(viewModel::putGameEntity)
+            .takeUntil { it is GameEntity.CityInfo && it.status == CityStatus.OK }
+            .repeat()
+            .ignoreElements()
+            .andThen(Observable.empty<FinishEvent>())
+            .onErrorResumeNext { t: Throwable ->
+                if (t is SurrenderException)
+                    Observable.just(
+                        if (t.byDisconnection) FinishEvent(
+                            t.target,
+                            FinishEvent.Reason.Disconnected
+                        )
+                        else FinishEvent(t.target, FinishEvent.Reason.Surrender)
+                    )
+                else Observable.error(t)
+            }
+    }
+
+    /**
+     * Translates word result to [GameEntity.CityInfo]
+     * @param result input result
+     * @return newly created [GameEntity] from [result]
+     */
+    private fun translateWordsResult(result: ResultWithCity): GameEntity {
+        val identityProvider = fun(identity: UserIdentity) =
+            session.findUserByIdentity(identity)?.position ?: Position.UNKNOWN
+        return GameEntity.CityInfo(result, _dictionary::getCountryCode, identityProvider)
+    }
+
+    /**
+     * Translates message to [GameEntity.MessageInfo]
+     * @param result input result
+     * @return newly created [GameEntity] from [result]
+     */
+    private fun translateMessageResult(result: ResultWithMessage): GameEntity {
+        return GameEntity.MessageInfo(result, fun(identity: UserIdentity) =
+            session.findUserByIdentity(identity)?.position ?: Position.UNKNOWN)
     }
 
     /**
@@ -178,19 +228,21 @@ class GamePresenter @Inject constructor(
      * Called when game starts and every time before move begins.
      */
     private fun resetTimer() {
-        val timeLimit = session.server.getTimeLimit()
-        if (timeLimit > 0) {
-            gameTimerDisposable?.apply { dispose(); disposable.delete(this) }
-            gameTimerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
-                .take(timeLimit + 1)
-                .subscribe({ time ->
-                    viewModel.updateTime(StringUtils.timeFormat(TimeUnit.SECONDS.toMillis(timeLimit - time)))
-                }, {
-                    //Errors should never happen in this place
-                }, {
-                    viewModel.updateState(GameState.Finish(FinishReason.TimeOut))
-                }).apply { addTo(disposable) }
-        }
+        gameTimerDisposable?.apply { dispose(); disposable.delete(this) }
+        gameTimerDisposable = session.server.getTimer()
+            .subscribe({ time ->
+                viewModel.updateTime(StringUtils.timeFormat(TimeUnit.SECONDS.toMillis(time)))
+            }, {
+                //Errors should never happen in this place
+            }, {
+                disconnectionSubject.onNext(
+                    FinishEvent(
+                        session.currentUser,
+                        FinishEvent.Reason.TimeOut
+                    )
+                )
+                disconnectionSubject.onComplete()
+            }).apply { addTo(disposable) }
     }
 
 }

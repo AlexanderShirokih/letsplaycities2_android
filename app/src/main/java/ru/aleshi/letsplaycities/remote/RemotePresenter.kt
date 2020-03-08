@@ -5,8 +5,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
+import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.base.player.RemoteUser
 import ru.quandastudio.lpsclient.model.PlayerData
 import javax.inject.Inject
 
@@ -49,8 +49,8 @@ class RemotePresenter @Inject constructor(
 
     private fun play(playerData: PlayerData, oppData: PlayerData) {
         val users = arrayOf(
-            Player(playerData, picasso),
-            RemoteUser(oppData, picasso)
+            Player(remoteServer, playerData, picasso),
+            NetworkUser(remoteServer, oppData, picasso)
         )
 
         view.onStartGame(GameSession(users, remoteServer, GameMode.MODE_MUL))

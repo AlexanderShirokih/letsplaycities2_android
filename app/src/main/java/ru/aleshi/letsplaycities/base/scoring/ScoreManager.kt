@@ -74,7 +74,7 @@ class ScoreManager @Inject constructor(
         groupMostBigCities = allGroups.getGroupAt(G_BIG_CITIES)
     }
 
-    fun saveStats() {
+    private fun saveStats() {
         prefs.putScoring(allGroups.storeStatsGroups())
     }
 
@@ -106,7 +106,7 @@ class ScoreManager @Inject constructor(
             ScoringType.LAST_MOVE -> 0
         }
 
-        gameSession.currentUser?.increaseScore(points)
+        gameSession.currentUser.increaseScore(points)
 
         saveStats()
 
@@ -114,7 +114,7 @@ class ScoreManager @Inject constructor(
     }
 
     private fun checkCombos(deltaTime: Long, word: String) {
-        val current = gameSession.currentUser!!
+        val current = gameSession.currentUser
 
         Completable.fromAction {
             current.comboSystem.addCity(
@@ -190,13 +190,13 @@ class ScoreManager @Inject constructor(
                 return String.format(
                     results.getValue(GameResult.TIME_UP),
                     next.name,
-                    gameSession.currentUser!!.name
+                    gameSession.currentUser.name
                 )
             }
             return String.format(
                 results.getValue(GameResult.TIME_UP),
                 next.name,
-                StringUtils.formatName(gameSession.currentUser!!.name)
+                StringUtils.formatName(gameSession.currentUser.name)
             )
         }
 

@@ -1,20 +1,23 @@
 package ru.aleshi.letsplaycities.base.player
 
 import com.squareup.picasso.Picasso
-import io.reactivex.Maybe
+import io.reactivex.Observable
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.server.BaseServer
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.aleshi.letsplaycities.utils.Utils
 import ru.quandastudio.lpsclient.model.PlayerData
 
 /**
- * Represents logic of remote network player. This is a remote bridge,
+ * Represents logic of network player. This is a remote bridge,
  * and on the other side it represented by [Player].
+ * @param server [BaseServer] network server instance
  * @param playerData [PlayerData] model class that contains info about user
  * @param picasso Picasso instance
  */
-class NetworkUser(playerData: PlayerData, picasso: Picasso) : User(
+class NetworkUser(private val server: BaseServer, playerData: PlayerData, picasso: Picasso) : User(
     playerData,
     PictureSource(
         picasso,
@@ -27,7 +30,7 @@ class NetworkUser(playerData: PlayerData, picasso: Picasso) : User(
 
     override fun onInit(comboSystemView: ComboSystemView): ComboSystem = ComboSystem(true)
 
-    // Word broadcasts by NetworkServer
-    override fun onMakeMove(firstChar: Char): Maybe<String> = Maybe.empty()
+    override fun onMakeMove(firstChar: Char): Observable<ResultWithCity> =
+        server.getIncomingWords().filter { it.identity.isTheSameUser(this) }
 
 }

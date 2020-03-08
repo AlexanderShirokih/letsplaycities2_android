@@ -73,4 +73,9 @@ class GameEntityWrapper(
             }
         }
     }
+
+    /**
+     * Returns a string representation of the object.
+     */
+    override fun toString() = gameEntity.toString()
 }

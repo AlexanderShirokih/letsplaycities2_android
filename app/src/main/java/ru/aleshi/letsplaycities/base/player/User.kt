@@ -1,10 +1,12 @@
 package ru.aleshi.letsplaycities.base.player
 
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
-import ru.aleshi.letsplaycities.base.game.*
+import ru.aleshi.letsplaycities.base.game.GameFacade
+import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.game.Position
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.quandastudio.lpsclient.model.PlayerData
 
 /**
@@ -84,17 +86,10 @@ abstract class User(
      * Called by system when users turn begins
      * @param firstChar first letter of that the city should begin.
      * Will be [Char.MIN_VALUE] if it's should be the first word in game.
-     * @return [Maybe] with word response or [Maybe.empty] if [User] can't give response.
+     * @return [Observable] with word response [ResultWithCity]. To finish move, [User]
+     * should emit `onComplete` event
      */
-    internal abstract fun onMakeMove(firstChar: Char): Maybe<String>
-
-    /**
-     * Called by system when user enters an input.
-     * Subclasses should override this method to receive keyboard events from user.
-     * @return [Maybe.empty] when user can't handle input. [Maybe] with [WordCheckingResult] when
-     * user handles the input.
-     */
-    open fun onUserInput(userInput: String): Observable<WordCheckingResult> = Observable.empty()
+    internal abstract fun onMakeMove(firstChar: Char): Observable<ResultWithCity>
 
     /**
      * Called by system to increase score points.

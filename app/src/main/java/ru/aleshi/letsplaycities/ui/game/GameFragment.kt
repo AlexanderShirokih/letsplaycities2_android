@@ -24,26 +24,24 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_game.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
-import ru.aleshi.letsplaycities.base.game.*
+import ru.aleshi.letsplaycities.base.game.GameViewModel
+import ru.aleshi.letsplaycities.base.game.WordCheckingResult
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
-import ru.aleshi.letsplaycities.network.NetworkUtils.showErrorSnackbar
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
+import ru.aleshi.letsplaycities.ui.game.listadapter.GameAdapter
 import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
 import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class GameFragment : Fragment() {
 
     private lateinit var gameViewModel: GameViewModel
     private lateinit var correctionViewModel: CorrectionViewModel
-    private lateinit var mAdapter: GameAdapter
+    private lateinit var adapter: GameAdapter
     private lateinit var adManager: AdManager
 
     @Inject
@@ -54,16 +52,14 @@ class GameFragment : Fragment() {
     lateinit var gameStateNotifier: GameStateNotifier
 
     private var clickSound: MediaPlayer? = null
-    private val screenReceiver = ScreenReceiver {
-        //        mGameSession?.onSurrender()
-    }
+    private val screenReceiver = ScreenReceiver { gameViewModel.onPlayerSurrender() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         val activity = requireActivity()
 
-        mAdapter = GameAdapter(activity)
+        adapter = GameAdapter(activity)
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
         }
@@ -94,7 +90,7 @@ class GameFragment : Fragment() {
                         R.id.mainMenuFragment,
                         false
                     )
-//                    it.checkWithResultCode(SURRENDER) -> mGameSession?.onSurrender()
+                    it.checkWithResultCode(SURRENDER) -> gameViewModel.onPlayerSurrender()
                     it.checkWithResultCode(USE_HINT) -> adManager.showAd()
 //                    it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession?.onFriendRequestResult(it.result
 //                    )?.subscribe({}, { err -> showErrorSnackbar(err, this) })
@@ -105,9 +101,8 @@ class GameFragment : Fragment() {
         }
 
         gameViewModel.apply {
-            state.observe(this@GameFragment) { state: GameState ->
-                gameStateNotifier.showState(state)
-            }
+            cities.observe(this@GameFragment, adapter::updateEntities)
+            state.observe(this@GameFragment, gameStateNotifier::showState)
             wordState.observe(this@GameFragment, ::handleWordResult)
             correctionViewModel.setCorrectionsList(wordState, ::processCityInput)
         }
@@ -131,7 +126,9 @@ class GameFragment : Fragment() {
         setupCityListeners(activity)
         setupMessageListeners()
 
-        adManager = AdManager(adView, activity)
+        adManager = AdManager(adView, activity) {
+            gameViewModel.useHintForPlayer()
+        }
         adManager.setupAds()
 
         btnMenu.setOnClickListener { showGoToMenuDialog() }
@@ -142,7 +139,7 @@ class GameFragment : Fragment() {
 //        avatarRight.setOnClickListener { mGameSession?.needsShowMenu(Position.RIGHT) }
 
         recyclerView.apply {
-            adapter = mAdapter
+            adapter = this@GameFragment.adapter
             layoutManager = LinearLayoutManager(activity).apply { stackFromEnd = true }
             addOnLayoutChangeListener { _, _, _,
                                         _, bottom, _, _, _, oldBottom ->
@@ -215,7 +212,10 @@ class GameFragment : Fragment() {
     private fun submitMessage() {
         val message = messageInput.text!!.toString()
         if (message.isNotBlank()) {
-            gameViewModel.processMessage(message)
+            gameViewModel.processMessage(message) {
+                clickSound?.start()
+                scrollRecyclerView()
+            }
             messageInput.text = null
             setMessagingLayout(false)
         }
@@ -238,12 +238,19 @@ class GameFragment : Fragment() {
                     toTitleCase(wordResult.word)
                 )
             )
-            is WordCheckingResult.Accepted -> cityInput.text = null
+            is WordCheckingResult.Accepted -> {
+                cityInput.text = null
+                clickSound?.start()
+                hideKeyboard()
+                recyclerView.postDelayed({
+                    scrollRecyclerView()
+                }, 200)
+            }
         }
     }
 
     private fun scrollRecyclerView() {
-        recyclerView?.scrollToPosition(mAdapter.itemCount - 1)
+        recyclerView?.scrollToPosition(adapter.itemCount - 1)
     }
 
     fun showFriendRequestDialog(name: String) {
@@ -302,47 +309,6 @@ class GameFragment : Fragment() {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
-    fun showUserMenu(isFriend: Boolean, name: String, userId: Int) {
-        findNavController().navigate(
-            GameFragmentDirections.showUserContextDialog(
-                isFriend,
-                name,
-                userId
-            )
-        )
-    }
-
-    fun showError(err: Throwable) {
-        showErrorSnackbar(err, this)
-    }
-
-    fun putMessage(message: String, position: Position) {
-        clickSound?.start()
-        mAdapter.addMessage(message, position)
-        scrollRecyclerView()
-    }
-
-    fun putCity(city: String, countryCode: Short, position: Position) {
-        clickSound?.start()
-        mAdapter.addCity(city, countryCode, position)
-        Completable.fromAction { hideKeyboard() }
-            .andThen(Completable.timer(200, TimeUnit.MILLISECONDS))
-            .observeOn(AndroidSchedulers.mainThread())
-            .andThen(Completable.fromAction { scrollRecyclerView() })
-            .subscribe()
-    }
-
-    fun updateCity(city: String, hasErrors: Boolean) {
-        mAdapter.updateCity(
-            GameEntity.CityInfo(
-                city = city,
-                status = if (hasErrors) CityStatus.ERROR else CityStatus.OK,
-                position = Position.UNKNOWN,
-                countryCode = 0
-            )
-        )
-    }
-
     private fun setMessagingLayout(isMessagingMode: Boolean) {
         TransitionManager.beginDelayedTransition(root)
         messageInputLayout.visibility = if (isMessagingMode) {
@@ -353,6 +319,16 @@ class GameFragment : Fragment() {
             cityInput.requestFocus()
             View.VISIBLE
         }
+    }
+
+    fun showUserMenu(isFriend: Boolean, name: String, userId: Int) {
+        findNavController().navigate(
+            GameFragmentDirections.showUserContextDialog(
+                isFriend,
+                name,
+                userId
+            )
+        )
     }
 
     companion object {

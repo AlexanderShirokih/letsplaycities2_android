@@ -42,6 +42,7 @@ interface GameContract {
          * Call to dispose all resources
          */
         fun dispose()
+
     }
 
     /**
@@ -63,6 +64,16 @@ interface GameContract {
         fun onUserInput(input: String): Observable<WordCheckingResult>
 
         /**
+         * Call to send user's message to server.
+         */
+        fun onMessage(message: String): Completable
+
+        /**
+         * Call when player wants to surrender
+         */
+        fun onSurrender()
+
+        /**
          * Sends friend request to [userId] over game server.
          * @param userId id of user that we want to add to friends
          */
@@ -78,6 +89,11 @@ interface GameContract {
          * Call to dispose resources.
          */
         fun dispose()
+
+        /**
+         * Starts searching hint for player.
+         */
+        fun onPlayerHint(): Completable
 
     }
 

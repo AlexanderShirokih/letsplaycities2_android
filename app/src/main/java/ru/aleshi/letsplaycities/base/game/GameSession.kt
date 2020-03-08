@@ -2,19 +2,16 @@ package ru.aleshi.letsplaycities.base.game
 
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import ru.aleshi.letsplaycities.base.GamePreferences
+import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
-import ru.aleshi.letsplaycities.base.dictionary.DictionaryService
-import ru.aleshi.letsplaycities.base.dictionary.ExclusionsService
-import ru.aleshi.letsplaycities.base.player.*
+import ru.aleshi.letsplaycities.base.player.Player
+import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.base.player.UserIdIdentity
+import ru.aleshi.letsplaycities.base.player.UserIdentity
 import ru.aleshi.letsplaycities.base.server.BaseServer
 import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.aleshi.letsplaycities.base.server.ResultWithMessage
-import ru.aleshi.letsplaycities.ui.game.CityStatus
 import ru.aleshi.letsplaycities.utils.StringUtils
-import ru.quandastudio.lpsclient.model.WordResult
 
 class GameSession(
     val users: Array<User>,
@@ -41,20 +38,15 @@ class GameSession(
         get() = (_currentUserIndex + 1) % users.size
 
     /**
-     * Last accepted word
-     */
-    private var lastWord: String = ""
-
-    /**
      * Keeps index of current user
      */
-    private var _currentUserIndex = -1
+    private var _currentUserIndex = 0
 
     /**
      * Returns current [User] or `null` if current user not defined yet.
      */
-    val currentUser: User?
-        get() = if (_currentUserIndex == -1) null else users[_currentUserIndex]
+    val currentUser: User
+        get() = users[_currentUserIndex]
 
     /**
      * Returns the next [User] in queue
@@ -63,158 +55,87 @@ class GameSession(
         get() = users[nextIndex]
 
     /**
-     * Call to switch current [User] to next.
+     * Returns previous [User] in queue
      */
-    fun switchUsers() {
-        _currentUserIndex = nextIndex
-    }
+    val prevUser: User
+        get() = users[(_currentUserIndex + 1) % users.size]
+
+    /**
+     * Last accepted word
+     */
+    private var lastWord: String = ""
+
+    /**
+     * Used to redirect player's messages to [getIncomingMessages].
+     */
+    private val playerMessageSubject = PublishSubject.create<ResultWithMessage>()
 
     /**
      * Should be called on start to init all [User]s.
      * @param comboSystemView single [ComboSystemView] for [Player]
-     * @param dictionary loaded [DictionaryService]
-     * @param exclusions loaded [ExclusionsService]
-     * @param prefs game preferences instance
+     * @param game [GameFacade]
      */
-    fun start(
-        comboSystemView: ComboSystemView,
-        dictionary: DictionaryService,
-        exclusions: ExclusionsService,
-        prefs: GamePreferences,
-        gameEntitySupplier: (gameEntity: GameEntity) -> Unit,
-        errorHandler: (t: Throwable) -> Unit
-    ): Disposable {
-        this.game = GameFacade(dictionary, exclusions, prefs)
-        users.forEach { user ->
-            user.init(comboSystemView, game)
-        }
-        return subscribeOnServerEvents(gameEntitySupplier, errorHandler)
+    fun start(comboSystemView: ComboSystemView, game: GameFacade) {
+        this.game = game
+        users.forEach { user -> user.init(comboSystemView, game) }
     }
 
     /**
      * Call to start game turn for current user.
      */
-    fun beginMove(gameEntitySupplier: (gameEntity: GameEntity) -> Unit): Completable {
-        return currentUser!!.onMakeMove(StringUtils.findLastSuitableChar(lastWord))
-            .map {
-                GameEntity.CityInfo(
-                    city = it,
-                    position = getUserPosition(currentUser!!),
-                    status = CityStatus.WAITING
-                )
+    fun makeMoveForCurrentUser(): Observable<ResultWithCity> =
+        Observable.just(0L)
+            .flatMap { currentUser.onMakeMove(StringUtils.findLastSuitableChar(lastWord)) }
+            .doOnNext {
+                if (it.isSuccessful()) {
+                    lastWord = it.city
+                    _currentUserIndex = nextIndex
+                }
             }
-            .doOnSuccess(gameEntitySupplier)
-            .onErrorComplete()
-            .flatMapCompletable { cityInfo -> server.sendCity(cityInfo.city, currentUser!!) }
-    }
+            .mergeWith(server.getDisconnections().map {
+                it.takeIf { msg -> msg.ownerId == 0 }
+                    ?: it.copy(ownerId = requirePlayer().credentials.userId)
+            }
+                .flatMap {
+                    findUserByIdentity(UserIdIdentity(it.ownerId))?.run {
+                        Observable.error<ResultWithCity>(
+                            SurrenderException(this, !it.leaved)
+                        )
+                    } ?: Observable.never()
+                })
 
     /**
-     * Propagates user input to current user.
-     * @return [Observable] that emits [WordCheckingResult] or [Observable.empty] if current user
-     * not yet defined or can't make move.
+     * Called by system when user enters an input.
+     * Subclasses should override this method to receive keyboard events from user.
+     * @return [Observable.empty] when user can't handle input. [Observable] with [WordCheckingResult] when
+     * user handles the input.
      */
-    fun onUserInput(input: String): Observable<WordCheckingResult> =
-        currentUser?.run { onUserInput(input) } ?: Observable.empty()
+    fun sendPlayersInput(userInput: String): Observable<WordCheckingResult> =
+        if (currentUser is Player) (currentUser as Player).onUserInput(userInput)
+        else Observable.empty()
 
     /**
-     * Returns [Position] of [user]
-     * @return position of [user]
+     * Called by system when user enters input message.
      */
-    private fun getUserPosition(user: User): Position = Position.values()[users.indexOf(user)]
-
-    //NEW CODE
-
-
-    /**
-     * Subscribes on all server events.
-     * @param gameEntitySupplier callback to consume [GameEntity] (for city and messages).
-     * @return disposable which holds all subscribed events.
-     */
-    //TODO: Add estimated events
-    private fun subscribeOnServerEvents(
-        gameEntitySupplier: (gameEntity: GameEntity) -> Unit,
-        errorHandler: (t: Throwable) -> Unit
-    ): Disposable {
-        val disposable = CompositeDisposable()
-        disposable.addAll(
-            server.getWordsResult()
-                .map(::translateWordsResult)
-                .subscribe({ res -> gameEntitySupplier(res) }, { errorHandler(it) })
-            ,
-            server.getIncomingMessages()
-                .map(::translateMessages)
-                .subscribe({ msgs -> gameEntitySupplier(msgs) }, { errorHandler(it) })
-            /*,
-            server.leave.subscribe({ leaved ->
-                if (leaved) showToastAndDisconnect(R.string.player_leaved, false)
-                else showToastAndDisconnect(R.string.opp_disconnect, false)
-            }, view::showError, {
-                showToastAndDisconnect(R.string.lost_connection, false)
-            })
-            ,
-            server.timeout.subscribe({
-                showToastAndDisconnect(R.string.time_out, true)
-            }, view::showError) */
-        )
-        return disposable
-    }
-
-    /**
-     * Translates word result to [GameEntity.CityInfo]
-     * @param result input result
-     * @return newly created [GameEntity] from [result]
-     */
-    private fun translateWordsResult(result: ResultWithCity): GameEntity {
-        return when (result.wordResult) {
-            WordResult.ACCEPTED, WordResult.RECEIVED -> createCityResult(
-                result.city,
-                result.identity,
-                true
-            )
-            else -> createCityResult(result.city, result.identity, false)
+    fun sendPlayersMessage(message: String): Completable = requirePlayer().run {
+        server.sendMessage(message, this).doOnComplete {
+            playerMessageSubject.onNext(ResultWithMessage(message, UserIdIdentity(this)))
         }
     }
-
-    /**
-     * Creates [GameEntity.CityInfo] from [city]. also fetches country code and user position
-     * for [currentUser].
-     * @param city input city
-     * @param isSuccess if `true` [CityStatus] will be [CityStatus.OK] or [CityStatus.ERROR] otherwise
-     * @return new [GameEntity.CityInfo]
-     */
-    private fun createCityResult(city: String, identity: UserIdentity, isSuccess: Boolean) =
-        GameEntity.CityInfo(
-            city = city,
-            status = if (isSuccess) CityStatus.OK else CityStatus.ERROR,
-            countryCode = game.getCountryCode(city),
-            position = findUserByIdentity(identity)?.position ?: Position.UNKNOWN
-        )
-
-    /**
-     * Converts [ResultWithMessage] to [GameEntity.MessageInfo].
-     */
-    private fun translateMessages(message: ResultWithMessage): GameEntity =
-        GameEntity.MessageInfo(
-            message = message.message,
-            position = findUserByIdentity(message.identity)?.position ?: Position.UNKNOWN
-        )
 
     /**
      * Finds associated user by its [userIdentity].
      * @param userIdentity wanted identity
      * @return [User] associated with [userIdentity] or `null` when its not found.
      */
-    private fun findUserByIdentity(userIdentity: UserIdentity): User? =
+    fun findUserByIdentity(userIdentity: UserIdentity): User? =
         users.firstOrNull { userIdentity.isTheSameUser(it) }
-
 
     /**
      * Checks whether current game mode local or not
      * @return `true` if current game mode is PVA or PVP, `false` otherwise.
      */
-    fun isLocal(): Boolean {
-        return gameMode == GameMode.MODE_PVA || gameMode == GameMode.MODE_PVP
-    }
+    fun isLocal() = gameMode == GameMode.MODE_PVA || gameMode == GameMode.MODE_PVP
 
     /**
      * Returns `true` if all users in this game allows sending messages
@@ -222,7 +143,25 @@ class GameSession(
      */
     fun isMessagesAllowed(): Boolean = !isLocal() && users.all { it.isMessagesAllowed }
 
+    fun getIncomingMessages(): Observable<ResultWithMessage> =
+        server.getIncomingMessages().filter { isMessagesAllowed() }.mergeWith(playerMessageSubject)
+
+    fun requirePlayer() = users.first { it is Player } as Player
+
+    /**
+     * Emits random word from player only if it current player now
+     */
+    fun useHintForPlayer(): Completable =
+        requirePlayer().takeIf { it == currentUser }?.useHint(game) ?: Completable.complete()
+
 /*
+            server.leave.subscribe({ leaved ->
+                if (leaved) showToastAndDisconnect(R.string.player_leaved, false)
+                else showToastAndDisconnect(R.string.opp_disconnect, false)
+            }, view::showError, {
+                showToastAndDisconnect(R.string.lost_connection, false)
+            })
+
     private fun beginNextMove(city: String) {
         scoreManager.moveStarted()
     }
@@ -236,18 +175,6 @@ class GameSession(
         server.dispose()
         scoreManager.updateScore()
     }
-
-    fun useHint() {
-        currentUser?.let {
-            disposable.add(mDictionary!!.getRandomWord(mFirstChar ?: "абвгдеклмн".random(), true)
-                .delay(300, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    getCurrentAsPlayer()?.run { onUserInput(it) {} }
-                })
-        }
-    }
-
 
     private fun finishGame(timeIsUp: Boolean, remote: Boolean) {
         dispose()

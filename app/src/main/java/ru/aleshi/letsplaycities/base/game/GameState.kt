@@ -40,7 +40,7 @@ sealed class GameState {
 
     /**
      * Applies when games finishes by any reason.
-     * @param reason reason why game hash finished.
+     * @param event reason why game hash finished.
      */
-    class Finish(val reason: FinishReason) : GameState()
+    class Finish(val event: FinishEvent) : GameState()
 }

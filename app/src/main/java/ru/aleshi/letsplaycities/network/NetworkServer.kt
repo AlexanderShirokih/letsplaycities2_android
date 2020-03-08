@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.network
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.base.player.UserIdIdentity
 import ru.aleshi.letsplaycities.base.server.BaseServer
@@ -13,9 +14,12 @@ import ru.quandastudio.lpsclient.core.LPSMessage
 import javax.inject.Inject
 
 class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) :
-    BaseServer() {
+    BaseServer(timeLimit = 92L) {
 
-    override fun getWordsResult(): Observable<ResultWithCity> {
+    override fun getDisconnections(): Observable<LPSMessage.LPSLeaveMessage> =
+        mNetworkRepository.getLeave().toObservable()
+
+    override fun getIncomingWords(): Observable<ResultWithCity> {
         return mNetworkRepository.getWords().map {
             ResultWithCity(
                 wordResult = it.result,
@@ -35,25 +39,24 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
             }
     }
 
-    companion object {
-        private const val NETWORK_TIMER = 92L
-    }
-
     override fun dispose() {
         mNetworkRepository.disconnect()
     }
 
-    override fun sendCity(city: String, sender: User): Completable =
-        mNetworkRepository.sendWord(city)
+    override fun sendCity(city: String, sender: User): Observable<ResultWithCity> {
+        return Observable.zip(
+            mNetworkRepository.sendWord(city)
+                .andThen(Observable.just(Unit)),
+            getIncomingWords().filter { it.identity.isTheSameUser(sender) },
+            BiFunction { _: Unit, word: ResultWithCity -> word }
+        )
+    }
 
-    override fun getTimeLimit(): Long = NETWORK_TIMER
+    override fun getTimer(): Observable<Long> =
+        super.getTimer().takeUntil(mNetworkRepository.getTimeout().toObservable())
 
     override fun sendMessage(message: String, sender: User): Completable =
         mNetworkRepository.sendMessage(message)
-
-    override val leave: Maybe<Boolean> = mNetworkRepository.getLeave().map { it.leaved }
-
-    override val timeout: Maybe<LPSMessage> = mNetworkRepository.getTimeout()
 
     override val friendsRequest: Observable<LPSMessage.FriendRequest> =
         mNetworkRepository.getFriendsRequest()
@@ -69,7 +72,6 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
 
     override fun banUser(userId: Int): Completable =
         mNetworkRepository.banUser(userId)
-
 
     override val kick: Maybe<Boolean> = mNetworkRepository.getKick().map { it.isBannedBySystem }
 }

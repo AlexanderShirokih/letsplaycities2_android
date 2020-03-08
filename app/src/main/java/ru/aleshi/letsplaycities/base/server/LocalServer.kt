@@ -13,7 +13,8 @@ import javax.inject.Inject
  * Implementation of [BaseServer] for local games.
  * @param gamePreferences [GamePreferences] instance for getting time limit
  */
-class LocalServer @Inject constructor(private val gamePreferences: GamePreferences) : BaseServer() {
+class LocalServer @Inject constructor(gamePreferences: GamePreferences) :
+    BaseServer(gamePreferences.getTimeLimit()) {
 
     /**
      * Used to redirect input words to output.
@@ -28,7 +29,7 @@ class LocalServer @Inject constructor(private val gamePreferences: GamePreferenc
     /**
      * Returns words emitted by all users
      */
-    override fun getWordsResult(): Observable<ResultWithCity> = cities
+    override fun getIncomingWords(): Observable<ResultWithCity> = cities
 
     /**
      * Returns messages written by all users
@@ -40,17 +41,15 @@ class LocalServer @Inject constructor(private val gamePreferences: GamePreferenc
      * @param city input city
      * @param sender city sender
      */
-    override fun sendCity(city: String, sender: User): Completable {
+    override fun sendCity(city: String, sender: User): Observable<ResultWithCity> {
         // We trust our local users
-        return Completable.fromAction {
-            cities.onNext(
-                ResultWithCity(
-                    wordResult = WordResult.ACCEPTED,
-                    city = city,
-                    identity = UserIdIdentity(sender.credentials.userId)
-                )
+        return Observable.just(
+            ResultWithCity(
+                wordResult = WordResult.ACCEPTED,
+                city = city,
+                identity = UserIdIdentity(sender.credentials.userId)
             )
-        }
+        )
     }
 
     /**
@@ -68,11 +67,5 @@ class LocalServer @Inject constructor(private val gamePreferences: GamePreferenc
             )
         }
     }
-
-    /**
-     * Returns time limit per move in seconds
-     * @return the time limit
-     */
-    override fun getTimeLimit(): Long = gamePreferences.getTimeLimit()
 
 }

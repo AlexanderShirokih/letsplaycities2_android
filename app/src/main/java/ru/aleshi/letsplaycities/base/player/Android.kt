@@ -1,13 +1,14 @@
 package ru.aleshi.letsplaycities.base.player
 
-import com.squareup.picasso.Picasso
 import io.reactivex.Maybe
-import ru.aleshi.letsplaycities.R
+import io.reactivex.Observable
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.game.SurrenderException
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
+import ru.quandastudio.lpsclient.model.WordResult
 import java.util.concurrent.TimeUnit
 
 /**
@@ -17,16 +18,6 @@ import java.util.concurrent.TimeUnit
  */
 class Android(playerData: PlayerData, pictureSource: PictureSource) :
     User(playerData, pictureSource) {
-
-    /**
-     * @param picasso [Picasso] instance
-     * @param versionInfo application [VersionInfo] instance
-     * @param name localized Android name
-     */
-    constructor(picasso: Picasso, name: String, versionInfo: VersionInfo) : this(
-        PlayerData.SimpleFactory().create(name, versionInfo),
-        PictureSource(picasso, R.drawable.ic_android_big)
-    )
 
     /**
      * Count of moves before Android surrenders
@@ -44,13 +35,21 @@ class Android(playerData: PlayerData, pictureSource: PictureSource) :
      * Generates random word starting with [firstChar]
      * and return it as [Maybe].
      * @param firstChar the first char of new word
-     * @return [Maybe] word or [Maybe.empty] if no words left for this letter
+     * @return [Maybe] word or [Maybe.empty] if no words left for this letter.
+     * Note that [Android] doesn't checks words in server.
      */
-    override fun onMakeMove(firstChar: Char): Maybe<String> {
-        return Maybe.just(firstChar)
+    override fun onMakeMove(firstChar: Char): Observable<ResultWithCity> =
+        Maybe.just(firstChar)
             .delay(1500, TimeUnit.MILLISECONDS)
             .filter { estimatedMoves-- > 0 }
             .flatMap(game::getRandomWord)
-    }
+            .switchIfEmpty(Maybe.error(SurrenderException(this, false)))
+            .map {
+                ResultWithCity(
+                    wordResult = WordResult.ACCEPTED,
+                    identity = UserIdIdentity(this),
+                    city = it
+                )
+            }.toObservable()
 
 }

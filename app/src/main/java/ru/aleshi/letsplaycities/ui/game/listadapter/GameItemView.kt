@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui.game
+package ru.aleshi.letsplaycities.ui.game.listadapter
 
 import android.content.Context
 import android.util.AttributeSet
@@ -16,6 +16,9 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.Theme
 import ru.aleshi.letsplaycities.base.ThemeManager
 import ru.aleshi.letsplaycities.base.game.Position
+import ru.aleshi.letsplaycities.ui.game.CityStatus
+import ru.aleshi.letsplaycities.ui.game.FlagDrawablesManager
+import ru.aleshi.letsplaycities.ui.game.GameEntityWrapper
 
 class GameItemView @JvmOverloads constructor(
     context: Context,
@@ -84,7 +87,10 @@ class GameItemView @JvmOverloads constructor(
         if (!entityWrapper.isMessage)
             when (entityWrapper.status) {
                 CityStatus.OK ->
-                    FlagDrawablesManager.getBitmapFor(context, entityWrapper.countryCode)?.run {
+                    FlagDrawablesManager.getBitmapFor(
+                        context,
+                        entityWrapper.countryCode
+                    )?.run {
                         wordIcon.setImageBitmap(this)
                     }
                 CityStatus.WAITING ->

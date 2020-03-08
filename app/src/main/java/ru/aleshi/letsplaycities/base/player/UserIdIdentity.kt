@@ -6,6 +6,8 @@ package ru.aleshi.letsplaycities.base.player
  */
 data class UserIdIdentity(val userId: Int) : UserIdentity {
 
+    constructor(user: User) : this(user.credentials.userId)
+
     /**
      * Returns `true` is [user] userID equals with [userId], `false` otherwise
      * @param user user for comparison

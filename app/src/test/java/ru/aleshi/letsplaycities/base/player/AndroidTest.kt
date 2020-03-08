@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.game.GameFacade
 import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.game.SurrenderException
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.VersionInfo
 
@@ -57,21 +58,20 @@ class AndroidTest {
             .test()
             .await()
             .assertNoErrors()
-            .assertValue { v -> v.startsWith('j') }
+            .assertValue { v -> v.isSuccessful() && v.city.startsWith("j") }
             .dispose()
     }
 
     @Test
-    fun onMakeMoveGeneratesWhenNoWord() {
+    fun onMakeMoveThrowsExceptionWhenNoWord() {
         android.onMakeMove('n')
             .test().await()
-            .assertNoErrors()
-            .assertComplete()
+            .assertError { e -> e is SurrenderException }
             .dispose()
     }
 
     @Test
-    fun onMakeMoveOnEstimateMovesGone() {
+    fun onMakeMoveOnEstimateMovesGoneThrowsAnException() {
         android.estimatedMoves = 1
 
         // Make first move
@@ -87,8 +87,7 @@ class AndroidTest {
             .test()
             .await()
             .assertNoValues()
-            .assertNoErrors()
-            .assertComplete()
+            .assertError { e -> e is SurrenderException }
             .dispose()
     }
 }

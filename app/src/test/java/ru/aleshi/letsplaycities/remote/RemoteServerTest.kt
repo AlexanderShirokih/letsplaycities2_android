@@ -47,9 +47,7 @@ class RemoteServerTest {
 
     @Test
     fun getWordsResult() {
-        remoteServer.sendCity("Word", Player(fakePlayerData, fakePictureSource)).blockingAwait()
-
-        val test = remoteServer.getWordsResult().test()
+        val test = remoteServer.sendCity("Word", Player(remoteServer, fakePlayerData, fakePictureSource)).test()
 
         test.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
         test.assertNoErrors()
@@ -64,7 +62,7 @@ class RemoteServerTest {
 
     @Test
     fun getInputMessages() {
-        remoteServer.sendMessage("test", Player(fakePlayerData, fakePictureSource)).blockingAwait()
+        remoteServer.sendMessage("test", Player(remoteServer, fakePlayerData, fakePictureSource)).blockingAwait()
 
         val test = remoteServer.getIncomingMessages().test()
 
@@ -83,14 +81,14 @@ class RemoteServerTest {
 
     @Test
     fun broadcastResult() {
-        remoteServer.sendCity("test", Player(fakePlayerData, fakePictureSource)).blockingAwait()
+        remoteServer.sendCity("test", Player(remoteServer, fakePlayerData, fakePictureSource)).blockingLast()
 
         verify(server, times(1)).sendCity(WordResult.RECEIVED, "test", 10)
     }
 
     @Test
     fun broadcastMessage() {
-        remoteServer.sendMessage("Hello message", Player(fakePlayerData, fakePictureSource))
+        remoteServer.sendMessage("Hello message", Player(remoteServer, fakePlayerData, fakePictureSource))
             .blockingAwait()
 
         verify(server, times(1)).sendMessage("Hello message", 10)

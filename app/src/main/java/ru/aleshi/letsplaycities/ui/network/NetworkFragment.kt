@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_network.*
@@ -34,7 +35,13 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     @Inject
     lateinit var prefs: GamePreferences
 
-    private val viewModelProvider: ViewModelProvider by lazy { ViewModelProvider(this) }
+    private val viewModelProvider: ViewModelProvider by lazy {
+        ViewModelProvider(
+            requireParentFragment()
+        )
+    }
+
+    private val args: NetworkFragmentArgs by navArgs()
 
     private val mFriendsViewModel: FriendsViewModel
         get() = viewModelProvider[FriendsViewModel::class.java]
@@ -62,7 +69,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         if (prefs.isChangeModeDialogRequested()) {
             findNavController().navigate(R.id.showChangeModeDialog)
         }
-        mNetworkPresenter.onAttachView(this)
+        mNetworkPresenter.onAttachView(this, args.isLocal)
 
         btnFriends.setOnClickListener { findNavController().navigate(R.id.start_friends_fragment) }
         btnHistory.setOnClickListener { findNavController().navigate(R.id.start_history_fragment) }
@@ -113,19 +120,16 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     override fun onResume() {
         super.onResume()
-        arguments?.let { args ->
-            val nfa = NetworkFragmentArgs.fromBundle(args)
-            if ("fm_game" == nfa.action) {
-                if (prefs.isLoggedIn()) {
-                    setLoadingLayout(true)
-                    mNetworkPresenter.onConnectToFriendGame(nfa.oppId)
-                } else
-                    Toast.makeText(
-                        requireContext(),
-                        R.string.sign_to_continue,
-                        Toast.LENGTH_LONG
-                    ).show()
-            }
+        if ("fm_game" == args.action) {
+            if (prefs.isLoggedIn()) {
+                setLoadingLayout(true)
+                mNetworkPresenter.onConnectToFriendGame(args.oppId)
+            } else
+                Toast.makeText(
+                    requireContext(),
+                    R.string.sign_to_continue,
+                    Toast.LENGTH_LONG
+                ).show()
         }
     }
 

@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.base.player
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -15,14 +16,19 @@ import ru.aleshi.letsplaycities.base.dictionary.CityResult
 import ru.aleshi.letsplaycities.base.game.GameFacade
 import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.aleshi.letsplaycities.base.game.WordCheckingResult
+import ru.aleshi.letsplaycities.base.server.BaseServer
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.quandastudio.lpsclient.model.PlayerData
 import ru.quandastudio.lpsclient.model.VersionInfo
+import ru.quandastudio.lpsclient.model.WordResult
 
 /**
  * Test for [Player]
  */
 @RunWith(MockitoJUnitRunner::class)
 class PlayerTest {
+
+    lateinit var server: BaseServer
 
     @Mock
     lateinit var pictureSource: PictureSource
@@ -33,6 +39,18 @@ class PlayerTest {
 
     @Before
     fun setUp() {
+        server = Mockito.mock(BaseServer::class.java)
+
+        doAnswer { inv ->
+            Observable.just(
+                ResultWithCity(
+                    wordResult = WordResult.ACCEPTED,
+                    city = inv.arguments[0] as String,
+                    identity = UserIdIdentity(inv.arguments[1] as User)
+                )
+            )
+        }.`when`(server).sendCity(any(), any())
+
         gameFacade = Mockito.mock(GameFacade::class.java)
 
         doAnswer { inv ->
@@ -58,6 +76,7 @@ class PlayerTest {
         }.`when`(gameFacade).getCorrections(any())
 
         p = Player(
+            server,
             PlayerData.SimpleFactory().create("player", VersionInfo("0", 0)),
             pictureSource
         ).apply {
@@ -82,7 +101,7 @@ class PlayerTest {
 
     @Test
     fun onMakeMoveWhenHasFirstWordMatches() {
-        val tester = TestObserver<String>()
+        val tester = TestObserver<ResultWithCity>()
 
         p.onMakeMove('n')
             .subscribe(tester)
@@ -92,7 +111,9 @@ class PlayerTest {
             .assertValue { v -> v is WordCheckingResult.Accepted }
             .assertComplete()
 
-        tester.assertValue("noex")
+        tester.assertValueAt(0) { v -> v.wordResult == WordResult.UNKNOWN && v.city == "noex" }
+        tester.assertValueAt(1) { v -> v.isSuccessful() && v.city == "noex" }
+        tester.assertComplete()
         tester.dispose()
     }
 

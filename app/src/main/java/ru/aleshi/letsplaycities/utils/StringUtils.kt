@@ -91,4 +91,10 @@ object StringUtils {
         return city.reversed().toCharArray()
             .find { it != 'ь' && it != 'ъ' && it != 'ы' && it != 'ё' } ?: Char.MIN_VALUE
     }
+
+    /**
+     * Returns random char in alphabet.
+     */
+    fun generateFirstChar(): Char = "абвгдежзиклмнопрстуфхчшэюя".toCharArray().random()
+
 }

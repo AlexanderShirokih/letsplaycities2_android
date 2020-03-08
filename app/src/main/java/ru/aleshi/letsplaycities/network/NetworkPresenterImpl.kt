@@ -14,7 +14,6 @@ import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.base.player.RemoteUser
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.FriendInfo
@@ -38,6 +37,7 @@ class NetworkPresenterImpl @Inject constructor(
     private lateinit var mAuthData: AuthData
     private val mDisposable: CompositeDisposable = CompositeDisposable()
     private var mView: NetworkContract.View? = null
+    private var isLocal = false
 
     /**
      * Called right after user view was created.
@@ -45,10 +45,11 @@ class NetworkPresenterImpl @Inject constructor(
      * @param view view to be attached
      * @see NetworkContract.View.setupLayout
      */
-    override fun onAttachView(view: NetworkContract.View) {
+    override fun onAttachView(view: NetworkContract.View, isLocal: Boolean) {
+        this.isLocal = isLocal
         mView = view
         mAuthData = mAuthDataFactory.load()
-        view.setupLayout(gamePreferences.isLoggedIn(), mNetworkRepository.isLocal)
+        view.setupLayout(gamePreferences.isLoggedIn(), isLocal)
     }
 
     /**
@@ -86,7 +87,7 @@ class NetworkPresenterImpl @Inject constructor(
         onDispose()
         mView?.apply {
             onCancel()
-            setupLayout(true, mNetworkRepository.isLocal)
+            setupLayout(true, isLocal)
         }
     }
 
@@ -205,11 +206,8 @@ class NetworkPresenterImpl @Inject constructor(
      */
     private fun play(playerData: PlayerData, oppData: PlayerData, youStarter: Boolean) {
         val users = arrayOf(
-            if (mNetworkRepository.isLocal)
-                RemoteUser(oppData, mPicasso)
-            else
-                NetworkUser(oppData, mPicasso),
-            Player(playerData, mPicasso)
+            NetworkUser(mNetworkServer, oppData, mPicasso),
+            Player(mNetworkServer, playerData, mPicasso)
         ).apply {
             if (youStarter)
                 reverse()

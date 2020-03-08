@@ -11,7 +11,11 @@ import ru.aleshi.letsplaycities.utils.TipsListener
 /**
  * Encapsulates ad management logic
  */
-class AdManager(private val adView: AdView, private val context: Context) {
+class AdManager(
+    private val adView: AdView,
+    private val context: Context,
+    private val onComplete: () -> Unit
+) {
 
     private val rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(context)
 
@@ -21,9 +25,7 @@ class AdManager(private val adView: AdView, private val context: Context) {
     fun setupAds() {
         adView.loadAd(AdRequest.Builder().build())
         adView.adListener = AdListenerHelper(adView)
-        rewardedVideoAd.rewardedVideoAdListener = TipsListener(::loadRewardedVideoAd) {
-            /*mGameSession::useHint*/
-        }
+        rewardedVideoAd.rewardedVideoAdListener = TipsListener(::loadRewardedVideoAd, onComplete)
         if (!rewardedVideoAd.isLoaded)
             loadRewardedVideoAd()
     }

@@ -35,7 +35,7 @@ class GameViewModel @Inject constructor(
     val helpBtnVisible: ObservableBoolean = ObservableBoolean()
     val msgBtnVisible: ObservableBoolean = ObservableBoolean()
 
-    private val _currentCities = MutableLiveData<List<GameEntityWrapper>>()
+    private val _currentCities = MutableLiveData<List<GameEntityWrapper>>(mutableListOf())
 
     private val _currentState = MutableLiveData<GameState>(GameState.Initial)
 
@@ -74,38 +74,6 @@ class GameViewModel @Inject constructor(
         presenter.start(this, gameSession)
     }
 
-    /*
-    context.getString(
-                        R.string.already_used,
-                        StringUtils.toTitleCase(data.first)
-                    )
-     when (data.second) {
-            Dictionary.CityResult.CITY_NOT_FOUND -> gameSession.correct(
-                data.first,
-                gameSession.view.context().getString(
-                    R.string.city_not_found,
-                    StringUtils.toTitleCase(data.first)
-                )
-            )
-            Dictionary.CityResult.OK -> {
-                sendCity(data.first)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSubscribe {
-                        onSuccess()
-                    }.subscribe(
-                        {
-                        },
-                        { err ->
-                            gameSession.notify(
-                                gameSession.view.context().getString(
-                                    R.string.unk_error,
-                                    err.message
-                                )
-                            )
-                        })
-            }
-        }*/
-
     /**
      * Call to process user input
      */
@@ -113,9 +81,16 @@ class GameViewModel @Inject constructor(
         disposable += presenter.onUserInput(input).subscribe(_wordState::postValue, ::showError)
     }
 
-    fun processMessage(message: String) {
-        TODO()
+    fun processMessage(message: String, onCompleted: () -> Unit) {
+        disposable += presenter.onMessage(message)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(onCompleted)
     }
+
+    /**
+     * Called when player wants to surrender.
+     */
+    fun onPlayerSurrender() = presenter.onSurrender()
 
     /**
      * Called to update current game state.
@@ -156,11 +131,21 @@ class GameViewModel @Inject constructor(
      * Called to put game entity (city or message) to the screen.
      */
     override fun putGameEntity(entity: GameEntity) {
+        val list = _currentCities.value as MutableList
+        val index = list.indexOfFirst { wrapper -> wrapper.gameEntity.areTheSameWith(entity) }
 
+        if (index != -1) {
+            //Item already exists, update content
+            list[index] = GameEntityWrapper(entity)
+        } else {
+            //New item
+            list.add(GameEntityWrapper(entity))
+        }
+        _currentCities.postValue(list)
     }
 
     /**
-     * Called when user leaves the game fragment
+     * Called when user leaves from the game fragment
      */
     override fun dispose() {
         disposable.dispose()
@@ -179,11 +164,6 @@ class GameViewModel @Inject constructor(
         t.printStackTrace()
         _currentState.postValue(GameState.Error(t))
     }
-
-    private fun showMessage(msg: String) {
-        TODO()
-    }
-
 
     /**
      * Sends friend request to [userId] over game server.
@@ -223,4 +203,13 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Starts searching hint for player.
+     */
+    fun useHintForPlayer() {
+        presenter.onPlayerHint()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
+            .addTo(disposable)
+    }
 }

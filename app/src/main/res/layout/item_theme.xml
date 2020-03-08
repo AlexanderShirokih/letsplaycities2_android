@@ -55,7 +55,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/topView"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
-            <ru.aleshi.letsplaycities.ui.game.GameItemView
+            <ru.aleshi.letsplaycities.ui.game.listadapter.GameItemView
                     android:id="@+id/sampleGameView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
                     android:layout_marginBottom="4dp"
                     android:layout_marginEnd="8dp"/>
 
-            <ru.aleshi.letsplaycities.ui.game.GameItemView
+            <ru.aleshi.letsplaycities.ui.game.listadapter.GameItemView
                     android:id="@+id/sampleGameView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"/>
 
-            <ru.aleshi.letsplaycities.ui.game.GameItemView
+            <ru.aleshi.letsplaycities.ui.game.listadapter.GameItemView
                     android:id="@+id/sampleGameView1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

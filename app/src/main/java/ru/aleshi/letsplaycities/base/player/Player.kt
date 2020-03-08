@@ -1,10 +1,10 @@
 package ru.aleshi.letsplaycities.base.player
 
 import com.squareup.picasso.Picasso
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
@@ -12,10 +12,11 @@ import ru.aleshi.letsplaycities.base.dictionary.CityResult
 import ru.aleshi.letsplaycities.base.game.GameFacade
 import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.aleshi.letsplaycities.base.game.WordCheckingResult
+import ru.aleshi.letsplaycities.base.server.BaseServer
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.utils.Utils
-import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
+import ru.quandastudio.lpsclient.model.*
 
 /**
  * Represents logic of user controlled player.
@@ -23,6 +24,7 @@ import ru.quandastudio.lpsclient.model.VersionInfo
  * @param pictureSource represents users picture
  */
 class Player(
+    private val server: BaseServer,
     playerData: PlayerData,
     pictureSource: PictureSource
 ) :
@@ -36,9 +38,11 @@ class Player(
      * @param playerData [PlayerData] model class that contains info about user
      */
     constructor(
+        server: BaseServer,
         playerData: PlayerData,
         picasso: Picasso
     ) : this(
+        server,
         playerData,
         PictureSource(
             picasso = picasso,
@@ -50,24 +54,9 @@ class Player(
     )
 
     /**
-     * Constructor used for local games.
-     * @param picasso [Picasso] instance
-     * @param name localized user names
-     * @param versionInfo application [VersionInfo] instance
-     */
-    constructor(
-        picasso: Picasso,
-        name: String,
-        versionInfo: VersionInfo
-    ) : this(
-        PlayerData.SimpleFactory().create(name, versionInfo),
-        picasso
-    )
-
-    /**
      * [PublishSubject] that will emit user input if it completes all checking.
      */
-    private val userInputSubject = BehaviorSubject.create<String>()
+    private val userInputSubject = PublishSubject.create<WordCheckingResult>()
 
     /**
      * Saved first letter of the last word
@@ -77,22 +66,24 @@ class Player(
     override fun onInit(comboSystemView: ComboSystemView): ComboSystem =
         ComboSystem(true, comboSystemView)
 
-    override fun onMakeMove(firstChar: Char): Maybe<String> {
+    override fun onMakeMove(firstChar: Char): Observable<ResultWithCity> {
         mFirstChar = firstChar
-        return userInputSubject.firstElement()
+        return userInputSubject
+            .flatMap { validateOnServer(it) }
+            .takeUntil { it.isSuccessful() }
     }
 
-    override fun onUserInput(userInput: String): Observable<WordCheckingResult> {
+    /**
+     * Processes user input
+     */
+    fun onUserInput(userInput: String): Observable<WordCheckingResult> {
         val input = StringUtils.formatCity(userInput)
         return Observable.just(input)
             .filter { it.isNotEmpty() }
             .filter { mFirstChar == Char.MIN_VALUE || it[0] == mFirstChar }
             .flatMap { checkForExclusions(input, game).switchIfEmpty(checkInDatabase(input, game)) }
             .flatMap { checkForCorrections(it, game) }
-            .doOnNext {
-                if (it is WordCheckingResult.Accepted)
-                    userInputSubject.onNext(it.word)
-            }
+            .doOnNext { userInputSubject.onNext(it) }
     }
 
     /**
@@ -167,4 +158,36 @@ class Player(
         } else
             Observable.just(currentResult)
     }
+
+    /**
+     * Sends [result] to server if it [WordCheckingResult.Accepted],
+     * otherwise returns [Observable.never].
+     * Returns Observable that emits [ResultWithCity] and completes.
+     */
+    private fun validateOnServer(
+        result: WordCheckingResult
+    ): Observable<ResultWithCity> {
+        return if (result is WordCheckingResult.Accepted) {
+            Observable.concatArray(
+                Observable.just(
+                    ResultWithCity(
+                        wordResult = WordResult.UNKNOWN,
+                        identity = UserIdIdentity(this),
+                        city = result.word
+                    )
+                ),
+                server.sendCity(result.word, this)
+            )
+        } else Observable.never<ResultWithCity>()
+    }
+
+    fun useHint(game: GameFacade): Completable =
+        Maybe.just(mFirstChar)
+            .map {
+                if (mFirstChar == Char.MIN_VALUE) StringUtils.generateFirstChar()
+                else mFirstChar
+            }
+            .flatMap(game::getRandomWord)
+            .doOnSuccess { userInputSubject.onNext(WordCheckingResult.Accepted(it)) }
+            .ignoreElement()
 }

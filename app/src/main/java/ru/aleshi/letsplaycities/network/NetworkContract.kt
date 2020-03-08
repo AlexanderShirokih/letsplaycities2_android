@@ -21,7 +21,7 @@ interface NetworkContract {
     }
 
     interface Presenter {
-        fun onAttachView(view: View)
+        fun onAttachView(view: View, isLocal: Boolean)
         fun onConnectToFriendGame(oppId: Int)
         fun onConnect()
         fun onCancel()
