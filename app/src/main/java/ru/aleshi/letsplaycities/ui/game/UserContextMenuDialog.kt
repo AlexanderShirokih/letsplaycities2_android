@@ -6,17 +6,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.game.GameViewModel
 
 class UserContextMenuDialog : DialogFragment() {
 
-    private lateinit var gameViewModel: GameViewModel
+    private lateinit var userMenuViewModel: UserMenuViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        gameViewModel = ViewModelProvider(requireParentFragment())[GameViewModel::class.java]
+        userMenuViewModel =
+            ViewModelProvider(requireParentFragment())[UserMenuViewModel::class.java]
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -43,24 +42,14 @@ class UserContextMenuDialog : DialogFragment() {
      * Sends friend request to [userId].
      * @param userId id of user that we want to add to friends
      */
-    private fun sendFriendRequest(userId: Int) {
-        gameViewModel.sendFriendRequest(userId) {
-            Toast.makeText(requireActivity(), R.string.new_friend_request, Toast.LENGTH_LONG).show()
-        }
-    }
+    private fun sendFriendRequest(userId: Int) =
+        userMenuViewModel.sendFriendRequest(userId)
 
     /**
      * Sends ban message to [userId]. After successful sending this message game will be stopped
      * and pop back parent view.
      */
-    private fun banPlayer(login: String, userId: Int) {
-        gameViewModel.banUser(userId) {
-            Toast.makeText(
-                requireActivity(),
-                getString(R.string.user_banned, login),
-                Toast.LENGTH_SHORT
-            ).show()
-            findNavController().popBackStack(R.id.gameFragment, true)
-        }
-    }
+    private fun banPlayer(login: String, userId: Int) =
+        userMenuViewModel.banUser(userId, login)
+
 }

@@ -95,6 +95,11 @@ interface GameContract {
          */
         fun onPlayerHint(): Completable
 
+        /**
+         * Returns current game session
+         */
+        fun getCurrentSession(): GameSession
+
     }
 
 }

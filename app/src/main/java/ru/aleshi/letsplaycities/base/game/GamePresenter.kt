@@ -133,6 +133,8 @@ class GamePresenter @Inject constructor(
 
     override fun onPlayerHint(): Completable = session.useHintForPlayer()
 
+    override fun getCurrentSession(): GameSession = session
+
     /**
      * Sends friend request to [userId] over game server.
      * @param userId id of user that we want to add to friends

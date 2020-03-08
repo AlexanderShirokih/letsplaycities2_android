@@ -32,11 +32,14 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameState
 import ru.aleshi.letsplaycities.base.game.GameViewModel
+import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.base.game.WordCheckingResult
+import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.game.listadapter.GameAdapter
+import ru.aleshi.letsplaycities.utils.Event
 import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
 import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
 import javax.inject.Inject
@@ -102,6 +105,10 @@ class GameFragment : Fragment() {
         viewModelProvider[GameSessionViewModel::class.java].apply {
             gameViewModel.startGame(gameSession.value!!.peekContent())
         }
+        viewModelProvider[UserMenuViewModel::class.java].actions.observe(
+            viewLifecycleOwner,
+            ::handleUserMenuAction
+        )
 
         gameViewModel.apply {
             cities.observe(this@GameFragment, adapter::updateEntities)
@@ -130,17 +137,15 @@ class GameFragment : Fragment() {
         setupCityListeners(activity)
         setupMessageListeners()
 
-        adManager = AdManager(adView, activity) {
-            gameViewModel.useHintForPlayer()
-        }
+        adManager = AdManager(adView, activity) { gameViewModel.useHintForPlayer() }
         adManager.setupAds()
 
         btnMenu.setOnClickListener { showGoToMenuDialog() }
         btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
         btnHelp.setOnClickListener { showConfirmationDialog(USE_HINT, R.string.use_hint) }
         btnMsg.setOnClickListener { setMessagingLayout(messageInputLayout.visibility != View.VISIBLE) }
-//        avatarLeft.setOnClickListener { mGameSession?.needsShowMenu(Position.LEFT) }
-//        avatarRight.setOnClickListener { mGameSession?.needsShowMenu(Position.RIGHT) }
+        avatarLeft.setOnClickListener { gameViewModel.showMenu(Position.LEFT, ::showUserMenu) }
+        avatarRight.setOnClickListener { gameViewModel.showMenu(Position.LEFT, ::showUserMenu) }
 
         recyclerView.apply {
             adapter = this@GameFragment.adapter
@@ -261,12 +266,35 @@ class GameFragment : Fragment() {
 
     private fun handleState(currentState: GameState) {
         if (currentState is GameState.Finish) {
-            navigateOnDestination(
+            navigateOnDestinationWaiting(
                 GameFragmentDirections.showGameResultDialog(
                     currentState.gameResultMessage,
                     currentState.playerScore
                 )
             )
+        }
+    }
+
+    private fun handleUserMenuAction(event: Event<UserMenuViewModel.UserMenuAction>) {
+        event.getContentIfNotHandled()?.apply {
+            when (action) {
+                UserMenuViewModel.Action.BanUser -> gameViewModel.banUser(userId) {
+                    Toast.makeText(
+                        requireActivity(),
+                        R.string.new_friend_request,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                UserMenuViewModel.Action.SendFriendRequest -> gameViewModel.sendFriendRequest(userId)
+                {
+                    Toast.makeText(
+                        requireActivity(),
+                        getString(R.string.user_banned, login),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    findNavController().popBackStack(R.id.gameFragment, true)
+                }
+            }
         }
     }
 
@@ -288,15 +316,13 @@ class GameFragment : Fragment() {
     }
 
     private fun showConfirmationDialog(code: Int, msg: Int) {
-        val navController = findNavController()
-        if (navController.currentDestination?.id == R.id.gameFragment)
-            navController.navigate(
-                GameFragmentDirections.showConfimationDialog(
-                    code,
-                    getString(msg),
-                    null
-                )
+        safeNavigate(
+            GameFragmentDirections.showConfimationDialog(
+                code,
+                getString(msg),
+                null
             )
+        )
     }
 
     override fun onStop() {
@@ -325,7 +351,7 @@ class GameFragment : Fragment() {
         }
     }
 
-    private fun navigateOnDestination(dir: NavDirections) {
+    private fun navigateOnDestinationWaiting(dir: NavDirections) {
         lifecycleScope.launch {
             val nav = findNavController()
             withContext(Dispatchers.Default) {
@@ -338,18 +364,24 @@ class GameFragment : Fragment() {
         }
     }
 
-    fun showUserMenu(isFriend: Boolean, name: String, userId: Int) {
-        navigateOnDestination(
+    private fun safeNavigate(dir: NavDirections) {
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.gameFragment)
+            navController.navigate(dir)
+    }
+
+    private fun showUserMenu(user: User) {
+        safeNavigate(
             GameFragmentDirections.showUserContextDialog(
-                isFriend,
-                name,
-                userId
+                user.playerData.isFriend,
+                user.name,
+                user.credentials.userId
             )
         )
     }
 
     fun showFriendRequestDialog(name: String) {
-        navigateOnDestination(
+        navigateOnDestinationWaiting(
             GameFragmentDirections.showConfimationDialog(
                 NEW_FRIEND_REQUEST,
                 getString(R.string.confirm_friend_request, name),

@@ -15,7 +15,7 @@ import ru.quandastudio.lpsclient.model.PlayerData
  * @property pictureSource represents users picture
  */
 abstract class User(
-    private val playerData: PlayerData,
+    val playerData: PlayerData,
     private val pictureSource: PictureSource
 ) {
 

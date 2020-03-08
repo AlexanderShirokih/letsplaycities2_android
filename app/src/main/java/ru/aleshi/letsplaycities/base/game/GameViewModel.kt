@@ -10,6 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.plusAssign
+import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.ui.ActivityScope
 import ru.aleshi.letsplaycities.ui.game.GameEntityWrapper
@@ -99,15 +100,6 @@ class GameViewModel @Inject constructor(
      */
     override fun updateState(state: GameState) {
         _currentState.postValue(state)
-    }
-
-
-    /**
-     * Call to reset game state
-     */
-    fun restart() {
-        //Try this...
-        updateState(GameState.Initial)
     }
 
     /**
@@ -212,5 +204,16 @@ class GameViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe()
             .addTo(disposable)
+    }
+
+    /**
+     * Calls [showMenuCallback] if user that currently bind at [position] has menu.
+     */
+    fun showMenu(position: Position, showMenuCallback: (u: User) -> Unit) {
+        presenter.getCurrentSession().apply {
+            val user = users.first { it.position == position }
+            if (gameMode == GameMode.MODE_NET && user !is Player)
+                showMenuCallback(user)
+        }
     }
 }
