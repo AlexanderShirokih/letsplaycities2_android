@@ -66,7 +66,7 @@ class GameFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val activity = requireActivity()
 
-        adapter = GameAdapter(activity)
+        adapter = GameAdapter(activity) { recyclerView.postDelayed(::scrollRecyclerView, 200) }
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
         }
@@ -257,9 +257,6 @@ class GameFragment : Fragment() {
                 cityInput.text = null
                 clickSound?.start()
                 hideKeyboard()
-                recyclerView.postDelayed({
-                    scrollRecyclerView()
-                }, 200)
             }
         }
     }

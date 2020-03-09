@@ -6,7 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import ru.aleshi.letsplaycities.ui.game.GameEntityWrapper
 
-class GameAdapter(val context: Context) : RecyclerView.Adapter<GameItemViewHolder>() {
+class GameAdapter(val context: Context, val onUpdated: () -> Unit) :
+    RecyclerView.Adapter<GameItemViewHolder>() {
 
     private var entityWrappers: MutableList<GameEntityWrapper> = mutableListOf()
 
@@ -29,6 +30,9 @@ class GameAdapter(val context: Context) : RecyclerView.Adapter<GameItemViewHolde
     fun updateEntities(citiesList: List<GameEntityWrapper>) {
         val diffUtil = GameItemDiffUtil(entityWrappers, citiesList)
         DiffUtil.calculateDiff(diffUtil, false).dispatchUpdatesTo(this)
+
+        if (entityWrappers.size != citiesList.size) onUpdated()
+
         entityWrappers.clear()
         entityWrappers.addAll(citiesList)
     }
