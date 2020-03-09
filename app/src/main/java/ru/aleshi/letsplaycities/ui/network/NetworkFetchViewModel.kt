@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.Maybe
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -30,7 +29,6 @@ class NetworkFetchViewModel @Inject constructor(private val apiRepo: LpsReposito
         mState.postValue(FetchState.LoadingState)
         disposable.add(
             fetchFunction(apiRepo)
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({ data ->
                     mState.postValue(

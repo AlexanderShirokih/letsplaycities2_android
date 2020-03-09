@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.NetworkUtils
@@ -30,7 +31,7 @@ class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
     lateinit var mPicasso: Picasso
 
     override fun onCreate() {
-        ViewModelProvider(this)[ConfirmViewModel::class.java].callback.observe(
+        ViewModelProvider(requireParentFragment())[ConfirmViewModel::class.java].callback.observe(
             this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.resultCode == requestCodeConfirmRemoving && request.result) {
@@ -48,6 +49,7 @@ class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
                 ) {
                     withApi {
                         it.deleteFromBlacklist(item.userId)
+                            .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 mAdapter.removeAt(position)

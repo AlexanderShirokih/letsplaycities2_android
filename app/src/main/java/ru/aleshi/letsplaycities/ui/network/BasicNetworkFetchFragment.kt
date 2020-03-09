@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.fragment_friends.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.ui.BasicListAdapter
 import ru.aleshi.letsplaycities.ui.FetchState
-import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.quandastudio.lpsclient.core.LpsRepository
 import javax.inject.Inject
 

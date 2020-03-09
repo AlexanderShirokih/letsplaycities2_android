@@ -13,12 +13,6 @@ class ConfirmViewModel: ViewModel() {
                 true
             } else false
         }
-        fun checkAnyWithResultCode(requestedCode: Int): Boolean {
-            return if (resultCode == requestedCode) {
-                resultCode = -1
-                true
-            } else false
-        }
     }
 
     val callback: MutableLiveData<Request> = MutableLiveData()

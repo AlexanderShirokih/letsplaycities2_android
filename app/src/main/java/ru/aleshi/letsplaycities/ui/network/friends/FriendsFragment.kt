@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
 import ru.aleshi.letsplaycities.R
@@ -34,7 +35,8 @@ class FriendsFragment : BasicNetworkFetchFragment<FriendInfo>(),
     private lateinit var mSelectedFriendsInfo: FriendInfo
 
     override fun onCreate() {
-        ViewModelProvider(this)[ConfirmViewModel::class.java].callback.observe(this,
+        ViewModelProvider(requireParentFragment())[ConfirmViewModel::class.java].callback.observe(
+            this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.result && ::mSelectedFriendsInfo.isInitialized) {
                     when (request.resultCode) {
@@ -47,6 +49,7 @@ class FriendsFragment : BasicNetworkFetchFragment<FriendInfo>(),
                         REQUEST_CODE_REMOVE_ITEM -> {
                             withApi {
                                 it.deleteFriend(mSelectedFriendsInfo.userId)
+                                    .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe({ mAdapter.removeItem(mSelectedFriendsInfo) }
                                         ,
