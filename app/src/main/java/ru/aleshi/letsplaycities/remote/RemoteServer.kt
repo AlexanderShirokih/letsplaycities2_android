@@ -13,7 +13,7 @@ import ru.quandastudio.lpsclient.model.WordResult
 import javax.inject.Inject
 
 class RemoteServer @Inject constructor(private val remoteRepository: RemoteRepository) :
-    BaseServer(timeLimit = 92L) {
+    BaseServer({ 92L }) {
 
     /**
      * Used to redirect input messages to output.

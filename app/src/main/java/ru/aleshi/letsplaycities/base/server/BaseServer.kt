@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Base class representing game server logic.
  */
-abstract class BaseServer(private val timeLimit: Long) {
+abstract class BaseServer(private val timeLimitSupplier: () -> Long) {
 
     open fun sendFriendAcceptance(accepted: Boolean, userId: Int): Completable =
         Completable.complete()
@@ -23,9 +23,10 @@ abstract class BaseServer(private val timeLimit: Long) {
 
     /**
      * Returns game timer, that ticks every second and completes when time is out.
-     * If [timeLimit] == 0 timer won't emit any event
+     * If [timeLimitSupplier] returns `0` timer won't emit any event
      */
     open fun getTimer(): Observable<Long> {
+        val timeLimit = timeLimitSupplier()
         return if (timeLimit > 0)
             Observable.interval(0, 1, TimeUnit.SECONDS)
                 .take(timeLimit + 1)

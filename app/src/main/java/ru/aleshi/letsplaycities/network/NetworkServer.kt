@@ -14,7 +14,7 @@ import ru.quandastudio.lpsclient.core.LPSMessage
 import javax.inject.Inject
 
 class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) :
-    BaseServer(timeLimit = 92L) {
+    BaseServer({ 92L }) {
 
     override fun getDisconnections(): Observable<LPSMessage.LPSLeaveMessage> =
         mNetworkRepository.getLeave().toObservable()

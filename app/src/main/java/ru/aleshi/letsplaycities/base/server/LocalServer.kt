@@ -14,7 +14,7 @@ import javax.inject.Inject
  * @param gamePreferences [GamePreferences] instance for getting time limit
  */
 class LocalServer @Inject constructor(gamePreferences: GamePreferences) :
-    BaseServer(gamePreferences.getTimeLimit()) {
+    BaseServer({ gamePreferences.getTimeLimit() }) {
 
     /**
      * Used to redirect input words to output.
