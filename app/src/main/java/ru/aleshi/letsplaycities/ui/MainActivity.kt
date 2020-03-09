@@ -16,6 +16,7 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.activity_main.*
+import ru.aleshi.letsplaycities.MyFirebaseMessagingService
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
@@ -57,7 +58,10 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
     override fun onResume() {
         super.onResume()
         LocalBroadcastManager.getInstance(this)
-            .registerReceiver(mFriendRequestReceiver, IntentFilter("fm_request"))
+            .registerReceiver(
+                mFriendRequestReceiver,
+                IntentFilter(MyFirebaseMessagingService.ACTION_FIREBASE)
+            )
     }
 
     override fun onPause() {
@@ -84,14 +88,23 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     private fun checkForFirebaseNotifications(intent: Intent) {
         intent.extras?.let { data ->
-            if ("fm_request" == data.getString("action", ""))
-                startFriendModeGame(data)
+            when (data.getString(MyFirebaseMessagingService.KEY_ACTION)) {
+                MyFirebaseMessagingService.ACTION_FM -> startFriendModeGame(data)
+                MyFirebaseMessagingService.ACTION_FRIEND_REQUEST -> showFriendRequestDialog(data)
+            }
         }
+    }
+
+    private fun showFriendRequestDialog(data: Bundle) {
+        findNavController(R.id.main_nav_fragment).navigate(
+            R.id.globalStartFriendRequestDialog,
+            data
+        )
     }
 
     private fun startFriendModeGame(data: Bundle) {
         findNavController(R.id.main_nav_fragment).navigate(
-            R.id.globalStartFriendRequestDialog,
+            R.id.globalStartFriendGameRequestDialog,
             data
         )
     }

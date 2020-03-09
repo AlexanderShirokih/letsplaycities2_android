@@ -82,6 +82,10 @@ class GamePresenter @Inject constructor(
         scoreManager.init(session)
         comboSystemView.init()
 
+        disposable += session.server.friendRequestResult.subscribe(
+            viewModel::onFriendRequestResult
+        ) { viewModel.updateState(GameState.Error(it)) }
+
         disposable +=
             Completable.fromAction { viewModel.updateState(GameState.CheckingForUpdates) }
                 .andThen(checkForUpdates())
@@ -96,7 +100,13 @@ class GamePresenter @Inject constructor(
                     session.start(comboSystemView, GameFacade(_dictionary, _exclusions, prefs))
                     updateUserViewAndResetTimer(true)
                 }
-                .flatMapObservable { makeMoves().mergeWith(disconnectionSubject) }
+                .flatMapObservable {
+                    Observable.merge(
+                        makeMoves(),
+                        disconnectionSubject,
+                        getKicks()
+                    )
+                }
                 .firstElement()
                 .map(scoreManager::getWinner)
                 .doFinally(::dispose)
@@ -233,6 +243,20 @@ class GamePresenter @Inject constructor(
         return GameEntity.MessageInfo(result, fun(identity: UserIdentity) =
             session.findUserByIdentity(identity)?.position ?: Position.UNKNOWN)
     }
+
+    private fun getKicks(): Observable<FinishEvent> =
+        session.server.kick.map { bySystem ->
+            /* Kicked message doesn't provide enough information about who sends the ban
+               message, so we do next trick: if player banned by system we will send player
+               instance, in another case we will any other user
+             */
+            FinishEvent(
+                if (bySystem)
+                    session.requirePlayer()
+                else session.users.first { it !== session.requirePlayer() },
+                FinishEvent.Reason.Kicked
+            )
+        }.toObservable()
 
     /**
      * Used to restart game timer to the time limit defined in the server.

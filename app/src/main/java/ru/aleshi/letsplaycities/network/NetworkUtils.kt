@@ -13,7 +13,7 @@ object NetworkUtils {
         fragment: Fragment,
         dismissCallback: (() -> Unit)? = null
     ) {
-        val context = fragment.activity!!
+        val context = fragment.requireActivity()
         var length = Snackbar.LENGTH_SHORT
         var message = context.getString(R.string.err_msg_on_exception)
 
@@ -29,7 +29,9 @@ object NetworkUtils {
             else -> exception.printStackTrace()
         }
 
-        Snackbar.make(fragment.requireView(), message, length)
+        val view = fragment.view ?: fragment.requireParentFragment().requireView()
+
+        Snackbar.make(view, message, length)
             .addCallback(object : Snackbar.Callback() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                     dismissCallback?.invoke()

@@ -3,6 +3,7 @@ package ru.aleshi.letsplaycities.base.game
 import io.reactivex.Completable
 import io.reactivex.Observable
 import ru.aleshi.letsplaycities.base.player.User
+import ru.quandastudio.lpsclient.core.LPSMessage
 
 /**
  * Interface that holds ViewModel and Presenter interfaces to game control.
@@ -37,6 +38,11 @@ interface GameContract {
          * Called to put game entity (city or message) to the screen.
          */
         fun putGameEntity(entity: GameEntity)
+
+        /**
+         * Called when received friend request
+         */
+        fun onFriendRequestResult(type: LPSMessage.LPSFriendRequest)
 
         /**
          * Call to dispose all resources

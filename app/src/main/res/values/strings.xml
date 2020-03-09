@@ -257,7 +257,11 @@
     <string name="time_out">Время вышло!</string>
     <string name="connecting_to_server">Подключение к серверу&#8230;</string>
     <string name="player_banned">Игрок Заблокирован!</string>
-    <string name="confirm_friend_request">Игрок %1$s хочет добавить Вас в друзья.\nПринять заявку?</string>
+
+    <!-- FriendRequestDialog -->
+    <string name="friend_request_message">Игрок %1$s хочет добавить Вас в друзья.</string>
+    <string name="friend_request_title">Заявка в друзья</string>
+
     <string name="friends_request_accepted">Игрок %1$s добавлен в друзья</string>
     <string name="friends_request_denied">Заявка отклонена!</string>
     <string name="multiplier">&#xD7;%1$.1f</string>
@@ -316,7 +320,7 @@
     <string name="already_friend">Игрок уже у Вас в друзьях</string>
     <string name="lost_connection">Потеряно соединение с сервером</string>
     <string name="kicked_by_system">Вы были отключены системой.</string>
-    <string name="kicked_by_user">Подключённый игрок добавил вас в чёрный список</string>
+    <string name="kicked_by_user">Оппонент добавил вас в чёрный список</string>
 
     <!-- FriendRequestDialog -->
     <string name="request_dialog_title">Приглашение в игру</string>

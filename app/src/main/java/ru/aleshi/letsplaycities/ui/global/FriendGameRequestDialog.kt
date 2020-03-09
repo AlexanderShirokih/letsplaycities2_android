@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui
+package ru.aleshi.letsplaycities.ui.global
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -13,29 +13,30 @@ import dagger.android.support.AndroidSupportInjection
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.NetworkUtils
-import ru.aleshi.letsplaycities.ui.network.FriendRequestViewModel
+import ru.aleshi.letsplaycities.ui.FetchState
 import javax.inject.Inject
 
 //TODO: Test
 
-class FriendRequestDialog : DialogFragment() {
+class FriendGameRequestDialog : DialogFragment() {
 
-    private val args: FriendRequestDialogArgs by navArgs()
+    private val args: FriendGameRequestDialogArgs by navArgs()
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var requestViewModel: FriendRequestViewModel
+    private lateinit var gameRequestViewModel: FriendGameRequestViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        requestViewModel =
-            ViewModelProvider(this, viewModelFactory)[FriendRequestViewModel::class.java]
-        requestViewModel.state.observe(this) { state ->
+        gameRequestViewModel =
+            ViewModelProvider(this, viewModelFactory)[FriendGameRequestViewModel::class.java]
+        gameRequestViewModel.state.observe(this) { state ->
             when (state) {
                 FetchState.LoadingState -> onBegin()
-                is FetchState.ErrorState -> NetworkUtils.showErrorSnackbar(state.error, this) {
+                is FetchState.ErrorState -> {
+                    NetworkUtils.showErrorSnackbar(state.error, this)
                     dismiss()
                 }
                 else -> dismiss()
@@ -47,7 +48,7 @@ class FriendRequestDialog : DialogFragment() {
         super.onStart()
         val alertDialog = requireDialog() as AlertDialog
         alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener {
-            requestViewModel.onDecline(args.userId)
+            gameRequestViewModel.onDecline(args.userId)
         }
     }
 
@@ -57,7 +58,7 @@ class FriendRequestDialog : DialogFragment() {
             .setMessage(getString(R.string.request_dialog_msg, args.login))
             .setPositiveButton(R.string.accept) { _, _ ->
                 findNavController().navigate(
-                    FriendRequestDialogDirections.startNetworkFragment(
+                    FriendGameRequestDialogDirections.startNetworkFragment(
                         BuildConfig.HOST,
                         "fm_game",
                         args.userId

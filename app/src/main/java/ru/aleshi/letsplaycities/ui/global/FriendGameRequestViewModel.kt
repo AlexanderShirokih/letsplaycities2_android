@@ -1,31 +1,30 @@
-package ru.aleshi.letsplaycities.ui.network
+package ru.aleshi.letsplaycities.ui.global
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.ui.FetchState
-import ru.quandastudio.lpsclient.core.LpsApi
-import ru.quandastudio.lpsclient.model.RequestType
+import ru.quandastudio.lpsclient.core.LpsRepository
 import javax.inject.Inject
 
-class FriendRequestViewModel @Inject constructor(private val api: LpsApi) : ViewModel() {
+class FriendGameRequestViewModel @Inject constructor(private val lpsRepository: LpsRepository) :
+    ViewModel() {
 
     private val disposable = CompositeDisposable()
-    private val mState: MutableLiveData<FetchState> = MutableLiveData(
-        FetchState.FinishState)
+    private val mState: MutableLiveData<FetchState> = MutableLiveData()
 
     val state: LiveData<FetchState>
         get() = mState
 
     fun onDecline(userId: Int) {
         disposable.add(
-            api.sendGameRequestResult(userId, RequestType.DENY)
-                .observeOn(AndroidSchedulers.mainThread())
+            lpsRepository.declineGameRequestResult(userId)
+                .subscribeOn(Schedulers.io())
                 .doOnSubscribe { mState.postValue(FetchState.LoadingState) }
                 .subscribe({ mState.postValue(FetchState.FinishState) },
-                    { error -> FetchState.ErrorState(error) })
+                    { error -> mState.postValue(FetchState.ErrorState(error)) })
         )
     }
 

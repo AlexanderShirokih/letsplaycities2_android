@@ -27,7 +27,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_game.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameState
@@ -357,19 +358,21 @@ class GameFragment : Fragment() {
         }
     }
 
+    /**
+     * Waits until currentDestination become gameFragment and then navigates to [dir].
+     */
     private fun navigateOnDestinationWaiting(dir: NavDirections) {
         lifecycleScope.launch {
             val nav = findNavController()
-            withContext(Dispatchers.Default) {
-                withTimeout(2000) {
-                    while (nav.currentDestination?.id ?: 0 != R.id.gameFragment)
-                        delay(100)
-                }
-            }
+            while (R.id.gameFragment != nav.currentDestination?.id)
+                delay(100)
             nav.navigate(dir)
         }
     }
 
+    /**
+     * Navigates to [dir] only if current destination is gameFragment.
+     */
     private fun safeNavigate(dir: NavDirections) {
         val navController = findNavController()
         if (navController.currentDestination?.id == R.id.gameFragment)

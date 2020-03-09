@@ -7,6 +7,8 @@ import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.IntoMap
 import ru.aleshi.letsplaycities.network.LpsRepositoryModule
+import ru.aleshi.letsplaycities.ui.global.FriendGameRequestViewModel
+import ru.aleshi.letsplaycities.ui.global.FriendRequestViewModel
 import ru.aleshi.letsplaycities.ui.network.NetworkFetchViewModel
 import ru.aleshi.letsplaycities.ui.profile.AuthorizationViewModel
 import kotlin.reflect.KClass
@@ -31,5 +33,15 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(AuthorizationViewModel::class)
     internal abstract fun authViewModel(viewModel: AuthorizationViewModel) : ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(FriendRequestViewModel::class)
+    internal abstract fun requestViewModel(viewModel: FriendRequestViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(FriendGameRequestViewModel::class)
+    internal abstract fun gameRequestViewModel(viewModel: FriendGameRequestViewModel): ViewModel
 
 }
