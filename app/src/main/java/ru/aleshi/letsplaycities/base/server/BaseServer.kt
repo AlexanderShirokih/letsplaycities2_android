@@ -12,14 +12,17 @@ import java.util.concurrent.TimeUnit
  */
 abstract class BaseServer(private val timeLimitSupplier: () -> Long) {
 
-    open fun sendFriendAcceptance(accepted: Boolean, userId: Int): Completable =
-        Completable.complete()
+    /**
+     * Triggers when opponent sends response for out friend request.
+     * Estimated results: ACCEPTED, DENIED.
+     */
+    open val friendRequestResult: Observable<LPSMessage.LPSFriendRequest> = Observable.never()
 
-    open val friendsRequest: Observable<LPSMessage.FriendRequest> = Observable.never()
-
+    /**
+     * Triggers when player was banned.
+     * `true` means that player was banned by system and `false` is that it was banned by opponent.
+     */
     open val kick: Maybe<Boolean> = Maybe.never()
-
-    //New code
 
     /**
      * Returns game timer, that ticks every second and completes when time is out.

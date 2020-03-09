@@ -9,6 +9,6 @@ import ru.aleshi.letsplaycities.base.player.User
  */
 class FinishEvent(val target: User, val reason: Reason) {
     enum class Reason {
-        TimeOut, Surrender, Disconnected
+        TimeOut, Surrender, Disconnected, Kicked
     }
 }

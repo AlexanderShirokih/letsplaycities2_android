@@ -161,7 +161,7 @@ class NetworkPresenterImpl @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { mView?.updateInfo(R.string.waiting_for_friend) }
             .observeOn(Schedulers.io())
-            .flatMap { mNetworkRepository.sendFriendRequestResult(true, oppId) }
+            .flatMap { mNetworkRepository.acceptFriendRequest(oppId) }
             .flatMapMaybe { mNetworkRepository.connectToFriend() }
     }
 

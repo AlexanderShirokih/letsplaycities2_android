@@ -40,7 +40,9 @@ class ScoreManager @Inject constructor(
         TIME_UP,
         WIN,
         WIN_BY_REMOTE,
-        DRAW
+        DRAW,
+        BANNED_BY_OPP,
+        BANNED_BY_SYSTEM
     }
 
     enum class ScoringType {
@@ -73,7 +75,7 @@ class ScoreManager @Inject constructor(
     fun init(session: GameSession) {
         gameSession = session
         allGroups = ScoringGroupsHelper.fromPreferences(prefs)
-        loadStatGroups ()
+        loadStatGroups()
         saveStats()
     }
 
@@ -204,6 +206,13 @@ class ScoreManager @Inject constructor(
         groupHighScores.child[mode.ordinal].max(me.score)
 
         saveStats()
+
+        if (finishEvent.reason == FinishEvent.Reason.Kicked) {
+            return results.getValue(
+                if (finishEvent.target == me) GameResult.BANNED_BY_SYSTEM
+                else GameResult.BANNED_BY_OPP
+            )
+        }
 
         if (finishEvent.reason == FinishEvent.Reason.TimeOut) {
             return if (mode == GameMode.MODE_NET) {

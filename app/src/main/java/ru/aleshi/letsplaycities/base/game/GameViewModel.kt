@@ -14,6 +14,7 @@ import ru.aleshi.letsplaycities.base.player.Player
 import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.ui.ActivityScope
 import ru.aleshi.letsplaycities.ui.game.GameEntityWrapper
+import ru.quandastudio.lpsclient.core.LPSMessage
 import javax.inject.Inject
 
 @ActivityScope
@@ -42,11 +43,15 @@ class GameViewModel @Inject constructor(
 
     private val _wordState = MutableLiveData<WordCheckingResult>()
 
+    private val _friendRequest = MutableLiveData<LPSMessage.LPSFriendRequest>()
+
     val cities: LiveData<List<GameEntityWrapper>> = _currentCities
 
     val state: LiveData<GameState> = _currentState
 
     val wordState: LiveData<WordCheckingResult> = _wordState
+
+    val friendRequest: LiveData<LPSMessage.LPSFriendRequest> = _friendRequest
 
     /**
      * Call from UI to start game
@@ -86,7 +91,7 @@ class GameViewModel @Inject constructor(
     fun processMessage(message: String, onCompleted: () -> Unit) {
         disposable += presenter.onMessage(message)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(onCompleted)
+            .subscribe(onCompleted, ::showError)
     }
 
     /**
@@ -166,9 +171,7 @@ class GameViewModel @Inject constructor(
     fun sendFriendRequest(userId: Int, onCompleted: () -> Unit) {
         presenter.sendFriendRequest(userId)
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnComplete(onCompleted)
-            .doOnError { err -> showError(err) }
-            .subscribe()
+            .subscribe(onCompleted, ::showError)
             .addTo(disposable)
     }
 
@@ -180,9 +183,7 @@ class GameViewModel @Inject constructor(
     fun banUser(userId: Int, onCompleted: () -> Unit) {
         presenter.banUser(userId)
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnComplete(onCompleted)
-            .doOnError { err -> showError(err) }
-            .subscribe()
+            .subscribe(onCompleted, ::showError)
             .addTo(disposable)
     }
 
@@ -202,7 +203,7 @@ class GameViewModel @Inject constructor(
     fun useHintForPlayer() {
         presenter.onPlayerHint()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe()
+            .subscribe({}, ::showError)
             .addTo(disposable)
     }
 
@@ -216,4 +217,7 @@ class GameViewModel @Inject constructor(
                 showMenuCallback(user)
         }
     }
+
+    override fun onFriendRequestResult(type: LPSMessage.LPSFriendRequest) =
+        _friendRequest.postValue(type)
 }

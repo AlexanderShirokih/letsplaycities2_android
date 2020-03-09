@@ -75,7 +75,9 @@ class Platform {
             ScoreManager.GameResult.TIME_UP to context.getString(R.string.timeup),
             ScoreManager.GameResult.WIN_BY_REMOTE to context.getString(R.string.win_by_remote),
             ScoreManager.GameResult.WIN to context.getString(R.string.win),
-            ScoreManager.GameResult.DRAW to context.getString(R.string.draw)
+            ScoreManager.GameResult.DRAW to context.getString(R.string.draw),
+            ScoreManager.GameResult.BANNED_BY_OPP to context.getString(R.string.kicked_by_user),
+            ScoreManager.GameResult.BANNED_BY_SYSTEM to context.getString(R.string.kicked_by_system)
         )
 
     @Provides

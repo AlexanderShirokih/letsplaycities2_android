@@ -58,7 +58,7 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
     override fun sendMessage(message: String, sender: User): Completable =
         mNetworkRepository.sendMessage(message)
 
-    override val friendsRequest: Observable<LPSMessage.FriendRequest> =
+    override val friendRequestResult: Observable<LPSMessage.LPSFriendRequest> =
         mNetworkRepository.getFriendsRequest()
 
     /**
@@ -67,11 +67,12 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
     override fun sendFriendRequest(userId: Int): Completable =
         mNetworkRepository.sendFriendRequest(userId)
 
-    override fun sendFriendAcceptance(accepted: Boolean, userId: Int): Completable =
-        mNetworkRepository.sendFriendAcceptance(accepted, userId)
-
     override fun banUser(userId: Int): Completable =
         mNetworkRepository.banUser(userId)
 
-    override val kick: Maybe<Boolean> = mNetworkRepository.getKick().map { it.isBannedBySystem }
+    /**
+     * I don't know why but isBannedBySystem inverted, so we flit it back and now `true` means
+     * banned by system and `false` banned by opponent
+     */
+    override val kick: Maybe<Boolean> = mNetworkRepository.getKick().map { !it.isBannedBySystem }
 }
