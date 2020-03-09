@@ -42,6 +42,7 @@ import ru.aleshi.letsplaycities.ui.game.listadapter.GameAdapter
 import ru.aleshi.letsplaycities.utils.Event
 import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
 import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
+import ru.quandastudio.lpsclient.core.LPSMessage
 import javax.inject.Inject
 
 class GameFragment : Fragment() {
@@ -99,7 +100,6 @@ class GameFragment : Fragment() {
                     )
                     it.checkWithResultCode(SURRENDER) -> gameViewModel.onPlayerSurrender()
                     it.checkWithResultCode(USE_HINT) -> adManager.showAd()
-//                  it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> gameViewModel.onFriendRequestResult(it.result)
                 }
             })
         viewModelProvider[GameSessionViewModel::class.java].apply {
@@ -115,6 +115,7 @@ class GameFragment : Fragment() {
             state.observe(this@GameFragment, ::handleState)
             state.observe(this@GameFragment, gameStateNotifier::showState)
             wordState.observe(this@GameFragment, ::handleWordResult)
+            friendRequest.observe(this@GameFragment, ::handleFriendRequest)
             correctionViewModel.setCorrectionsList(wordState, ::processCityInput)
         }
     }
@@ -145,7 +146,7 @@ class GameFragment : Fragment() {
         btnHelp.setOnClickListener { showConfirmationDialog(USE_HINT, R.string.use_hint) }
         btnMsg.setOnClickListener { setMessagingLayout(messageInputLayout.visibility != View.VISIBLE) }
         avatarLeft.setOnClickListener { gameViewModel.showMenu(Position.LEFT, ::showUserMenu) }
-        avatarRight.setOnClickListener { gameViewModel.showMenu(Position.LEFT, ::showUserMenu) }
+        avatarRight.setOnClickListener { gameViewModel.showMenu(Position.RIGHT, ::showUserMenu) }
 
         recyclerView.apply {
             adapter = this@GameFragment.adapter
@@ -262,14 +263,12 @@ class GameFragment : Fragment() {
     }
 
     private fun handleState(currentState: GameState) {
-        if (currentState is GameState.Finish) {
-            navigateOnDestinationWaiting(
-                GameFragmentDirections.showGameResultDialog(
-                    currentState.gameResultMessage,
-                    currentState.playerScore
-                )
+        if (currentState is GameState.Finish) navigateOnDestinationWaiting(
+            GameFragmentDirections.showGameResultDialog(
+                currentState.gameResultMessage,
+                currentState.playerScore
             )
-        }
+        )
     }
 
     private fun handleUserMenuAction(event: Event<UserMenuViewModel.UserMenuAction>) {
@@ -278,20 +277,30 @@ class GameFragment : Fragment() {
                 UserMenuViewModel.Action.BanUser -> gameViewModel.banUser(userId) {
                     Toast.makeText(
                         requireActivity(),
-                        R.string.new_friend_request,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                UserMenuViewModel.Action.SendFriendRequest -> gameViewModel.sendFriendRequest(userId)
-                {
-                    Toast.makeText(
-                        requireActivity(),
                         getString(R.string.user_banned, login),
                         Toast.LENGTH_SHORT
                     ).show()
                     findNavController().popBackStack(R.id.gameFragment, true)
                 }
+                UserMenuViewModel.Action.SendFriendRequest -> gameViewModel.sendFriendRequest(userId)
+                {
+                    Toast.makeText(
+                        requireActivity(),
+                        R.string.new_friend_request,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
+        }
+    }
+
+    private fun handleFriendRequest(request: LPSMessage.LPSFriendRequest) {
+        when (request.result) {
+            LPSMessage.FriendRequest.ACCEPTED -> showInfo(
+                getString(R.string.friends_request_accepted, request.login)
+            )
+            LPSMessage.FriendRequest.DENIED -> showInfo(getString(R.string.friends_request_denied))
+            else -> Unit
         }
     }
 
@@ -377,20 +386,9 @@ class GameFragment : Fragment() {
         )
     }
 
-    fun showFriendRequestDialog(name: String) {
-        navigateOnDestinationWaiting(
-            GameFragmentDirections.showConfimationDialog(
-                NEW_FRIEND_REQUEST,
-                getString(R.string.confirm_friend_request, name),
-                null
-            )
-        )
-    }
-
     companion object {
         private const val GO_TO_MENU = 21
         private const val SURRENDER = 22
         private const val USE_HINT = 23
-        private const val NEW_FRIEND_REQUEST = 24
     }
 }

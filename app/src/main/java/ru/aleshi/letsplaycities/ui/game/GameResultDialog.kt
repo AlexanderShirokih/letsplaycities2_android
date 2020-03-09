@@ -50,7 +50,7 @@ class GameResultDialog : DialogFragment() {
                     fragment = this@GameResultDialog
                 }.root
             )
-            .create()
+            .create().apply { setCanceledOnTouchOutside(false) }
     }
 
     /**
