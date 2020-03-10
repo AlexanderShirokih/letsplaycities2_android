@@ -81,6 +81,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.3.4"
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
@@ -128,7 +129,7 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-    implementation 'ru.aleshi.lps:lps-client:1.0'
+    implementation 'ru.aleshi.lps:lps-client:1.0.1'
 
     // For JDK9+
     kapt 'javax.xml.bind:jaxb-api:2.3.1'

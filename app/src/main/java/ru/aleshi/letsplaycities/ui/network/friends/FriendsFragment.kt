@@ -9,10 +9,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_friends.*
 import kotlinx.android.synthetic.main.fragment_friends.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
@@ -20,6 +20,7 @@ import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
 import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.FriendInfo
+import java.io.IOException
 import javax.inject.Inject
 
 class FriendsFragment : BasicNetworkFetchFragment<FriendInfo>(),
@@ -48,17 +49,17 @@ class FriendsFragment : BasicNetworkFetchFragment<FriendInfo>(),
                         }
                         REQUEST_CODE_REMOVE_ITEM -> {
                             withApi {
-                                it.deleteFriend(mSelectedFriendsInfo.userId)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe({ mAdapter.removeItem(mSelectedFriendsInfo) }
-                                        ,
-                                        { error ->
-                                            NetworkUtils.showErrorSnackbar(
-                                                error,
-                                                this@FriendsFragment
-                                            )
-                                        })
+                                withContext(Dispatchers.Main) {
+                                    mAdapter.removeItem(mSelectedFriendsInfo)
+                                    setListVisibility(mAdapter.itemCount != 0)
+                                }
+                                try {
+                                    it.deleteFriend(mSelectedFriendsInfo.userId)
+                                } catch (error: IOException) {
+                                    withContext(Dispatchers.Main) {
+                                        NetworkUtils.showErrorSnackbar(error, this@FriendsFragment)
+                                    }
+                                }
                             }
                         }
                     }

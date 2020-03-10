@@ -11,6 +11,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.rxSingle
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
@@ -121,7 +122,11 @@ class AuthorizationViewModel @Inject constructor(
                 )
             }
             .doOnSuccess { mState.postValue(FetchState.DataState(R.string.authorization)) }
-            .flatMap(apiRepo::signUp)
+            .flatMap {
+                rxSingle {
+                    apiRepo.signUp(it)
+                }
+            }
             .doOnSuccess { resp ->
                 credentialsProvider.update(
                     Credentials(
@@ -140,7 +145,11 @@ class AuthorizationViewModel @Inject constructor(
     private fun uploadAvatar(picture: ByteArray, hash: String) =
         Single.just(FetchState.DataState(R.string.uploading_picture))
             .doOnSuccess(mState::postValue)
-            .flatMap { apiRepo.updatePicture("png", hash, picture) }
+            .flatMap {
+                rxSingle {
+                    apiRepo.updatePicture("png", hash, picture)
+                }
+            }
 
     /**
      * Used to load image by given URI, then calculates MD5
