@@ -13,14 +13,14 @@ import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.core.LPSMessage
 import javax.inject.Inject
 
-class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) :
+class NetworkServer @Inject constructor(internal val networkRepository: NetworkRepository) :
     BaseServer({ 92L }) {
 
     override fun getDisconnections(): Observable<LPSMessage.LPSLeaveMessage> =
-        mNetworkRepository.getLeave().toObservable()
+        networkRepository.getLeave().toObservable()
 
     override fun getIncomingWords(): Observable<ResultWithCity> {
-        return mNetworkRepository.getWords().map {
+        return networkRepository.getWords().map {
             ResultWithCity(
                 wordResult = it.result,
                 city = it.word,
@@ -30,7 +30,7 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
     }
 
     override fun getIncomingMessages(): Observable<ResultWithMessage> {
-        return mNetworkRepository.getMessages()
+        return networkRepository.getMessages()
             .map {
                 ResultWithMessage(
                     message = if (it.isSystemMsg) "[СИСТЕМА] " else "" + it.msg,
@@ -40,12 +40,12 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
     }
 
     override fun dispose() {
-        mNetworkRepository.disconnect()
+        networkRepository.disconnect()
     }
 
     override fun sendCity(city: String, sender: User): Observable<ResultWithCity> {
         return Observable.zip(
-            mNetworkRepository.sendWord(city)
+            networkRepository.sendWord(city)
                 .andThen(Observable.just(Unit)),
             getIncomingWords().filter { it.identity.isTheSameUser(sender) },
             BiFunction { _: Unit, word: ResultWithCity -> word }
@@ -53,26 +53,26 @@ class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkR
     }
 
     override fun getTimer(): Observable<Long> =
-        super.getTimer().takeUntil(mNetworkRepository.getTimeout().toObservable())
+        super.getTimer().takeUntil(networkRepository.getTimeout().toObservable())
 
     override fun sendMessage(message: String, sender: User): Completable =
-        mNetworkRepository.sendMessage(message)
+        networkRepository.sendMessage(message)
 
     override val friendRequestResult: Observable<LPSMessage.LPSFriendRequest> =
-        mNetworkRepository.getFriendsRequest()
+        networkRepository.getFriendsRequest()
 
     /**
      * Sends friends request from current player to [userId].
      */
     override fun sendFriendRequest(userId: Int): Completable =
-        mNetworkRepository.sendFriendRequest(userId)
+        networkRepository.sendFriendRequest(userId)
 
     override fun banUser(userId: Int): Completable =
-        mNetworkRepository.banUser(userId)
+        networkRepository.banUser(userId)
 
     /**
      * I don't know why but isBannedBySystem inverted, so we flit it back and now `true` means
      * banned by system and `false` banned by opponent
      */
-    override val kick: Maybe<Boolean> = mNetworkRepository.getKick().map { !it.isBannedBySystem }
+    override val kick: Maybe<Boolean> = networkRepository.getKick().map { !it.isBannedBySystem }
 }

@@ -102,8 +102,8 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     override fun onCancel() = setLoadingLayout(false)
 
-    override fun getProfileViewModel(): ProfileViewModel =
-        viewModelProvider[ProfileViewModel::class.java]
+    override fun updatePictureHash(userId: Int, picHash: String?) =
+        viewModelProvider[ProfileViewModel::class.java].updatePictureHash(userId, picHash)
 
     override fun setupLayout(isLoggedIn: Boolean, isLocal: Boolean) {
         btnConnect.isVisible = isLoggedIn
