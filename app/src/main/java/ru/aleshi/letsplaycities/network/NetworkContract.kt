@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.network
 
-import androidx.lifecycle.Observer
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.ui.profile.ProfileViewModel
 import ru.quandastudio.lpsclient.model.FriendInfo
@@ -23,9 +22,8 @@ interface NetworkContract {
     interface Presenter {
         fun onAttachView(view: View, isLocal: Boolean)
         fun onConnectToFriendGame(oppId: Int)
-        fun onConnect()
+        fun onConnect(friendsInfo: FriendInfo? = null)
         fun onCancel()
-        fun onFriendsInfo(): Observer<in FriendInfo>
         fun onDispose()
     }
 }

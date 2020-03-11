@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.network
 
-import androidx.lifecycle.Observer
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -62,20 +61,10 @@ class NetworkPresenterImpl @Inject constructor(
 
     /**
      * Called when user touched the connect button.
+     * @param friendsInfo if not null, game will connects to friend mode.
      */
-    override fun onConnect() {
-        startGame(createPlayerData(), null)
-    }
-
-    /**
-     * Called when user wants to start game in friend mode.
-     */
-    override fun onFriendsInfo(): Observer<in FriendInfo> {
-        return Observer { friendInfo ->
-            friendInfo?.apply {
-                startGame(createPlayerData(), friendInfo)
-            }
-        }
+    override fun onConnect(friendsInfo: FriendInfo?) {
+        startGame(createPlayerData(), friendsInfo)
     }
 
     /**

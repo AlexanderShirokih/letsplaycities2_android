@@ -1,28 +1,20 @@
 package ru.aleshi.letsplaycities.utils
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.view.LayoutInflater
-import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.squareup.picasso.Picasso
-import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.dialog_waiting.view.*
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.LPSApplication
-import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.ThemeManager
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
-import java.util.concurrent.TimeUnit
 
 object Utils {
 
@@ -97,43 +89,6 @@ object Utils {
         val theme = ThemeManager.getCurrentTheme(prefs)
         if (theme.isFreeOrAvailable())
             context.setTheme(theme.themeId)
-    }
-
-    fun showWaitingForConnectionDialog(
-        reconnectionDelay: Int,
-        activity: Activity,
-        task: () -> Unit,
-        cancelCallback: () -> Unit
-    ) {
-        var active = true
-        val view = LayoutInflater.from(activity).inflate(R.layout.dialog_waiting, null, false)
-        with(AlertDialog.Builder(activity)) {
-            setCancelable(true)
-            setView(view)
-            create()
-        }.apply {
-            val disposable =
-                Observable.intervalRange(0, reconnectionDelay.toLong(), 0, 1, TimeUnit.SECONDS)
-                    .map { reconnectionDelay - it }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .takeWhile { active }
-                    .subscribe(
-                        {
-                            view.con_waiting_tv.text =
-                                activity.getString(R.string.waiting_for_connection, it)
-                        },
-                        ::error,
-                        {
-                            dismiss()
-                            if (active) task() else cancelCallback()
-                        }
-                    )
-            setOnCancelListener {
-                active = false
-                cancelCallback()
-                disposable.dispose()
-            }
-        }.show()
     }
 
 }
