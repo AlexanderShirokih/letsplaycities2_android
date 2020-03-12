@@ -60,7 +60,7 @@ class DictionaryUpdater constructor(
                     fetchedVersion to localInfo
                 })
             .filter { it.first > it.second.version }
-            .map { "$HOST/data-$it.bin" to it.second }
+            .map { "$HOST/data-${it.first}.bin" to it.second }
             .toObservable()
             .flatMap { loadFile(it.first, it.second.savePath) }
     }

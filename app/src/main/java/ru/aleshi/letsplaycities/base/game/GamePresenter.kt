@@ -160,10 +160,11 @@ class GamePresenter @Inject constructor(
 
     /**
      * Call [DictionaryUpdater.checkForUpdates] to fetch updates from server.
-     * Doesn't work in local games modes, just completes.
+     * Doesn't work in remote mode, just completes.
      */
     private fun checkForUpdates(): Completable {
-        return if (session.isLocal()) Completable.complete()
+        return if (session.gameMode == GameMode.MODE_MUL)
+            Completable.complete()
         else dictionaryUpdater.checkForUpdates()
             .doOnNext { viewModel.updateState(GameState.LoadingUpdate(it.loadingPercent)) }
             .lastElement()
