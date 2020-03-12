@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base.dictionary
 
+import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -29,8 +30,8 @@ class DictionaryServiceImpl constructor(
     /**
      * @see DictionaryService.checkCity
      */
-    override fun checkCity(city: String): Single<CityResult> {
-        return Single.fromCallable {
+    override fun checkCity(city: String): Flowable<CityResult> {
+        return Flowable.fromCallable {
             if (!dictionary.containsKey(city))
                 CityResult.CITY_NOT_FOUND
             else
@@ -39,6 +40,7 @@ class DictionaryServiceImpl constructor(
                 else
                     CityResult.OK
         }.subscribeOn(Schedulers.computation())
+            .onBackpressureLatest()
     }
 
     override fun markUsed(city: String) {

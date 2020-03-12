@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities.base.game
 
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
@@ -106,9 +107,9 @@ class GameSession(
      * @return [Observable.empty] when user can't handle input. [Observable] with [WordCheckingResult] when
      * user handles the input.
      */
-    fun sendPlayersInput(userInput: String): Observable<WordCheckingResult> =
+    fun sendPlayersInput(userInput: String): Flowable<WordCheckingResult> =
         if (currentUser is Player) (currentUser as Player).onUserInput(userInput)
-        else Observable.empty()
+        else Flowable.empty()
 
     /**
      * Called by system when user enters input message.

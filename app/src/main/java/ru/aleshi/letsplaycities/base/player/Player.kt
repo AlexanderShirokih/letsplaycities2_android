@@ -1,10 +1,8 @@
 package ru.aleshi.letsplaycities.base.player
 
 import com.squareup.picasso.Picasso
-import io.reactivex.Completable
-import io.reactivex.Maybe
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.*
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
@@ -76,9 +74,9 @@ class Player(
     /**
      * Processes user input
      */
-    fun onUserInput(userInput: String): Observable<WordCheckingResult> {
+    fun onUserInput(userInput: String): Flowable<WordCheckingResult> {
         val input = StringUtils.formatCity(userInput)
-        return Observable.just(input)
+        return Flowable.just(input)
             .filter { it.isNotEmpty() }
             .flatMap {
                 checkFirstLetterMatches(input).switchIfEmpty(
@@ -97,23 +95,25 @@ class Player(
     /**
      * Checks that [userInput] starts with [mFirstChar]
      */
-    private fun checkFirstLetterMatches(userInput: String): Observable<WordCheckingResult> =
+    private fun checkFirstLetterMatches(userInput: String): Flowable<WordCheckingResult> =
         if (mFirstChar == Char.MIN_VALUE || mFirstChar == userInput[0])
-            Observable.empty()
+            Flowable.empty()
         else
-            Observable.just(WordCheckingResult.WrongLetter(mFirstChar))
+            Flowable.just(WordCheckingResult.WrongLetter(mFirstChar))
 
     /**
      * Checks current [word] for exclusions.
      * @return  empty [Observable] if word has no exclusions or
      * [WordCheckingResult.Exclusion] if it has.
      */
-    private fun checkForExclusions(word: String, game: GameFacade): Observable<WordCheckingResult> =
-        Observable.just(word).map { it to game.checkForExclusion(it) }
+    private fun checkForExclusions(word: String, game: GameFacade): Flowable<WordCheckingResult> =
+        Flowable.just(word).map { it to game.checkForExclusion(it) }
+            .subscribeOn(Schedulers.computation())
+            .onBackpressureLatest()
             .flatMap {
                 if (it.second.isEmpty())
-                    Observable.empty<WordCheckingResult>()
-                else Observable.just(WordCheckingResult.Exclusion(it.second))
+                    Flowable.empty<WordCheckingResult>()
+                else Flowable.just(WordCheckingResult.Exclusion(it.second))
             }
 
 
@@ -124,20 +124,20 @@ class Player(
 
     /**
      * Checks current [city] in game database.
-     * @return [Observable] of [WordCheckingResult.Accepted] if [city] was found in database and
+     * @return [Flowable] of [WordCheckingResult.Accepted] if [city] was found in database and
      * can be used, [WordCheckingResult.NotFound] if [city] was't found in database,
      * [WordCheckingResult.AlreadyUsed] if word already used before.
      */
-    private fun checkInDatabase(city: String, game: GameFacade): Observable<WordCheckingResult> {
+    private fun checkInDatabase(city: String, game: GameFacade): Flowable<WordCheckingResult> {
         var word = city
         return game.checkCity(word)
             .flatMap { result ->
                 when (result) {
-                    CityResult.CITY_NOT_FOUND -> Single.error<WordCheckingResult>(
+                    CityResult.CITY_NOT_FOUND -> Flowable.error<WordCheckingResult>(
                         CityNotFoundException(word)
                     )
-                    CityResult.ALREADY_USED -> Single.just(WordCheckingResult.AlreadyUsed(city))
-                    else -> Single.just(WordCheckingResult.Accepted(word))
+                    CityResult.ALREADY_USED -> Flowable.just(WordCheckingResult.AlreadyUsed(city))
+                    else -> Flowable.just(WordCheckingResult.Accepted(word))
                 }
             }
             .retry { c, t ->
@@ -146,34 +146,36 @@ class Player(
             }
             .onErrorResumeNext { t: Throwable ->
                 if (t is CityNotFoundException)
-                    Single.just(
+                    Flowable.just(
                         WordCheckingResult.NotFound(t.city)
                     )
                 else
-                    Single.error<WordCheckingResult>(t)
-            }.toObservable()
+                    Flowable.error<WordCheckingResult>(t)
+            }
     }
 
     /**
      * If previous result was [WordCheckingResult.NotFound] this function will search corrections
      * and emit [WordCheckingResult.Corrections] if corrections was found or [WordCheckingResult.NotFound]
      * if corrections if not available.
-     * For any other states will emit [Observable.empty].
+     * For any other states will emit [Flowable.empty].
      */
     private fun checkForCorrections(
         currentResult: WordCheckingResult,
         game: GameFacade
-    ): Observable<WordCheckingResult> {
+    ): Flowable<WordCheckingResult> {
         return if (currentResult is WordCheckingResult.NotFound) {
             game.getCorrections(currentResult.word)
-                .flatMapObservable {
+                .subscribeOn(Schedulers.computation())
+                .flatMapPublisher {
                     if (it.isEmpty())
-                        Observable.just(WordCheckingResult.NotFound(currentResult.word))
+                        Flowable.just(WordCheckingResult.NotFound(currentResult.word))
                     else
-                        Observable.just(WordCheckingResult.Corrections(it))
+                        Flowable.just(WordCheckingResult.Corrections(it))
                 }
+                .onBackpressureLatest()
         } else
-            Observable.just(currentResult)
+            Flowable.just(currentResult)
     }
 
     /**

@@ -1,8 +1,6 @@
 package ru.aleshi.letsplaycities.base.game
 
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
@@ -125,7 +123,7 @@ class GamePresenter @Inject constructor(
      * @return [Observable] that emits [WordCheckingResult] or [Observable.empty] if current user
      * not yet defined or can't make move.
      */
-    override fun onUserInput(input: String): Observable<WordCheckingResult> =
+    override fun onUserInput(input: String): Flowable<WordCheckingResult> =
         session.sendPlayersInput(input)
 
     override fun onMessage(message: String): Completable =

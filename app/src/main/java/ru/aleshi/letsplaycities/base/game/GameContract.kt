@@ -1,7 +1,7 @@
 package ru.aleshi.letsplaycities.base.game
 
 import io.reactivex.Completable
-import io.reactivex.Observable
+import io.reactivex.Flowable
 import ru.aleshi.letsplaycities.base.player.User
 import ru.quandastudio.lpsclient.core.LPSMessage
 
@@ -64,10 +64,10 @@ interface GameContract {
 
         /**
          * Call to send input from user to players.
-         * @return [Observable] that emits [WordCheckingResult] or [Observable.empty] if current user
+         * @return [Flowable] that emits [WordCheckingResult] or [Flowable.empty] if current user
          * not yet defined or can't make move.
          */
-        fun onUserInput(input: String): Observable<WordCheckingResult>
+        fun onUserInput(input: String): Flowable<WordCheckingResult>
 
         /**
          * Call to send user's message to server.

@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base.dictionary
 
+import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -21,7 +22,7 @@ interface DictionaryService {
      * @return [Observable] with [CityResult.OK] if city not used before, [CityResult.ALREADY_USED] if
      * [city] has already been used, [CityResult.CITY_NOT_FOUND] if [city] not found in dictionary.
      */
-    fun checkCity(city: String): Single<CityResult>
+    fun checkCity(city: String): Flowable<CityResult>
 
     /**
      * Returns random word from database starting at [firstChar].

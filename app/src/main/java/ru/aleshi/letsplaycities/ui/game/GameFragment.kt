@@ -248,7 +248,7 @@ class GameFragment : Fragment() {
             )
             is WordCheckingResult.Exclusion -> showInfo(wordResult.description)
             is WordCheckingResult.Corrections ->
-                findNavController().navigate(R.id.showCorrectionTipsDialog)
+                navigateOnDestinationWaiting(GameFragmentDirections.showCorrectionTipsDialog())
             is WordCheckingResult.NotFound -> showInfo(
                 getString(
                     R.string.city_not_found,

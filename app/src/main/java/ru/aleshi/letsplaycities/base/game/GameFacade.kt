@@ -1,5 +1,6 @@
 package ru.aleshi.letsplaycities.base.game
 
+import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import ru.aleshi.letsplaycities.base.GamePreferences
@@ -34,7 +35,7 @@ open class GameFacade(
      * @return [CityResult.OK] if city not used before, [CityResult.ALREADY_USED] if
      * [city] has already been used, [CityResult.CITY_NOT_FOUND] if [city] not found in dictionary.
      */
-    open fun checkCity(city: String) = dictionary.checkCity(city)
+    open fun checkCity(city: String): Flowable<CityResult> = dictionary.checkCity(city)
 
     /**
      * Returns correction variants for [city] or empty list if there are no corrections available

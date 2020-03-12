@@ -52,6 +52,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     private var gameSound: MediaPlayer? = null
     private var lastConnectionTime: Long = 0
     private val reconnectionDelay = 5
+    private var argsHandled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -117,10 +118,11 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     override fun onResume() {
         super.onResume()
-        if ("fm_game" == args.action) {
+        if (!argsHandled && "fm_game" == args.action) {
             if (prefs.isLoggedIn()) {
                 setLoadingLayout(true)
                 mNetworkPresenter.onConnectToFriendGame(args.oppId)
+                argsHandled = true
             } else
                 Toast.makeText(
                     requireContext(),
