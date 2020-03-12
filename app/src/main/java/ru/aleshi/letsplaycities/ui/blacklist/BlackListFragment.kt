@@ -9,17 +9,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_blacklist.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
-import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
-import ru.quandastudio.lpsclient.core.LpsApi
 import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.BlackListItem
+import java.io.IOException
 import javax.inject.Inject
 
 class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
@@ -31,11 +31,8 @@ class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
     @Inject
     lateinit var mPicasso: Picasso
 
-    override fun onCreate(sharedViewModelFactory: ViewModelFactory) {
-        ViewModelProvider(
-            requireActivity(),
-            sharedViewModelFactory
-        )[ConfirmViewModel::class.java].callback.observe(
+    override fun onCreate() {
+        ViewModelProvider(requireParentFragment())[ConfirmViewModel::class.java].callback.observe(
             this,
             Observer<ConfirmViewModel.Request> { request ->
                 if (request.resultCode == requestCodeConfirmRemoving && request.result) {
@@ -52,14 +49,17 @@ class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
                     )
                 ) {
                     withApi {
-                        it.deleteFromBlacklist(item.userId)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                mAdapter.removeAt(position)
-                                setListVisibility(mAdapter.itemCount != 0)
-                            }, { error ->
+                        withContext(Dispatchers.Main) {
+                            mAdapter.removeAt(position)
+                            setListVisibility(mAdapter.itemCount != 0)
+                        }
+                        try {
+                            it.deleteFromBlacklist(item.userId)
+                        } catch (error: IOException) {
+                            withContext(Dispatchers.Main) {
                                 NetworkUtils.showErrorSnackbar(error, this@BlackListFragment)
-                            })
+                            }
+                        }
                     }
                 }
             }

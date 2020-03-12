@@ -16,99 +16,64 @@ import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
-import com.crashlytics.android.Crashlytics
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.reward.RewardedVideoAd
-import com.squareup.picasso.RequestCreator
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_game.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
-import ru.aleshi.letsplaycities.base.combos.ComboSystemView
-import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
-import ru.aleshi.letsplaycities.base.game.GameContract
+import ru.aleshi.letsplaycities.base.game.GameState
+import ru.aleshi.letsplaycities.base.game.GameViewModel
 import ru.aleshi.letsplaycities.base.game.Position
+import ru.aleshi.letsplaycities.base.game.WordCheckingResult
+import ru.aleshi.letsplaycities.base.player.User
 import ru.aleshi.letsplaycities.databinding.FragmentGameBinding
-import ru.aleshi.letsplaycities.network.NetworkUtils.showErrorSnackbar
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
+import ru.aleshi.letsplaycities.ui.game.listadapter.GameAdapter
+import ru.aleshi.letsplaycities.utils.Event
 import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
-import ru.aleshi.letsplaycities.utils.TipsListener
-import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
-import java.util.concurrent.TimeUnit
+import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
+import ru.quandastudio.lpsclient.core.LPSMessage
+import javax.inject.Inject
 
-class GameFragment : Fragment(), GameContract.View {
+class GameFragment : Fragment() {
 
-    private lateinit var mBinding: FragmentGameBinding
-    private lateinit var mGameViewModel: GameViewModel
-    private lateinit var mGameSessionViewModel: GameSessionViewModel
-    private var mGameSession: GameContract.Presenter? = null
-    private lateinit var mAdapter: GameAdapter
-    private lateinit var mRewardedVideoAd: RewardedVideoAd
+    private lateinit var gameViewModel: GameViewModel
+    private lateinit var correctionViewModel: CorrectionViewModel
+    private lateinit var adapter: GameAdapter
+    private lateinit var adManager: AdManager
 
-    private var mClickSound: MediaPlayer? = null
-    private val disposable: CompositeDisposable = CompositeDisposable()
-    private val screenReceiver = ScreenReceiver {
-        mGameSession?.onSurrender()
-    }
+    @Inject
+    lateinit var prefs: GamePreferences
+    @Inject
+    lateinit var viewModelFactory: GameViewModelFactory
+    @Inject
+    lateinit var gameStateNotifier: GameStateNotifier
+
+    private var clickSound: MediaPlayer? = null
+    private val screenReceiver = ScreenReceiver { gameViewModel.onPlayerSurrender() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        val activity = requireActivity() as MainActivity
-        ViewModelProvider(activity)[ConfirmViewModel::class.java].callback.observe(
-            this,
-            Observer {
-                when {
-                    it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(
-                        R.id.mainMenuFragment,
-                        false
-                    )
-                    it.checkWithResultCode(SURRENDER) -> mGameSession?.onSurrender()
-                    it.checkWithResultCode(USE_HINT) -> showAd()
-                    it.checkAnyWithResultCode(NEW_FRIEND_REQUEST) -> mGameSession?.onFriendRequestResult(
-                        it.result
-                    )?.subscribe({}, { err -> showErrorSnackbar(err, this) })
-                }
-            })
+        val activity = requireActivity()
 
-        mGameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
-        mGameSessionViewModel =
-            ViewModelProvider(activity)[GameSessionViewModel::class.java].apply {
-                mGameSession = gameSession
-
-                correctedWord.observe(this@GameFragment, Observer {
-                    if (it != null) {
-                        mGameSession?.postCorrectedWord(it.first, it.second)
-                        it.first?.let { cityInput.text = null }
-                        correctedWord.value = null
-                    }
-                })
-                restart.observe(this@GameFragment, Observer {
-                    if (it) {
-                        stopGame()
-                        startGame()
-                        restart.value = false
-                    }
-                })
-            }
-        mAdapter = GameAdapter(activity)
+        adapter = GameAdapter(activity) { recyclerView.postDelayed(::scrollRecyclerView, 200) }
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
         }
-        if (getGamePreferences().isSoundEnabled()) {
-            mClickSound = MediaPlayer.create(activity, R.raw.click)
+        if (prefs.isSoundEnabled()) {
+            clickSound = MediaPlayer.create(activity, R.raw.click)
             screenReceiver.sound = MediaPlayer.create(activity, R.raw.notification)
         }
 
@@ -118,89 +83,51 @@ class GameFragment : Fragment(), GameContract.View {
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_SCREEN_ON)
             })
+        gameViewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
     }
 
-    override fun downloadingListener(): DictionaryUpdater.DownloadingListener {
-        return SnackbarDownloadingListener(this)
-    }
-
-    override fun comboSystemView(): ComboSystemView {
-        val view = layoutInflater.inflate(R.layout.combo_badge, badgeRoot, false)
-        badgeRoot.addView(view)
-        return ComboBadgeView(view)
-    }
-
-    override fun setMenuItemsVisibility(help: Boolean, msg: Boolean) {
-        mGameViewModel.helpBtnVisible.set(help)
-        mGameViewModel.msgBtnVisible.set(msg)
-    }
-
-    private fun setupAds(activity: Activity) {
-        adView.loadAd(AdRequest.Builder().build())
-        adView.adListener = object : AdListener() {
-            override fun onAdClosed() {
-                adView?.visibility = View.GONE
-            }
-
-            override fun onAdLoaded() {
-                adView?.visibility = View.VISIBLE
-            }
-
-            override fun onAdFailedToLoad(error: Int) {
-                adView?.visibility = View.GONE
-            }
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        val viewModelProvider =
+            ViewModelProvider(requireParentFragment())
+        correctionViewModel = viewModelProvider[CorrectionViewModel::class.java]
+        viewModelProvider[ConfirmViewModel::class.java].callback.observe(
+            viewLifecycleOwner,
+            Observer {
+                when {
+                    it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(
+                        R.id.mainMenuFragment,
+                        false
+                    )
+                    it.checkWithResultCode(SURRENDER) -> gameViewModel.onPlayerSurrender()
+                    it.checkWithResultCode(USE_HINT) -> adManager.showAd()
+                }
+            })
+        viewModelProvider[GameSessionViewModel::class.java].apply {
+            gameViewModel.startGame(gameSession.value!!.peekContent())
         }
-        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(activity).apply {
-            rewardedVideoAdListener = TipsListener(::loadRewardedVideoAd, mGameSession!!::useHint)
-        }
-        if (!mRewardedVideoAd.isLoaded)
-            loadRewardedVideoAd()
-    }
-
-    private fun showAd() {
-        if (mRewardedVideoAd.isLoaded) {
-            mRewardedVideoAd.show()
-        } else {
-            loadRewardedVideoAd()
-            Toast.makeText(requireContext(), R.string.internet_unavailable, Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-
-    private fun loadRewardedVideoAd() {
-        mRewardedVideoAd.loadAd(
-            requireContext().getString(R.string.rewarded_ad_id),
-            AdRequest.Builder().build()
+        viewModelProvider[UserMenuViewModel::class.java].actions.observe(
+            viewLifecycleOwner,
+            ::handleUserMenuAction
         )
-    }
 
-    override fun getGamePreferences(): GamePreferences = lpsApplication.gamePreferences
-
-    override fun onHighlightUser(position: Position) {
-        when (position) {
-            Position.LEFT -> mGameViewModel.isLeftActive.set(true)
-            Position.RIGHT -> mGameViewModel.isLeftActive.set(false)
-            else -> Unit
+        gameViewModel.apply {
+            cities.observe(this@GameFragment, adapter::updateEntities)
+            state.observe(this@GameFragment, ::handleState)
+            state.observe(this@GameFragment, gameStateNotifier::showState)
+            wordState.observe(this@GameFragment, ::handleWordResult)
+            friendRequest.observe(this@GameFragment, ::handleFriendRequest)
+            correctionViewModel.setCorrectionsList(wordState, ::processCityInput)
         }
-    }
-
-    override fun onTimerUpdate(time: String) {
-        gameTimer.text = time
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return DataBindingUtil.inflate<FragmentGameBinding>(
-            inflater,
-            R.layout.fragment_game,
-            container,
-            false
-        ).apply {
-            viewModel = mGameViewModel
-            mBinding = this
+    ): View {
+        return FragmentGameBinding.inflate(inflater, container, false).apply {
+            viewModel = gameViewModel
         }.root
     }
 
@@ -208,31 +135,22 @@ class GameFragment : Fragment(), GameContract.View {
         val activity = requireActivity()
         (activity as MainActivity).setToolbarVisibility(false)
 
-        if (mGameSession == null) {
-            showInfo(getString(R.string.game_session_is_null_error))
-            Crashlytics.log("Game session is null!")
-            try {
-                getActivity()?.supportFragmentManager?.popBackStack()
-            } catch (e: Exception) {
-                Crashlytics.logException(e)
-            }
-            return
-        }
-
         checkForFirstLaunch()
         setupCityListeners(activity)
         setupMessageListeners()
-        setupAds(activity)
+
+        adManager = AdManager(adView, activity) { gameViewModel.useHintForPlayer() }
+        adManager.setupAds()
 
         btnMenu.setOnClickListener { showGoToMenuDialog() }
         btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
         btnHelp.setOnClickListener { showConfirmationDialog(USE_HINT, R.string.use_hint) }
         btnMsg.setOnClickListener { setMessagingLayout(messageInputLayout.visibility != View.VISIBLE) }
-        avatarLeft.setOnClickListener { mGameSession?.needsShowMenu(Position.LEFT) }
-        avatarRight.setOnClickListener { mGameSession?.needsShowMenu(Position.RIGHT) }
+        avatarLeft.setOnClickListener { gameViewModel.showMenu(Position.LEFT, ::showUserMenu) }
+        avatarRight.setOnClickListener { gameViewModel.showMenu(Position.RIGHT, ::showUserMenu) }
 
         recyclerView.apply {
-            adapter = mAdapter
+            adapter = this@GameFragment.adapter
             layoutManager = LinearLayoutManager(activity).apply { stackFromEnd = true }
             addOnLayoutChangeListener { _, _, _,
                                         _, bottom, _, _, _, oldBottom ->
@@ -245,12 +163,13 @@ class GameFragment : Fragment(), GameContract.View {
             }
             setHasFixedSize(true)
         }
-
-        startGame()
     }
 
+    /**
+     * TODO: Create new hints
+     */
     private fun checkForFirstLaunch() {
-        if (getGamePreferences().isFirstLaunch()) {
+        if (prefs.isFirstLaunch()) {
             val context = requireContext()
             resources.getStringArray(R.array.hints).forEachIndexed { i, hint ->
                 Handler().postDelayed({
@@ -286,48 +205,108 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        SpeechRecognitionHelper.onActivityResult(requestCode, resultCode, data) {
-            mGameSession?.submit(it) {} ?: false
-        }
+        SpeechRecognitionHelper.onActivityResult(
+            requestCode,
+            resultCode,
+            data,
+            gameViewModel::processCityInput
+        )
     }
 
     private fun submit() {
-        mGameSession?.submit(cityInput.text.toString()) {
-            cityInput.text = null
+        cityInput.apply {
+            if (!text.isNullOrEmpty())
+                gameViewModel.processCityInput(text.toString())
         }
     }
 
     private fun submitMessage() {
         val message = messageInput.text!!.toString()
-
         if (message.isNotBlank()) {
-            mGameSession!!.sendMessage(message)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe {
-                    messageInput.text = null
-                    setMessagingLayout(false)
+            gameViewModel.processMessage(message) {
+                clickSound?.start()
+                scrollRecyclerView()
+            }
+            messageInput.text = null
+            setMessagingLayout(false)
+        }
+    }
+
+    private fun handleWordResult(wordResult: WordCheckingResult) {
+        when (wordResult) {
+            is WordCheckingResult.WrongLetter -> showInfo(
+                getString(
+                    R.string.wrong_letter,
+                    wordResult.validLetter.toUpperCase()
+                )
+            )
+            is WordCheckingResult.AlreadyUsed -> showInfo(
+                getString(
+                    R.string.already_used,
+                    toTitleCase(wordResult.word)
+                )
+            )
+            is WordCheckingResult.Exclusion -> showInfo(wordResult.description)
+            is WordCheckingResult.Corrections ->
+                findNavController().navigate(R.id.showCorrectionTipsDialog)
+            is WordCheckingResult.NotFound -> showInfo(
+                getString(
+                    R.string.city_not_found,
+                    toTitleCase(wordResult.word)
+                )
+            )
+            is WordCheckingResult.Accepted -> {
+                cityInput.text = null
+                clickSound?.start()
+                hideKeyboard()
+            }
+        }
+    }
+
+    private fun handleState(currentState: GameState) {
+        if (currentState is GameState.Finish) navigateOnDestinationWaiting(
+            GameFragmentDirections.showGameResultDialog(
+                currentState.gameResultMessage,
+                currentState.playerScore
+            )
+        )
+    }
+
+    private fun handleUserMenuAction(event: Event<UserMenuViewModel.UserMenuAction>) {
+        event.getContentIfNotHandled()?.apply {
+            when (action) {
+                UserMenuViewModel.Action.BanUser -> gameViewModel.banUser(userId) {
+                    Toast.makeText(
+                        requireActivity(),
+                        getString(R.string.user_banned, login),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    findNavController().popBackStack(R.id.gameFragment, true)
                 }
-                .subscribe({}, { err -> showErrorSnackbar(err, this) })
-                .addTo(disposable)
+                UserMenuViewModel.Action.SendFriendRequest -> gameViewModel.sendFriendRequest(userId)
+                {
+                    Toast.makeText(
+                        requireActivity(),
+                        R.string.new_friend_request,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun handleFriendRequest(request: LPSMessage.LPSFriendRequest) {
+        when (request.result) {
+            LPSMessage.FriendRequest.ACCEPTED -> showInfo(
+                getString(R.string.friends_request_accepted, request.login)
+            )
+            LPSMessage.FriendRequest.DENIED -> showInfo(getString(R.string.friends_request_denied))
+            else -> Unit
         }
     }
 
     private fun scrollRecyclerView() {
-        if (recyclerView != null)
-            recyclerView.scrollToPosition(mAdapter.itemCount - 1)
-        else
-            Crashlytics.log("Can't scroll because recyclerView is null!")
-    }
-
-    override fun showFriendRequestDialog(name: String) {
-        val msg = getString(R.string.confirm_friend_request, name)
-        findNavController().navigate(
-            GameFragmentDirections.showConfimationDialog(
-                NEW_FRIEND_REQUEST,
-                msg,
-                null
-            )
-        )
+        recyclerView?.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun hideKeyboard() {
@@ -344,7 +323,7 @@ class GameFragment : Fragment(), GameContract.View {
     }
 
     private fun showConfirmationDialog(code: Int, msg: Int) {
-        findNavController().navigate(
+        safeNavigate(
             GameFragmentDirections.showConfimationDialog(
                 code,
                 getString(msg),
@@ -353,97 +332,18 @@ class GameFragment : Fragment(), GameContract.View {
         )
     }
 
-    override fun showGameResults(result: String, score: Int) {
-        val nav = findNavController()
-        disposable.add(Completable.timer(100, TimeUnit.MILLISECONDS)
-            .repeatUntil { nav.currentDestination!!.id == R.id.gameFragment }
-            .subscribe {
-                nav.navigate(
-                    GameFragmentDirections.showGameResultDialog(
-                        result,
-                        score
-                    )
-                )
-            })
-    }
-
-    private fun startGame() {
-        mGameSession?.onAttachView(this)
-        mAdapter.clear()
-    }
-
-    private fun stopGame() {
+    override fun onStop() {
+        super.onStop()
         hideKeyboard()
-        disposable.clear()
-        mGameSession?.onStop()
     }
 
     override fun onDetach() {
-        stopGame()
         super.onDetach()
         requireActivity().unregisterReceiver(screenReceiver)
-        mGameSession?.onDetachView()
     }
 
-    override fun showInfo(msg: String) {
+    private fun showInfo(msg: String) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun showUserMenu(isFriend: Boolean, name: String, userId: Int) {
-        findNavController().navigate(
-            GameFragmentDirections.showUserContextDialog(
-                isFriend,
-                name,
-                userId
-            )
-        )
-    }
-
-    override fun showError(err: Throwable) {
-        showErrorSnackbar(err, this)
-    }
-
-    override fun updateLabel(info: String, position: Position) {
-        when (position) {
-            Position.LEFT -> mGameViewModel.infoLeft.set(info)
-            Position.RIGHT -> mGameViewModel.infoRight.set(info)
-            else -> Unit
-        }
-    }
-
-    override fun updateAvatar(imageRequest: RequestCreator, position: Position) {
-        when (position) {
-            Position.LEFT -> mGameViewModel.imageLeft.set(imageRequest)
-            Position.RIGHT -> mGameViewModel.imageRight.set(imageRequest)
-            else -> Unit
-        }
-    }
-
-    override fun putMessage(message: String, position: Position) {
-        mClickSound?.start()
-        mAdapter.addMessage(message, position)
-        scrollRecyclerView()
-    }
-
-    override fun putCity(city: String, countryCode: Short, position: Position) {
-        mClickSound?.start()
-        mAdapter.addCity(city, countryCode, position)
-        Completable.fromAction { hideKeyboard() }
-            .andThen(Completable.timer(200, TimeUnit.MILLISECONDS))
-            .observeOn(AndroidSchedulers.mainThread())
-            .andThen(Completable.fromAction { scrollRecyclerView() })
-            .subscribe()
-    }
-
-    override fun updateCity(city: String, hasErrors: Boolean) {
-        mAdapter.updateCity(city, hasErrors)
-    }
-
-    override fun showCorrectionDialog(word: String, errorMsg: String) {
-        findNavController().apply {
-            if (R.id.gameFragment == currentDestination?.id ?: 0)
-                navigate(GameFragmentDirections.showCorrectionTipsDialog(word, errorMsg))
-        }
     }
 
     private fun setMessagingLayout(isMessagingMode: Boolean) {
@@ -458,12 +358,40 @@ class GameFragment : Fragment(), GameContract.View {
         }
     }
 
-    override fun context(): Context = requireContext()
+    /**
+     * Waits until currentDestination become gameFragment and then navigates to [dir].
+     */
+    private fun navigateOnDestinationWaiting(dir: NavDirections) {
+        lifecycleScope.launch {
+            val nav = findNavController()
+            while (R.id.gameFragment != nav.currentDestination?.id)
+                delay(100)
+            nav.navigate(dir)
+        }
+    }
+
+    /**
+     * Navigates to [dir] only if current destination is gameFragment.
+     */
+    private fun safeNavigate(dir: NavDirections) {
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.gameFragment)
+            navController.navigate(dir)
+    }
+
+    private fun showUserMenu(user: User) {
+        safeNavigate(
+            GameFragmentDirections.showUserContextDialog(
+                user.playerData.isFriend,
+                user.name,
+                user.credentials.userId
+            )
+        )
+    }
 
     companion object {
         private const val GO_TO_MENU = 21
         private const val SURRENDER = 22
         private const val USE_HINT = 23
-        private const val NEW_FRIEND_REQUEST = 24
     }
 }

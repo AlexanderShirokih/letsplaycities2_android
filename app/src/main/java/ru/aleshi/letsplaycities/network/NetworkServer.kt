@@ -3,56 +3,76 @@ package ru.aleshi.letsplaycities.network
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
-import ru.aleshi.letsplaycities.base.game.BaseServer
+import io.reactivex.functions.BiFunction
+import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.base.player.UserIdIdentity
+import ru.aleshi.letsplaycities.base.server.BaseServer
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
+import ru.aleshi.letsplaycities.base.server.ResultWithMessage
 import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.core.LPSMessage
-import ru.quandastudio.lpsclient.model.WordResult
 import javax.inject.Inject
 
-class NetworkServer @Inject constructor(private val mNetworkRepository: NetworkRepository) :
-    BaseServer() {
+class NetworkServer @Inject constructor(internal val networkRepository: NetworkRepository) :
+    BaseServer({ 92L }) {
 
-    override fun getWordsResult(): Observable<Pair<WordResult, String>> {
-        return mNetworkRepository.getWords().map { it.result to it.word }
+    override fun getDisconnections(): Observable<LPSMessage.LPSLeaveMessage> =
+        networkRepository.getLeave().toObservable()
+
+    override fun getIncomingWords(): Observable<ResultWithCity> {
+        return networkRepository.getWords().map {
+            ResultWithCity(
+                wordResult = it.result,
+                city = it.word,
+                identity = UserIdIdentity(it.ownerId)
+            )
+        }
     }
 
-    override fun getInputMessages(): Observable<String> {
-        return mNetworkRepository.getMessages()
-            .map { if (it.isSystemMsg) "[СИСТЕМА] " else "" + it.msg }
-    }
-
-    companion object {
-        private const val NETWORK_TIMER = 92L
+    override fun getIncomingMessages(): Observable<ResultWithMessage> {
+        return networkRepository.getMessages()
+            .map {
+                ResultWithMessage(
+                    message = if (it.isSystemMsg) "[СИСТЕМА] " else "" + it.msg,
+                    identity = UserIdIdentity(it.ownerId)
+                )
+            }
     }
 
     override fun dispose() {
-        mNetworkRepository.disconnect()
+        networkRepository.disconnect()
     }
 
-    override fun broadcastResult(city: String) =
-        mNetworkRepository.sendWord(city)
+    override fun sendCity(city: String, sender: User): Observable<ResultWithCity> {
+        return Observable.zip(
+            networkRepository.sendWord(city)
+                .andThen(Observable.just(Unit)),
+            getIncomingWords().filter { it.identity.isTheSameUser(sender) },
+            BiFunction { _: Unit, word: ResultWithCity -> word }
+        )
+    }
 
-    override fun getTimeLimit(): Long = NETWORK_TIMER
+    override fun getTimer(): Observable<Long> =
+        super.getTimer().takeUntil(networkRepository.getTimeout().toObservable())
 
-    override fun broadcastMessage(message: String): Completable =
-        mNetworkRepository.sendMessage(message)
+    override fun sendMessage(message: String, sender: User): Completable =
+        networkRepository.sendMessage(message)
 
-    override val leave: Maybe<Boolean> = mNetworkRepository.getLeave().map { it.leaved }
+    override val friendRequestResult: Observable<LPSMessage.LPSFriendRequest> =
+        networkRepository.getFriendsRequest()
 
-    override val timeout: Maybe<LPSMessage> = mNetworkRepository.getTimeout()
-
-    override val friendsRequest: Observable<LPSMessage.FriendRequest> =
-        mNetworkRepository.getFriendsRequest()
-
-    override fun sendFriendRequest(): Completable =
-        mNetworkRepository.sendFriendRequest()
-
-    override fun sendFriendAcceptance(accepted: Boolean): Completable =
-        mNetworkRepository.sendFriendAcceptance(accepted)
+    /**
+     * Sends friends request from current player to [userId].
+     */
+    override fun sendFriendRequest(userId: Int): Completable =
+        networkRepository.sendFriendRequest(userId)
 
     override fun banUser(userId: Int): Completable =
-        mNetworkRepository.banUser(userId)
+        networkRepository.banUser(userId)
 
-
-    override val kick: Maybe<Boolean> = mNetworkRepository.getKick().map { it.isBannedBySystem }
+    /**
+     * I don't know why but isBannedBySystem inverted, so we flit it back and now `true` means
+     * banned by system and `false` banned by opponent
+     */
+    override val kick: Maybe<Boolean> = networkRepository.getKick().map { !it.isBannedBySystem }
 }

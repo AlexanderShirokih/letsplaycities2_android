@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities
 
 import android.content.Context
 import android.util.Base64
+import android.widget.Toast
 import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.squareup.picasso.OkHttp3Downloader
@@ -9,6 +10,7 @@ import com.squareup.picasso.Picasso
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
+import io.reactivex.plugins.RxJavaPlugins
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -17,7 +19,6 @@ import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import javax.inject.Inject
 
-
 class LPSApplication : MultiDexApplication(), HasAndroidInjector {
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
@@ -25,9 +26,8 @@ class LPSApplication : MultiDexApplication(), HasAndroidInjector {
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
-    val gamePreferences: GamePreferences by lazy {
-        GamePreferences(this)
-    }
+    @Inject
+    lateinit var gamePreferences: GamePreferences
 
     override fun onCreate() {
         super.onCreate()
@@ -38,9 +38,15 @@ class LPSApplication : MultiDexApplication(), HasAndroidInjector {
             .build()
             .inject(this)
         SocialNetworkManager.init(this, ServiceType.VK)
-        if (!BuildConfig.DEBUG)
-            Crashlytics.getInstance()
+
+        RxJavaPlugins.setErrorHandler {
+            showErrorToast(it)
+            Crashlytics.logException(it)
+        }
     }
+
+    private fun showErrorToast(error: Throwable) =
+        Toast.makeText(this, "ERR: $error", Toast.LENGTH_LONG).show()
 
     private fun initPicasso(context: Context): Picasso {
         return Picasso.Builder(context)
@@ -62,6 +68,5 @@ class LPSApplication : MultiDexApplication(), HasAndroidInjector {
             } else response
         }.cache(Cache(context.cacheDir, 2 * 1024 * 1024)).build()
     }
-
 
 }

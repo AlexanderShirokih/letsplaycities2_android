@@ -1,42 +1,55 @@
 package ru.aleshi.letsplaycities.base.player
 
-import com.squareup.picasso.Picasso
 import io.reactivex.Maybe
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import ru.aleshi.letsplaycities.R
+import io.reactivex.Observable
+import ru.aleshi.letsplaycities.base.combos.ComboSystem
+import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.game.SurrenderException
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
+import ru.quandastudio.lpsclient.model.WordResult
 import java.util.concurrent.TimeUnit
 
-class Android(picasso: Picasso, name: String, versionInfo: VersionInfo) : User(
-    PlayerData.SimpleFactory().create(name, versionInfo),
-    PictureSource(picasso, R.drawable.ic_android_big),
-    canUseQuickTime = false
-) {
+/**
+ * Represents logic of Android player.
+ * @param playerData [PlayerData] model class that contains info about user
+ * @param pictureSource represents android's picture
+ */
+class Android(playerData: PlayerData, pictureSource: PictureSource) :
+    User(playerData, pictureSource) {
 
-    private var mEstimatedMoves: Int = 1
+    /**
+     * Count of moves before Android surrenders
+     */
+    internal var estimatedMoves: Int = 1
 
-    override fun onBeginMove(firstChar: Char?) {
-        gameSession.disposable.add(Maybe.just(firstChar)
-            .subscribeOn(Schedulers.computation())
+    override fun onInit(comboSystemView: ComboSystemView): ComboSystem {
+        val diff = game.difficulty - 1
+        estimatedMoves = (20 + diff.toFloat() / 3f * 70).toInt()
+        estimatedMoves = (estimatedMoves..(estimatedMoves * 1.35f).toInt()).random()
+        return ComboSystem(false)
+    }
+
+    /**
+     * Generates random word starting with [firstChar]
+     * and return it as [Maybe].
+     * @param firstChar the first char of new word
+     * @return [Maybe] word or [Maybe.empty] if no words left for this letter.
+     * Note that [Android] doesn't checks words in server.
+     */
+    override fun onMakeMove(firstChar: Char): Observable<ResultWithCity> =
+        Maybe.just(firstChar)
             .delay(1500, TimeUnit.MILLISECONDS)
-            .filter { mEstimatedMoves-- > 0 }
-            .flatMap { gameSession.dictionary().getRandomWord(it, false) }
-            .observeOn(Schedulers.io())
-            .flatMapCompletable(::sendCity)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnError { gameSession.onSurrender() }
-            .subscribe()
-        )
-    }
-
-    override fun reset() {
-        super.reset()
-        val diff = gameSession.difficulty - 1
-        mEstimatedMoves = (15 + diff.toFloat() / 3f * 70).toInt()
-        mEstimatedMoves = (mEstimatedMoves..(mEstimatedMoves * 1.35f).toInt()).random()
-    }
+            .filter { estimatedMoves-- > 0 }
+            .flatMap(game::getRandomWord)
+            .switchIfEmpty(Maybe.error(SurrenderException(this, false)))
+            .map {
+                ResultWithCity(
+                    wordResult = WordResult.ACCEPTED,
+                    identity = UserIdIdentity(this),
+                    city = it
+                )
+            }.toObservable()
 
 }

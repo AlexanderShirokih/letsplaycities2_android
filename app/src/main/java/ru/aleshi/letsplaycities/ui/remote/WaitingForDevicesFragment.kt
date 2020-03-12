@@ -10,11 +10,11 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_waiting_for_devices.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.remote.RemoteContract
 import ru.aleshi.letsplaycities.remote.RemotePresenter
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
-import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
 import javax.inject.Inject
 
 class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices),
@@ -23,13 +23,16 @@ class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices
     @Inject
     lateinit var remotePresenter: RemoteContract.Presenter
 
+    @Inject
+    lateinit var gamePreferences: GamePreferences
+
     private var mGameSound: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         remotePresenter.onApplyView(this)
-        if (lpsApplication.gamePreferences.isSoundEnabled()) {
+        if (gamePreferences.isSoundEnabled()) {
             mGameSound = MediaPlayer.create(activity, R.raw.begin)
         }
     }
@@ -40,8 +43,9 @@ class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices
     }
 
     override fun onStartGame(gameSession: GameSession) {
-        ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =
+        ViewModelProvider(this)[GameSessionViewModel::class.java].setGameSession(
             gameSession
+        )
         mGameSound?.start()
         findNavController().navigate(R.id.start_game_fragment)
     }

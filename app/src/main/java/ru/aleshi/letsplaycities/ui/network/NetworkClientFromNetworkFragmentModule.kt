@@ -13,10 +13,9 @@ class NetworkClientFromNetworkFragmentModule {
         val connectionType =
             if (args.isLocal) NetworkClient.ConnectionType.PureSocket else NetworkClient.ConnectionType.WebSocket
         return if (args.port > 0) NetworkClient(
-            args.isLocal,
             connectionType,
             args.host,
             args.port
-        ) else NetworkClient(args.isLocal, connectionType, args.host)
+        ) else NetworkClient(connectionType, args.host)
     }
 }

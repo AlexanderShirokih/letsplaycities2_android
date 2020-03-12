@@ -10,6 +10,6 @@ class NetworkClientModule {
 
     @Provides
     fun provideNetworkClient(): NetworkClient =
-        NetworkClient(false, NetworkClient.ConnectionType.WebSocket, BuildConfig.HOST)
+        NetworkClient(NetworkClient.ConnectionType.WebSocket, BuildConfig.HOST)
 
 }

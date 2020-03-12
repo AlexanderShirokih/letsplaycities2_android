@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
-import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.databinding.FragmentProfileViewBinding
@@ -17,8 +16,10 @@ import ru.quandastudio.lpsclient.core.CredentialsProvider
 import javax.inject.Inject
 
 class ViewProfileFragment : Fragment() {
-    private lateinit var mGamePreferences: GamePreferences
     private lateinit var mProfileViewModel: ProfileViewModel
+
+    @Inject
+    lateinit var gamePreferences: GamePreferences
 
     @Inject
     lateinit var credentialsProvider: CredentialsProvider
@@ -28,12 +29,11 @@ class ViewProfileFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        mGamePreferences = (requireContext().applicationContext as LPSApplication).gamePreferences
         mProfileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
     }
 
     fun onLogout(view: View) {
-        SocialNetworkManager.logout(mGamePreferences, credentialsProvider)
+        SocialNetworkManager.logout(gamePreferences, credentialsProvider)
         findNavController().navigate(R.id.actionLogin)
     }
 
@@ -43,7 +43,7 @@ class ViewProfileFragment : Fragment() {
             findNavController().popBackStack()
         else {
             mVisited = true
-            if (!mGamePreferences.isLoggedIn())
+            if (!gamePreferences.isLoggedIn())
                 findNavController().navigate(R.id.actionLogin)
         }
     }

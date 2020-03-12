@@ -3,8 +3,10 @@ package ru.aleshi.letsplaycities.social
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.core.net.toUri
 import ru.aleshi.letsplaycities.LPSApplication
-import ru.aleshi.letsplaycities.base.player.DeviceId
+import ru.aleshi.letsplaycities.platform.AndroidDeviceId
 import ru.quandastudio.lpsclient.model.AuthType
 
 class NativeAccess : ISocialNetwork() {
@@ -19,11 +21,11 @@ class NativeAccess : ISocialNetwork() {
         val prefs = (activity.application as LPSApplication).gamePreferences
         callback?.onLoggedIn(
             SocialAccountData(
-                snUID = DeviceId(activity).toString(),
+                snUID = AndroidDeviceId(activity).toString(),
                 login = prefs.lastNativeLogin,
                 accessToken = accessToken,
                 networkType = AuthType.Native,
-                pictureUri = prefs.lastAvatarUri
+                pictureUri = prefs.lastAvatarUri?.toString()?.toUri() ?: Uri.EMPTY
             )
         )
     }

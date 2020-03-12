@@ -4,7 +4,12 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
-class ComboSystem(private val view: ComboSystemView, private val canUseQuickTime: Boolean) {
+class ComboSystem(
+    private val canUseQuickTime: Boolean,
+    private val view: ComboSystemView = DefaultSystemView
+) {
+
+    object DefaultSystemView : ComboSystemView
 
     private val maxSingleScore = 3f
     private val activeCombos = mutableMapOf<ComboType, Int>()

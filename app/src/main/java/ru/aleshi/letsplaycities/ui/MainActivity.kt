@@ -16,11 +16,12 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.activity_main.*
+import ru.aleshi.letsplaycities.MyFirebaseMessagingService
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.ThemeManager
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
+import ru.aleshi.letsplaycities.utils.Utils
 import javax.inject.Inject
-
 
 class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
@@ -28,6 +29,9 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
+
+    @Inject
+    lateinit var prefs: GamePreferences
 
     private val mFriendRequestReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) =
@@ -37,7 +41,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-        ThemeManager.applyTheme(this)
+        Utils.applyTheme(prefs, this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
@@ -54,7 +58,10 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
     override fun onResume() {
         super.onResume()
         LocalBroadcastManager.getInstance(this)
-            .registerReceiver(mFriendRequestReceiver, IntentFilter("fm_request"))
+            .registerReceiver(
+                mFriendRequestReceiver,
+                IntentFilter(MyFirebaseMessagingService.ACTION_FIREBASE)
+            )
     }
 
     override fun onPause() {
@@ -81,14 +88,23 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     private fun checkForFirebaseNotifications(intent: Intent) {
         intent.extras?.let { data ->
-            if ("fm_request" == data.getString("action", ""))
-                startFriendModeGame(data)
+            when (data.getString(MyFirebaseMessagingService.KEY_ACTION)) {
+                MyFirebaseMessagingService.ACTION_FM -> startFriendModeGame(data)
+                MyFirebaseMessagingService.ACTION_FRIEND_REQUEST -> showFriendRequestDialog(data)
+            }
         }
+    }
+
+    private fun showFriendRequestDialog(data: Bundle) {
+        findNavController(R.id.main_nav_fragment).navigate(
+            R.id.globalStartFriendRequestDialog,
+            data
+        )
     }
 
     private fun startFriendModeGame(data: Bundle) {
         findNavController(R.id.main_nav_fragment).navigate(
-            R.id.globalStartFriendRequestDialog,
+            R.id.globalStartFriendGameRequestDialog,
             data
         )
     }

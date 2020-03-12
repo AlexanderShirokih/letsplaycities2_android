@@ -12,9 +12,7 @@ import kotlinx.android.synthetic.main.fragment_friends.view.*
 import kotlinx.android.synthetic.main.fragment_history.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
-import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
-import ru.quandastudio.lpsclient.core.LpsApi
 import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.HistoryInfo
 import javax.inject.Inject
@@ -27,7 +25,7 @@ class HistoryFragment : BasicNetworkFetchFragment<HistoryInfo>(),
     @Inject
     lateinit var mPicasso: Picasso
 
-    override fun onCreate(sharedViewModelFactory: ViewModelFactory) = Unit
+    override fun onCreate() = Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,

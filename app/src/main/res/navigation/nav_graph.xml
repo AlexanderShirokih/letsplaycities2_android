@@ -57,9 +57,9 @@
             android:label="RateDialog" />
 
     <dialog
-            android:id="@+id/friendRequestDialog"
-            android:name="ru.aleshi.letsplaycities.ui.FriendRequestDialog"
-            android:label="FriendRequestDialog">
+            android:id="@+id/friendGameRequestDialog"
+            android:name="ru.aleshi.letsplaycities.ui.global.FriendGameRequestDialog"
+            android:label="FriendGameRequestDialog">
         <argument
                 android:name="login"
                 app:argType="string" />
@@ -76,11 +76,14 @@
                     android:name="oppId"
                     app:argType="integer" />
         </action>
+        <argument
+                android:name="user_id"
+                app:argType="integer" />
     </dialog>
 
     <action
-            android:id="@+id/globalStartFriendRequestDialog"
-            app:destination="@id/friendRequestDialog" />
+            android:id="@+id/globalStartFriendGameRequestDialog"
+            app:destination="@id/friendGameRequestDialog" />
 
     <navigation
             android:id="@+id/settingsNav"
@@ -181,23 +184,13 @@
             <argument
                     android:name="score"
                     app:argType="integer" />
-            <action
-                    android:id="@+id/back_to_game_fragment"
-                    app:popUpTo="@id/gameFragment"
-                    app:popUpToInclusive="false" />
         </dialog>
+
         <dialog
                 android:id="@+id/correctionTipsDialog"
                 android:name="ru.aleshi.letsplaycities.ui.game.CorrectionTipsDialog"
                 android:label="CorrectionTipsDialog"
-                tools:layout="@layout/dialog_correction_tips">
-            <argument
-                    android:name="word"
-                    app:argType="string" />
-            <argument
-                    android:name="errorMsg"
-                    app:argType="string" />
-        </dialog>
+                tools:layout="@layout/dialog_correction_tips" />
         <dialog
                 android:id="@+id/userContextMenuDialog"
                 android:name="ru.aleshi.letsplaycities.ui.game.UserContextMenuDialog"
@@ -356,5 +349,23 @@
                     app:destination="@+id/gameNav" />
         </fragment>
     </navigation>
+
+    <dialog
+            android:id="@+id/friendRequestDialog"
+            android:name="ru.aleshi.letsplaycities.ui.global.FriendRequestDialog"
+            android:label="FriendRequestDialog" >
+        <argument
+                android:name="result"
+                app:argType="string" />
+        <argument
+                android:name="login"
+                app:argType="string" />
+        <argument
+                android:name="user_id"
+                app:argType="integer" />
+    </dialog>
+    <action
+            android:id="@+id/globalStartFriendRequestDialog"
+            app:destination="@id/friendRequestDialog" />
 
 </navigation>

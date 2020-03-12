@@ -45,8 +45,8 @@ object Bindings {
 
     @BindingAdapter("imageRequest")
     @JvmStatic
-    fun setPlayerImageUri(imageView: ImageView, imageRequest: RequestCreator) {
-        imageRequest.into(imageView)
+    fun setPlayerImageRequest(imageView: ImageView, imageRequest: RequestCreator?) {
+        imageRequest?.into(imageView)
     }
 
 }

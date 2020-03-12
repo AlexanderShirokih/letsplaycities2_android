@@ -3,11 +3,11 @@ package ru.aleshi.letsplaycities
 import com.squareup.picasso.Picasso
 import dagger.BindsInstance
 import dagger.Component
-import ru.aleshi.letsplaycities.base.game.GameModule
+import ru.aleshi.letsplaycities.platform.Platform
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, GameModule::class])
+@Component(modules = [AppModule::class, Platform::class])
 interface AppComponent {
 
     @Component.Builder

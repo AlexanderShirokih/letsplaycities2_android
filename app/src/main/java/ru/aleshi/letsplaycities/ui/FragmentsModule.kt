@@ -2,12 +2,16 @@ package ru.aleshi.letsplaycities.ui
 
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-import ru.aleshi.letsplaycities.base.dictionary.DictionaryModule
 import ru.aleshi.letsplaycities.base.game.GameModule
+import ru.aleshi.letsplaycities.base.mainmenu.MainMenuModule
 import ru.aleshi.letsplaycities.network.NetworkClientModule
 import ru.aleshi.letsplaycities.network.NetworkModule
 import ru.aleshi.letsplaycities.remote.RemoteModule
 import ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment
+import ru.aleshi.letsplaycities.ui.game.GameFragment
+import ru.aleshi.letsplaycities.ui.game.GameFragmentModule
+import ru.aleshi.letsplaycities.ui.global.FriendGameRequestDialog
+import ru.aleshi.letsplaycities.ui.global.FriendRequestDialog
 import ru.aleshi.letsplaycities.ui.network.friends.FriendsFragment
 import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkFragment
@@ -16,13 +20,14 @@ import ru.aleshi.letsplaycities.ui.network.history.HistoryFragment
 import ru.aleshi.letsplaycities.ui.profile.LoginProfileFragment
 import ru.aleshi.letsplaycities.ui.profile.ViewProfileFragment
 import ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment
+import ru.aleshi.letsplaycities.ui.settings.SettingsFragment
+import ru.aleshi.letsplaycities.ui.theme.ThemeFragment
 
-//TODO: Create common component with NetworkModule
 @Module
 abstract class FragmentsModule {
 
     @ActivityScope
-    @ContributesAndroidInjector(modules = [GameModule::class, DictionaryModule::class])
+    @ContributesAndroidInjector(modules = [ViewBindingsModule::class, MainMenuModule::class])
     abstract fun contributeMainMenuFragment(): MainMenuFragment
 
     @ActivityScope
@@ -34,26 +39,42 @@ abstract class FragmentsModule {
     abstract fun contributeWaitingForDevicesFragment(): WaitingForDevicesFragment
 
     @ActivityScope
-    @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientModule::class])
-    abstract fun contributeFriendsFragment(): FriendsFragment
-
-    @ActivityScope
-    @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientModule::class])
-    abstract fun contributeHistoryFragment(): HistoryFragment
-
-    @ActivityScope
-    @ContributesAndroidInjector(modules = [NetworkModule::class, NetworkClientModule::class])
-    abstract fun contributeBlackListFragment(): BlackListFragment
-
-    @ActivityScope
-    @ContributesAndroidInjector(modules = [NetworkModule::class])
-    abstract fun contributeFriendRequestDialog(): FriendRequestDialog
-
-    @ActivityScope
-    @ContributesAndroidInjector(modules = [NetworkModule::class])
+    @ContributesAndroidInjector
     abstract fun contributeLoginProfileFragment(): LoginProfileFragment
 
     @ActivityScope
-    @ContributesAndroidInjector(modules = [NetworkModule::class])
+    @ContributesAndroidInjector(modules = [NetworkClientModule::class])
+    abstract fun contributeHistoryFragment(): HistoryFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [NetworkClientModule::class])
+    abstract fun contributeFriendsFragment(): FriendsFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [NetworkClientModule::class])
+    abstract fun contributeBlackListFragment(): BlackListFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeFriendGameRequestDialog(): FriendGameRequestDialog
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeFriendRequestDialog(): FriendRequestDialog
+
+    @ActivityScope
+    @ContributesAndroidInjector
     abstract fun contributeViewProfileFragment(): ViewProfileFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeThemeFragment(): ThemeFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeSettingsFragment(): SettingsFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [GameModule::class, GameFragmentModule::class])
+    abstract fun contributeGameFragment(): GameFragment
 }

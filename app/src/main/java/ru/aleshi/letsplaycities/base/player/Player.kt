@@ -1,126 +1,210 @@
 package ru.aleshi.letsplaycities.base.player
 
 import com.squareup.picasso.Picasso
+import io.reactivex.Completable
 import io.reactivex.Maybe
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.dictionary.Dictionary
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.subjects.PublishSubject
+import ru.aleshi.letsplaycities.base.combos.ComboSystem
+import ru.aleshi.letsplaycities.base.combos.ComboSystemView
+import ru.aleshi.letsplaycities.base.dictionary.CityResult
+import ru.aleshi.letsplaycities.base.game.GameFacade
 import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.game.WordCheckingResult
+import ru.aleshi.letsplaycities.base.server.BaseServer
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.aleshi.letsplaycities.utils.StringUtils
 import ru.aleshi.letsplaycities.utils.Utils
-import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
+import ru.quandastudio.lpsclient.model.*
 
+/**
+ * Represents logic of user controlled player.
+ * @param playerData [PlayerData] model class that contains info about user
+ * @param pictureSource represents users picture
+ */
 class Player(
+    private val server: BaseServer,
     playerData: PlayerData,
-    picasso: Picasso
+    pictureSource: PictureSource
 ) :
     User(
         playerData,
+        pictureSource
+    ) {
+
+    /**
+     * @param picasso [Picasso] instance
+     * @param playerData [PlayerData] model class that contains info about user
+     */
+    constructor(
+        server: BaseServer,
+        playerData: PlayerData,
+        picasso: Picasso
+    ) : this(
+        server,
+        playerData,
         PictureSource(
             picasso = picasso,
-            uri = Utils.getPictureUri(
+            uri = Utils.getPictureURI(
                 playerData.authData.credentials.userId,
                 playerData.pictureHash
-            ),
-            placeholder = R.drawable.ic_player_big
-        ),
-        hasUserInput = true
-    ) {
-
-    constructor(
-        picasso: Picasso,
-        name: String,
-        versionInfo: VersionInfo
-    ) : this(
-        PlayerData.SimpleFactory().create(name, versionInfo),
-        picasso
+            )
+        )
     )
 
-    private val mCompositeDisposable: CompositeDisposable = CompositeDisposable()
-    private var mFirstChar: Char? = null
+    /**
+     * [PublishSubject] that will emit user input if it completes all checking.
+     */
+    private val userInputSubject = PublishSubject.create<WordCheckingResult>()
 
-    override fun onBeginMove(firstChar: Char?) {
+    /**
+     * Saved first letter of the last word
+     */
+    private var mFirstChar: Char = Char.MIN_VALUE
+
+    override fun onInit(comboSystemView: ComboSystemView): ComboSystem =
+        ComboSystem(true, comboSystemView)
+
+    override fun onMakeMove(firstChar: Char): Observable<ResultWithCity> {
         mFirstChar = firstChar
+        return userInputSubject
+            .flatMap { validateOnServer(it) }
+            .takeUntil { it.isSuccessful() }
     }
 
-    class CityNotFoundException(val city: String) : Exception()
-
-    override fun onUserInput(userInput: String, onSuccess: () -> Unit) {
-        mCompositeDisposable.add(Maybe.just(userInput)
-            .map { StringUtils.formatCity(it) }
+    /**
+     * Processes user input
+     */
+    fun onUserInput(userInput: String): Observable<WordCheckingResult> {
+        val input = StringUtils.formatCity(userInput)
+        return Observable.just(input)
             .filter { it.isNotEmpty() }
-            .filter { mFirstChar == null || it[0] == mFirstChar }
-            .map { gameSession.mExclusions.check(it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { it.second?.run { gameSession.notify(this) } }
-            .filter { it.second == null }
-            .map { it.first }
-            .observeOn(Schedulers.computation())
             .flatMap {
-                var city = it
-                Maybe.just(0)
-                    .map { city }
-                    .map { c -> gameSession.dictionary().applyCity(c) }
-                    .flatMap { res ->
-                        if (res.second == Dictionary.CityResult.CITY_NOT_FOUND) Maybe.error(
-                            CityNotFoundException(res.first)
-                        ) else Maybe.just(res)
-                    }
-                    .retry { c, t ->
-                        city = StringUtils.replaceWhitespaces(city)
-                        c < 2 && t is CityNotFoundException
-                    }
-                    .onErrorResumeNext { t: Throwable ->
-                        if (t is CityNotFoundException)
-                            Maybe.just(t.city to Dictionary.CityResult.CITY_NOT_FOUND)
-                        else
-                            Maybe.error<Pair<String, Dictionary.CityResult>>(t)
-                    }
+                checkFirstLetterMatches(input).switchIfEmpty(
+                    checkForExclusions(input, game).switchIfEmpty(
+                        checkInDatabase(
+                            input,
+                            game
+                        )
+                    )
+                )
             }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ processCityResult(it, onSuccess) }, ::error)
-        )
+            .flatMap { checkForCorrections(it, game) }
+            .doOnNext { userInputSubject.onNext(it) }
     }
 
-    private fun processCityResult(
-        data: Pair<String, Dictionary.CityResult>,
-        onSuccess: () -> Unit
-    ) {
-        when (data.second) {
-            Dictionary.CityResult.ALREADY_USED -> gameSession.notify(
-                gameSession.view.context().getString(
-                    R.string.already_used,
-                    StringUtils.toTitleCase(data.first)
-                )
-            )
-            Dictionary.CityResult.CITY_NOT_FOUND -> gameSession.correct(
-                data.first,
-                gameSession.view.context().getString(
-                    R.string.city_not_found,
-                    StringUtils.toTitleCase(data.first)
-                )
-            )
-            Dictionary.CityResult.OK -> {
-                sendCity(data.first)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSubscribe {
-                        onSuccess()
-                    }.subscribe(
-                        {
-                        },
-                        { err ->
-                            gameSession.notify(
-                                gameSession.view.context().getString(
-                                    R.string.unk_error,
-                                    err.message
-                                )
-                            )
-                        })
+    /**
+     * Checks that [userInput] starts with [mFirstChar]
+     */
+    private fun checkFirstLetterMatches(userInput: String): Observable<WordCheckingResult> =
+        if (mFirstChar == Char.MIN_VALUE || mFirstChar == userInput[0])
+            Observable.empty()
+        else
+            Observable.just(WordCheckingResult.WrongLetter(mFirstChar))
+
+    /**
+     * Checks current [word] for exclusions.
+     * @return  empty [Observable] if word has no exclusions or
+     * [WordCheckingResult.Exclusion] if it has.
+     */
+    private fun checkForExclusions(word: String, game: GameFacade): Observable<WordCheckingResult> =
+        Observable.just(word).map { it to game.checkForExclusion(it) }
+            .flatMap {
+                if (it.second.isEmpty())
+                    Observable.empty<WordCheckingResult>()
+                else Observable.just(WordCheckingResult.Exclusion(it.second))
             }
-        }
+
+
+    /**
+     * Internal class which represents state when input city wasn't found in database
+     */
+    inner class CityNotFoundException(val city: String) : Exception()
+
+    /**
+     * Checks current [city] in game database.
+     * @return [Observable] of [WordCheckingResult.Accepted] if [city] was found in database and
+     * can be used, [WordCheckingResult.NotFound] if [city] was't found in database,
+     * [WordCheckingResult.AlreadyUsed] if word already used before.
+     */
+    private fun checkInDatabase(city: String, game: GameFacade): Observable<WordCheckingResult> {
+        var word = city
+        return game.checkCity(word)
+            .flatMap { result ->
+                when (result) {
+                    CityResult.CITY_NOT_FOUND -> Single.error<WordCheckingResult>(
+                        CityNotFoundException(word)
+                    )
+                    CityResult.ALREADY_USED -> Single.just(WordCheckingResult.AlreadyUsed(city))
+                    else -> Single.just(WordCheckingResult.Accepted(word))
+                }
+            }
+            .retry { c, t ->
+                word = StringUtils.replaceWhitespaces(word)
+                c < 2 && t is CityNotFoundException
+            }
+            .onErrorResumeNext { t: Throwable ->
+                if (t is CityNotFoundException)
+                    Single.just(
+                        WordCheckingResult.NotFound(t.city)
+                    )
+                else
+                    Single.error<WordCheckingResult>(t)
+            }.toObservable()
     }
 
+    /**
+     * If previous result was [WordCheckingResult.NotFound] this function will search corrections
+     * and emit [WordCheckingResult.Corrections] if corrections was found or [WordCheckingResult.NotFound]
+     * if corrections if not available.
+     * For any other states will emit [Observable.empty].
+     */
+    private fun checkForCorrections(
+        currentResult: WordCheckingResult,
+        game: GameFacade
+    ): Observable<WordCheckingResult> {
+        return if (currentResult is WordCheckingResult.NotFound) {
+            game.getCorrections(currentResult.word)
+                .flatMapObservable {
+                    if (it.isEmpty())
+                        Observable.just(WordCheckingResult.NotFound(currentResult.word))
+                    else
+                        Observable.just(WordCheckingResult.Corrections(it))
+                }
+        } else
+            Observable.just(currentResult)
+    }
+
+    /**
+     * Sends [result] to server if it [WordCheckingResult.Accepted],
+     * otherwise returns [Observable.never].
+     * Returns Observable that emits [ResultWithCity] and completes.
+     */
+    private fun validateOnServer(
+        result: WordCheckingResult
+    ): Observable<ResultWithCity> {
+        return if (result is WordCheckingResult.Accepted) {
+            Observable.concatArray(
+                Observable.just(
+                    ResultWithCity(
+                        wordResult = WordResult.UNKNOWN,
+                        identity = UserIdIdentity(this),
+                        city = result.word
+                    )
+                ),
+                server.sendCity(result.word, this)
+            )
+        } else Observable.never<ResultWithCity>()
+    }
+
+    fun useHint(game: GameFacade): Completable =
+        Maybe.just(mFirstChar)
+            .map {
+                if (mFirstChar == Char.MIN_VALUE) StringUtils.generateFirstChar()
+                else mFirstChar
+            }
+            .flatMap(game::getRandomWord)
+            .doOnSuccess { userInputSubject.onNext(WordCheckingResult.Accepted(it)) }
+            .ignoreElement()
 }

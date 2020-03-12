@@ -1,51 +1,111 @@
 package ru.aleshi.letsplaycities.base.game
 
-import android.content.Context
-import com.squareup.picasso.RequestCreator
 import io.reactivex.Completable
-import ru.aleshi.letsplaycities.base.GamePreferences
-import ru.aleshi.letsplaycities.base.combos.ComboSystemView
-import ru.aleshi.letsplaycities.base.dictionary.Dictionary
-import ru.aleshi.letsplaycities.base.dictionary.DictionaryUpdater
+import io.reactivex.Observable
+import ru.aleshi.letsplaycities.base.player.User
+import ru.quandastudio.lpsclient.core.LPSMessage
 
+/**
+ * Interface that holds ViewModel and Presenter interfaces to game control.
+ */
 interface GameContract {
 
-    interface View {
-        fun showUserMenu(isFriend: Boolean, name: String, userId: Int)
-        fun showInfo(msg: String)
-        fun showError(err: Throwable)
-        fun updateLabel(info: String, position: Position)
-        fun updateAvatar(imageRequest: RequestCreator, position: Position)
-        fun context(): Context
-        fun putMessage(message: String, position: Position)
-        fun putCity(city: String, countryCode: Short, position: Position)
-        fun updateCity(city: String, hasErrors: Boolean)
-        fun showGameResults(result: String, score: Int)
-        fun showCorrectionDialog(word: String, errorMsg: String)
-        fun getGamePreferences(): GamePreferences
-        fun onTimerUpdate(time: String)
-        fun onHighlightUser(position: Position)
-        fun setMenuItemsVisibility(help: Boolean, msg: Boolean)
-        fun downloadingListener(): DictionaryUpdater.DownloadingListener
-        fun showFriendRequestDialog(name: String)
-        fun comboSystemView(): ComboSystemView
+    /**
+     * ViewModel interface for controlling game UI state.
+     */
+    interface ViewModel {
+
+        /**
+         * Called to update current game state.
+         * @param state new [GameState] to bind.
+         */
+        fun updateState(state: GameState)
+
+        /**
+         * Called on every game timer tick to update UI time.
+         * @param time current time label
+         */
+        fun updateTime(time: String)
+
+        /**
+         * Called to switch active user highlight and update other user info.
+         * @param prev user that has finished move or `null` if there are no moves before.
+         * @param next user whose turn has come
+         */
+        fun switchUser(prev: User?, next: User)
+
+        /**
+         * Called to put game entity (city or message) to the screen.
+         */
+        fun putGameEntity(entity: GameEntity)
+
+        /**
+         * Called when received friend request
+         */
+        fun onFriendRequestResult(type: LPSMessage.LPSFriendRequest)
+
+        /**
+         * Call to dispose all resources
+         */
+        fun dispose()
+
     }
 
+    /**
+     * Presenter interface which is responsible for controlling game.
+     */
     interface Presenter {
-        fun onAttachView(view: View)
-        fun onDetachView()
-        fun onStop()
-        fun submit(userInput: String, callback: () -> Unit): Boolean
-        fun useHint()
+        /**
+         * Call to begin game sequence.
+         * @param viewModel ViewModel Instance
+         * @param session current [GameSession] instance
+         */
+        fun start(viewModel: ViewModel, session: GameSession)
+
+        /**
+         * Call to send input from user to players.
+         * @return [Observable] that emits [WordCheckingResult] or [Observable.empty] if current user
+         * not yet defined or can't make move.
+         */
+        fun onUserInput(input: String): Observable<WordCheckingResult>
+
+        /**
+         * Call to send user's message to server.
+         */
+        fun onMessage(message: String): Completable
+
+        /**
+         * Call when player wants to surrender
+         */
         fun onSurrender()
-        fun postCorrectedWord(word: String?, errorMsg: String?)
-        fun sendMessage(message: String) : Completable
-        fun correct(word: String, errorMsg: String)
-        fun dictionary(): Dictionary
-        fun needsShowMenu(position: Position)
-        fun sendFriendRequest() : Completable
-        fun onFriendRequestResult(isAccepted: Boolean) : Completable
-        fun banUser(userId: Int) : Completable
+
+        /**
+         * Sends friend request to [userId] over game server.
+         * @param userId id of user that we want to add to friends
+         */
+        fun sendFriendRequest(userId: Int): Completable
+
+        /**
+         * Sends ban message to [userId] over game server.
+         * @param userId id of user that we want to ban
+         */
+        fun banUser(userId: Int): Completable
+
+        /**
+         * Call to dispose resources.
+         */
+        fun dispose()
+
+        /**
+         * Starts searching hint for player.
+         */
+        fun onPlayerHint(): Completable
+
+        /**
+         * Returns current game session
+         */
+        fun getCurrentSession(): GameSession
+
     }
 
 }

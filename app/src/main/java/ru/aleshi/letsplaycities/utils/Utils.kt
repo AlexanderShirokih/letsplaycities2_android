@@ -1,37 +1,56 @@
 package ru.aleshi.letsplaycities.utils
 
-import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.view.LayoutInflater
-import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.squareup.picasso.Picasso
-import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.dialog_waiting.view.*
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.LPSApplication
-import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.ThemeManager
 import java.io.File
 import java.io.FileOutputStream
-import java.util.concurrent.TimeUnit
+import java.net.URI
 
 object Utils {
 
     val Fragment.lpsApplication
         get() = requireContext().applicationContext as LPSApplication
 
-    fun getPictureUri(userId: Int, hash: String?): Uri = if (hash == null) Uri.EMPTY else
-        Uri.parse("${getServerBaseUrl()}user/${userId}/picture?hash=${hash}")
+    /**
+     * Created [Uri] to user image.
+     * @param userId userID of user that image URI should be created
+     * @param hash image hash of user or `null` if hash not present
+     * @return [Uri] containing path to user's picture or [Uri.EMPTY] if [hash] is not present
+     * @see getPictureURI
+     */
+    fun getPictureUri(userId: Int, hash: String?): Uri =
+        getPictureURI(userId, hash)?.run { toString().toUri() } ?: Uri.EMPTY
 
+    /**
+     * Creates [URI] to user image.
+     * @param userId userID of user that image URI should be created
+     * @param hash image hash of user or `null` if hash not present
+     * @return [URI] containing path to user's picture or `null` if [hash] is not present
+     */
+    fun getPictureURI(userId: Int, hash: String?): URI? = if (hash == null) null else
+        URI.create("${getServerBaseUrl()}user/${userId}/picture?hash=${hash}")
+
+    /**
+     * Returns base server URL string
+     */
     fun getServerBaseUrl(): String {
         return "http://${BuildConfig.HOST}:8080/"
     }
 
+    /**
+     * Loads picture from [uri], then resizes it 128x128px and
+     * saves to [filesDir]/img.png
+     */
     fun createThumbnail(filesDir: File, uri: Uri): Single<Uri> =
         Single.just(uri)
             .observeOn(Schedulers.computation())
@@ -45,6 +64,10 @@ object Utils {
                 outputFile.toUri()
             }
 
+    /**
+     * Loads image from [uri].
+     * @return [Single] with loaded image [Bitmap]
+     */
     private fun loadResized(uri: Uri): Single<Bitmap> =
         Single.create {
             try {
@@ -59,41 +82,13 @@ object Utils {
             }
         }
 
-    fun showWaitingForConnectionDialog(
-        reconnectionDelay: Int,
-        activity: Activity,
-        task: () -> Unit,
-        cancelCallback: () -> Unit
-    ) {
-        var active = true
-        val view = LayoutInflater.from(activity).inflate(R.layout.dialog_waiting, null, false)
-        with(AlertDialog.Builder(activity)) {
-            setCancelable(true)
-            setView(view)
-            create()
-        }.apply {
-            val disposable =
-                Observable.intervalRange(0, reconnectionDelay.toLong(), 0, 1, TimeUnit.SECONDS)
-                    .map { reconnectionDelay - it }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .takeWhile { active }
-                    .subscribe(
-                        {
-                            view.con_waiting_tv.text =
-                                activity.getString(R.string.waiting_for_connection, it)
-                        },
-                        ::error,
-                        {
-                            dismiss()
-                            if (active) task() else cancelCallback()
-                        }
-                    )
-            setOnCancelListener {
-                active = false
-                cancelCallback()
-                disposable.dispose()
-            }
-        }.show()
+    /**
+     * Applies theme saved in preferences to the application.
+     */
+    fun applyTheme(prefs: GamePreferences, context: Context) {
+        val theme = ThemeManager.getCurrentTheme(prefs)
+        if (theme.isFreeOrAvailable())
+            context.setTheme(theme.themeId)
     }
 
 }

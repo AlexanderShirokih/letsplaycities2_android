@@ -82,8 +82,19 @@ object StringUtils {
         }
     }
 
-    fun findLastSuitableChar(city: String): Char? {
+    /**
+     * Finds last char in [city] or return [Char.MIN_VALUE] if no suitable char found.
+     * @param city input word
+     * @return last suitable char for [city] or [Char.MIN_VALUE] if it empty or has no suitable chars.
+     */
+    fun findLastSuitableChar(city: String): Char {
         return city.reversed().toCharArray()
-            .find { it != 'ь' && it != 'ъ' && it != 'ы' && it != 'ё' }
+            .find { it != 'ь' && it != 'ъ' && it != 'ы' && it != 'ё' } ?: Char.MIN_VALUE
     }
+
+    /**
+     * Returns random char in alphabet.
+     */
+    fun generateFirstChar(): Char = "абвгдежзиклмнопрстуфхчшэюя".toCharArray().random()
+
 }

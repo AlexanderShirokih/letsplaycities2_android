@@ -10,20 +10,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.Maybe
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_friends.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.ui.BasicListAdapter
 import ru.aleshi.letsplaycities.ui.FetchState
-import ru.aleshi.letsplaycities.ui.ViewModelFactory
 import ru.quandastudio.lpsclient.core.LpsRepository
 import javax.inject.Inject
 
 abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
 
     @Inject
-    protected lateinit var viewModelFactory: ViewModelFactory
+    protected lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var networkFetchViewModel: NetworkFetchViewModel
 
@@ -32,7 +29,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        onCreate(viewModelFactory)
+        onCreate()
         networkFetchViewModel =
             ViewModelProvider(this, viewModelFactory)[NetworkFetchViewModel::class.java]
         networkFetchViewModel.state.observe(this@BasicNetworkFetchFragment) { state ->
@@ -41,12 +38,11 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
                 FetchState.LoadingState -> onLoading()
                 is FetchState.DataState<*> -> onData(state.data as List<FetchDataType>)
                 is FetchState.ErrorState -> onError(state.error)
-                FetchState.FinishState -> onData(emptyList())
             }
         }
     }
 
-    abstract fun onCreate(sharedViewModelFactory: ViewModelFactory)
+    abstract fun onCreate()
 
     class ViewDataHolder<FetchDataType>(
         val adapter: BasicListAdapter<FetchDataType, *>,
@@ -56,7 +52,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
         @StringRes val emptyViewPlaceholder: Int
     )
 
-    protected fun withApi(action: (api: LpsRepository) -> Disposable) {
+    protected fun withApi(action: suspend (api: LpsRepository) -> Unit) {
         networkFetchViewModel.withApi(action)
     }
 
@@ -67,7 +63,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
         networkFetchViewModel.fetchData(onStartRequest())
     }
 
-    abstract fun onStartRequest(): (apiRepo: LpsRepository) -> Maybe<List<FetchDataType>>
+    abstract fun onStartRequest(): suspend (apiRepo: LpsRepository) -> List<FetchDataType>
 
     protected open fun onLoading() {
         setListVisibility(visible = false, showLoading = true)

@@ -220,7 +220,7 @@
     <string name="request">[Заявка]</string>
     <string name="waiting_for_connection">Ожидание подключения&#8230; %1$d</string>
     <string name="waiting_for_opp">Ожидание оппонента&#8230;</string>
-    <string name="waiting_for_friend">Ожидание игрока %1$s</string>
+    <string name="waiting_for_friend">Ожидание подключения к игроку…</string>
     <string name="connecting_to_friend">Подключение к другу&#8230;</string>
     <string name="banned_player">Вы подключились к заблокированному вами игроку. Повторный поиск&#8230;</string>
     <string name="server_auth_error">Ошибка авторизации на сервере: %1$s</string>
@@ -238,6 +238,7 @@
     <string name="no_history">История игр пуста</string>
 
     <!-- GameFragment -->
+    <string name="wrong_letter">Город должен начинаться на букву "%c" </string>
     <string name="already_used">Город "%1$s" уже был загадан</string>
     <string name="city_not_found">Очень жаль, но нам неизвестен город "%1$s".\nПроверьте правильность написания</string>
     <string name="player">Игрок</string>
@@ -256,11 +257,14 @@
     <string name="time_out">Время вышло!</string>
     <string name="connecting_to_server">Подключение к серверу&#8230;</string>
     <string name="player_banned">Игрок Заблокирован!</string>
-    <string name="confirm_friend_request">Игрок %1$s хочет добавить Вас в друзья.\nПринять заявку?</string>
+
+    <!-- FriendRequestDialog -->
+    <string name="friend_request_message">Игрок %1$s хочет добавить Вас в друзья.</string>
+    <string name="friend_request_title">Заявка в друзья</string>
+
     <string name="friends_request_accepted">Игрок %1$s добавлен в друзья</string>
     <string name="friends_request_denied">Заявка отклонена!</string>
     <string name="multiplier">&#xD7;%1$.1f</string>
-    <string name="game_session_is_null_error">Ошибка создания игровой сессии. Попробуйте снова.</string>
     <string name="unk_error">Произошла неизвестная ошибка. ERR:  %1$s</string>
 
     <string-array name="hints">
@@ -311,13 +315,12 @@
         Google\"
     </string>
     <string name="tell_city">Назовите город</string>
-    <string name="loading_dictionary">Загрузка обновления словаря</string>
     <string name="loading_dictionary_error">Не удалось обновить словарь</string>
     <string name="loading_dictionary_completed">Обновление словаря загружено!</string>
     <string name="already_friend">Игрок уже у Вас в друзьях</string>
     <string name="lost_connection">Потеряно соединение с сервером</string>
     <string name="kicked_by_system">Вы были отключены системой.</string>
-    <string name="kicked_by_user">Подключённый игрок добавил вас в чёрный список</string>
+    <string name="kicked_by_user">Оппонент добавил вас в чёрный список</string>
 
     <!-- FriendRequestDialog -->
     <string name="request_dialog_title">Приглашение в игру</string>
@@ -343,4 +346,9 @@
     <string name="exec_picture">Обработка аватарки…</string>
     <string name="uploading_picture">Обновление аватарки профиля…</string>
     <string name="error_upd_avatar">Не удалось обработать аватарку</string>
+
+    <!-- GameStateNotifier -->
+    <string name="checking_for_updates">Проверка обновлений словаря…</string>
+    <string name="updating_dictionary">Обновление словаря %d%%</string>
+    <string name="loading_dictionary">Загрузка словаря</string>
 </resources>

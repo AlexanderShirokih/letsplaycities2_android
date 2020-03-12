@@ -6,25 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_blacklist.*
 import ru.aleshi.letsplaycities.BadTokenException
-import ru.aleshi.letsplaycities.LPSApplication
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.base.SignatureChecker
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.ThemeManager
 import ru.aleshi.letsplaycities.base.ThemeManager.test2
 import ru.aleshi.letsplaycities.billing.InAppPurchaseManager
 import ru.aleshi.letsplaycities.billing.PurchaseListener
+import ru.aleshi.letsplaycities.utils.Utils.applyTheme
+import javax.inject.Inject
 
 class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
 
+    @Inject
+    lateinit var prefs: GamePreferences
     private lateinit var mThemeListAdapter: ThemeListAdapter
-    private lateinit var mApplication: LPSApplication
     private lateinit var mInAppPurchaseManager: InAppPurchaseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        mApplication = requireContext().applicationContext as LPSApplication
         mInAppPurchaseManager = InAppPurchaseManager(requireActivity(), this)
         mInAppPurchaseManager.startConnection()
 
@@ -39,10 +42,14 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
 
         }
 
-        ThemeManager.checkAvailable(mApplication)
+        ThemeManager.checkAvailable(prefs)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_theme, container, false)
     }
 
@@ -65,15 +72,15 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
     }
 
     override fun onPurchased(productId: String, purchaseToken: String, signature: String) {
-        if (SignatureChecker.check(requireContext()) == "Y") {
-            ThemeManager.putTheme(mApplication, productId, purchaseToken, signature)
-            requireActivity().recreate()
-        }
+        ThemeManager.putTheme(prefs, productId, purchaseToken, signature)
+        applyTheme(prefs, requireContext())
+        requireActivity().recreate()
     }
 
     override fun onSelectTheme(namedTheme: ThemeListAdapter.NamedTheme) {
         if (namedTheme.theme.isFreeOrAvailable()) {
-            ThemeManager.switchTheme(namedTheme.theme, mApplication)
+            ThemeManager.saveCurrentTheme(prefs, namedTheme.theme)
+            applyTheme(prefs, requireContext())
             requireActivity().recreate()
         } else
             onUnlock(namedTheme)
@@ -84,4 +91,5 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
         val themes = ThemeManager.themes
         return Array(themes.size) { ThemeListAdapter.NamedTheme(themeNames[it], themes[it]) }
     }
+
 }

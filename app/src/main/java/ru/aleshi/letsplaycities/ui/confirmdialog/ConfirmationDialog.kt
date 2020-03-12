@@ -13,7 +13,7 @@ class ConfirmationDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
+        confirmViewModel = ViewModelProvider(requireParentFragment())[ConfirmViewModel::class.java]
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

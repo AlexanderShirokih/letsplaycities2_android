@@ -9,38 +9,24 @@ import android.view.animation.AnimationUtils.makeInAnimation
 import android.view.animation.AnimationUtils.makeOutAnimation
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.squareup.picasso.Picasso
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
-import ru.aleshi.letsplaycities.AppVersionInfo
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
-import ru.aleshi.letsplaycities.base.game.LocalServer
-import ru.aleshi.letsplaycities.base.player.Android
-import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.base.player.User
+import ru.aleshi.letsplaycities.base.mainmenu.MainMenuContract
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
-import ru.aleshi.letsplaycities.utils.Utils.lpsApplication
-import ru.quandastudio.lpsclient.model.VersionInfo
 import javax.inject.Inject
 
-class MainMenuFragment : Fragment() {
-    @Inject
-    lateinit var gameSessionBuilder: GameSession.GameSessionBuilder
+class MainMenuFragment : Fragment(), MainMenuContract.MainMenuView {
 
     @Inject
-    lateinit var localServer: LocalServer
-
+    lateinit var presenter: MainMenuContract.MainMenuPresenter
     @Inject
-    lateinit var picasso: Picasso
-
-    @Inject
-    @AppVersionInfo
-    lateinit var versionInfo: VersionInfo
+    lateinit var prefs: GamePreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -69,7 +55,7 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun checkRateDialog() {
-        lpsApplication.gamePreferences.checkForRateDialogLaunch {
+        prefs.checkForRateDialogLaunch {
             findNavController().navigate(R.id.showRateDialog)
         }
     }
@@ -85,8 +71,8 @@ class MainMenuFragment : Fragment() {
 
                 val navController = findNavController()
                 when (v.id) {
-                    R.id.btn_pva -> startGame(navController, false)
-                    R.id.btn_pvp -> startGame(navController, true)
+                    R.id.btn_pva -> presenter.startGame(false)
+                    R.id.btn_pvp -> presenter.startGame(true)
                     R.id.btn_mul -> navController.navigate(R.id.start_multiplayer_fragment)
                     R.id.btn_net -> navController.navigate(
                         MainMenuFragmentDirections.startNetworkFragment(
@@ -100,26 +86,6 @@ class MainMenuFragment : Fragment() {
         }
     }
 
-    private fun startGame(navController: NavController, hasLocalOpponents: Boolean) {
-        val players: Array<User> = if (hasLocalOpponents)
-            arrayOf(
-                Player(picasso, "${getString(R.string.player)} 1", versionInfo),
-                Player(picasso, "${getString(R.string.player)} 2", versionInfo)
-            )
-        else
-            arrayOf(
-                Player(picasso, getString(R.string.player), versionInfo),
-                Android(picasso, getString(R.string.android), versionInfo)
-            )
-
-        ViewModelProvider(requireActivity())[GameSessionViewModel::class.java].gameSession =
-            gameSessionBuilder
-                .users(players)
-                .server(localServer)
-                .build()
-
-        navController.navigate(R.id.start_game_fragment)
-    }
 
     private fun makeInAnimation() {
         startAnimation(btn_pva, 0, true, null)
@@ -159,6 +125,13 @@ class MainMenuFragment : Fragment() {
         } else
             v.visibility = View.VISIBLE
         v.startAnimation(animation)
+    }
+
+    override fun startGame(gameSession: GameSession) {
+        ViewModelProvider(requireParentFragment())[GameSessionViewModel::class.java].setGameSession(
+            gameSession
+        )
+        findNavController().navigate(R.id.start_game_fragment)
     }
 
 }

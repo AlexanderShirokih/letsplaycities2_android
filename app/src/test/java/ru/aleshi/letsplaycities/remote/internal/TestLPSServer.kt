@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.remote.internal
 
-import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -9,18 +8,15 @@ import org.mockito.Mockito.*
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.quandastudio.lpsclient.core.LPSClientMessage
 import ru.quandastudio.lpsclient.core.LPSMessage
-import ru.quandastudio.lpsclient.model.AuthType
-import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
-import ru.quandastudio.lpsclient.model.WordResult
+import ru.quandastudio.lpsclient.model.*
 
 class TestLPSServer {
 
     private fun createPlayerData(): PlayerData =
-            PlayerData.SimpleFactory().create(
-                "TestData",
-                VersionInfo(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
-            )
+        PlayerData(
+            AuthData("TestData", AuthType.Native, Credentials()),
+            VersionInfo(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+        )
 
     private lateinit var lpsServer: LPSServer
     private lateinit var connection: TestConnection
@@ -110,13 +106,14 @@ class TestLPSServer {
     fun testReceiveWord() {
         testLogIn()
 
-        lpsServer.sendCity(WordResult.ACCEPTED, "city")
+        lpsServer.sendCity(WordResult.ACCEPTED, "city", 10)
 
         val cityMsg = connection.reader()
 
         cityMsg as LPSMessage.LPSWordMessage
 
         assertEquals(cityMsg.result, WordResult.ACCEPTED)
+        assertEquals(cityMsg.ownerId, 10)
         assertEquals(cityMsg.word, "city")
     }
 
@@ -124,13 +121,14 @@ class TestLPSServer {
     fun testReceiveMessage() {
         testLogIn()
 
-        lpsServer.sendMessage("Test")
+        lpsServer.sendMessage("Test", 10)
 
         val cityMsg = connection.reader()
 
         cityMsg as LPSMessage.LPSMsgMessage
 
         assertEquals(cityMsg.msg, "Test")
+        assertEquals(cityMsg.ownerId, 10)
         assertFalse(cityMsg.isSystemMsg)
     }
 }

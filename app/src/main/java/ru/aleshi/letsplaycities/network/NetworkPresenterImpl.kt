@@ -1,6 +1,5 @@
 package ru.aleshi.letsplaycities.network
 
-import androidx.lifecycle.Observer
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -9,12 +8,11 @@ import io.reactivex.schedulers.Schedulers
 import ru.aleshi.letsplaycities.AppVersionInfo
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.base.player.RemoteUser
-import ru.quandastudio.lpsclient.NetworkRepository
 import ru.quandastudio.lpsclient.model.AuthData
 import ru.quandastudio.lpsclient.model.FriendInfo
 import ru.quandastudio.lpsclient.model.PlayerData
@@ -27,17 +25,17 @@ import javax.inject.Inject
 class NetworkPresenterImpl @Inject constructor(
     @AppVersionInfo
     private val versionInfo: VersionInfo,
-    private val mGameSessionBuilder: GameSession.GameSessionBuilder,
-    private val mNetworkServer: NetworkServer,
-    private val mNetworkRepository: NetworkRepository,
-    private val mAuthDataFactory: GameAuthDataFactory,
-    private val mPicasso: Picasso,
+    private val networkServer: NetworkServer,
+    private val authDataFactory: GameAuthDataFactory,
+    private val picasso: Picasso,
     private val gamePreferences: GamePreferences
 ) : NetworkContract.Presenter {
 
     private lateinit var mAuthData: AuthData
-    private val mDisposable: CompositeDisposable = CompositeDisposable()
-    private var mView: NetworkContract.View? = null
+    private val networkRepository = networkServer.networkRepository
+    private val disposable: CompositeDisposable = CompositeDisposable()
+    private var view: NetworkContract.View? = null
+    private var isLocal = false
 
     /**
      * Called right after user view was created.
@@ -45,10 +43,11 @@ class NetworkPresenterImpl @Inject constructor(
      * @param view view to be attached
      * @see NetworkContract.View.setupLayout
      */
-    override fun onAttachView(view: NetworkContract.View) {
-        mView = view
-        mAuthData = mAuthDataFactory.load()
-        view.setupLayout(gamePreferences.isLoggedIn(), mNetworkRepository.isLocal)
+    override fun onAttachView(view: NetworkContract.View, isLocal: Boolean) {
+        this.isLocal = isLocal
+        this.view = view
+        mAuthData = authDataFactory.load()
+        view.setupLayout(gamePreferences.isLoggedIn(), isLocal)
     }
 
     /**
@@ -61,20 +60,10 @@ class NetworkPresenterImpl @Inject constructor(
 
     /**
      * Called when user touched the connect button.
+     * @param friendsInfo if not null, game will connects to friend mode.
      */
-    override fun onConnect() {
-        startGame(createPlayerData(), null)
-    }
-
-    /**
-     * Called when user wants to start game in friend mode.
-     */
-    override fun onFriendsInfo(): Observer<in FriendInfo> {
-        return Observer { friendInfo ->
-            friendInfo?.apply {
-                startGame(createPlayerData(), friendInfo)
-            }
-        }
+    override fun onConnect(friendsInfo: FriendInfo?) {
+        startGame(createPlayerData(), friendsInfo)
     }
 
     /**
@@ -82,11 +71,11 @@ class NetworkPresenterImpl @Inject constructor(
      * either an error or another problems was occurred in login sequence.
      */
     override fun onCancel() {
-        mNetworkRepository.disconnect()
+        networkRepository.disconnect()
         onDispose()
-        mView?.apply {
+        view?.apply {
             onCancel()
-            setupLayout(true, mNetworkRepository.isLocal)
+            setupLayout(true, isLocal)
         }
     }
 
@@ -95,7 +84,7 @@ class NetworkPresenterImpl @Inject constructor(
      * resources and interrupt connections.
      */
     override fun onDispose() {
-        mDisposable.clear()
+        disposable.clear()
     }
 
     /**
@@ -116,12 +105,12 @@ class NetworkPresenterImpl @Inject constructor(
      * @see processFriendGameLoginSequence
      */
     private fun startFriendGame(userData: PlayerData, oppId: Int) {
-        mDisposable.add(
+        disposable.add(
             processFriendGameLoginSequence(userData, oppId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ play(userData, oppData = it.first, youStarter = it.second) }, {
                     onCancel()
-                    mView?.handleError(it)
+                    view?.handleError(it)
                 }, ::onCancel)
         )
     }
@@ -133,13 +122,13 @@ class NetworkPresenterImpl @Inject constructor(
      * @see processLoginSequence
      */
     private fun startGame(userData: PlayerData, friendsInfo: FriendInfo?) {
-        mView?.checkForWaiting {
-            mDisposable.add(
+        view?.checkForWaiting {
+            disposable.add(
                 processLoginSequence(userData, friendsInfo)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ play(userData, it.first, it.second) }, {
                         onCancel()
-                        mView?.handleError(it)
+                        view?.handleError(it)
                     }, ::onCancel)
             )
         }
@@ -156,12 +145,12 @@ class NetworkPresenterImpl @Inject constructor(
         userData: PlayerData,
         oppId: Int
     ): Observable<Pair<PlayerData, Boolean>> {
-        return mNetworkRepository.login(userData)
+        return networkRepository.login(userData)
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext { mView?.updateInfo(R.string.waiting_for_friend) }
+            .doOnNext { view?.updateInfo(R.string.waiting_for_friend) }
             .observeOn(Schedulers.io())
-            .flatMap { mNetworkRepository.sendFriendRequestResult(true, oppId) }
-            .flatMapMaybe { mNetworkRepository.connectToFriend() }
+            .flatMap { networkRepository.acceptFriendRequest(oppId) }
+            .flatMapMaybe { networkRepository.connectToFriend() }
     }
 
     /**
@@ -175,24 +164,23 @@ class NetworkPresenterImpl @Inject constructor(
         userData: PlayerData,
         friendsInfo: FriendInfo?
     ): Observable<Pair<PlayerData, Boolean>> {
-        return mNetworkRepository
+        return networkRepository
             .login(userData)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                mView!!.updateInfo(R.string.connecting_to_server)
+                view!!.updateInfo(R.string.connecting_to_server)
             }
             .doOnNext {
-                mView?.let { view ->
+                view?.let { view ->
                     view.updateInfo(R.string.waiting_for_opp)
-                    view.getProfileViewModel()
-                        .updatePictureHash(userData.authData.credentials.userId, it.picHash)
+                    view.updatePictureHash(userData.authData.credentials.userId, it.picHash)
                     if (it.newerBuild > userData.versionInfo.versionCode)
                         view.showMessage(R.string.new_version_available)
                 }
             }
             .observeOn(Schedulers.io())
             .flatMap {
-                mNetworkRepository.play(friendsInfo != null, friendsInfo?.userId)
+                networkRepository.play(friendsInfo != null, friendsInfo?.userId)
             }
     }
 
@@ -205,22 +193,14 @@ class NetworkPresenterImpl @Inject constructor(
      */
     private fun play(playerData: PlayerData, oppData: PlayerData, youStarter: Boolean) {
         val users = arrayOf(
-            if (mNetworkRepository.isLocal)
-                RemoteUser(oppData, mPicasso)
-            else
-                NetworkUser(oppData, mPicasso),
-            Player(playerData, mPicasso)
+            NetworkUser(networkServer, oppData, picasso),
+            Player(networkServer, playerData, picasso)
         ).apply {
             if (youStarter)
                 reverse()
         }
 
-        mView?.onStartGame(
-            mGameSessionBuilder
-                .server(mNetworkServer)
-                .users(users)
-                .build()
-        )
+        view?.onStartGame(GameSession(users, networkServer, GameMode.MODE_NET))
     }
 
 }

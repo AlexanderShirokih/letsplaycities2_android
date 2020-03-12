@@ -3,15 +3,15 @@ package ru.aleshi.letsplaycities.remote
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
+import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
-import ru.aleshi.letsplaycities.base.player.RemoteUser
 import ru.quandastudio.lpsclient.model.PlayerData
 import javax.inject.Inject
 
 class RemotePresenter @Inject constructor(
     private val remoteRepository: RemoteRepository,
-    private val gameSessionBuilder: GameSession.GameSessionBuilder,
     private val remoteServer: RemoteServer,
     private val picasso: Picasso
 ) : RemoteContract.Presenter {
@@ -49,16 +49,11 @@ class RemotePresenter @Inject constructor(
 
     private fun play(playerData: PlayerData, oppData: PlayerData) {
         val users = arrayOf(
-            Player(playerData, picasso),
-            RemoteUser(oppData, picasso)
+            Player(remoteServer, playerData, picasso),
+            NetworkUser(remoteServer, oppData, picasso)
         )
 
-        view.onStartGame(
-            gameSessionBuilder
-                .server(remoteServer)
-                .users(users)
-                .build()
-        )
+        view.onStartGame(GameSession(users, remoteServer, GameMode.MODE_MUL))
     }
 
     override fun onStop() {

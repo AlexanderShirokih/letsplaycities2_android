@@ -12,13 +12,27 @@ def dagger_version = '2.26'
 android {
     signingConfigs {
         default_test {
-            def testPass = file('/home/alexander/Keystores/pass.txt').text
-            storeFile file('/home/alexander/Keystores/letsplaycities.jks')
+            def testPass = file(project.properties["store_pass"] as String).text
+            storeFile file(project.properties["store_file"] as String)
             storePassword = testPass
             keyPassword = testPass
             keyAlias = 'letsplaycities'
         }
     }
+
+    sourceSets {
+        test {
+            resources.srcDirs += ['sampledata']
+        }
+        androidTest {
+            resources.srcDirs += ['sampledata']
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     def HOST_LOCAL = "\"192.168.2.244\""
     def HOST_REMOTE = "\"194.87.111.204\""
 
@@ -67,6 +81,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.3.4"
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
@@ -79,20 +94,20 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.google.android.material:material:1.2.0-alpha04'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
     implementation 'com.mikhaellopez:circularimageview:4.0.1'
     implementation 'com.android.billingclient:billing:2.1.0'
 
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
-    implementation 'com.google.android.gms:play-services-ads-lite:18.3.0'
-    implementation 'com.google.android.gms:play-services-games:19.0.0'
+    implementation 'com.google.android.gms:play-services-ads-lite:19.0.0'
+//    implementation 'com.google.android.gms:play-services-games:19.0.0'
 
     implementation 'com.vk:androidsdk:2.2.1'
     implementation 'com.facebook.android:facebook-login:5.15.1'
     implementation 'ru.ok:odnoklassniki-android-sdk:2.1.8'
 
-    implementation 'com.google.firebase:firebase-core:17.2.2'
-    implementation 'com.google.firebase:firebase-messaging:20.1.0'
+    implementation 'com.google.firebase:firebase-core:17.2.3'
+    implementation 'com.google.firebase:firebase-messaging:20.1.2'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
@@ -114,6 +129,14 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-    implementation 'ru.aleshi.lps:lps-client:0.4.3.2'
+    implementation 'ru.aleshi.lps:lps-client:1.0.4'
 
+    // For JDK9+
+    kapt 'javax.xml.bind:jaxb-api:2.3.1'
+    kapt 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    kapt 'com.sun.xml.bind:jaxb-impl:2.3.2'
+    annotationProcessor 'javax.xml.bind:jaxb-api:2.3.1'
+    annotationProcessor 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    annotationProcessor 'com.sun.xml.bind:jaxb-impl:2.3.2'
+    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
 }

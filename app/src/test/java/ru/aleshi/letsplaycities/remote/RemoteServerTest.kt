@@ -4,18 +4,29 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doNothing
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import ru.aleshi.letsplaycities.base.game.PictureSource
+import ru.aleshi.letsplaycities.base.player.Player
+import ru.aleshi.letsplaycities.base.player.UserIdIdentity
+import ru.aleshi.letsplaycities.base.server.ResultWithCity
+import ru.aleshi.letsplaycities.base.server.ResultWithMessage
 import ru.aleshi.letsplaycities.remote.internal.LPSServer
-import ru.quandastudio.lpsclient.core.LPSClientMessage
-import ru.quandastudio.lpsclient.model.WordResult
+import ru.quandastudio.lpsclient.model.*
 import java.util.concurrent.TimeUnit
 
 class RemoteServerTest {
+
+    private val fakePlayerData = PlayerData(
+        AuthData("login", AuthType.Native, Credentials(10, "hash")),
+        VersionInfo("v1.0", 10)
+    )
+
+    @Mock
+    lateinit var fakePictureSource: PictureSource
 
     @Mock
     lateinit var server: LPSServer
@@ -30,30 +41,37 @@ class RemoteServerTest {
         MockitoAnnotations.initMocks(this)
         remoteServer = RemoteServer(repository)
 
-        doNothing().`when`(server).sendCity(any(), any())
+        doNothing().`when`(server).sendCity(any(), any(), any())
     }
 
     @Test
     fun getWordsResult() {
-        remoteServer.broadcastResult("Word").blockingAwait()
-
-        val test = remoteServer.getWordsResult().test()
+        val test =
+            remoteServer.sendCity("Word", Player(remoteServer, fakePlayerData, fakePictureSource))
+                .test()
 
         test.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
         test.assertNoErrors()
-            .assertValue { it == WordResult.ACCEPTED to "Word" }
+            .assertValue {
+                it == ResultWithCity(
+                    WordResult.ACCEPTED,
+                    "Word",
+                    identity = UserIdIdentity(10)
+                )
+            }
     }
 
     @Test
     fun getInputMessages() {
-        repository.onMessage(LPSClientMessage.LPSMsg("test"))
+        remoteServer.sendMessage("test", Player(remoteServer, fakePlayerData, fakePictureSource))
+            .blockingAwait()
 
-        val test = remoteServer.getInputMessages().test()
+        val test = remoteServer.getIncomingMessages().test()
 
         test.awaitTerminalEvent(1000, TimeUnit.MILLISECONDS)
         test.assertNoErrors()
             .assertValueCount(1)
-            .assertValue { it == "test" }
+            .assertValue { it == ResultWithMessage("test", UserIdIdentity(10)) }
     }
 
     @Test
@@ -65,20 +83,21 @@ class RemoteServerTest {
 
     @Test
     fun broadcastResult() {
-        remoteServer.broadcastResult("test").blockingAwait()
+        remoteServer.sendCity("test", Player(remoteServer, fakePlayerData, fakePictureSource))
+            .blockingLast()
 
-        verify(server, times(1)).sendCity(WordResult.RECEIVED, "test")
+        verify(server, times(1)).sendCity(WordResult.RECEIVED, "test", 10)
     }
 
     @Test
     fun broadcastMessage() {
-        remoteServer.broadcastMessage("Hello message").blockingAwait()
+        remoteServer.sendMessage(
+            "Hello message",
+            Player(remoteServer, fakePlayerData, fakePictureSource)
+        )
+            .blockingAwait()
 
-        verify(server, times(1)).sendMessage("Hello message")
+        verify(server, times(1)).sendMessage("Hello message", 10)
     }
 
-    @Test
-    fun getTimeLimit() {
-        Assert.assertEquals(remoteServer.getTimeLimit(), 92L)
-    }
 }
