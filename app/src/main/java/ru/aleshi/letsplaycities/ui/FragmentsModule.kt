@@ -17,6 +17,7 @@ import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkClientFromNetworkFragmentModule
 import ru.aleshi.letsplaycities.ui.network.history.HistoryFragment
+import ru.aleshi.letsplaycities.ui.profile.LoginNoSnProfileFragment
 import ru.aleshi.letsplaycities.ui.profile.LoginProfileFragment
 import ru.aleshi.letsplaycities.ui.profile.ViewProfileFragment
 import ru.aleshi.letsplaycities.ui.remote.WaitingForDevicesFragment
@@ -65,6 +66,10 @@ abstract class FragmentsModule {
     @ActivityScope
     @ContributesAndroidInjector
     abstract fun contributeViewProfileFragment(): ViewProfileFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeLoginNoSnProfileFragment(): LoginNoSnProfileFragment
 
     @ActivityScope
     @ContributesAndroidInjector
