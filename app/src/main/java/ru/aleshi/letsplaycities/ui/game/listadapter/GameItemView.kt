@@ -73,11 +73,13 @@ class GameItemView @JvmOverloads constructor(
                 if (entityWrapper.isMessage)
                     if (entityWrapper.position == Position.LEFT) R.attr.itemMsgMe else R.attr.itemMsgOther
                 else
-                    if (entityWrapper.position == Position.LEFT) R.attr.itemBgMe else R.attr.itemBgOther
+                    if (entityWrapper.position == Position.LEFT) R.attr.itemBgMe else R.attr.itemBgOther,
+                android.R.attr.textColor
             )
         )
 
         city.text = entityWrapper.getSpannableString(typedValue.getColorOrThrow(0))
+        city.setTextColor(typedValue.getColorOrThrow(2))
 
         (this as LinearLayout).gravity =
             if (entityWrapper.position == Position.LEFT) Gravity.START else Gravity.END

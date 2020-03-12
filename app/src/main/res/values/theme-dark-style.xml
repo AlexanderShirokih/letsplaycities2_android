@@ -20,7 +20,7 @@
         <item name="itemMsgOther">@drawable/drk_msg_bg</item>
         <item name="cityInputColor">#fff</item>
         <item name="fgSpanColor">#fff</item>
-        <item name="avatarBorderColor">#fff</item>
+        <item name="avatarBorderColor">#9C27B0</item>
     </style>
 
 </resources>
