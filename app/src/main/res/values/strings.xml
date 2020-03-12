@@ -220,7 +220,7 @@
     <string name="request">[Заявка]</string>
     <string name="waiting_for_connection">Ожидание подключения&#8230; %1$d</string>
     <string name="waiting_for_opp">Ожидание оппонента&#8230;</string>
-    <string name="waiting_for_friend">Ожидание игрока %1$s</string>
+    <string name="waiting_for_friend">Ожидание подключения к игроку…</string>
     <string name="connecting_to_friend">Подключение к другу&#8230;</string>
     <string name="banned_player">Вы подключились к заблокированному вами игроку. Повторный поиск&#8230;</string>
     <string name="server_auth_error">Ошибка авторизации на сервере: %1$s</string>
