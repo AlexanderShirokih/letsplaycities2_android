@@ -43,7 +43,7 @@ class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices
     }
 
     override fun onStartGame(gameSession: GameSession) {
-        ViewModelProvider(this)[GameSessionViewModel::class.java].setGameSession(
+        ViewModelProvider(requireParentFragment())[GameSessionViewModel::class.java].setGameSession(
             gameSession
         )
         mGameSound?.start()

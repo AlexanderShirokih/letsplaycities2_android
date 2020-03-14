@@ -220,7 +220,12 @@ class NetworkPresenterImpl @Inject constructor(
                 reverse()
         }
 
-        view?.onStartGame(GameSession(users, networkServer, GameMode.MODE_NET))
+        view?.onStartGame(
+            GameSession(
+                users, networkServer,
+                if (isLocal) GameMode.MODE_MUL else GameMode.MODE_NET
+            )
+        )
     }
 
 }
