@@ -19,15 +19,14 @@ class NativeAccess : ISocialNetwork() {
 
     override fun onLoggedIn(activity: Activity, accessToken: String) {
         val prefs = (activity.application as LPSApplication).gamePreferences
-        callback?.onLoggedIn(
-            SocialAccountData(
-                snUID = AndroidDeviceId(activity).toString(),
-                login = prefs.lastNativeLogin,
-                accessToken = accessToken,
-                networkType = AuthType.Native,
-                pictureUri = prefs.lastAvatarUri?.toString()?.toUri() ?: Uri.EMPTY
-            )
+        val data = SocialAccountData(
+            snUID = AndroidDeviceId(activity).getDeviceId(),
+            login = prefs.lastNativeLogin,
+            accessToken = accessToken,
+            networkType = AuthType.Native,
+            pictureUri = prefs.lastAvatarUri?.toString()?.toUri() ?: Uri.EMPTY
         )
+        callback?.onLoggedIn(data)
     }
 
     override fun onActivityResult(

@@ -95,10 +95,13 @@ class AuthorizationViewModel @Inject constructor(
                     }
             }
             .flatMap { t ->
-                if (t.second.isNotEmpty() && t.second != t.third.picHash) {
-                    uploadAvatar(t.first, t.second).map { t.third }
+                if (t.second.isNotEmpty()) {
+                    if (t.second != t.third.picHash)
+                        uploadAvatar(t.first, t.second).map { t.third }
+                    else
+                        Single.just(t.third)
                 } else
-                    Single.just(t.third)
+                    deleteAvatar().map { t.third }
             }
 
     /**
@@ -152,7 +155,17 @@ class AuthorizationViewModel @Inject constructor(
             }
 
     /**
-     * Used to load image by given URI, then calculates MD5
+     * Deletes picture on server
+     */
+    private fun deleteAvatar() =
+        Single.just(FetchState.DataState(R.string.uploading_picture))
+            .doOnSuccess(mState::postValue)
+            .flatMap {
+                rxSingle { apiRepo.deletePicture() }
+            }
+
+    /**
+     * Loads image by given URI, then calculates MD5
      * @param uri image URI
      * @return Loaded image with its MD5 hash or pair of empty array and string if something went wrong
      */
