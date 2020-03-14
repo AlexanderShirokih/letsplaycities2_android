@@ -16,8 +16,6 @@ import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.FetchState
 import javax.inject.Inject
 
-//TODO: Test
-
 class FriendGameRequestDialog : DialogFragment() {
 
     private val args: FriendGameRequestDialogArgs by navArgs()
@@ -50,6 +48,7 @@ class FriendGameRequestDialog : DialogFragment() {
         alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener {
             gameRequestViewModel.onDecline(args.userId)
         }
+        alertDialog.setCanceledOnTouchOutside(false)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

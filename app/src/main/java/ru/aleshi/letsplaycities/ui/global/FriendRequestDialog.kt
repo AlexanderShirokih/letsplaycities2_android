@@ -58,6 +58,7 @@ class FriendRequestDialog : DialogFragment() {
         alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
             gameRequestViewModel.sendResult(args.userId, true)
         }
+        alertDialog.setCanceledOnTouchOutside(false)
     }
 
     private fun onBegin() {
