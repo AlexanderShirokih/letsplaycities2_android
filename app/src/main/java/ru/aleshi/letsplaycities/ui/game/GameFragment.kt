@@ -262,12 +262,15 @@ class GameFragment : Fragment() {
     }
 
     private fun handleState(currentState: GameState) {
-        if (currentState is GameState.Finish) navigateOnDestinationWaiting(
-            GameFragmentDirections.showGameResultDialog(
-                currentState.gameResultMessage,
-                currentState.playerScore
+        if (currentState is GameState.Finish) {
+            hideKeyboard()
+            navigateOnDestinationWaiting(
+                GameFragmentDirections.showGameResultDialog(
+                    currentState.gameResultMessage,
+                    currentState.playerScore
+                )
             )
-        )
+        }
     }
 
     private fun handleUserMenuAction(event: Event<UserMenuViewModel.UserMenuAction>) {

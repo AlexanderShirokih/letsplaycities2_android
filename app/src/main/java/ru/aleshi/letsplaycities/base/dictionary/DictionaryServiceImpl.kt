@@ -75,14 +75,14 @@ class DictionaryServiceImpl constructor(
             }
 
             if (candidates.isNotEmpty())
-                it.onSuccess(candidates)
+                it.onSuccess(candidates.distinct())
 
             for (s in list)
                 for (w in edits(s))
                     if (candidates.size < 4 && canUse(w) && !candidates.contains(w))
                         candidates.add(w)
 
-            it.onSuccess(candidates)
+            it.onSuccess(candidates.distinct())
         }
             .subscribeOn(Schedulers.computation())
 
