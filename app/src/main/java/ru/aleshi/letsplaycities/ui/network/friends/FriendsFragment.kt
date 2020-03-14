@@ -18,6 +18,7 @@ import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.ui.OnRemovableItemClickListener
 import ru.aleshi.letsplaycities.ui.confirmdialog.ConfirmViewModel
 import ru.aleshi.letsplaycities.ui.network.BasicNetworkFetchFragment
+import ru.aleshi.letsplaycities.utils.Event
 import ru.quandastudio.lpsclient.core.LpsRepository
 import ru.quandastudio.lpsclient.model.FriendInfo
 import java.io.IOException
@@ -43,7 +44,7 @@ class FriendsFragment : BasicNetworkFetchFragment<FriendInfo>(),
                     when (request.resultCode) {
                         REQUEST_CODE_SELECT_ITEM -> {
                             ViewModelProvider(requireParentFragment())[FriendsViewModel::class.java].friendsInfo.postValue(
-                                mSelectedFriendsInfo
+                                Event(mSelectedFriendsInfo)
                             )
                             findNavController().popBackStack(R.id.networkFragment, false)
                         }

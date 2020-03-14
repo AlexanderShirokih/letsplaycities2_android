@@ -30,6 +30,8 @@ import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import ru.aleshi.letsplaycities.ui.network.friends.FriendsViewModel
 import ru.aleshi.letsplaycities.ui.profile.ProfileViewModel
+import ru.aleshi.letsplaycities.utils.Event
+import ru.quandastudio.lpsclient.model.FriendInfo
 import ru.quandastudio.lpsclient.model.FriendModeResult
 import javax.inject.Inject
 
@@ -52,13 +54,16 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     private var gameSound: MediaPlayer? = null
     private var lastConnectionTime: Long = 0
     private val reconnectionDelay = 5
-    private var argsHandled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
 
-        friendsViewModel.friendsInfo.observe(this@NetworkFragment, mNetworkPresenter::onConnect)
+        friendsViewModel.friendsInfo.observe(this@NetworkFragment) { event: Event<FriendInfo> ->
+            event.getContentIfNotHandled()?.let { friendInfo ->
+                mNetworkPresenter.onConnect(friendInfo)
+            }
+        }
 
         if (prefs.isSoundEnabled()) {
             gameSound = MediaPlayer.create(activity, R.raw.begin)
@@ -83,8 +88,8 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         val msgId = when (result) {
             FriendModeResult.BUSY -> R.string.friend_busy
             FriendModeResult.DENIED -> R.string.friend_denied
-            FriendModeResult.OFFLINE -> R.string.friend_offline
             FriendModeResult.NOT_FRIEND -> R.string.not_friend
+            FriendModeResult.NO_USER -> R.string.no_user
         }
         Toast.makeText(requireContext(), getString(msgId, login ?: ""), Toast.LENGTH_LONG).show()
     }
@@ -116,13 +121,20 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
         mNetworkPresenter.onDispose()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        gameSound?.release()
+    }
+
     override fun onResume() {
         super.onResume()
-        if (!argsHandled && "fm_game" == args.action) {
+        val networkViewModel = ViewModelProvider(this)[NetworkViewModel::class.java]
+
+        if (networkViewModel.argsHandled.value != true && "fm_game" == args.action) {
             if (prefs.isLoggedIn()) {
                 setLoadingLayout(true)
                 mNetworkPresenter.onConnectToFriendGame(args.oppId)
-                argsHandled = true
+                networkViewModel.argsHandled.value = true
             } else
                 Toast.makeText(
                     requireContext(),
