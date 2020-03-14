@@ -334,6 +334,7 @@ class GameFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        gameStateNotifier.hide()
         hideKeyboard()
     }
 

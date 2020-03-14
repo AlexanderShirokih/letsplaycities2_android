@@ -16,9 +16,9 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.activity_main.*
-import ru.aleshi.letsplaycities.MyFirebaseMessagingService
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.service.MyFirebaseMessagingService
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.utils.Utils
 import javax.inject.Inject
@@ -85,14 +85,32 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 //        google.signIn(this)
     }
 
-
     private fun checkForFirebaseNotifications(intent: Intent) {
         intent.extras?.let { data ->
             when (data.getString(MyFirebaseMessagingService.KEY_ACTION)) {
-                MyFirebaseMessagingService.ACTION_FM -> startFriendModeGame(data)
-                MyFirebaseMessagingService.ACTION_FRIEND_REQUEST -> showFriendRequestDialog(data)
+                MyFirebaseMessagingService.ACTION_FM -> startFriendModeGame(
+                    translateStringKey(
+                        data,
+                        MyFirebaseMessagingService.KEY_USER_ID,
+                        MyFirebaseMessagingService.KEY_TARGET
+                    )
+                )
+                MyFirebaseMessagingService.ACTION_FRIEND_REQUEST -> showFriendRequestDialog(
+                    translateStringKey(data, MyFirebaseMessagingService.KEY_USER_ID)
+                )
             }
         }
+    }
+
+    private fun translateStringKey(data: Bundle, vararg keys: String): Bundle {
+        for (key in keys) {
+            val userId = data.get(key)
+            if (userId != null && userId is String) {
+                data.remove(key)
+                data.putInt(MyFirebaseMessagingService.KEY_USER_ID, userId.toInt())
+            }
+        }
+        return data
     }
 
     private fun showFriendRequestDialog(data: Bundle) {

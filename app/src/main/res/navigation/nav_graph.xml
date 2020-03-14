@@ -75,9 +75,15 @@
             <argument
                     android:name="oppId"
                     app:argType="integer" />
+            <argument
+                    android:name="targetId"
+                    app:argType="integer" />
         </action>
         <argument
                 android:name="user_id"
+                app:argType="integer" />
+        <argument
+                android:name="target_id"
                 app:argType="integer" />
     </dialog>
 
@@ -234,6 +240,12 @@
                     android:name="oppId"
                     android:defaultValue="0"
                     app:argType="integer" />
+
+            <argument
+                    android:name="targetId"
+                    android:defaultValue="0"
+                    app:argType="integer"/>
+
             <argument
                     android:name="host"
                     app:argType="string" />

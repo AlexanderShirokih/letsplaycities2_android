@@ -13,10 +13,7 @@ import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.base.player.NetworkUser
 import ru.aleshi.letsplaycities.base.player.Player
-import ru.quandastudio.lpsclient.model.AuthData
-import ru.quandastudio.lpsclient.model.FriendInfo
-import ru.quandastudio.lpsclient.model.PlayerData
-import ru.quandastudio.lpsclient.model.VersionInfo
+import ru.quandastudio.lpsclient.model.*
 import javax.inject.Inject
 
 /**
@@ -31,7 +28,7 @@ class NetworkPresenterImpl @Inject constructor(
     private val gamePreferences: GamePreferences
 ) : NetworkContract.Presenter {
 
-    private lateinit var mAuthData: AuthData
+    private lateinit var authData: AuthData
     private val networkRepository = networkServer.networkRepository
     private val disposable: CompositeDisposable = CompositeDisposable()
     private var view: NetworkContract.View? = null
@@ -46,7 +43,7 @@ class NetworkPresenterImpl @Inject constructor(
     override fun onAttachView(view: NetworkContract.View, isLocal: Boolean) {
         this.isLocal = isLocal
         this.view = view
-        mAuthData = authDataFactory.load()
+        authData = authDataFactory.load()
         view.setupLayout(gamePreferences.isLoggedIn(), isLocal)
     }
 
@@ -88,11 +85,11 @@ class NetworkPresenterImpl @Inject constructor(
     }
 
     /**
-     * Creates new PlayerData/
+     * Creates new PlayerData.
      */
     private fun createPlayerData() =
         PlayerData(
-            authData = mAuthData,
+            authData = authData,
             versionInfo = versionInfo,
             canReceiveMessages = gamePreferences.canReceiveMessages(),
             pictureHash = gamePreferences.pictureHash
@@ -108,7 +105,19 @@ class NetworkPresenterImpl @Inject constructor(
         disposable.add(
             processFriendGameLoginSequence(userData, oppId)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ play(userData, oppData = it.first, youStarter = it.second) }, {
+                .subscribe({
+                    when (it) {
+                        is ConnectionResult.ConnectedToUser -> play(
+                            userData,
+                            it.oppData,
+                            it.isYouStarter
+                        )
+                        is ConnectionResult.FriendModeRejected -> {
+                            view?.showMessage(R.string.cant_connect_to_friend)
+                            onCancel()
+                        }
+                    }
+                }, {
                     onCancel()
                     view?.handleError(it)
                 }, ::onCancel)
@@ -126,7 +135,19 @@ class NetworkPresenterImpl @Inject constructor(
             disposable.add(
                 processLoginSequence(userData, friendsInfo)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ play(userData, it.first, it.second) }, {
+                    .subscribe({
+                        when (it) {
+                            is ConnectionResult.ConnectedToUser -> play(
+                                userData,
+                                it.oppData,
+                                it.isYouStarter
+                            )
+                            is ConnectionResult.FriendModeRejected -> {
+                                view?.onFriendModeResult(it.reason, it.login)
+                                onCancel()
+                            }
+                        }
+                    }, {
                         onCancel()
                         view?.handleError(it)
                     }, ::onCancel)
@@ -144,7 +165,7 @@ class NetworkPresenterImpl @Inject constructor(
     private fun processFriendGameLoginSequence(
         userData: PlayerData,
         oppId: Int
-    ): Observable<Pair<PlayerData, Boolean>> {
+    ): Observable<ConnectionResult> {
         return networkRepository.login(userData)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { view?.updateInfo(R.string.waiting_for_friend) }
@@ -157,13 +178,12 @@ class NetworkPresenterImpl @Inject constructor(
      * This function creates game login sequence.
      * @param userData Players data
      * @param friendsInfo for random pair mode should contain info about friend you want to invite
-     * @return Observable with result of login sequence (Pair of opponents data and who starts the
-     * game (true - user, false -opponent). If something went wrong will return error.
+     * @return Observable with result of login sequence. If something went wrong will return error.
      */
     private fun processLoginSequence(
         userData: PlayerData,
         friendsInfo: FriendInfo?
-    ): Observable<Pair<PlayerData, Boolean>> {
+    ): Observable<ConnectionResult> {
         return networkRepository
             .login(userData)
             .observeOn(AndroidSchedulers.mainThread())
@@ -180,7 +200,7 @@ class NetworkPresenterImpl @Inject constructor(
             }
             .observeOn(Schedulers.io())
             .flatMap {
-                networkRepository.play(friendsInfo != null, friendsInfo?.userId)
+                networkRepository.play(friendsInfo?.userId)
             }
     }
 

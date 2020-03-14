@@ -60,7 +60,8 @@ class FriendGameRequestDialog : DialogFragment() {
                     FriendGameRequestDialogDirections.startNetworkFragment(
                         BuildConfig.HOST,
                         "fm_game",
-                        args.userId
+                        args.userId,
+                        args.targetId
                     )
                 )
             }

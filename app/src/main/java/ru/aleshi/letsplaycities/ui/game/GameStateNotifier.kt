@@ -50,7 +50,7 @@ class GameStateNotifier @Inject constructor(
         }
     }
 
-    private fun hide() {
+    fun hide() {
         snackbar.dismiss()
     }
 

@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
+import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.network.NetworkContract
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
@@ -41,6 +42,8 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     lateinit var mNetworkPresenter: NetworkContract.Presenter
     @Inject
     lateinit var prefs: GamePreferences
+    @Inject
+    lateinit var authDataFactory: GameAuthDataFactory
 
     private val viewModelProvider: ViewModelProvider by lazy {
         ViewModelProvider(requireParentFragment())
@@ -129,12 +132,20 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     override fun onResume() {
         super.onResume()
         val networkViewModel = ViewModelProvider(this)[NetworkViewModel::class.java]
-
         if (networkViewModel.argsHandled.value != true && "fm_game" == args.action) {
-            if (prefs.isLoggedIn()) {
-                setLoadingLayout(true)
-                mNetworkPresenter.onConnectToFriendGame(args.oppId)
-                networkViewModel.argsHandled.value = true
+            val cred = authDataFactory.loadCredentials()
+            if (cred.isValid()) {
+                if (args.targetId != cred.userId) {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.friend_game_diff_account,
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    setLoadingLayout(true)
+                    mNetworkPresenter.onConnectToFriendGame(args.oppId)
+                    networkViewModel.argsHandled.value = true
+                }
             } else
                 Toast.makeText(
                     requireContext(),

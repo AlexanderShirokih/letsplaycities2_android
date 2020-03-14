@@ -19,6 +19,7 @@ import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import javax.inject.Inject
 
+
 class LPSApplication : MultiDexApplication(), HasAndroidInjector {
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector

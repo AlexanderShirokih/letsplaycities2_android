@@ -6,9 +6,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.android.AndroidInjectionModule
 import ru.aleshi.letsplaycities.base.game.GameModule
+import ru.aleshi.letsplaycities.service.ServiceModule
 import ru.aleshi.letsplaycities.ui.MainActivityModule
 
-@Module(includes = [AndroidInjectionModule::class, MainActivityModule::class])
+@Module(includes = [AndroidInjectionModule::class, ServiceModule::class, MainActivityModule::class])
 abstract class AppModule {
 
     @Binds
