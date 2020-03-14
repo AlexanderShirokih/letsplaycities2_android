@@ -68,7 +68,7 @@ class GameFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val activity = requireActivity()
 
-        adapter = GameAdapter(activity) { recyclerView.postDelayed(::scrollRecyclerView, 200) }
+        adapter = GameAdapter(activity) { recyclerView.postDelayed(::onUpdateEntities, 200) }
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
         }
@@ -223,13 +223,15 @@ class GameFragment : Fragment() {
     private fun submitMessage() {
         val message = messageInput.text!!.toString()
         if (message.isNotBlank()) {
-            gameViewModel.processMessage(message) {
-                clickSound?.start()
-                scrollRecyclerView()
-            }
+            gameViewModel.processMessage(message)
             messageInput.text = null
             setMessagingLayout(false)
         }
+    }
+
+    private fun onUpdateEntities() {
+        clickSound?.start()
+        scrollRecyclerView()
     }
 
     private fun handleWordResult(wordResult: WordCheckingResult) {
@@ -255,11 +257,7 @@ class GameFragment : Fragment() {
                     toTitleCase(wordResult.word)
                 )
             )
-            is WordCheckingResult.Accepted -> {
-                cityInput.text = null
-                clickSound?.start()
-                hideKeyboard()
-            }
+            is WordCheckingResult.Accepted -> cityInput.text = null
         }
     }
 
@@ -341,6 +339,8 @@ class GameFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         requireActivity().unregisterReceiver(screenReceiver)
+        clickSound?.release()
+        clickSound = null
     }
 
     private fun showInfo(msg: String) {

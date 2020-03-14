@@ -88,10 +88,10 @@ class GameViewModel @Inject constructor(
         disposable += presenter.onUserInput(input).subscribe(_wordState::postValue, ::showError)
     }
 
-    fun processMessage(message: String, onCompleted: () -> Unit) {
+    fun processMessage(message: String) {
         disposable += presenter.onMessage(message)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(onCompleted, ::showError)
+            .subscribe({}, ::showError)
     }
 
     /**
