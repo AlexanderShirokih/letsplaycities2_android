@@ -25,7 +25,10 @@ class AdManager(
     fun setupAds() {
         adView.loadAd(AdRequest.Builder().build())
         adView.adListener = AdListenerHelper(adView)
-        rewardedVideoAd.rewardedVideoAdListener = TipsListener(::loadRewardedVideoAd, onComplete)
+
+        rewardedVideoAd.rewardedVideoAdListener =
+            TipsListener(::loadRewardedVideoAd, onComplete)
+
         if (!rewardedVideoAd.isLoaded)
             loadRewardedVideoAd()
     }
