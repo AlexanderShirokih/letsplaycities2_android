@@ -23,7 +23,7 @@
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_marginStart="7dp"
-                android:src="@drawable/ic_player"
+                android:src="@drawable/ic_player_big"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

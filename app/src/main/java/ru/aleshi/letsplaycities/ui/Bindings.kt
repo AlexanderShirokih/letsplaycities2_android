@@ -36,8 +36,9 @@ object Bindings {
     fun setPlayerImageUri(imageView: ImageView, playerImageUri: Uri) {
         Picasso.get()
             .load(if (playerImageUri == Uri.EMPTY) null else playerImageUri)
-            .placeholder(R.drawable.ic_player)
-            .error(R.drawable.ic_player)
+            .placeholder(R.drawable.ic_player_big)
+            .error(R.drawable.ic_player_big
+            )
             .networkPolicy(NetworkPolicy.NO_CACHE)
             .memoryPolicy(MemoryPolicy.NO_CACHE)
             .into(imageView)

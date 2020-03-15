@@ -19,8 +19,8 @@ class FriendsViewHolder(private val picasso: Picasso, view: View) :
         }
         itemView.item_name.text = value
         picasso.load(Utils.getPictureUri(item.userId, item.pictureHash))
-            .placeholder(R.drawable.ic_player)
-            .error(R.drawable.ic_player)
+            .placeholder(R.drawable.ic_player_big)
+            .error(R.drawable.ic_player_big)
             .into(itemView.iv_friends_item)
     }
 }

@@ -38,8 +38,8 @@ class BlackListAdapter(
         override fun bind(item: BlackListItem) {
             view.item_name.text = item.login
             picasso.load(Utils.getPictureUri(item.userId, item.pictureHash))
-                .placeholder(R.drawable.ic_player)
-                .error(R.drawable.ic_player)
+                .placeholder(R.drawable.ic_player_big)
+                .error(R.drawable.ic_player_big)
                 .into(itemView.iv_friends_item)
         }
 
