@@ -33,6 +33,13 @@ class RemoteServer @Inject constructor(private val remoteRepository: RemoteRepos
                 )
             )
         }
+            .doOnNext { inputWord ->
+                remoteRepository.sendWord(
+                    wordResult = WordResult.ACCEPTED,
+                    city = inputWord.city,
+                    ownerId = (inputWord.identity as UserIdIdentity).userId
+                )
+            }
     }
 
     /**
