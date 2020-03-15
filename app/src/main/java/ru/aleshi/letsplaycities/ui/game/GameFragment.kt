@@ -47,8 +47,7 @@ class GameFragment : Fragment() {
     private lateinit var gameViewModel: GameViewModel
     private lateinit var correctionViewModel: CorrectionViewModel
     private lateinit var adapter: GameAdapter
-
-    private var adManager: AdManager? = null
+    private lateinit var adManager: AdManager
 
     @Inject
     lateinit var prefs: GamePreferences
@@ -103,7 +102,7 @@ class GameFragment : Fragment() {
                         false
                     )
                     it.checkWithResultCode(SURRENDER) -> gameViewModel.onPlayerSurrender()
-                    it.checkWithResultCode(USE_HINT) -> adManager?.showAd()
+                    it.checkWithResultCode(USE_HINT) -> adManager.showAd()
                 }
             })
         viewModelProvider[GameSessionViewModel::class.java].apply {
@@ -138,12 +137,6 @@ class GameFragment : Fragment() {
         val activity = requireActivity()
         (activity as MainActivity).setToolbarVisibility(false)
 
-        lifecycleScope.launchWhenResumed {
-            val ad = AdManager(adView, activity) { gameViewModel.useHintForPlayer() }
-            ad.setupAds()
-            adManager = ad
-        }
-
         checkForFirstLaunch()
         setupCityListeners(activity)
         setupMessageListeners()
@@ -169,6 +162,12 @@ class GameFragment : Fragment() {
             }
             setHasFixedSize(true)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adManager = AdManager(adView, requireActivity()) { gameViewModel.useHintForPlayer() }
+        adManager.setupAds()
     }
 
     /**
