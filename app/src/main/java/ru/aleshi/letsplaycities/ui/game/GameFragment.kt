@@ -7,10 +7,7 @@ import android.content.IntentFilter
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
@@ -27,8 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_game.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameState
@@ -51,7 +47,8 @@ class GameFragment : Fragment() {
     private lateinit var gameViewModel: GameViewModel
     private lateinit var correctionViewModel: CorrectionViewModel
     private lateinit var adapter: GameAdapter
-    private lateinit var adManager: AdManager
+
+    private var adManager: AdManager? = null
 
     @Inject
     lateinit var prefs: GamePreferences
@@ -65,6 +62,7 @@ class GameFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
+
         super.onCreate(savedInstanceState)
         val activity = requireActivity()
 
@@ -72,9 +70,14 @@ class GameFragment : Fragment() {
         activity.onBackPressedDispatcher.addCallback(this) {
             showGoToMenuDialog()
         }
-        if (prefs.isSoundEnabled()) {
-            clickSound = MediaPlayer.create(activity, R.raw.click)
-            screenReceiver.sound = MediaPlayer.create(activity, R.raw.notification)
+
+        lifecycleScope.launchWhenCreated {
+            withContext(Dispatchers.Default) {
+                if (prefs.isSoundEnabled()) {
+                    clickSound = MediaPlayer.create(activity, R.raw.click)
+                    screenReceiver.sound = MediaPlayer.create(activity, R.raw.notification)
+                }
+            }
         }
 
         // Register receiver for handling screen power off events
@@ -100,7 +103,7 @@ class GameFragment : Fragment() {
                         false
                     )
                     it.checkWithResultCode(SURRENDER) -> gameViewModel.onPlayerSurrender()
-                    it.checkWithResultCode(USE_HINT) -> adManager.showAd()
+                    it.checkWithResultCode(USE_HINT) -> adManager?.showAd()
                 }
             })
         viewModelProvider[GameSessionViewModel::class.java].apply {
@@ -135,12 +138,15 @@ class GameFragment : Fragment() {
         val activity = requireActivity()
         (activity as MainActivity).setToolbarVisibility(false)
 
+        lifecycleScope.launchWhenResumed {
+            val ad = AdManager(adView, activity) { gameViewModel.useHintForPlayer() }
+            ad.setupAds()
+            adManager = ad
+        }
+
         checkForFirstLaunch()
         setupCityListeners(activity)
         setupMessageListeners()
-
-        adManager = AdManager(adView, activity) { gameViewModel.useHintForPlayer() }
-        adManager.setupAds()
 
         btnMenu.setOnClickListener { showGoToMenuDialog() }
         btnSurrender.setOnClickListener { showConfirmationDialog(SURRENDER, R.string.surrender) }
@@ -173,7 +179,9 @@ class GameFragment : Fragment() {
             val context = requireContext()
             resources.getStringArray(R.array.hints).forEachIndexed { i, hint ->
                 Handler().postDelayed({
-                    Toast.makeText(context, hint, Toast.LENGTH_LONG).show()
+                    val toast = Toast.makeText(context, hint, Toast.LENGTH_LONG)
+                    toast.setGravity(Gravity.CENTER, 0, 0)
+                    toast.show()
                 }, 3600L * i)
             }
         }
@@ -263,6 +271,7 @@ class GameFragment : Fragment() {
 
     private fun handleState(currentState: GameState) {
         if (currentState is GameState.Finish) {
+            screenReceiver.active = false
             hideKeyboard()
             navigateOnDestinationWaiting(
                 GameFragmentDirections.showGameResultDialog(
@@ -270,6 +279,8 @@ class GameFragment : Fragment() {
                     currentState.playerScore
                 )
             )
+        } else if (currentState is GameState.Started) {
+            screenReceiver.active = true
         }
     }
 
@@ -344,6 +355,7 @@ class GameFragment : Fragment() {
         requireActivity().unregisterReceiver(screenReceiver)
         clickSound?.release()
         clickSound = null
+        screenReceiver.dispose()
     }
 
     private fun showInfo(msg: String) {
