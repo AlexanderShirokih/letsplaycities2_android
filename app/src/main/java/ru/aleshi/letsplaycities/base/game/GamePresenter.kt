@@ -176,7 +176,8 @@ class GamePresenter @Inject constructor(
      * Called when system view should be disposed.
      */
     override fun dispose() {
-        session.server.dispose()
+        if (::session.isInitialized)
+            session.server.dispose()
         disposable.clear()
     }
 

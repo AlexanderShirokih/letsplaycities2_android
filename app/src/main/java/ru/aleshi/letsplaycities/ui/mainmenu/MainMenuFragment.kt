@@ -9,9 +9,15 @@ import android.view.animation.AnimationUtils.makeInAnimation
 import android.view.animation.AnimationUtils.makeOutAnimation
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import com.crashlytics.android.Crashlytics
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
@@ -128,10 +134,20 @@ class MainMenuFragment : Fragment(), MainMenuContract.MainMenuView {
     }
 
     override fun startGame(gameSession: GameSession) {
-        ViewModelProvider(requireParentFragment())[GameSessionViewModel::class.java].setGameSession(
-            gameSession
-        )
-        findNavController().navigate(R.id.start_game_fragment)
+        ViewModelProvider(requireParentFragment())[GameSessionViewModel::class.java].apply {
+            setGameSession(gameSession)
+            this.gameSession.observe(this@MainMenuFragment) {
+                if (!it.hasBeenHandled) {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        val controller = findNavController()
+                        while (R.id.mainMenuFragment != controller.currentDestination?.id) {
+                            delay(100)
+                        }
+                        controller.navigate(R.id.start_game_fragment)
+                    }
+                }
+            }
+        }
     }
 
 }

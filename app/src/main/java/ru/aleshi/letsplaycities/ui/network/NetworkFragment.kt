@@ -18,6 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.dialog_waiting.view.*
 import kotlinx.android.synthetic.main.fragment_network.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
@@ -98,9 +99,20 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     }
 
     override fun onStartGame(session: GameSession) {
-        viewModelProvider[GameSessionViewModel::class.java].setGameSession(session)
-        gameSound?.start()
-        findNavController().navigate(R.id.start_game_fragment)
+        viewModelProvider[GameSessionViewModel::class.java].apply {
+            setGameSession(session)
+            gameSession.observe(this@NetworkFragment) {
+                if (!it.hasBeenHandled) {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        val controller = findNavController()
+                        while (R.id.networkFragment != controller.currentDestination?.id)
+                            delay(100)
+                        gameSound?.start()
+                        controller.navigate(R.id.start_game_fragment)
+                    }
+                }
+            }
+        }
     }
 
     override fun handleError(throwable: Throwable) =

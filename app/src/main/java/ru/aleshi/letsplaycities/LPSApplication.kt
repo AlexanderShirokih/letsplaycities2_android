@@ -11,6 +11,9 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -41,13 +44,17 @@ class LPSApplication : MultiDexApplication(), HasAndroidInjector {
         SocialNetworkManager.init(this, ServiceType.VK)
 
         RxJavaPlugins.setErrorHandler {
-            showErrorToast(it)
             Crashlytics.logException(it)
+            showErrorToast(it)
         }
     }
 
-    private fun showErrorToast(error: Throwable) =
-        Toast.makeText(this, "ERR: $error", Toast.LENGTH_LONG).show()
+    private fun showErrorToast(error: Throwable) {
+        val context = this
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(context, "ERR: $error", Toast.LENGTH_LONG).show()
+        }
+    }
 
     private fun initPicasso(context: Context): Picasso {
         return Picasso.Builder(context)
