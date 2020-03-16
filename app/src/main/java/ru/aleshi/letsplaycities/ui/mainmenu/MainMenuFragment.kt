@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import com.crashlytics.android.Crashlytics
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
 import kotlinx.coroutines.Dispatchers
