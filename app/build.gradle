@@ -40,10 +40,10 @@ android {
     defaultConfig {
         applicationId "ru.aleshi.letsplaycities"
         multiDexEnabled true
-        minSdkVersion 21
+        minSdkVersion 17
         targetSdkVersion 29
-        versionCode 272
-        versionName "2.7.2"
+        versionCode 273
+        versionName "2.7.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
 
@@ -130,6 +130,9 @@ dependencies {
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'ru.aleshi.lps:lps-client:1.2.2'
+
+    //noinspection GradleDependency
+    implementation 'com.squareup.okhttp3:okhttp:3.12.10'
 
     // For JDK9+
     kapt 'javax.xml.bind:jaxb-api:2.3.1'
