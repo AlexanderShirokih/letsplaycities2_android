@@ -104,10 +104,10 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     private fun translateStringKey(data: Bundle, vararg keys: String): Bundle {
         for (key in keys) {
-            val userId = data.get(key)
-            if (userId != null && userId is String) {
+            val value = data.get(key)
+            if (value != null && value is String) {
                 data.remove(key)
-                data.putInt(MyFirebaseMessagingService.KEY_USER_ID, userId.toInt())
+                data.putInt(key, value.toInt())
             }
         }
         return data
