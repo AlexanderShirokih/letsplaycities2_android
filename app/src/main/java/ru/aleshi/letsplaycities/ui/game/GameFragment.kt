@@ -106,9 +106,9 @@ class GameFragment : Fragment() {
                 }
             })
         viewModelProvider[GameSessionViewModel::class.java].apply {
-            gameSession.value!!.getContentIfNotHandled()?.run(gameViewModel::startGame)
-                ?: kotlin.run { findNavController().popBackStack() }
+            gameSession.value?.getContentIfNotHandled()?.run(gameViewModel::startGame)
         }
+
         viewModelProvider[UserMenuViewModel::class.java].actions.observe(
             viewLifecycleOwner,
             ::handleUserMenuAction

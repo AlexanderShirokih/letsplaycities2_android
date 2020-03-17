@@ -5,15 +5,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_waiting_for_devices.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
@@ -31,14 +26,14 @@ class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices
     @Inject
     lateinit var gamePreferences: GamePreferences
 
-    private var mGameSound: MediaPlayer? = null
+    private var gameSound: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         remotePresenter.onApplyView(this)
         if (gamePreferences.isSoundEnabled()) {
-            mGameSound = MediaPlayer.create(activity, R.raw.begin)
+            gameSound = MediaPlayer.create(activity, R.raw.begin)
         }
     }
 
@@ -50,17 +45,8 @@ class WaitingForDevicesFragment : Fragment(R.layout.fragment_waiting_for_devices
     override fun onStartGame(gameSession: GameSession) {
         ViewModelProvider(requireParentFragment())[GameSessionViewModel::class.java].apply {
             setGameSession(gameSession)
-            this.gameSession.observe(this@WaitingForDevicesFragment) {
-                if (!it.hasBeenHandled) {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        val controller = findNavController()
-                        while (R.id.waitingForDevicesFragment != controller.currentDestination?.id)
-                            delay(100)
-                        mGameSound?.start()
-                        controller.navigate(R.id.start_game_fragment)
-                    }
-                }
-            }
+            gameSound?.start()
+            findNavController().navigate(R.id.start_game_fragment)
         }
     }
 
