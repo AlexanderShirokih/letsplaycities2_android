@@ -40,10 +40,10 @@ android {
     defaultConfig {
         applicationId "ru.aleshi.letsplaycities"
         multiDexEnabled true
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 271
-        versionName "2.7.1"
+        versionName "2.7.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
 
