@@ -82,10 +82,19 @@ class GameViewModel @Inject constructor(
     }
 
     /**
-     * Call to process user input
+     * Call to process user input. In this case city correction won't be used.
+     */
+    fun processCityInputWithoutCorrection(input: String) {
+        disposable += presenter.onUserInput(input, true)
+            .subscribe(_wordState::postValue, ::showError)
+    }
+
+    /**
+     * Call to process user input.
      */
     fun processCityInput(input: String) {
-        disposable += presenter.onUserInput(input).subscribe(_wordState::postValue, ::showError)
+        disposable += presenter.onUserInput(input, false)
+            .subscribe(_wordState::postValue, ::showError)
     }
 
     fun processMessage(message: String) {

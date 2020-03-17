@@ -66,8 +66,9 @@ interface GameContract {
          * Call to send input from user to players.
          * @return [Flowable] that emits [WordCheckingResult] or [Flowable.empty] if current user
          * not yet defined or can't make move.
+         * @param skipCorrections if true, correction dialog won't be shown
          */
-        fun onUserInput(input: String): Flowable<WordCheckingResult>
+        fun onUserInput(input: String, skipCorrections: Boolean): Flowable<WordCheckingResult>
 
         /**
          * Call to send user's message to server.

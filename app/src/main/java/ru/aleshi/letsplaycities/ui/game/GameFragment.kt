@@ -106,7 +106,7 @@ class GameFragment : Fragment() {
                 }
             })
         viewModelProvider[GameSessionViewModel::class.java].apply {
-            gameSession.value?.getContentIfNotHandled()?.run(gameViewModel::startGame)
+            gameSession.value?.peekContent()?.run(gameViewModel::startGame)
         }
 
         viewModelProvider[UserMenuViewModel::class.java].actions.observe(
@@ -171,9 +171,6 @@ class GameFragment : Fragment() {
         adManager.setupAds()
     }
 
-    /**
-     * TODO: Create new hints
-     */
     private fun checkForFirstLaunch() {
         if (prefs.isFirstLaunch()) {
             val context = requireContext()
@@ -217,7 +214,7 @@ class GameFragment : Fragment() {
             requestCode,
             resultCode,
             data,
-            gameViewModel::processCityInput
+            gameViewModel::processCityInputWithoutCorrection
         )
     }
 

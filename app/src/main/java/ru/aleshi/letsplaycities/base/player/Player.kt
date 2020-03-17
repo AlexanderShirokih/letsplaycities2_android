@@ -74,7 +74,7 @@ class Player(
     /**
      * Processes user input
      */
-    fun onUserInput(userInput: String): Flowable<WordCheckingResult> {
+    fun onUserInput(userInput: String, skipCorrections: Boolean): Flowable<WordCheckingResult> {
         val input = StringUtils.formatCity(userInput)
         return Flowable.just(input)
             .filter { it.isNotEmpty() }
@@ -88,7 +88,7 @@ class Player(
                     )
                 )
             }
-            .flatMap { checkForCorrections(it, game) }
+            .flatMap { checkForCorrections(it, game, skipCorrections) }
             .doOnNext { userInputSubject.onNext(it) }
     }
 
@@ -157,14 +157,15 @@ class Player(
     /**
      * If previous result was [WordCheckingResult.NotFound] this function will search corrections
      * and emit [WordCheckingResult.Corrections] if corrections was found or [WordCheckingResult.NotFound]
-     * if corrections if not available.
+     * if corrections if not available or if [skipCorrections] is `true`.
      * For any other states will emit [Flowable.empty].
      */
     private fun checkForCorrections(
         currentResult: WordCheckingResult,
-        game: GameFacade
+        game: GameFacade,
+        skipCorrections: Boolean
     ): Flowable<WordCheckingResult> {
-        return if (currentResult is WordCheckingResult.NotFound) {
+        return if (currentResult is WordCheckingResult.NotFound && !skipCorrections) {
             game.getCorrections(currentResult.word)
                 .subscribeOn(Schedulers.computation())
                 .flatMapPublisher {

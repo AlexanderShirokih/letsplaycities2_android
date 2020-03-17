@@ -107,8 +107,8 @@ class GameSession(
      * @return [Observable.empty] when user can't handle input. [Observable] with [WordCheckingResult] when
      * user handles the input.
      */
-    fun sendPlayersInput(userInput: String): Flowable<WordCheckingResult> =
-        if (currentUser is Player) (currentUser as Player).onUserInput(userInput)
+    fun sendPlayersInput(userInput: String, skipCorrections: Boolean): Flowable<WordCheckingResult> =
+        if (currentUser is Player) (currentUser as Player).onUserInput(userInput, skipCorrections)
         else Flowable.empty()
 
     /**
