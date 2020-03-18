@@ -32,6 +32,9 @@
         <action
                 android:id="@+id/showConfimationDialog"
                 app:destination="@id/confirmationDialog" />
+        <action
+                android:id="@+id/showCitiesList"
+                app:destination="@id/citiesListFragment" />
     </fragment>
 
     <dialog
@@ -379,5 +382,10 @@
     <action
             android:id="@+id/globalStartFriendRequestDialog"
             app:destination="@id/friendRequestDialog" />
+    <fragment
+            android:id="@+id/citiesListFragment"
+            android:name="ru.aleshi.letsplaycities.ui.citieslist.CitiesListFragment"
+            android:label="@string/cities_list_label"
+            tools:layout="@layout/cities_list_fragment" />
 
 </navigation>
