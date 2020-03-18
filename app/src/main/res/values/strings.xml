@@ -357,4 +357,7 @@
     <string name="checking_for_updates">Проверка обновлений словаря…</string>
     <string name="updating_dictionary">Обновление словаря %d%%</string>
     <string name="loading_dictionary">Загрузка словаря</string>
+
+    <!-- CitiesListFragment -->
+    <string name="cities_list_label">Города</string>
 </resources>
