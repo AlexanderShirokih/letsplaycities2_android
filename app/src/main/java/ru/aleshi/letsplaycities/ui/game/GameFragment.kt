@@ -61,6 +61,10 @@ class GameFragment : Fragment() {
     private var clickSound: MediaPlayer? = null
     private val screenReceiver = ScreenReceiver { gameViewModel.onPlayerSurrender() }
 
+    private val viewModelProvider: ViewModelProvider by lazy {
+        ViewModelProvider(requireParentFragment())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
 
@@ -87,35 +91,8 @@ class GameFragment : Fragment() {
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_SCREEN_ON)
             })
-        gameViewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        val viewModelProvider =
-            ViewModelProvider(requireParentFragment())
         correctionViewModel = viewModelProvider[CorrectionViewModel::class.java]
-        viewModelProvider[ConfirmViewModel::class.java].callback.observe(
-            viewLifecycleOwner,
-            Observer {
-                when {
-                    it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(
-                        R.id.mainMenuFragment,
-                        false
-                    )
-                    it.checkWithResultCode(SURRENDER) -> gameViewModel.onPlayerSurrender()
-                    it.checkWithResultCode(USE_HINT) -> adManager.showAd()
-                }
-            })
-        viewModelProvider[GameSessionViewModel::class.java].apply {
-            gameSession.value?.peekContent()?.run(gameViewModel::startGame)
-        }
-
-        viewModelProvider[UserMenuViewModel::class.java].actions.observe(
-            viewLifecycleOwner,
-            ::handleUserMenuAction
-        )
-
+        gameViewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
         gameViewModel.apply {
             cities.observe(this@GameFragment, adapter::updateEntities)
             state.observe(this@GameFragment, ::handleState)
@@ -164,6 +141,26 @@ class GameFragment : Fragment() {
 
             }
             setHasFixedSize(true)
+        }
+
+        viewModelProvider[ConfirmViewModel::class.java].callback.observe(
+            viewLifecycleOwner,
+            Observer {
+                when {
+                    it.checkWithResultCode(GO_TO_MENU) -> findNavController().popBackStack(
+                        R.id.mainMenuFragment,
+                        false
+                    )
+                    it.checkWithResultCode(SURRENDER) -> gameViewModel.onPlayerSurrender()
+                    it.checkWithResultCode(USE_HINT) -> adManager.showAd()
+                }
+            })
+        viewModelProvider[UserMenuViewModel::class.java].actions.observe(
+            viewLifecycleOwner,
+            ::handleUserMenuAction
+        )
+        viewModelProvider[GameSessionViewModel::class.java].apply {
+            gameSession.value?.peekContent()?.run(gameViewModel::startGame)
         }
     }
 

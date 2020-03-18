@@ -42,8 +42,8 @@ android {
         multiDexEnabled true
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 274
-        versionName "2.7.4"
+        versionCode 275
+        versionName "2.7.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
 

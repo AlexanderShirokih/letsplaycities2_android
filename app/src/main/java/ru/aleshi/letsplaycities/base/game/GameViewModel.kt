@@ -36,6 +36,7 @@ class GameViewModel @Inject constructor(
 
     val helpBtnVisible: ObservableBoolean = ObservableBoolean()
     val msgBtnVisible: ObservableBoolean = ObservableBoolean()
+    val gameStarted: ObservableBoolean = ObservableBoolean()
 
     private val _currentCities = MutableLiveData<List<GameEntityWrapper>>(mutableListOf())
 
@@ -85,15 +86,22 @@ class GameViewModel @Inject constructor(
      * Call to process user input.
      */
     fun processCityInput(input: String) {
-        disposable += presenter.onUserInput(input)
-            .subscribe(_wordState::postValue, ::showError)
+        if (isStarted())
+            disposable += presenter.onUserInput(input)
+                .subscribe(_wordState::postValue, ::showError)
     }
 
     fun processMessage(message: String) {
-        disposable += presenter.onMessage(message)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({}, ::showError)
+        if (isStarted())
+            disposable += presenter.onMessage(message)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({}, ::showError)
     }
+
+    /**
+     * Returns `true` if game in [GameState.Started]
+     */
+    private fun isStarted() = GameState.Started == _currentState.value
 
     /**
      * Called when player wants to surrender.
@@ -105,6 +113,7 @@ class GameViewModel @Inject constructor(
      * @param state new [GameState] to bind.
      */
     override fun updateState(state: GameState) {
+        gameStarted.set(state == GameState.Started)
         _currentState.postValue(state)
     }
 
@@ -202,10 +211,11 @@ class GameViewModel @Inject constructor(
      * Starts searching hint for player.
      */
     fun useHintForPlayer() {
-        presenter.onPlayerHint()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({}, ::showError)
-            .addTo(disposable)
+        if (isStarted())
+            presenter.onPlayerHint()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({}, ::showError)
+                .addTo(disposable)
     }
 
     /**
