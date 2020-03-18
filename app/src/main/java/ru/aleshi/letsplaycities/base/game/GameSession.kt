@@ -53,7 +53,9 @@ class GameSession(
      * Returns previous [User] in queue
      */
     val prevUser: User
-        get() = users[(_currentUserIndex + 1) % users.size]
+        get() = users[floorMod(_currentUserIndex - 1, users.size)]
+
+    private fun floorMod(x: Int, y: Int) = ((x % y) + y) % y
 
     /**
      * Last accepted word
@@ -90,9 +92,9 @@ class GameSession(
                 }
             }
             .mergeWith(server.getDisconnections().map {
-                it.takeIf { msg -> msg.ownerId == 0 }
-                    ?: it.copy(ownerId = requirePlayer().credentials.userId)
-            }
+                    it.takeIf { msg -> msg.ownerId == 0 }
+                        ?: it.copy(ownerId = requirePlayer().credentials.userId)
+                }
                 .flatMap {
                     findUserByIdentity(UserIdIdentity(it.ownerId))?.run {
                         Observable.error<ResultWithCity>(
@@ -107,7 +109,10 @@ class GameSession(
      * @return [Observable.empty] when user can't handle input. [Observable] with [WordCheckingResult] when
      * user handles the input.
      */
-    fun sendPlayersInput(userInput: String, skipCorrections: Boolean): Flowable<WordCheckingResult> =
+    fun sendPlayersInput(
+        userInput: String,
+        skipCorrections: Boolean
+    ): Flowable<WordCheckingResult> =
         if (currentUser is Player) (currentUser as Player).onUserInput(userInput, skipCorrections)
         else Flowable.empty()
 

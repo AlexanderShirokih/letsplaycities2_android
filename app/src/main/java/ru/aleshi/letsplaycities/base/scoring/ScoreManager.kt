@@ -24,7 +24,7 @@ import ru.aleshi.letsplaycities.utils.StringUtils
 import javax.inject.Inject
 
 /**
- * Check game winner.
+ * Checks game winner.
  * Note, that now it works only for two users.
  */
 class ScoreManager @Inject constructor(
@@ -53,14 +53,19 @@ class ScoreManager @Inject constructor(
 
     // Статистика партий
     private lateinit var groupParts: ScoringGroup
+
     // Статистика онлайна
     private lateinit var groupOnline: ScoringGroup
+
     // Статистика рекордов
     private lateinit var groupHighScores: ScoringGroup
+
     // Статистика комбо
     private lateinit var groupCombo: ScoringGroup
+
     // Самые загадываемые города
     private lateinit var groupMostFrqCities: ScoringGroup
+
     // Самые длинные города
     private lateinit var groupMostBigCities: ScoringGroup
 
@@ -117,7 +122,7 @@ class ScoreManager @Inject constructor(
 
         lastTime += deltaTime
 
-        return mostChecker(word).andThen(
+        return mostChecker(current, word).andThen(
             Completable.fromAction {
                 val points = when (scoringType) {
                     ScoringType.LAST_MOVE -> 0
@@ -144,17 +149,17 @@ class ScoreManager @Inject constructor(
             Completable.complete()
         else
             Completable.fromAction {
-                current.comboSystem.addCity(
-                    CityComboInfo.create(
-                        deltaTime,
-                        word,
-                        gameSession.game.getCountryCode(word)
+                    current.comboSystem.addCity(
+                        CityComboInfo.create(
+                            deltaTime,
+                            word,
+                            gameSession.game.getCountryCode(word)
+                        )
                     )
-                )
-            }
+                }
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .andThen(Completable.fromAction {
-                    if (isCurrentIsPlayer()) {
+                    if (current is Player) {
                         current.comboSystem.activeCombosList.forEach {
                             groupCombo.child[it.key.ordinal].max(it.value)
                         }
@@ -164,30 +169,30 @@ class ScoreManager @Inject constructor(
     /**
      * Checks stats fro most-category (most biggest cities, most frequent cities)
      */
-    private fun mostChecker(word: String): Completable {
-        return if (!isCurrentIsPlayer())
+    private fun mostChecker(current: User, word: String): Completable {
+        return if (current !is Player)
             Completable.complete()
         else
             Completable.fromAction {
-                //Most biggest cities
-                val wordLength = word.length
-                for (i in groupMostBigCities.child.indices) {
-                    val f = groupMostBigCities.child[i]
-                    if (f.hasValue() && f.value() != V_EMPTY_S) {
-                        if (wordLength > f.value().length) {
-                            //Shift
-                            for (j in groupMostBigCities.child.size - 1 downTo i + 1)
-                                groupMostBigCities.child[j].set(groupMostBigCities.child[j - 1].value())
+                    //Most biggest cities
+                    val wordLength = word.length
+                    for (i in groupMostBigCities.child.indices) {
+                        val f = groupMostBigCities.child[i]
+                        if (f.hasValue() && f.value() != V_EMPTY_S) {
+                            if (wordLength > f.value().length) {
+                                //Shift
+                                for (j in groupMostBigCities.child.size - 1 downTo i + 1)
+                                    groupMostBigCities.child[j].set(groupMostBigCities.child[j - 1].value())
+                                f.set(word)
+                                break
+                            } else if (word == f.value())
+                                break
+                        } else {
                             f.set(word)
                             break
-                        } else if (word == f.value())
-                            break
-                    } else {
-                        f.set(word)
-                        break
+                        }
                     }
                 }
-            }
                 .andThen(cityStatDatabaseHelper.updateFrequentWords(word, groupMostFrqCities))
                 .doOnComplete { saveStats() }
     }
@@ -263,6 +268,6 @@ class ScoreManager @Inject constructor(
         saveStats()
     }
 
-    private fun isCurrentIsPlayer() = gameSession.currentUser is Player
+//    private fun isCurrentIsPlayer() = gameSession.currentUser is Player
 
 }
