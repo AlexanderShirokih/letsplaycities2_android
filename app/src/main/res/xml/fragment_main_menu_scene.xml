@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/start">
+
+        <Constraint
+                android:id="@+id/btn_play"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="14dp"
+                app:layout_constraintBottom_toTopOf="@+id/btn_achievements"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/logo"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_pva"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@+id/btn_pvp"
+                app:layout_constraintStart_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btn_play"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_pvp"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@+id/btn_net"
+                app:layout_constraintEnd_toEndOf="@+id/btn_pva"
+                app:layout_constraintStart_toStartOf="@+id/btn_pva"
+                app:layout_constraintTop_toBottomOf="@+id/btn_pva"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_net"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@+id/btn_mul"
+                app:layout_constraintEnd_toEndOf="@+id/btn_pva"
+                app:layout_constraintStart_toStartOf="@+id/btn_pva"
+                app:layout_constraintTop_toBottomOf="@+id/btn_pvp"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_mul"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_play"
+                app:layout_constraintEnd_toEndOf="@+id/btn_pva"
+                app:layout_constraintStart_toStartOf="@+id/btn_pva"
+                app:layout_constraintTop_toBottomOf="@+id/btn_net"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_achievements"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="64dp"
+                android:layout_marginBottom="14dp"
+                app:layout_constraintBottom_toTopOf="@+id/btn_cities_list"
+                app:layout_constraintEnd_toEndOf="@+id/btn_play"
+                app:layout_constraintStart_toStartOf="@+id/btn_play"
+                app:layout_constraintTop_toBottomOf="@id/btn_play"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_cities_list"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:layout_constraintBottom_toTopOf="@+id/btn_set"
+                app:layout_constraintEnd_toEndOf="@+id/btn_play"
+                app:layout_constraintStart_toStartOf="@+id/btn_play"
+                app:layout_constraintTop_toBottomOf="@+id/btn_achievements"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_set"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/btn_play"
+                app:layout_constraintStart_toStartOf="@+id/btn_play"
+                app:layout_constraintTop_toBottomOf="@+id/btn_cities_list" />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+
+        <Constraint
+                android:id="@+id/btn_play"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:layout_constraintEnd_toStartOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_pva"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="14dp"
+                android:padding="@dimen/btn_pad"
+                android:text="@string/pva"
+                app:icon="@drawable/ic_android_24dp"
+                app:layout_constraintBottom_toTopOf="@+id/btn_pvp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btn_play"
+                app:layout_constraintTop_toBottomOf="@+id/logo"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_pvp"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:padding="@dimen/btn_pad"
+                android:text="@string/pvp"
+                app:icon="@drawable/ic_player"
+                app:layout_constraintBottom_toTopOf="@+id/btn_net"
+                app:layout_constraintEnd_toEndOf="@id/btn_pva"
+                app:layout_constraintStart_toStartOf="@id/btn_pva"
+                app:layout_constraintTop_toBottomOf="@+id/btn_pva" />
+
+        <Constraint
+                android:id="@+id/btn_net"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:padding="@dimen/btn_pad"
+                android:text="@string/net"
+                app:icon="@drawable/ic_global"
+                app:layout_constraintBottom_toTopOf="@+id/btn_mul"
+                app:layout_constraintEnd_toEndOf="@+id/btn_pva"
+                app:layout_constraintStart_toStartOf="@id/btn_pva"
+                app:layout_constraintTop_toBottomOf="@+id/btn_pvp" />
+
+        <Constraint
+                android:id="@+id/btn_mul"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:padding="@dimen/btn_pad"
+                android:text="@string/mul"
+                app:icon="@drawable/ic_net_24"
+                app:layout_constraintBottom_toTopOf="@id/btn_achievements"
+                app:layout_constraintEnd_toEndOf="@+id/btn_pva"
+                app:layout_constraintStart_toStartOf="@id/btn_pva"
+                app:layout_constraintTop_toBottomOf="@+id/btn_net" />
+
+        <Constraint
+                android:id="@+id/btn_achievements"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@id/btn_cities_list"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_cities_list"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@id/btn_set"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_achievements"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+        <Constraint
+                android:id="@+id/btn_set"
+                android:layout_width="@dimen/main_menu_btn_width"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_cities_list"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+    </ConstraintSet>
+
+    <Transition
+            android:id="@+id/startToEnd"
+            app:constraintSetEnd="@id/end"
+            app:constraintSetStart="@+id/start"
+            app:duration="1000">
+
+        <OnClick
+                app:clickAction="transitionToEnd"
+                app:targetId="@id/btn_play" />
+        <KeyFrameSet>
+
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_play"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_pva"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_pvp"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_net"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_mul"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="20"
+                    app:motionTarget="@+id/btn_achievements"
+                    app:percentY="0.35" />
+            <KeyPosition
+                    app:framePosition="20"
+                    app:motionTarget="@+id/btn_cities_list"
+                    app:percentY="0.35" />
+            <KeyPosition
+                    app:framePosition="20"
+                    app:motionTarget="@+id/btn_set"
+                    app:percentY="0.35" />
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_achievements"
+                    app:percentY="0.35" />
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_cities_list"
+                    app:percentY="0.35" />
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_set"
+                    app:percentY="0.35" />
+        </KeyFrameSet>
+
+    </Transition>
+    <Transition
+            android:id="@+id/endToStart"
+            app:constraintSetEnd="@+id/start"
+            app:constraintSetStart="@+id/end"
+            app:duration="1000">
+
+        <KeyFrameSet>
+
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_play"
+                    app:percentX="0.0"
+                    app:percentY="0.0" />
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_achievements"
+                    app:percentX="0.0"
+                    app:percentY="0.0" />
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_cities_list"
+                    app:percentX="0.0"
+                    app:percentY="0.0" />
+            <KeyPosition
+                    app:framePosition="70"
+                    app:motionTarget="@+id/btn_set"
+                    app:percentX="0.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="99"
+                    app:motionTarget="@+id/btn_pva"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="99"
+                    app:motionTarget="@+id/btn_pvp"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="99"
+                    app:motionTarget="@+id/btn_net"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+
+            <KeyPosition
+                    app:framePosition="99"
+                    app:motionTarget="@+id/btn_mul"
+                    app:percentX="1.0"
+                    app:percentY="0.0" />
+        </KeyFrameSet>
+    </Transition>
+</MotionScene>
