@@ -112,7 +112,7 @@ class Player(
             .onBackpressureLatest()
             .flatMap {
                 if (it.second.isEmpty())
-                    Flowable.empty<WordCheckingResult>()
+                    Flowable.empty()
                 else Flowable.just(WordCheckingResult.Exclusion(it.second))
             }
 
@@ -133,7 +133,7 @@ class Player(
         return game.checkCity(word)
             .flatMap { result ->
                 when (result) {
-                    CityResult.CITY_NOT_FOUND -> Flowable.error<WordCheckingResult>(
+                    CityResult.CITY_NOT_FOUND -> Flowable.error(
                         CityNotFoundException(word)
                     )
                     CityResult.ALREADY_USED -> Flowable.just(WordCheckingResult.AlreadyUsed(city))
@@ -167,11 +167,14 @@ class Player(
         return if (currentResult is WordCheckingResult.NotFound) {
             game.getCorrections(currentResult.word)
                 .subscribeOn(Schedulers.computation())
-                .flatMapPublisher {
-                    if (it.isEmpty())
-                        Flowable.just(WordCheckingResult.NotFound(currentResult.word))
-                    else
-                        Flowable.just(WordCheckingResult.Corrections(it))
+                .flatMapPublisher { correctionsList ->
+                    Flowable.just(
+                        when (correctionsList.size) {
+                            0 -> WordCheckingResult.NotFound(currentResult.word)
+                            1 -> WordCheckingResult.Accepted(currentResult.word)
+                            else -> WordCheckingResult.Corrections(correctionsList)
+                        }
+                    )
                 }
                 .onBackpressureLatest()
         } else
@@ -197,7 +200,7 @@ class Player(
                 ),
                 server.sendCity(result.word, this)
             )
-        } else Observable.never<ResultWithCity>()
+        } else Observable.never()
     }
 
     fun useHint(game: GameFacade): Completable =
