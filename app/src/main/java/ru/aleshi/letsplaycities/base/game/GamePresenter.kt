@@ -126,8 +126,8 @@ class GamePresenter @Inject constructor(
      * @return [Observable] that emits [WordCheckingResult] or [Observable.empty] if current user
      * not yet defined or can't make move.
      */
-    override fun onUserInput(input: String, skipCorrections: Boolean): Flowable<WordCheckingResult> =
-        session.sendPlayersInput(input, skipCorrections)
+    override fun onUserInput(input: String): Flowable<WordCheckingResult> =
+        session.sendPlayersInput(input)
 
     override fun onMessage(message: String): Completable =
         session.sendPlayersMessage(message)

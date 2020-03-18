@@ -51,8 +51,10 @@ class GameFragment : Fragment() {
 
     @Inject
     lateinit var prefs: GamePreferences
+
     @Inject
     lateinit var viewModelFactory: GameViewModelFactory
+
     @Inject
     lateinit var gameStateNotifier: GameStateNotifier
 
@@ -214,7 +216,7 @@ class GameFragment : Fragment() {
             requestCode,
             resultCode,
             data,
-            gameViewModel::processCityInputWithoutCorrection
+            gameViewModel::processCityInput
         )
     }
 
