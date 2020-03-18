@@ -22,4 +22,5 @@
 
     <dimen name="flagImgWidth">36dp</dimen>
     <dimen name="flagImgHeight">24dp</dimen>
+    <dimen name="main_menu_btn_width">275dp</dimen>
 </resources>

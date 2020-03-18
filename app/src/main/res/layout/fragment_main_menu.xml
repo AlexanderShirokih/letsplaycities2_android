@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/motionLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_main_menu_scene">
 
     <ImageView
             android:id="@+id/logo"
@@ -18,13 +20,55 @@
             android:src="@drawable/logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_play"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="14dp"
+            android:padding="@dimen/btn_pad"
+            android:text="@string/play"
+            app:icon="@drawable/ic_play_arrow_24"
+            app:layout_constraintBottom_toTopOf="@+id/btn_achievements"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/logo"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_achievements"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:padding="@dimen/btn_pad"
+            android:text="@string/achievements"
+            app:icon="@drawable/ic_achievements"
+            app:layout_constraintBottom_toTopOf="@+id/btn_cities_list"
+            app:layout_constraintEnd_toEndOf="@+id/btn_play"
+            app:layout_constraintStart_toStartOf="@+id/btn_play"
+            app:layout_constraintTop_toBottomOf="@+id/btn_play"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cities_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:padding="@dimen/btn_pad"
+            android:text="@string/cities_list"
+            app:icon="@drawable/ic_city_24"
+            app:layout_constraintBottom_toTopOf="@+id/btn_pva"
+            app:layout_constraintEnd_toEndOf="@+id/btn_play"
+            app:layout_constraintStart_toStartOf="@+id/btn_play"
+            app:layout_constraintTop_toBottomOf="@+id/btn_achievements"
+            app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_pva"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:layout_marginBottom="14dp"
             android:padding="@dimen/btn_pad"
             android:text="@string/pva"
@@ -32,47 +76,47 @@
             app:layout_constraintBottom_toTopOf="@+id/btn_pvp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logo"
+            app:layout_constraintTop_toBottomOf="@+id/btn_achievements"
             app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_pvp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/pvp"
-            android:padding="@dimen/btn_pad"
             android:layout_marginBottom="14dp"
+            android:padding="@dimen/btn_pad"
+            android:text="@string/pvp"
             app:icon="@drawable/ic_player"
-            app:layout_constraintStart_toStartOf="@+id/btn_pva"
+            app:layout_constraintBottom_toTopOf="@+id/btn_net"
             app:layout_constraintEnd_toEndOf="@+id/btn_pva"
-            app:layout_constraintTop_toBottomOf="@+id/btn_pva"
-            app:layout_constraintBottom_toTopOf="@+id/btn_net"/>
+            app:layout_constraintStart_toStartOf="@+id/btn_pva"
+            app:layout_constraintTop_toBottomOf="@+id/btn_pva" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_net"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/net"
-            android:padding="@dimen/btn_pad"
             android:layout_marginBottom="14dp"
+            android:padding="@dimen/btn_pad"
+            android:text="@string/net"
             app:icon="@drawable/ic_global"
-            app:layout_constraintStart_toStartOf="@+id/btn_pva"
+            app:layout_constraintBottom_toTopOf="@+id/btn_mul"
             app:layout_constraintEnd_toEndOf="@+id/btn_pva"
-            app:layout_constraintTop_toBottomOf="@+id/btn_pvp"
-            app:layout_constraintBottom_toTopOf="@+id/btn_mul"/>
+            app:layout_constraintStart_toStartOf="@+id/btn_pva"
+            app:layout_constraintTop_toBottomOf="@+id/btn_pvp" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_mul"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
-            android:text="@string/mul"
             android:padding="@dimen/btn_pad"
+            android:text="@string/mul"
             app:icon="@drawable/ic_net_24"
-            app:layout_constraintStart_toStartOf="@+id/btn_pva"
+            app:layout_constraintBottom_toTopOf="@+id/btn_set"
             app:layout_constraintEnd_toEndOf="@+id/btn_pva"
-            app:layout_constraintTop_toBottomOf="@+id/btn_net"
-            app:layout_constraintBottom_toTopOf="@+id/btn_set"/>
+            app:layout_constraintStart_toStartOf="@+id/btn_pva"
+            app:layout_constraintTop_toBottomOf="@+id/btn_net" />
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_set"
@@ -87,4 +131,4 @@
             app:layout_constraintStart_toStartOf="@+id/btn_pva"
             app:layout_constraintTop_toBottomOf="@+id/btn_mul" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>

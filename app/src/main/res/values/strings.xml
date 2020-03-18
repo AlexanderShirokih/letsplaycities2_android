@@ -6,6 +6,9 @@
     <string name="fb_login_protocol_scheme">fb1023004964531266</string>
 
     <!-- MainMenuFragment -->
+    <string name="play">Играть</string>
+    <string name="achievements">Достижения</string>
+    <string name="cities_list">Города</string>
     <string name="pva">Игрок против Андроида</string>
     <string name="pvp">Игрок против Игрока</string>
     <string name="mul">Мультиплеер</string>
