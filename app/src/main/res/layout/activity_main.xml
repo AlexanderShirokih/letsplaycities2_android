@@ -14,7 +14,7 @@
             android:theme="@style/Toolbar"
             app:popupTheme="@style/Theme.AppCompat.NoActionBar" />
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
             android:id="@+id/main_nav_fragment"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
