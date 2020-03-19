@@ -170,6 +170,7 @@ class GamePresenter @Inject constructor(
             .doOnNext { viewModel.updateState(GameState.LoadingUpdate(it.loadingPercent)) }
             .lastElement()
             .ignoreElement()
+            .onErrorComplete()
     }
 
     /**
