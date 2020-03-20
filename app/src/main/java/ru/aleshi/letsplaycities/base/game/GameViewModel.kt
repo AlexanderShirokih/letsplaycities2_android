@@ -222,11 +222,12 @@ class GameViewModel @Inject constructor(
      * Calls [showMenuCallback] if user that currently bind at [position] has menu.
      */
     fun showMenu(position: Position, showMenuCallback: (u: User) -> Unit) {
-        presenter.getCurrentSession().apply {
-            val user = users.first { it.position == position }
-            if (gameMode == GameMode.MODE_NET && user !is Player)
-                showMenuCallback(user)
-        }
+        if (isStarted())
+            presenter.getCurrentSession().apply {
+                val user = users.first { it.position == position }
+                if (gameMode == GameMode.MODE_NET && user !is Player)
+                    showMenuCallback(user)
+            }
     }
 
     override fun onFriendRequestResult(type: LPSMessage.LPSFriendRequest) =
