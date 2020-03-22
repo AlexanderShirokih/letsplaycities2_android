@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.base.player
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -60,15 +61,16 @@ class PlayerTest {
 
         doAnswer { inv ->
             when (inv.arguments[0] as String) {
-                "noword", "correction" -> Single.just(CityResult.CITY_NOT_FOUND)
-                "already" -> Single.just(CityResult.ALREADY_USED)
-                else -> Single.just(CityResult.OK)
+                "noword", "correction", "mulcorr" -> Flowable.just(CityResult.CITY_NOT_FOUND)
+                "already" -> Flowable.just(CityResult.ALREADY_USED)
+                else -> Flowable.just(CityResult.OK)
             }
         }.`when`(gameFacade).checkCity(any())
 
         doAnswer { inv ->
             when (inv.arguments[0] as String) {
                 "correction" -> Single.just(listOf("correctionAvail"))
+                "mulcorr" -> Single.just(listOf("mulCorrection", "mulCorrectionAvail"))
                 else -> Single.just(emptyList())
             }
         }.`when`(gameFacade).getCorrections(any())
@@ -83,7 +85,7 @@ class PlayerTest {
     }
 
     @Test
-    fun onUserInputWhenHasNoExclusion() {
+    fun testWhenUserInputHasNoExclusionWordWillAccepted() {
         p.onUserInput("noEx").test().await()
             .assertValueCount(1)
             .assertValue { v -> v is WordCheckingResult.Accepted }
@@ -91,14 +93,14 @@ class PlayerTest {
     }
 
     @Test
-    fun onUserInputWhenHasExclusion() {
+    fun testWhenUserInputHasAnExclusionExclusionWillEmitted() {
         p.onUserInput("withEx").test().await()
             .assertValueCount(1)
             .assertValue { v -> v is WordCheckingResult.Exclusion && v.description == "exclusion" }
     }
 
     @Test
-    fun onUserInputWhenWrongLetter() {
+    fun testWhenWrongFirstLetterWrongLetterEmitted() {
         val tester = TestObserver<ResultWithCity>()
 
         p.onMakeMove('g')
@@ -114,7 +116,7 @@ class PlayerTest {
     }
 
     @Test
-    fun onMakeMoveWhenHasFirstWordMatches() {
+    fun testWhenHasFirstWordOnInputMatchesWithFirstLetterThenWordWillAccepted() {
         val tester = TestObserver<ResultWithCity>()
 
         p.onMakeMove('n')
@@ -122,6 +124,7 @@ class PlayerTest {
 
         p.onUserInput("noEx")
             .test()
+            .await()
             .assertValue { v -> v is WordCheckingResult.Accepted }
             .assertComplete()
 
@@ -132,24 +135,31 @@ class PlayerTest {
     }
 
     @Test
-    fun onUserInputWhenAlready() {
+    fun testWhenAlreadyWordUserAlreadyUserEmitted() {
         p.onUserInput("already").test().await()
             .assertValueCount(1)
             .assertValue { v -> v is WordCheckingResult.AlreadyUsed }
     }
 
     @Test
-    fun onUserInputWhenNoWord() {
+    fun testWhenNoWordNotFoundEmitted() {
         p.onUserInput("noword").test().await()
             .assertValueCount(1)
             .assertValue { v -> v is WordCheckingResult.NotFound }
     }
 
     @Test
-    fun onUserInputWhenCorrectionsAvailable() {
+    fun testWhenSingleCorrectionsAvailableJustAcceptsIt() {
         p.onUserInput("correction").test().await()
             .assertValueCount(1)
-            .assertValue { v -> v is WordCheckingResult.Corrections && v.corrections.contains("correctionAvail") }
+            .assertValue { v -> v is WordCheckingResult.Accepted && v.word.contains("correctionAvail") }
+    }
+
+    @Test
+    fun testWhenMultipleCorrectionsAvailableWillReturnCorrections() {
+        p.onUserInput("mulcorr").test().await()
+            .assertValueCount(1)
+            .assertValue { v -> v is WordCheckingResult.Corrections && v.corrections.contains("mulCorrection") }
     }
 
 }

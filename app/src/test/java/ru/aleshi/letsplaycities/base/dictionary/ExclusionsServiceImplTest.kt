@@ -13,7 +13,11 @@ class ExclusionsServiceImplTest {
     fun setUp() {
         exclusion = ExclusionsServiceImpl(
             exclusionsList = createExclusionMap(),
-            countries = listOf("aabr", "creade", "denito"),
+            countries = listOf(
+                CountryEntity("aabr", 1),
+                CountryEntity("creade", 2),
+                CountryEntity("denito", 3)
+            ),
             states = listOf("statea", "stateb"),
             errMessages = ErrorCode.values().associate { t -> t to "${t.name}:%s" }
         )

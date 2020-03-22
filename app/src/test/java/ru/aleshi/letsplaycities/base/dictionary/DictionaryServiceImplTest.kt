@@ -10,31 +10,31 @@ class DictionaryServiceImplTest {
     fun testDictionaryHasAllPresentCities() {
         val dic = DictionaryServiceImpl(simpleMap())
 
-        assertEquals(CityResult.OK, dic.checkCity("abcd").blockingGet())
-        assertEquals(CityResult.OK, dic.checkCity("bcde").blockingGet())
-        assertEquals(CityResult.OK, dic.checkCity("cdef").blockingGet())
-        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("another").blockingGet())
+        assertEquals(CityResult.OK, dic.checkCity("abcd").blockingFirst())
+        assertEquals(CityResult.OK, dic.checkCity("bcde").blockingFirst())
+        assertEquals(CityResult.OK, dic.checkCity("cdef").blockingFirst())
+        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("another").blockingFirst())
     }
 
     @Test
     fun testDictionaryMarkUsed() {
         val dic = DictionaryServiceImpl(simpleMap())
 
-        assertEquals(CityResult.OK, dic.checkCity("abcd").blockingGet())
+        assertEquals(CityResult.OK, dic.checkCity("abcd").blockingFirst())
         dic.markUsed("abcd")
 
-        assertEquals(CityResult.ALREADY_USED, dic.checkCity("abcd").blockingGet())
-        assertEquals(CityResult.OK, dic.checkCity("bcde").blockingGet())
+        assertEquals(CityResult.ALREADY_USED, dic.checkCity("abcd").blockingFirst())
+        assertEquals(CityResult.OK, dic.checkCity("bcde").blockingFirst())
     }
 
     @Test
     fun testDictionaryMarkUsedWhenWordNotExists() {
         val dic = DictionaryServiceImpl(simpleMap())
 
-        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("wyxz").blockingGet())
+        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("wyxz").blockingFirst())
         dic.markUsed("wyxz")
 
-        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("wyxz").blockingGet())
+        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("wyxz").blockingFirst())
     }
 
     @Test
@@ -65,17 +65,17 @@ class DictionaryServiceImplTest {
         dic.markUsed("another")
         dic.reset()
 
-        assertEquals(CityResult.OK, dic.checkCity("abcd").blockingGet())
-        assertEquals(CityResult.OK, dic.checkCity("bcde").blockingGet())
-        assertEquals(CityResult.OK, dic.checkCity("cdef").blockingGet())
-        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("another").blockingGet())
+        assertEquals(CityResult.OK, dic.checkCity("abcd").blockingFirst())
+        assertEquals(CityResult.OK, dic.checkCity("bcde").blockingFirst())
+        assertEquals(CityResult.OK, dic.checkCity("cdef").blockingFirst())
+        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("another").blockingFirst())
     }
 
     @Test
     fun testClearReallyClearsDictionary() {
         val dic = DictionaryServiceImpl(simpleMap())
         dic.clear()
-        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("abcd").blockingGet())
+        assertEquals(CityResult.CITY_NOT_FOUND, dic.checkCity("abcd").blockingFirst())
     }
 
     @Test

@@ -1,5 +1,7 @@
 package ru.aleshi.letsplaycities.base.dictionary
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -11,12 +13,16 @@ class ExclusionsFactoryTest {
 
     private lateinit var fileProvider: FileProvider
 
+    private lateinit var countryListLoaderService: CountryListLoaderService
+
     @Before
     fun setUp() {
         fileProvider = Mockito.mock(FileProvider::class.java)
         Mockito.`when`(fileProvider.open(ArgumentMatchers.anyString())).thenAnswer {
             javaClass.getResourceAsStream("/${it.arguments[0] as String}")
         }
+
+        countryListLoaderService = Mockito.mock(CountryListLoaderService::class.java)
     }
 
     @Test
@@ -25,12 +31,21 @@ class ExclusionsFactoryTest {
     }
 
     @Test
-    fun testNormalLoadingExclusionsFactory() {
-        ExclusionsFactory(fileProvider, createErrMap())
+    fun testNormalLoadingExclusionsFactory(): Unit = runBlocking(Dispatchers.IO) {
+        Mockito.`when`(countryListLoaderService.loadCountryList()).thenReturn(
+            listOf(
+                CountryEntity("test", 1),
+                CountryEntity("test2", 2)
+            )
+        )
+
+        ExclusionsFactory(fileProvider, countryListLoaderService, createErrMap())
             .load()
             .test()
             .await()
             .assertNoErrors()
+
+        Unit
     }
 
     private fun createErrMap() =
