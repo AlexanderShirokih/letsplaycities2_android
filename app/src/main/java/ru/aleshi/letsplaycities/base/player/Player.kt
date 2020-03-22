@@ -171,7 +171,7 @@ class Player(
                     Flowable.just(
                         when (correctionsList.size) {
                             0 -> WordCheckingResult.NotFound(currentResult.word)
-                            1 -> WordCheckingResult.Accepted(currentResult.word)
+                            1 -> WordCheckingResult.Accepted(correctionsList[0])
                             else -> WordCheckingResult.Corrections(correctionsList)
                         }
                     )
