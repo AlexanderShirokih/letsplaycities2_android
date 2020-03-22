@@ -7,7 +7,6 @@ import io.reactivex.Single
 import ru.aleshi.letsplaycities.GsonModule
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.ui.ActivityScope
-import javax.inject.Singleton
 
 @Module(includes = [GsonModule::class])
 class DictionaryModule {
@@ -18,6 +17,9 @@ class DictionaryModule {
         prefs: GamePreferences,
         factory: DictionaryFactory
     ): DictionaryUpdater = DictionaryUpdater(gson, prefs, factory)
+
+    @Provides
+    fun countryListLoader(service: CountryListLoaderServiceImpl): CountryListLoaderService = service
 
     @Provides
     fun exclusions(factory: ExclusionsFactory): Single<ExclusionsService> = factory.load()

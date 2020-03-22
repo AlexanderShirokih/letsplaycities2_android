@@ -22,7 +22,7 @@ import java.util.*
 class ExclusionsServiceImpl(
     private val exclusionsList: Map<String, Exclusion>,
     private val errMessages: Map<ErrorCode, String>,
-    private val countries: List<String>,
+    private val countries: List<CountryEntity>,
     private val states: List<String>
 ) : ExclusionsService {
 
@@ -57,7 +57,7 @@ class ExclusionsServiceImpl(
     class Exclusion(var type: ExclusionType, var thing: String)
 
     override fun checkForExclusion(city: String): String {
-        if (countries.contains(city))
+        if (countries.any { it.name == city })
             return String.format(
                 errMessages.getValue(ErrorCode.THIS_IS_A_COUNTRY),
                 StringUtils.toTitleCase(city)
@@ -108,7 +108,9 @@ class ExclusionsServiceImpl(
 
     override fun hasNoExclusions(input: String): Boolean {
         val word = input.trim().toLowerCase(Locale.getDefault())
-        return !countries.contains(word) && !states.contains(word) && !exclusionsList.contains(word)
+        return countries.none { it.name == word } && !states.contains(word) && !exclusionsList.contains(
+            word
+        )
     }
 
 }

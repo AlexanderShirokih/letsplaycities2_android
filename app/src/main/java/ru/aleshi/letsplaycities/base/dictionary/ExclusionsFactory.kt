@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.base.dictionary
 
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.runBlocking
 import ru.aleshi.letsplaycities.FileProvider
 import ru.aleshi.letsplaycities.Localization
 import java.io.BufferedReader
@@ -13,6 +14,7 @@ import javax.inject.Inject
  */
 class ExclusionsFactory @Inject constructor(
     private val fileProvider: FileProvider,
+    private val countryListLoaderService: CountryListLoaderService,
     @Localization("exclusion-errors")
     private val errMessages: Map<ExclusionsServiceImpl.ErrorCode, String>
 ) {
@@ -36,10 +38,10 @@ class ExclusionsFactory @Inject constructor(
             }
             .toMap()
 
-        val countries = BufferedReader(InputStreamReader(fileProvider.open("countries.txt")))
-            .readLines()
         val states = BufferedReader(InputStreamReader(fileProvider.open("states.txt")))
             .readLines()
+
+        val countries = runBlocking { countryListLoaderService.loadCountryList() }
 
         return ExclusionsServiceImpl(
             exclusionsList,
