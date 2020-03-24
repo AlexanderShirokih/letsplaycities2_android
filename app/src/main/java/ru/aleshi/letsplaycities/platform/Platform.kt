@@ -9,6 +9,8 @@ import dagger.Provides
 import io.reactivex.Single
 import ru.aleshi.letsplaycities.*
 import ru.aleshi.letsplaycities.base.GamePreferences
+import ru.aleshi.letsplaycities.base.dictionary.CountryListLoaderService
+import ru.aleshi.letsplaycities.base.dictionary.CountryListLoaderServiceImpl
 import ru.aleshi.letsplaycities.base.dictionary.ExclusionsServiceImpl
 import ru.aleshi.letsplaycities.base.scoring.CityStatDatabaseHelper
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
@@ -34,6 +36,10 @@ class Platform {
 
         @Binds
         fun dbHelper(cityStatDatabaseHelper: SQLiteCityStatDatabaseHelper): CityStatDatabaseHelper
+
+        @Binds
+        fun countryListLoader(service: CountryListLoaderServiceImpl): CountryListLoaderService
+
     }
 
     @Provides

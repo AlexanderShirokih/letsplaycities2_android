@@ -1,7 +1,7 @@
 package ru.aleshi.letsplaycities.base.dictionary
 
 import ru.aleshi.letsplaycities.base.dictionary.ExclusionsServiceImpl.ErrorCode
-import ru.aleshi.letsplaycities.utils.StringUtils
+import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
 import java.util.*
 
 /**
@@ -60,13 +60,13 @@ class ExclusionsServiceImpl(
         if (countries.any { it.name == city })
             return String.format(
                 errMessages.getValue(ErrorCode.THIS_IS_A_COUNTRY),
-                StringUtils.toTitleCase(city)
+                city.toTitleCase()
             )
 
         if (states.contains(city))
             return String.format(
                 errMessages.getValue(ErrorCode.THIS_IS_A_STATE),
-                StringUtils.toTitleCase(city)
+                city.toTitleCase()
             )
 
         return checkCity(city)
@@ -78,24 +78,24 @@ class ExclusionsServiceImpl(
             ExclusionType.CITY_WAS_RENAMED ->  // Город был переименован
                 String.format(
                     errMessages.getValue(ErrorCode.RENAMED_CITY),
-                    StringUtils.toTitleCase(city),
-                    StringUtils.toTitleCase(ex.thing)
+                    city.toTitleCase(),
+                    ex.thing.toTitleCase()
                 )
             ExclusionType.INCOMPLETE_NAME ->  // Неполное название
                 String.format(
                     errMessages.getValue(ErrorCode.INCOMPLETE_CITY),
-                    StringUtils.toTitleCase(ex.thing)
+                    ex.thing.toTitleCase()
                 )
             ExclusionType.NOT_A_CITY ->  // Географические объекты - не города
                 String.format(
                     errMessages.getValue(ErrorCode.NOT_A_CITY),
-                    StringUtils.toTitleCase(city),
+                    city.toTitleCase(),
                     ex.thing
                 )
             ExclusionType.REGION_NAME ->  // Исторические название областей
                 String.format(
                     errMessages.getValue(ErrorCode.THIS_IS_NOT_A_CITY),
-                    StringUtils.toTitleCase(city)
+                    city.toTitleCase()
                 )
             else -> ""
 

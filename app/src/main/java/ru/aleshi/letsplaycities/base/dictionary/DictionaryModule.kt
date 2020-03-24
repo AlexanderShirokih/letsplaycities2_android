@@ -19,9 +19,6 @@ class DictionaryModule {
     ): DictionaryUpdater = DictionaryUpdater(gson, prefs, factory)
 
     @Provides
-    fun countryListLoader(service: CountryListLoaderServiceImpl): CountryListLoaderService = service
-
-    @Provides
     fun exclusions(factory: ExclusionsFactory): Single<ExclusionsService> = factory.load()
 
     @Provides
