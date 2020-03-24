@@ -8,14 +8,15 @@ import ru.aleshi.letsplaycities.network.NetworkClientModule
 import ru.aleshi.letsplaycities.network.NetworkModule
 import ru.aleshi.letsplaycities.remote.RemoteModule
 import ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment
+import ru.aleshi.letsplaycities.ui.citieslist.CountryFilterDialog
 import ru.aleshi.letsplaycities.ui.game.GameFragment
 import ru.aleshi.letsplaycities.ui.game.GameFragmentModule
 import ru.aleshi.letsplaycities.ui.global.FriendGameRequestDialog
 import ru.aleshi.letsplaycities.ui.global.FriendRequestDialog
-import ru.aleshi.letsplaycities.ui.network.friends.FriendsFragment
 import ru.aleshi.letsplaycities.ui.mainmenu.MainMenuFragment
-import ru.aleshi.letsplaycities.ui.network.NetworkFragment
 import ru.aleshi.letsplaycities.ui.network.NetworkClientFromNetworkFragmentModule
+import ru.aleshi.letsplaycities.ui.network.NetworkFragment
+import ru.aleshi.letsplaycities.ui.network.friends.FriendsFragment
 import ru.aleshi.letsplaycities.ui.network.history.HistoryFragment
 import ru.aleshi.letsplaycities.ui.profile.LoginNoSnProfileFragment
 import ru.aleshi.letsplaycities.ui.profile.LoginProfileFragment
@@ -82,4 +83,9 @@ abstract class FragmentsModule {
     @ActivityScope
     @ContributesAndroidInjector(modules = [GameModule::class, GameFragmentModule::class])
     abstract fun contributeGameFragment(): GameFragment
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeCountryFilterDialog(): CountryFilterDialog
+
 }

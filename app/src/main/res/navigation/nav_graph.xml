@@ -34,7 +34,7 @@
                 app:destination="@id/confirmationDialog" />
         <action
                 android:id="@+id/showCitiesList"
-                app:destination="@id/citiesListFragment" />
+                app:destination="@id/citiesListNav" />
     </fragment>
 
     <dialog
@@ -247,7 +247,7 @@
             <argument
                     android:name="targetId"
                     android:defaultValue="0"
-                    app:argType="integer"/>
+                    app:argType="integer" />
 
             <argument
                     android:name="host"
@@ -368,7 +368,7 @@
     <dialog
             android:id="@+id/friendRequestDialog"
             android:name="ru.aleshi.letsplaycities.ui.global.FriendRequestDialog"
-            android:label="FriendRequestDialog" >
+            android:label="FriendRequestDialog">
         <argument
                 android:name="result"
                 app:argType="string" />
@@ -382,10 +382,25 @@
     <action
             android:id="@+id/globalStartFriendRequestDialog"
             app:destination="@id/friendRequestDialog" />
-    <fragment
-            android:id="@+id/citiesListFragment"
-            android:name="ru.aleshi.letsplaycities.ui.citieslist.CitiesListFragment"
-            android:label="@string/cities_list_label"
-            tools:layout="@layout/fragment_cities_list" />
+    <navigation
+            android:id="@+id/citiesListNav"
+            app:startDestination="@id/citiesListFragment">
+        <fragment
+                android:id="@+id/citiesListFragment"
+                android:name="ru.aleshi.letsplaycities.ui.citieslist.CitiesListFragment"
+                android:label="@string/cities_list_label"
+                tools:layout="@layout/fragment_cities_list">
+            <action
+                    android:id="@+id/startCountryFilterDialog"
+                    app:destination="@id/countryFilterDialog" />
+        </fragment>
+
+        <dialog
+                android:id="@+id/countryFilterDialog"
+                android:name="ru.aleshi.letsplaycities.ui.citieslist.CountryFilterDialog"
+                android:label="@string/countries"
+                tools:layout="@layout/dialog_country_filter" />
+
+    </navigation>
 
 </navigation>

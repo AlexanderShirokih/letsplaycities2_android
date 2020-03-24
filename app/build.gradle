@@ -42,8 +42,8 @@ android {
         multiDexEnabled true
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 2770
-        versionName "2.7.7"
+        versionCode 2800
+        versionName "2.8.0preview"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
 
@@ -90,6 +90,7 @@ dependencies {
     implementation "androidx.navigation:navigation-runtime-ktx:$rootProject.navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$rootProject.navVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
 
     implementation 'androidx.multidex:multidex:2.0.1'
 

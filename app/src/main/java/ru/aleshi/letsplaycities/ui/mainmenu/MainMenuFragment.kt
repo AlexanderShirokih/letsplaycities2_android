@@ -45,6 +45,7 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu), MainMenuContract
         }
         checkRateDialog()
         setupPlayButtonListeners()
+        btn_cities_list.setOnClickListener { findNavController().navigate(R.id.showCitiesList) }
     }
 
     private fun checkRateDialog() {

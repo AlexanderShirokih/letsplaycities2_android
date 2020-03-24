@@ -360,4 +360,10 @@
 
     <!-- CitiesListFragment -->
     <string name="cities_list_label">Города</string>
+    <string name="search">Поиск</string>
+    <string name="cities_list_query_hint">Введите город</string>
+    <string name="filter">Фильтр</string>
+    <string name="countries">Страны</string>
+    <string name="select_all">Выбрать все</string>
+    <string name="apply">Применить</string>
 </resources>
