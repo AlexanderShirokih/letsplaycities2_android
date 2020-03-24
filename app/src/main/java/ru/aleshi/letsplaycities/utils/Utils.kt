@@ -3,8 +3,11 @@ package ru.aleshi.letsplaycities.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.annotation.IdRes
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import com.squareup.picasso.Picasso
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -20,6 +23,14 @@ object Utils {
 
     val Fragment.lpsApplication
         get() = requireContext().applicationContext as LPSApplication
+
+    /**
+     * Navigates to [dir] only if current destination is gameFragment.
+     */
+    fun safeNavigate(navController: NavController, @IdRes dest: Int, dir: NavDirections) {
+        if (navController.currentDestination?.id == dest)
+            navController.navigate(dir)
+    }
 
     /**
      * Created [Uri] to user image.

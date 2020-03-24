@@ -7,11 +7,11 @@ import kotlin.math.abs
 
 object StringUtils {
 
-    fun toTitleCase(input: String): String {
+    fun String.toTitleCase(): String {
         val sb = StringBuilder()
-        for (i in input.indices) {
-            var c = input[i]
-            if (i == 0 || input[i - 1] == '-' || input[i - 1] == ' ')
+        for (i in indices) {
+            var c = this[i]
+            if (i == 0 || this[i - 1] == '-' || this[i - 1] == ' ')
                 c = Character.toUpperCase(c)
             sb.append(c)
         }
@@ -26,17 +26,15 @@ object StringUtils {
     fun replaceWhitespaces(city: String): String = city.replace(" ", "-")
 
     fun formatCity(city: String): String {
-        val s = city.trim().toLowerCase()
+        val s = city.trim().toLowerCase(Locale.getDefault())
         val replaced = s.replace("ё", "е")
         val sb = StringBuilder()
         var prev: Char = 0.toChar()
         for (element in replaced) {
-            val c = element
-
-            if (!(c == '-' && prev == '-')) {
-                sb.append(c)
+            if (!(element == '-' && prev == '-')) {
+                sb.append(element)
             }
-            prev = c
+            prev = element
         }
         return sb.toString()
     }

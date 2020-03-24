@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.dialog_correction_tips.*
 import kotlinx.android.synthetic.main.dialog_correction_tips.view.*
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.databinding.DialogCorrectionTipsBinding
-import ru.aleshi.letsplaycities.utils.StringUtils
+import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
 
 /**
  * Dialog for selecting correction variants and waiting until they were loaded
@@ -121,7 +121,7 @@ class CorrectionTipsDialog : DialogFragment() {
          * @param item item to be attached to the list item
          */
         fun bind(item: String) {
-            itemView.findViewById<TextView>(android.R.id.text1).text = StringUtils.toTitleCase(item)
+            itemView.findViewById<TextView>(android.R.id.text1).text = item.toTitleCase()
         }
     }
 }

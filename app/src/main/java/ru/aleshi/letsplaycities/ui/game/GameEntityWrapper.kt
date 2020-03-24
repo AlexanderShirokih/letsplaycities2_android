@@ -5,6 +5,7 @@ import android.text.style.ForegroundColorSpan
 import ru.aleshi.letsplaycities.base.game.GameEntity
 import ru.aleshi.letsplaycities.base.game.Position
 import ru.aleshi.letsplaycities.utils.StringUtils
+import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
 import java.util.*
 
 /**
@@ -56,7 +57,7 @@ class GameEntityWrapper(
                 val city = gameEntity.city
                 val end =
                     city.lastIndexOf(StringUtils.findLastSuitableChar(city.toLowerCase(Locale.getDefault())))
-                SpannableStringBuilder(StringUtils.toTitleCase(city)).apply {
+                SpannableStringBuilder(city.toTitleCase()).apply {
                     setSpan(
                         ForegroundColorSpan(foregroundSpanColor),
                         0,

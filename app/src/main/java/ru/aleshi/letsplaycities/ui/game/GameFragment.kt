@@ -39,6 +39,7 @@ import ru.aleshi.letsplaycities.ui.game.listadapter.GameAdapter
 import ru.aleshi.letsplaycities.utils.Event
 import ru.aleshi.letsplaycities.utils.SpeechRecognitionHelper
 import ru.aleshi.letsplaycities.utils.StringUtils.toTitleCase
+import ru.aleshi.letsplaycities.utils.Utils.safeNavigate
 import ru.quandastudio.lpsclient.core.LPSMessage
 import javax.inject.Inject
 
@@ -249,7 +250,7 @@ class GameFragment : Fragment() {
             is WordCheckingResult.AlreadyUsed -> showInfo(
                 getString(
                     R.string.already_used,
-                    toTitleCase(wordResult.word)
+                    wordResult.word.toTitleCase()
                 )
             )
             is WordCheckingResult.Exclusion -> showInfo(wordResult.description)
@@ -258,7 +259,7 @@ class GameFragment : Fragment() {
             is WordCheckingResult.NotFound -> showInfo(
                 getString(
                     R.string.city_not_found,
-                    toTitleCase(wordResult.word)
+                    wordResult.word.toTitleCase()
                 )
             )
             is WordCheckingResult.Accepted -> cityInput.text = null
@@ -332,6 +333,8 @@ class GameFragment : Fragment() {
 
     private fun showConfirmationDialog(code: Int, msg: Int) {
         safeNavigate(
+            findNavController(),
+            R.id.gameFragment,
             GameFragmentDirections.showConfimationDialog(
                 code,
                 getString(msg),
@@ -382,17 +385,10 @@ class GameFragment : Fragment() {
         }
     }
 
-    /**
-     * Navigates to [dir] only if current destination is gameFragment.
-     */
-    private fun safeNavigate(dir: NavDirections) {
-        val navController = findNavController()
-        if (navController.currentDestination?.id == R.id.gameFragment)
-            navController.navigate(dir)
-    }
-
     private fun showUserMenu(user: User) {
         safeNavigate(
+            findNavController(),
+            R.id.gameFragment,
             GameFragmentDirections.showUserContextDialog(
                 user.playerData.isFriend,
                 user.name,
