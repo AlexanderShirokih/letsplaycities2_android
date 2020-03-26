@@ -26,6 +26,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/btn_pvp"
                 app:layout_constraintStart_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/btn_play"
+                app:layout_constraintVertical_bias="0.0"
                 app:layout_constraintVertical_chainStyle="packed" />
 
         <Constraint
@@ -208,6 +209,30 @@
         <KeyFrameSet>
 
             <KeyPosition
+                    app:framePosition="20"
+                    app:motionTarget="@+id/btn_pva"
+                    app:percentX="0.0"
+                    app:percentY="0.3" />
+
+            <KeyPosition
+                    app:framePosition="20"
+                    app:motionTarget="@+id/btn_pvp"
+                    app:percentX="0.0"
+                    app:percentY="0.3" />
+
+            <KeyPosition
+                    app:framePosition="20"
+                    app:motionTarget="@+id/btn_net"
+                    app:percentX="0.0"
+                    app:percentY="0.3" />
+
+            <KeyPosition
+                    app:framePosition="20"
+                    app:motionTarget="@+id/btn_mul"
+                    app:percentX="0.0"
+                    app:percentY="0.3" />
+
+            <KeyPosition
                     app:framePosition="70"
                     app:motionTarget="@+id/btn_play"
                     app:percentX="1.0"
@@ -217,50 +242,50 @@
                     app:framePosition="70"
                     app:motionTarget="@+id/btn_pva"
                     app:percentX="1.0"
-                    app:percentY="0.0" />
+                    app:percentY="1.0" />
 
             <KeyPosition
                     app:framePosition="70"
                     app:motionTarget="@+id/btn_pvp"
                     app:percentX="1.0"
-                    app:percentY="0.0" />
+                    app:percentY="1.0" />
 
             <KeyPosition
                     app:framePosition="70"
                     app:motionTarget="@+id/btn_net"
                     app:percentX="1.0"
-                    app:percentY="0.0" />
+                    app:percentY="1.0" />
 
             <KeyPosition
                     app:framePosition="70"
                     app:motionTarget="@+id/btn_mul"
                     app:percentX="1.0"
-                    app:percentY="0.0" />
+                    app:percentY="1.0" />
 
             <KeyPosition
                     app:framePosition="20"
                     app:motionTarget="@+id/btn_achievements"
-                    app:percentY="0.35" />
+                    app:percentY="0.5" />
             <KeyPosition
                     app:framePosition="20"
                     app:motionTarget="@+id/btn_cities_list"
-                    app:percentY="0.35" />
+                    app:percentY="0.5" />
             <KeyPosition
                     app:framePosition="20"
                     app:motionTarget="@+id/btn_set"
-                    app:percentY="0.35" />
+                    app:percentY="0.5" />
             <KeyPosition
                     app:framePosition="70"
                     app:motionTarget="@+id/btn_achievements"
-                    app:percentY="0.35" />
+                    app:percentY="1.0" />
             <KeyPosition
                     app:framePosition="70"
                     app:motionTarget="@+id/btn_cities_list"
-                    app:percentY="0.35" />
+                    app:percentY="1.0" />
             <KeyPosition
                     app:framePosition="70"
                     app:motionTarget="@+id/btn_set"
-                    app:percentY="0.35" />
+                    app:percentY="1.0" />
         </KeyFrameSet>
 
     </Transition>
