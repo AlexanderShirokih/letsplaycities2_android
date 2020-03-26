@@ -94,7 +94,7 @@ class DictionaryFactory @Inject constructor(
                 return this
             }
 
-            val dictionary: HashMap<String, DictionaryServiceImpl.CityProperties> = HashMap(count)
+            val dictionary: HashMap<String, CityProperties> = HashMap(count)
 
             for (i in 0 until count + 1) {
                 try {
@@ -106,7 +106,7 @@ class DictionaryFactory @Inject constructor(
                     val name = sb.toString()
                     val diff = inputStream.readByte()
                     val countryCode = inputStream.readShort()
-                    val city = DictionaryServiceImpl.CityProperties(diff, countryCode)
+                    val city = CityProperties(diff, countryCode)
 
                     if (i == count) {
                         if (Integer.parseInt(name.substring(0, name.length - 6)) != count)

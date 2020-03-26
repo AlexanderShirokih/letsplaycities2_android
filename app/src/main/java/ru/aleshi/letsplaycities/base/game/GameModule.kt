@@ -4,7 +4,7 @@ import dagger.Binds
 import dagger.Module
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryModule
 
-@Module(includes = [DictionaryModule::class])
+@Module
 interface GameModule {
 
     @Binds

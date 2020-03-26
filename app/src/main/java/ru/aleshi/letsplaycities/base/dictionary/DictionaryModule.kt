@@ -7,6 +7,7 @@ import io.reactivex.Single
 import ru.aleshi.letsplaycities.GsonModule
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.ui.ActivityScope
+import javax.inject.Singleton
 
 @Module(includes = [GsonModule::class])
 class DictionaryModule {
@@ -25,6 +26,6 @@ class DictionaryModule {
     fun dictionary(factory: DictionaryFactory): Single<DictionaryService> = factory.load()
 
     @Provides
-    @ActivityScope
+    @Singleton
     fun cache() = DictionaryFactory.Cache()
 }

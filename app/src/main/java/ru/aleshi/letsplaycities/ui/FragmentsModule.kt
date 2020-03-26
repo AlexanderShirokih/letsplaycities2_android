@@ -8,6 +8,7 @@ import ru.aleshi.letsplaycities.network.NetworkClientModule
 import ru.aleshi.letsplaycities.network.NetworkModule
 import ru.aleshi.letsplaycities.remote.RemoteModule
 import ru.aleshi.letsplaycities.ui.blacklist.BlackListFragment
+import ru.aleshi.letsplaycities.ui.citieslist.CitiesListFragment
 import ru.aleshi.letsplaycities.ui.citieslist.CountryFilterDialog
 import ru.aleshi.letsplaycities.ui.game.GameFragment
 import ru.aleshi.letsplaycities.ui.game.GameFragmentModule
@@ -87,5 +88,9 @@ abstract class FragmentsModule {
     @ActivityScope
     @ContributesAndroidInjector
     abstract fun contributeCountryFilterDialog(): CountryFilterDialog
+
+    @ActivityScope
+    @ContributesAndroidInjector
+    abstract fun contributeCitiesListFragment() : CitiesListFragment
 
 }

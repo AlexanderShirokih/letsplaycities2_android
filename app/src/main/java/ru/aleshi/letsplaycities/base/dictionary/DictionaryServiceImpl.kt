@@ -32,14 +32,14 @@ class DictionaryServiceImpl constructor(
      */
     override fun checkCity(city: String): Flowable<CityResult> {
         return Flowable.fromCallable {
-            if (!dictionary.containsKey(city))
-                CityResult.CITY_NOT_FOUND
-            else
-                if (dictionary[city]!!.diff < 0)
-                    CityResult.ALREADY_USED
+                if (!dictionary.containsKey(city))
+                    CityResult.CITY_NOT_FOUND
                 else
-                    CityResult.OK
-        }.subscribeOn(Schedulers.computation())
+                    if (dictionary[city]!!.diff < 0)
+                        CityResult.ALREADY_USED
+                    else
+                        CityResult.OK
+            }.subscribeOn(Schedulers.computation())
             .onBackpressureLatest()
     }
 
@@ -58,34 +58,38 @@ class DictionaryServiceImpl constructor(
                     .filterValues { prop -> prop.diff > 0 && prop.countryCode != 0.toShort() && prop.diff <= difficulty }
                     .keys
                     .takeIf { it.isNotEmpty() }?.random()?.run { Maybe.just(this) }
-                    ?: Maybe.empty<String>()
+                    ?: Maybe.empty()
             }
     }
 
     override fun getCorrectionVariants(city: String): Single<List<String>> =
         Single.create<List<String>> {
-            val list = edits(city)
-            val candidates = ArrayList<String>()
-            for (s in list) {
-                // Max 3 words
-                if (candidates.size == 3)
-                    break
-                if (canUse(s))
-                    candidates.add(s)
-            }
+                val list = edits(city)
+                val candidates = ArrayList<String>()
+                for (s in list) {
+                    // Max 3 words
+                    if (candidates.size == 3)
+                        break
+                    if (canUse(s))
+                        candidates.add(s)
+                }
 
-            if (candidates.isNotEmpty())
+                if (candidates.isNotEmpty())
+                    it.onSuccess(candidates.distinct())
+
+                for (s in list)
+                    for (w in edits(s))
+                        if (candidates.size < 4 && canUse(w) && !candidates.contains(w))
+                            candidates.add(w)
+
                 it.onSuccess(candidates.distinct())
-
-            for (s in list)
-                for (w in edits(s))
-                    if (candidates.size < 4 && canUse(w) && !candidates.contains(w))
-                        candidates.add(w)
-
-            it.onSuccess(candidates.distinct())
-        }
+            }
             .subscribeOn(Schedulers.computation())
 
+    /**
+     * Returns all cities in database.
+     */
+    override fun getAll(): Map<String, CityProperties> = dictionary
 
     private fun edits(word: String): ArrayList<String> {
         val result = ArrayList<String>()
@@ -137,16 +141,4 @@ class DictionaryServiceImpl constructor(
         dictionary.clear()
     }
 
-
-    class CityProperties(var diff: Byte, var countryCode: Short) {
-        fun resetUsageFlag() {
-            if (diff < 0) diff = (-diff).toByte()
-        }
-
-        fun isNotUsed() = diff > 0
-
-        fun markUsed() {
-            if (diff > 0) diff = (-diff).toByte()
-        }
-    }
 }

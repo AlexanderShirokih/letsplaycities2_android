@@ -44,6 +44,11 @@ interface DictionaryService {
     fun getCorrectionVariants(city: String): Single<List<String>>
 
     /**
+     * Returns all cities in database.
+     */
+    fun getAll(): Map<String, CityProperties>
+
+    /**
      * Marks [city] as already used
      */
     fun markUsed(city: String)

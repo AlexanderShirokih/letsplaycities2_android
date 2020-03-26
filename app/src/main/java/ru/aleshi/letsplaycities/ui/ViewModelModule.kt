@@ -7,6 +7,7 @@ import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.IntoMap
 import ru.aleshi.letsplaycities.network.LpsRepositoryModule
+import ru.aleshi.letsplaycities.ui.citieslist.CitiesListViewModel
 import ru.aleshi.letsplaycities.ui.citieslist.CountryFilterDialogViewModel
 import ru.aleshi.letsplaycities.ui.global.FriendGameRequestViewModel
 import ru.aleshi.letsplaycities.ui.global.FriendRequestViewModel
@@ -54,4 +55,8 @@ abstract class ViewModelModule {
     @ViewModelKey(CountryFilterDialogViewModel::class)
     internal abstract fun countryFilterDialogViewModel(viewModel: CountryFilterDialogViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(CitiesListViewModel::class)
+    internal abstract fun citiesListViewModel(viewModel: CitiesListViewModel): ViewModel
 }

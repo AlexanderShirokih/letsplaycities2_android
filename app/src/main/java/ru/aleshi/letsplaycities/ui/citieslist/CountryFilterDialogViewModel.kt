@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities.ui.citieslist
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import ru.aleshi.letsplaycities.base.dictionary.CountryEntity
 import ru.aleshi.letsplaycities.base.dictionary.CountryListLoaderService
 import javax.inject.Inject
@@ -80,9 +81,9 @@ class CountryFilterDialogViewModel @Inject constructor(
      * Sends list of currently *unselected* country codes to [liveData].
      * @param liveData data receiver
      */
-    fun dispatchSelectedCitiesTo(liveData: MutableLiveData<List<Short>>) {
+    fun dispatchSelectedCitiesTo(liveData: ConflatedBroadcastChannel<List<Short>>) {
         countryListWithCheckboxes.value?.let { selectedCities ->
-            liveData.postValue(
+            liveData.offer(
                 selectedCities
                     .filterNot { it.second }
                     .map { it.first.countryCode }

@@ -1,30 +1,51 @@
 package ru.aleshi.letsplaycities.ui.citieslist
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.fragment_cities_list.view.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.ui.FetchState
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.utils.Utils.safeNavigate
+import javax.inject.Inject
 
 class CitiesListFragment : Fragment(R.layout.fragment_cities_list) {
 
     private lateinit var viewModel: CitiesListViewModel
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(requireParentFragment())[CitiesListViewModel::class.java]
+        viewModel = ViewModelProvider(
+            requireParentFragment(),
+            viewModelFactory
+        )[CitiesListViewModel::class.java]
         (requireActivity() as MainActivity).setToolbarVisibility(true)
         setHasOptionsMenu(true)
-        viewModel.citiesFilter.observe(this) { disabledCountries: List<Short> ->
-            Log.d("TAG", "Selected items: ${disabledCountries.size}")
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.recyclerView.apply {
+            val adapter = CitiesListAdapter()
+            this.adapter = adapter
+            viewModel.filteredCities.observe(viewLifecycleOwner, adapter)
+            viewModel.viewState.observe(viewLifecycleOwner) { state ->
+                view.progressBar.isVisible = state is FetchState.LoadingState
+            }
         }
     }
 
@@ -45,9 +66,9 @@ class CitiesListFragment : Fragment(R.layout.fragment_cities_list) {
 
                 override fun onQueryTextSubmit(query: String?) = false
 
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    //TODO
-                    return false
+                override fun onQueryTextChange(newText: String): Boolean {
+                    viewModel.cityFilterChannel.offer(newText)
+                    return true
                 }
             })
         }

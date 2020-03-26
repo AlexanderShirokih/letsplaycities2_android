@@ -19,6 +19,7 @@ class CountryFilterDialog : DialogFragment() {
     @Inject
     lateinit var viewModelProviderFactory: ViewModelProvider.Factory
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
@@ -39,7 +40,10 @@ class CountryFilterDialog : DialogFragment() {
             .setView(view)
             .setPositiveButton(R.string.apply) { _, _ ->
                 viewModel.dispatchSelectedCitiesTo(
-                    ViewModelProvider(requireParentFragment())[CitiesListViewModel::class.java].citiesFilter
+                    ViewModelProvider(
+                        requireParentFragment(),
+                        viewModelProviderFactory
+                    )[CitiesListViewModel::class.java].countryListFilterChannel
                 )
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> }

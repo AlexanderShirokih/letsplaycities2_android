@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal">
+
+    <TextView
+            android:id="@+id/cityName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="6dp"
+            android:gravity="center_horizontal|start"
+            android:padding="4dp"
+            tools:drawableStart="@sample/flags"
+            tools:text="@sample/simple_cities_list.txt" />
+
+    <TextView
+            android:id="@+id/countryHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:textStyle="italic"
+            tools:text="@sample/simple_countries_list.txt" />
+
+</LinearLayout>
