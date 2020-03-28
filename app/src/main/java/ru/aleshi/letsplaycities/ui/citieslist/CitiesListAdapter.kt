@@ -19,6 +19,7 @@ import ru.aleshi.letsplaycities.ui.game.FlagDrawablesManager
 class CitiesListAdapter : RecyclerView.Adapter<CitiesListAdapter.CityViewHolder>() {
 
     private var items: List<CityItem>? = null
+    private var hasAllItems = false
 
     /**
      * ViewHolder for cities list adapter
@@ -59,8 +60,15 @@ class CitiesListAdapter : RecyclerView.Adapter<CitiesListAdapter.CityViewHolder>
     suspend fun onUpdatesDelivered(update: Pair<List<CityItem>, Boolean>) {
         val (newList, isAllPresent) = update
 
-        if (isAllPresent || newList.isEmpty()) {
+        /*
+         * Simplify item updating adapter when:
+         * - new list contains all items
+         * - new list is empty
+         * - old list had all items
+         */
+        if (isAllPresent || newList.isEmpty() || hasAllItems) {
             this.items = newList
+            this.hasAllItems = isAllPresent
             notifyDataSetChanged()
             return
         }
@@ -71,6 +79,7 @@ class CitiesListAdapter : RecyclerView.Adapter<CitiesListAdapter.CityViewHolder>
             )
         }
         this.items = newList
+        this.hasAllItems = isAllPresent
         diffResult.dispatchUpdatesTo(this)
     }
 
