@@ -37,7 +37,6 @@
     </string-array>
 
     <string-array name="settings_item">
-        <item>Добавление городов</item>
         <item>Тема</item>
         <item>Сложность</item>
         <item>Подсчёт очков</item>
@@ -83,7 +82,7 @@
         <item>Выкл</item>
     </string-array>
 
-    <string name="hint_addcity">Правила добавления городов</string>
+    <string name="hint_addcity">О добавлении городов…</string>
     <string name="hint_stats">Просмотр статистики</string>
     <string name="hint_blacklist">Управление заблокированными игроками</string>
 

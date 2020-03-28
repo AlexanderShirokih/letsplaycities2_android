@@ -42,7 +42,6 @@ abstract class GamePreferences {
         private val settings_pref_keys =
             arrayOf(
                 KEY_NULL,
-                KEY_NULL,
                 KEY_DIFF,
                 KEY_SCORING,
                 KEY_TIMER,
@@ -53,7 +52,7 @@ abstract class GamePreferences {
                 KEY_NULL,
                 KEY_UPD_DIC
             )
-        private val settings_defaults = intArrayOf(0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0)
+        private val settings_defaults = intArrayOf(0, 0, 0, 0, 1, 1, 1, 0, 0, 0)
     }
 
     /**
@@ -139,17 +138,11 @@ abstract class GamePreferences {
     /**
      * Loads settings values from preferences
      */
-    fun getSettingsValues(): IntArray {
-        val array = settings_defaults.copyOf(settings_defaults.size)
-        for (i in settings_defaults.indices) {
-            array[i] =
-                if (settings_pref_keys[i] == KEY_NULL) 0 else getInt(
-                    settings_pref_keys[i],
-                    settings_defaults[i]
-                )
+    fun getSettingsValues() =
+        settings_defaults.copyOf(settings_defaults.size).mapIndexed { i: Int, value: Int ->
+            if (settings_pref_keys[i] == KEY_NULL) 0
+            else getInt(settings_pref_keys[i], value)
         }
-        return array
-    }
 
     /**
      * Saves settings values to preferences

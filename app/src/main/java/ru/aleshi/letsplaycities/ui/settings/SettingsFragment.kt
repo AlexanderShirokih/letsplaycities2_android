@@ -55,14 +55,13 @@ class SettingsFragment : Fragment() {
                     } else {
                         val nav = findNavController()
                         when (position) {
-                            0 -> nav.navigate(R.id.start_addcity_fragment)
-                            1 -> nav.navigate(R.id.start_theme_fragment)
-                            2 -> showSelectVariantDialog(nav, R.array.diff_names, value, position)
-                            3 -> showSelectVariantDialog(nav, R.array.scoring, value, position)
-                            4 -> showSelectVariantDialog(nav, R.array.timing, value, position)
-                            8 -> nav.navigate(R.id.start_score_fragment)
-                            9 -> nav.navigate(R.id.start_blacklist_fragment)
-                            10 -> showSelectVariantDialog(nav, R.array.dic_upd, value, position)
+                            0 -> nav.navigate(R.id.start_theme_fragment)
+                            1 -> showSelectVariantDialog(nav, R.array.diff_names, value, position)
+                            2 -> showSelectVariantDialog(nav, R.array.scoring, value, position)
+                            3 -> showSelectVariantDialog(nav, R.array.timing, value, position)
+                            7 -> nav.navigate(R.id.start_score_fragment)
+                            8 -> nav.navigate(R.id.start_blacklist_fragment)
+                            9 -> showSelectVariantDialog(nav, R.array.dic_upd, value, position)
                         }
                     }
                 }
@@ -90,34 +89,36 @@ class SettingsFragment : Fragment() {
 
     private fun createSettingsItems(): List<SettingsItem> {
         val onOff = resources.getStringArray(R.array.on_off)
-        val names = resources.getStringArray(R.array.settings_item)
 
-        val defaults = prefs.getSettingsValues()
-        val values = arrayOfNulls<Array<String>>(11)
-
-        values[0] = arrayOf(resources.getString(R.string.hint_addcity))
-        values[1] = arrayOf(
-            ThemeManager.getCurrentThemeName(
-                prefs,
-                requireContext().resources.getStringArray(R.array.themes)
-            )
-        )
-        values[2] = resources.getStringArray(R.array.diff_names)
-        values[3] = resources.getStringArray(R.array.scoring)
-        values[4] = resources.getStringArray(R.array.timing)
-        values[5] = onOff
-        values[6] = values[5]
-        values[7] = values[5]
-        values[8] = arrayOf(resources.getString(R.string.hint_stats))
-        values[9] = arrayOf(resources.getString(R.string.hint_blacklist))
-        values[10] = resources.getStringArray(R.array.dic_upd)
-
-        val items = mutableListOf<SettingsItem>()
-
-        for (index in names.indices) {
-            items.add(SettingsItem(defaults[index], names[index], values[index]!!))
-        }
         SettingsItem.disabledVariantName = onOff[0]
-        return items
+
+        return ArrayList<Array<String>>(10).apply {
+                add(
+                    arrayOf(
+                        ThemeManager.getCurrentThemeName(
+                            prefs,
+                            requireContext().resources.getStringArray(R.array.themes)
+                        )
+                    )
+                )
+
+                add(resources.getStringArray(R.array.diff_names))
+                add(resources.getStringArray(R.array.scoring))
+                add(resources.getStringArray(R.array.timing))
+                add(onOff)
+                add(onOff)
+                add(onOff)
+                add(arrayOf(resources.getString(R.string.hint_stats)))
+                add(arrayOf(resources.getString(R.string.hint_blacklist)))
+                add(resources.getStringArray(R.array.dic_upd))
+            }
+            .zip(prefs.getSettingsValues()) { value: Array<String>, default: Int -> value to default }
+            .zip(resources.getStringArray(R.array.settings_item)) { entry: Pair<Array<String>, Int>, name: String ->
+                SettingsItem(
+                    entry.second,
+                    name,
+                    entry.first
+                )
+            }
     }
 }

@@ -43,6 +43,13 @@ class CitiesListFragment : Fragment(R.layout.fragment_cities_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        view.addCities.setOnClickListener {
+            safeNavigate(
+                findNavController(),
+                R.id.citiesListFragment,
+                CitiesListFragmentDirections.startAddcityFragment()
+            )
+        }
         view.recyclerView.apply {
             val adapter = CitiesListAdapter()
             this.adapter = adapter

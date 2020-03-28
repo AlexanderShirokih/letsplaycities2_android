@@ -103,9 +103,6 @@
                 android:label="@string/settings"
                 tools:layout="@layout/fragment_settings">
             <action
-                    android:id="@+id/start_addcity_fragment"
-                    app:destination="@id/addCityFragment" />
-            <action
                     android:id="@+id/start_blacklist_fragment"
                     app:destination="@id/blackListFragment" />
             <action
@@ -137,11 +134,6 @@
                     android:id="@+id/showConfimationDialog"
                     app:destination="@id/confirmationDialog" />
         </fragment>
-        <fragment
-                android:id="@+id/addCityFragment"
-                android:name="ru.aleshi.letsplaycities.ui.AddCityFragment"
-                android:label="@string/addcity_title"
-                tools:layout="@layout/fragment_addcity" />
 
         <dialog
                 android:id="@+id/selectVariantDialog"
@@ -386,6 +378,11 @@
             android:id="@+id/citiesListNav"
             app:startDestination="@id/citiesListFragment">
         <fragment
+                android:id="@+id/addCityFragment"
+                android:name="ru.aleshi.letsplaycities.ui.AddCityFragment"
+                android:label="@string/addcity_title"
+                tools:layout="@layout/fragment_addcity" />
+        <fragment
                 android:id="@+id/citiesListFragment"
                 android:name="ru.aleshi.letsplaycities.ui.citieslist.CitiesListFragment"
                 android:label="@string/cities_list_label"
@@ -393,6 +390,9 @@
             <action
                     android:id="@+id/startCountryFilterDialog"
                     app:destination="@id/countryFilterDialog" />
+            <action
+                    android:id="@+id/start_addcity_fragment"
+                    app:destination="@id/addCityFragment" />
         </fragment>
 
         <dialog
