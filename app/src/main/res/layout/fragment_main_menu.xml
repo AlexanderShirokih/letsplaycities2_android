@@ -43,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
             android:padding="@dimen/btn_pad"
+            android:clickable="false"
             android:text="@string/achievements"
             app:icon="@drawable/ic_achievements"
             app:layout_constraintBottom_toTopOf="@+id/btn_cities_list"

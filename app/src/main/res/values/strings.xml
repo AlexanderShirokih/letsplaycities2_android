@@ -366,4 +366,5 @@
     <string name="select_all">Выбрать все</string>
     <string name="apply">Применить</string>
     <string name="unknown_country">(Неизвестн.)</string>
+    <string name="unavail_in_beta">Пока недоступно в данной версии</string>
 </resources>

@@ -2,6 +2,7 @@ package ru.aleshi.letsplaycities.ui.mainmenu
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -45,6 +46,13 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu), MainMenuContract
         }
         checkRateDialog()
         setupPlayButtonListeners()
+        btn_achievements.setOnClickListener {
+            Toast.makeText(
+                activity,
+                R.string.unavail_in_beta,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
         btn_cities_list.setOnClickListener { findNavController().navigate(R.id.showCitiesList) }
     }
 
