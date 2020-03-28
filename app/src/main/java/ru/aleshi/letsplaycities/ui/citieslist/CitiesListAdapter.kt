@@ -4,18 +4,19 @@ import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_city.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.citieslist.CityItem
 import ru.aleshi.letsplaycities.ui.game.FlagDrawablesManager
 
 /**
  * Adapter for [CitiesListFragment] which can bind cities items.
  */
-class CitiesListAdapter : RecyclerView.Adapter<CitiesListAdapter.CityViewHolder>(),
-    Observer<List<CityItem>?> {
+class CitiesListAdapter : RecyclerView.Adapter<CitiesListAdapter.CityViewHolder>() {
 
     private var items: List<CityItem>? = null
 
@@ -26,7 +27,8 @@ class CitiesListAdapter : RecyclerView.Adapter<CitiesListAdapter.CityViewHolder>
 
         fun bind(cityItem: CityItem) {
             itemView.cityName.text = cityItem.city
-            itemView.countryHint.text = cityItem.country
+            itemView.countryHint.text =
+                if (cityItem.country.isEmpty()) itemView.context.getString(R.string.unknown_country) else cityItem.country
 
             FlagDrawablesManager.getBitmapFor(
                 itemView.context,
@@ -54,10 +56,22 @@ class CitiesListAdapter : RecyclerView.Adapter<CitiesListAdapter.CityViewHolder>
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) =
         holder.bind(items!![position])
 
-    override fun onChanged(t: List<CityItem>?) {
-        val diffUtil = CitiesListDiffUtil(this.items ?: emptyList(), t ?: emptyList())
-        this.items = t
-        DiffUtil.calculateDiff(diffUtil, false).dispatchUpdatesTo(this)
+    suspend fun onUpdatesDelivered(update: Pair<List<CityItem>, Boolean>) {
+        val (newList, isAllPresent) = update
+
+        if (isAllPresent || newList.isEmpty()) {
+            this.items = newList
+            notifyDataSetChanged()
+            return
+        }
+
+        val diffResult = withContext(Dispatchers.Default) {
+            DiffUtil.calculateDiff(
+                CitiesListDiffUtil(this@CitiesListAdapter.items ?: emptyList(), newList)
+            )
+        }
+        this.items = newList
+        diffResult.dispatchUpdatesTo(this)
     }
 
 }

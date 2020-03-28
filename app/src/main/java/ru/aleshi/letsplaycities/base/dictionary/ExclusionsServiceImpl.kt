@@ -57,7 +57,7 @@ class ExclusionsServiceImpl(
     class Exclusion(var type: ExclusionType, var thing: String)
 
     override fun checkForExclusion(city: String): String {
-        if (countries.any { it.name == city })
+        if (countries.any { !it.hasSiblingCity && it.name == city })
             return String.format(
                 errMessages.getValue(ErrorCode.THIS_IS_A_COUNTRY),
                 city.toTitleCase()
@@ -108,7 +108,7 @@ class ExclusionsServiceImpl(
 
     override fun hasNoExclusions(input: String): Boolean {
         val word = input.trim().toLowerCase(Locale.getDefault())
-        return countries.none { it.name == word } && !states.contains(word) && !exclusionsList.contains(
+        return countries.none { !it.hasSiblingCity && it.name == word } && !states.contains(word) && !exclusionsList.contains(
             word
         )
     }

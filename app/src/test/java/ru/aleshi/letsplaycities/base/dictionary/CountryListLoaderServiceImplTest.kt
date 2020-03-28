@@ -35,7 +35,7 @@ class CountryListLoaderServiceImplTest {
             .all {
                 if (it.indexOf('|') < 0) false
                 else {
-                    val (name, cc) = it.split("|")
+                    val (name, cc) = it.split('|', '+')
                     name.isNotBlank() && cc.isNotBlank() && cc.matches("[0-9]+".toRegex())
                 }
             })
@@ -47,8 +47,9 @@ class CountryListLoaderServiceImplTest {
             CountryListLoaderServiceImpl(fileProvider)
                 .loadCountryList()
         }
-        assertEquals(3, list.size)
+        assertEquals(4, list.size)
         assertEquals("ангола", list.first().name)
         assertEquals(41.toShort(), list.first().countryCode)
+        assertTrue(list.component2().hasSiblingCity)
     }
 }

@@ -124,15 +124,15 @@ class DictionaryServiceImplTest {
 
     private fun simpleMap() =
         hashMapOf(
-            "abcd" to DictionaryServiceImpl.CityProperties(1, 10),
-            "bcde" to DictionaryServiceImpl.CityProperties(2, 20),
-            "cdef" to DictionaryServiceImpl.CityProperties(3, 30)
+            "abcd" to CityProperties(1, 10),
+            "bcde" to CityProperties(2, 20),
+            "cdef" to CityProperties(3, 30)
         )
 
     private fun simpleMapCyr() =
         hashMapOf(
-            "абвг" to DictionaryServiceImpl.CityProperties(1, 10),
-            "бвгд" to DictionaryServiceImpl.CityProperties(2, 20),
-            "вгде" to DictionaryServiceImpl.CityProperties(3, 30)
+            "абвг" to CityProperties(1, 10),
+            "бвгд" to CityProperties(2, 20),
+            "вгде" to CityProperties(3, 30)
         )
 }

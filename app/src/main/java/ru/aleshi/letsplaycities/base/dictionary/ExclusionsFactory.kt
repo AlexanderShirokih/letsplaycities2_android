@@ -7,6 +7,7 @@ import ru.aleshi.letsplaycities.FileProvider
 import ru.aleshi.letsplaycities.Localization
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -42,6 +43,7 @@ class ExclusionsFactory @Inject constructor(
             .readLines()
 
         val countries = runBlocking { countryListLoaderService.loadCountryList() }
+            .map { it.copy(name = it.name.toLowerCase(Locale.getDefault())) }
 
         return ExclusionsServiceImpl(
             exclusionsList,

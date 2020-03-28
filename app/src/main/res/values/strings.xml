@@ -366,4 +366,5 @@
     <string name="countries">Страны</string>
     <string name="select_all">Выбрать все</string>
     <string name="apply">Применить</string>
+    <string name="unknown_country">(Неизвестн.)</string>
 </resources>

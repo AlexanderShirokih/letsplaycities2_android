@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.ui.citieslist
+package ru.aleshi.letsplaycities.base.citieslist
 
 /**
  * Model class representing city item with its country.

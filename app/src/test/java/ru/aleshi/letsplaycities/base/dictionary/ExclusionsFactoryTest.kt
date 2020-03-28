@@ -34,8 +34,8 @@ class ExclusionsFactoryTest {
     fun testNormalLoadingExclusionsFactory(): Unit = runBlocking(Dispatchers.IO) {
         Mockito.`when`(countryListLoaderService.loadCountryList()).thenReturn(
             listOf(
-                CountryEntity("test", 1),
-                CountryEntity("test2", 2)
+                CountryEntity("test", 1, false),
+                CountryEntity("test2", 2, false)
             )
         )
 

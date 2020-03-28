@@ -14,9 +14,9 @@ class ExclusionsServiceImplTest {
         exclusion = ExclusionsServiceImpl(
             exclusionsList = createExclusionMap(),
             countries = listOf(
-                CountryEntity("aabr", 1),
-                CountryEntity("creade", 2),
-                CountryEntity("denito", 3)
+                CountryEntity("aabr", 1, false),
+                CountryEntity("creade", 2, false),
+                CountryEntity("denito", 3, false)
             ),
             states = listOf("statea", "stateb"),
             errMessages = ErrorCode.values().associate { t -> t to "${t.name}:%s" }

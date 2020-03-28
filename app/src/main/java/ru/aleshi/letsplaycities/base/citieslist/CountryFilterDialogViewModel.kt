@@ -1,25 +1,20 @@
-package ru.aleshi.letsplaycities.ui.citieslist
+package ru.aleshi.letsplaycities.base.citieslist
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import ru.aleshi.letsplaycities.base.dictionary.CountryEntity
-import ru.aleshi.letsplaycities.base.dictionary.CountryListLoaderService
-import javax.inject.Inject
 
-class CountryFilterDialogViewModel @Inject constructor(
-    private val countryListLoader: CountryListLoaderService
-) : ViewModel() {
-
-    /**
-     * [LiveData] that once loads country list using [countryListLoader].
-     */
-    private val countryList: LiveData<List<CountryEntity>> =
-        liveData { emit(countryListLoader.loadCountryList()) }
+class CountryFilterDialogViewModel : ViewModel() {
 
     /**
      * [LiveData] that info about currently checked items in dialog's list.
      */
     private val checkboxes = MutableLiveData<MutableList<Boolean>>()
+
+    /**
+     * Should be filled from data in `CityListViewModel`
+     */
+    val countryList = MutableLiveData<List<CountryEntity>>()
 
     /**
      * Combines data from [countryList] and [checkboxes].
@@ -34,9 +29,9 @@ class CountryFilterDialogViewModel @Inject constructor(
             addSource(checkboxes) {
                 value = value
                     ?.zip(it) { old, new -> old.copy(second = new) }
-                    ?: it.map { isChecked -> CountryEntity("-", 0) to isChecked }
+                    ?: it.map { isChecked -> CountryEntity("-", 0, false) to isChecked }
             }
-        }
+        }.distinctUntilChanged()
 
     /**
      * Emits `true` when after changes all items in checkbox list is `true`, `false` otherwise.
@@ -78,15 +73,27 @@ class CountryFilterDialogViewModel @Inject constructor(
     }
 
     /**
-     * Sends list of currently *unselected* country codes to [liveData].
-     * @param liveData data receiver
+     * Sends list of currently selected country codes to [broadcastChannel].
+     * @param broadcastChannel data receiver
      */
-    fun dispatchSelectedCitiesTo(liveData: ConflatedBroadcastChannel<List<Short>>) {
-        countryListWithCheckboxes.value?.let { selectedCities ->
-            liveData.offer(
-                selectedCities
-                    .filterNot { it.second }
-                    .map { it.first.countryCode }
+    fun dispatchSelectedCitiesTo(broadcastChannel: ConflatedBroadcastChannel<CountryFilter>) {
+        countryListWithCheckboxes.value?.let { cities ->
+            val selectedCities = cities
+                .filter { it.second }
+                .map { it.first }
+
+            val citiesList = countryList.value ?: emptyList()
+            val isAllSelected = selectedCities.size == citiesList.size
+
+            broadcastChannel.offer(
+                if (isAllSelected) CountryFilter(
+                    citiesList,
+                    true
+                )
+                else CountryFilter(
+                    selectedCities,
+                    false
+                )
             )
         }
     }

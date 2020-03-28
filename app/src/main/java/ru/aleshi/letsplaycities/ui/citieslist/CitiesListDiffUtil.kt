@@ -1,6 +1,7 @@
 package ru.aleshi.letsplaycities.ui.citieslist
 
 import androidx.recyclerview.widget.DiffUtil
+import ru.aleshi.letsplaycities.base.citieslist.CityItem
 
 class CitiesListDiffUtil(
     private val old: List<CityItem>,

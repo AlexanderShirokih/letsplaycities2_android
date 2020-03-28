@@ -9,12 +9,16 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_cities_list.view.*
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
-import ru.aleshi.letsplaycities.ui.FetchState
+import ru.aleshi.letsplaycities.base.citieslist.CitiesListViewModel
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.utils.Utils.safeNavigate
 import javax.inject.Inject
@@ -42,9 +46,19 @@ class CitiesListFragment : Fragment(R.layout.fragment_cities_list) {
         view.recyclerView.apply {
             val adapter = CitiesListAdapter()
             this.adapter = adapter
-            viewModel.filteredCities.observe(viewLifecycleOwner, adapter)
-            viewModel.viewState.observe(viewLifecycleOwner) { state ->
-                view.progressBar.isVisible = state is FetchState.LoadingState
+
+            lifecycleScope.launch {
+                viewModel.filteredCities
+                    .collectLatest { newItems ->
+                        viewModel.setLoading(true)
+                        adapter.onUpdatesDelivered(newItems)
+                        viewModel.forceStopLoading()
+                    }
+            }
+            lifecycleScope.launch {
+                viewModel.loadingChannel.asFlow().collect { state ->
+                    view.progressBar.isVisible = state
+                }
             }
         }
     }

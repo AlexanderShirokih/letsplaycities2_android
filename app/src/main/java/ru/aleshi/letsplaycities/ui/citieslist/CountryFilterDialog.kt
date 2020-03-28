@@ -10,21 +10,27 @@ import androidx.lifecycle.observe
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.dialog_country_filter.view.*
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.citieslist.CitiesListViewModel
+import ru.aleshi.letsplaycities.base.citieslist.CountryFilterDialogViewModel
 import javax.inject.Inject
 
 class CountryFilterDialog : DialogFragment() {
 
     private lateinit var viewModel: CountryFilterDialogViewModel
+    private lateinit var citiesListViewModel: CitiesListViewModel
 
     @Inject
     lateinit var viewModelProviderFactory: ViewModelProvider.Factory
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        val viewModelProvider = ViewModelProvider(this, viewModelProviderFactory)
-        viewModel = viewModelProvider[CountryFilterDialogViewModel::class.java]
+        val parent = requireParentFragment()
+        viewModel =
+            ViewModelProvider(parent)[CountryFilterDialogViewModel::class.java]
+        citiesListViewModel =
+            ViewModelProvider(parent, viewModelProviderFactory)[CitiesListViewModel::class.java]
+        citiesListViewModel.countryList.observe(this) { viewModel.countryList.value = it }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -39,15 +45,9 @@ class CountryFilterDialog : DialogFragment() {
         return AlertDialog.Builder(activity)
             .setView(view)
             .setPositiveButton(R.string.apply) { _, _ ->
-                viewModel.dispatchSelectedCitiesTo(
-                    ViewModelProvider(
-                        requireParentFragment(),
-                        viewModelProviderFactory
-                    )[CitiesListViewModel::class.java].countryListFilterChannel
-                )
+                viewModel.dispatchSelectedCitiesTo(citiesListViewModel.countryListFilterChannel)
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> }
             .create()
     }
-
 }

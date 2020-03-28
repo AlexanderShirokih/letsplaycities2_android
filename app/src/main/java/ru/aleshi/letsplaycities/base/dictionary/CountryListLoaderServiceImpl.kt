@@ -24,10 +24,12 @@ class CountryListLoaderServiceImpl @Inject constructor(
                 .readLines()
                 .filter { it.isNotBlank() }
                 .map { line ->
-                    val (name, countryCode) = line.split("|")
+                    val split = line.split('|', '+')
+                    val (name, countryCode) = split
                     CountryEntity(
                         name = name,
-                        countryCode = countryCode.toShort()
+                        countryCode = countryCode.toShort(),
+                        hasSiblingCity = split.size == 3
                     )
                 }
         }
