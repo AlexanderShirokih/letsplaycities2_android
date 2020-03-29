@@ -7,7 +7,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
 def lifecycle_version = '2.2.0'
-def dagger_version = '2.26'
+def dagger_version = '2.27'
 
 android {
     signingConfigs {
@@ -16,7 +16,7 @@ android {
             storeFile file(project.properties["store_file"] as String)
             storePassword = testPass
             keyPassword = testPass
-            keyAlias = project.properties['lps_alias'] as String
+            keyAlias project.properties['lps_alias'] as String
         }
     }
 
@@ -42,8 +42,8 @@ android {
         multiDexEnabled true
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 2800
-        versionName "2.8.0preview"
+        versionCode 2801
+        versionName "2.8.1preview"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
 
@@ -97,11 +97,11 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.material:material:1.2.0-alpha05'
     implementation 'com.mikhaellopez:circularimageview:4.0.1'
-    implementation 'com.android.billingclient:billing:2.1.0'
+    implementation 'com.android.billingclient:billing:2.2.0'
 
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
-    implementation 'com.google.android.gms:play-services-ads-lite:19.0.0'
-//    implementation 'com.google.android.gms:play-services-games:19.0.0'
+    implementation 'com.google.android.gms:play-services-ads-lite:19.0.1'
+    implementation 'com.google.android.gms:play-services-games:19.0.0'
 
     implementation 'com.vk:androidsdk:2.2.1'
     implementation 'com.facebook.android:facebook-login:5.15.1'
@@ -127,7 +127,7 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$dagger_version"
     implementation "com.google.dagger:dagger-android-support:$dagger_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
-    kapt "com.google.dagger:dagger-android-processor:$dagger_version"
+    kapt "com.google.dagger:dagger-android-processor:${dagger_version}"
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'ru.aleshi.lps:lps-client:1.2.2'

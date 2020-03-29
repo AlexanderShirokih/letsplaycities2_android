@@ -12,6 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.rx2.rxSingle
+import ru.aleshi.letsplaycities.GameException
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
@@ -75,8 +76,14 @@ class AuthorizationViewModel @Inject constructor(
                 )
             }
 
-            override fun onError() {
-                mState.postValue(FetchState.ErrorState(Exception()))
+            override fun onError(message: String?) {
+                mState.postValue(
+                    FetchState.ErrorState(
+                        GameException(
+                            message ?: "Error: #04: Error message not present"
+                        )
+                    )
+                )
             }
         })
     }

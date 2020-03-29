@@ -13,9 +13,10 @@
     <string name="pvp">Игрок против Игрока</string>
     <string name="mul">Мультиплеер</string>
     <string name="net">Онлайн</string>
-    <string name="settings">Настройки</string>
+    <string name="leaders">Рейтинги</string>
 
     <!-- Settings Fragment-->
+    <string name="settings">Настройки</string>
     <string-array name="diff_names">
         <item>Лёгко</item>
         <item>Нормально</item>
@@ -215,6 +216,7 @@
     <string name="no_friends">Список друзей пуст.\nЧтобы добавить игрока в
         друзья нажмите на его аватарку и выберите пункт Добавить в друзья
     </string>
+    <string name="error">Ошибка: %1$s</string>
     <string name="err_msg_on_exception">Произошла какая-то ошибка&#8230; Проверьте подключение к Интернету \nили попробуйте зайти снова</string>
     <string name="invite_friend">Отправить приглашение игроку \"%1$s\"?\n Игрок получит приглашение если у него есть
         активное подключение к интернету
@@ -366,5 +368,6 @@
     <string name="select_all">Выбрать все</string>
     <string name="apply">Применить</string>
     <string name="unknown_country">(Неизвестн.)</string>
-    <string name="unavail_in_beta">Пока недоступно в данной версии</string>
+    <string name="no_game_services">Для авторизации установите приложении Play Игры</string>
+    <string name="not_all_requested_data_received">Не удалось получить все данные для авторизации! Попробуйте снова</string>
 </resources>

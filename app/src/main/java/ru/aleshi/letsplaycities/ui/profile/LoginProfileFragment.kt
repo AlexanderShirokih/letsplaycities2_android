@@ -6,10 +6,12 @@ import android.widget.ImageButton
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_profile_login.*
+import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.network.NetworkUtils
 import ru.aleshi.letsplaycities.social.ServiceType
@@ -46,7 +48,9 @@ class LoginProfileFragment : Fragment(R.layout.fragment_profile_login) {
         }
         ViewModelProvider(requireActivity())[ProfileViewModel::class.java].nativeEvents.observe(this) {
             it.getContentIfNotHandled()?.run {
-                SocialNetworkManager.login(ServiceType.NV, requireActivity())
+                lifecycleScope.launch {
+                    SocialNetworkManager.login(ServiceType.NV, requireActivity())
+                }
             }
         }
     }
@@ -66,5 +70,5 @@ class LoginProfileFragment : Fragment(R.layout.fragment_profile_login) {
     }
 
     private fun ImageButton.setSocialListener(activity: MainActivity, serviceType: ServiceType) =
-        setOnClickListener(OnSocialButtonClickedListener(activity, serviceType))
+        setOnClickListener(OnSocialButtonClickedListener(activity, serviceType, lifecycleScope))
 }
