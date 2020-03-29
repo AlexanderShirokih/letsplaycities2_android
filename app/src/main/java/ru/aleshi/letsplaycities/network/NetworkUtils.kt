@@ -1,10 +1,13 @@
 package ru.aleshi.letsplaycities.network
 
 import androidx.fragment.app.Fragment
+import com.crashlytics.android.Crashlytics
 import com.google.android.material.snackbar.Snackbar
+import ru.aleshi.letsplaycities.GameException
 import ru.aleshi.letsplaycities.R
 import ru.quandastudio.lpsclient.AuthorizationException
 import ru.quandastudio.lpsclient.LPSException
+import java.io.IOException
 
 object NetworkUtils {
 
@@ -22,11 +25,15 @@ object NetworkUtils {
                 length = Snackbar.LENGTH_LONG
                 message = exception.banReason
             }
-            is LPSException -> {
+            is LPSException, is GameException -> {
                 length = Snackbar.LENGTH_LONG
-                message = exception.message!!
+                message = fragment.getString(R.string.error, exception.message!!)
             }
             else -> exception.printStackTrace()
+        }
+
+        if (exception !is IOException && exception !is GameException) {
+            Crashlytics.logException(exception)
         }
 
         val view = fragment.view ?: fragment.requireParentFragment().requireView()
