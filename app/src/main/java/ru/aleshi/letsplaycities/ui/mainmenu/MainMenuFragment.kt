@@ -15,7 +15,7 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.mainmenu.MainMenuContract
-import ru.aleshi.letsplaycities.social.GoogleAccountHelper
+import ru.aleshi.letsplaycities.social.GoogleServicesHelper
 import ru.aleshi.letsplaycities.ui.BaseAsyncActivity
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
@@ -51,12 +51,12 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu), MainMenuContract
         setupPlayButtonListeners()
         btn_achievements.setOnClickListener {
             lifecycleScope.launch {
-                GoogleAccountHelper.showAchievementsIntent(requireActivity() as BaseAsyncActivity)
+                GoogleServicesHelper.showAchievementsIntent(requireActivity() as BaseAsyncActivity)
             }
         }
         btn_leaders.setOnClickListener {
             lifecycleScope.launch {
-                GoogleAccountHelper.showLeaderboardIntent(requireActivity() as BaseAsyncActivity)
+                GoogleServicesHelper.showLeaderboardIntent(requireActivity() as BaseAsyncActivity)
             }
         }
         btn_cities_list.setOnClickListener {

@@ -1,7 +1,6 @@
 package ru.aleshi.letsplaycities.social
 
 import android.app.Activity
-import android.content.Context
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -17,41 +16,47 @@ import ru.aleshi.letsplaycities.ui.BaseAsyncActivity
 import ru.aleshi.letsplaycities.utils.GoogleServicesExt.await
 import ru.quandastudio.lpsclient.LPSException
 
-object GoogleAccountHelper {
+/**
+ * This class contains functions for work with Google SignIn and Google Game Services
+ */
+object GoogleServicesHelper {
 
-
-    private suspend fun getAchievementsClient(activity: BaseAsyncActivity): AchievementsClient? {
-        val account = signIn(activity)
-
-        return if (account is Result.Success) {
-            Games.getAchievementsClient(activity, account.value)
-        } else null
-    }
-
-    private fun getLeaderboardsClient(context: Context): LeaderboardsClient? {
-        val account = GoogleSignIn.getLastSignedInAccount(context)
-        return if (account != null) {
-            Games.getLeaderboardsClient(context, account)
-        } else null
-    }
-
-    suspend fun unlockAchievement(context: BaseAsyncActivity, achievement: Achievement) {
-        getAchievementsClient(context)?.apply {
+    /**
+     * Unlocks or increments achievement on play games server only if user logged in
+     * @param achievement the achievement to be unlocked
+     * @return `true` if user signed in or `false` if not
+     */
+    suspend fun unlockAchievement(activity: BaseAsyncActivity, achievement: Achievement): Boolean {
+        getAchievementsClient(activity, false)?.apply {
             if (achievement.isIncremental) {
-                increment(context.getString(achievement.res), 1)
+                increment(activity.getString(achievement.res), 1)
             } else {
-                unlock(context.getString(achievement.res))
+                unlock(activity.getString(achievement.res))
             }
+            return true
         }
+        return false
     }
 
-    fun submitScore(context: Context, score: Int) {
-        getLeaderboardsClient(context)?.submitScore(
-            context.getString(R.string.score_leaderboard),
-            score.toLong()
-        )
+    /**
+     * Submits score to play games server only if user logged in
+     * @param score user score to be submitted
+     * @return `true` if user signed in or `false` if not
+     */
+    suspend fun submitScore(activity: BaseAsyncActivity, score: Int): Boolean {
+        getLeaderboardsClient(activity, false)?.apply {
+            submitScore(
+                activity.getString(R.string.score_leaderboard),
+                score.toLong()
+            )
+            return true
+        }
+        return false
     }
 
+    /**
+     * Launches signOut task and awaits for it completion
+     */
     suspend fun signOut(activity: Activity) {
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
             .requestServerAuthCode(activity.getString(R.string.default_web_client_id))
@@ -60,6 +65,12 @@ object GoogleAccountHelper {
         client.signOut().await()
     }
 
+    /**
+     * Starts sign in flow. If last signed account is available it will returned,
+     * otherwise silent sign in flow will started, and if no way to login from silent mode
+     * sign in activity will launched and then result from it will returned.
+     * @return [Result.Success] if sign in successful, [Result.Failure] is can't login
+     */
     suspend fun signIn(activity: BaseAsyncActivity): Result<GoogleSignInAccount> {
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
             .requestServerAuthCode(activity.getString(R.string.default_web_client_id))
@@ -96,20 +107,43 @@ object GoogleAccountHelper {
         }
     }
 
-    suspend fun showAchievementsIntent(context: BaseAsyncActivity) {
-        val client = getAchievementsClient(context)
-
-        val result = client?.achievementsIntent?.await()
-
-        result?.apply {
-            context.launchIntentAsync(this).await()
-        }
+    /**
+     * Starts sign in sequence if needed and shows achievements activity
+     */
+    suspend fun showAchievementsIntent(activity: BaseAsyncActivity) {
+        getAchievementsClient(activity, true)
+            ?.achievementsIntent?.await()
+            ?.apply { activity.launchIntentAsync(this).await() }
     }
 
+    /**
+     * Starts sign in sequence if needed and shows leaderboard activity
+     */
     suspend fun showLeaderboardIntent(context: BaseAsyncActivity) {
-        getLeaderboardsClient(context)
+        getLeaderboardsClient(context, true)
             ?.getLeaderboardIntent(context.getString(R.string.score_leaderboard))
             ?.await()
             ?.apply { context.launchIntentAsync(this).await() }
+    }
+
+    private suspend fun getAchievementsClient(
+        activity: BaseAsyncActivity,
+        autoSignIn: Boolean
+    ): AchievementsClient? {
+        val account = if (autoSignIn) signIn(activity).valueOrNull
+        else GoogleSignIn.getLastSignedInAccount(activity)
+        return account?.run { Games.getAchievementsClient(activity, this) }
+    }
+
+    private suspend fun getLeaderboardsClient(
+        activity: BaseAsyncActivity,
+        autoSignIn: Boolean
+    ): LeaderboardsClient? {
+        val account = if (autoSignIn) signIn(activity).valueOrNull
+        else GoogleSignIn.getLastSignedInAccount(activity)
+
+        return if (account != null) {
+            Games.getLeaderboardsClient(activity, account)
+        } else null
     }
 }
