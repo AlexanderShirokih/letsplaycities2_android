@@ -19,11 +19,11 @@ abstract class ISocialNetwork {
 
     protected abstract fun onInitialize(context: Context)
 
-    fun login(activity: Activity) {
+    suspend fun login(activity: Activity) {
         onLogin(activity)
     }
 
-    protected abstract fun onLogin(activity: Activity)
+    protected abstract suspend fun onLogin(activity: Activity)
 
     abstract fun onLoggedIn(activity: Activity, accessToken: String)
 
@@ -42,7 +42,17 @@ abstract class ISocialNetwork {
         data: Intent?
     ): Boolean
 
-    fun sendResult(mainActivity: Activity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        return if (isInitialized) onActivityResult(mainActivity, requestCode, resultCode, data) else false
+    fun sendResult(
+        mainActivity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
+        return if (isInitialized) onActivityResult(
+            mainActivity,
+            requestCode,
+            resultCode,
+            data
+        ) else false
     }
 }

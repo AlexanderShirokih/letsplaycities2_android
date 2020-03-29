@@ -38,7 +38,7 @@ class VKontakte : ISocialNetwork() {
 
     override fun onInitialize(context: Context) = Unit
 
-    override fun onLogin(activity: Activity) = VK.login(activity)
+    override suspend fun onLogin(activity: Activity) = VK.login(activity)
 
     override fun onLoggedIn(activity: Activity, accessToken: String) {
         disposable.add(Observable.fromCallable { VK.executeSync(VKUsersRequest()) }
@@ -53,7 +53,7 @@ class VKontakte : ISocialNetwork() {
                 )
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ callback?.onLoggedIn(it) }, { callback?.onError() }))
+            .subscribe({ callback?.onLoggedIn(it) }, { callback?.onError(it.message) }))
     }
 
     override fun onLogout() {

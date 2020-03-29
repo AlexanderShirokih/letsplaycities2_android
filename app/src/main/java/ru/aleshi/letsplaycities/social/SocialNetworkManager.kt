@@ -20,7 +20,7 @@ object SocialNetworkManager {
         return false
     }
 
-    fun login(serviceType: ServiceType, activity: Activity) {
+    suspend fun login(serviceType: ServiceType, activity: Activity) {
         type = serviceType
         init(activity, serviceType)
         serviceType.network.login(activity)

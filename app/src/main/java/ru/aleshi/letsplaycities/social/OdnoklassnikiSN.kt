@@ -29,7 +29,7 @@ class OdnoklassnikiSN : ISocialNetwork() {
         odnoklassniki = Odnoklassniki.createInstance(context, "1267998976", "CBACCFJMEBABABABA")
     }
 
-    override fun onLogin(activity: Activity) {
+    override suspend fun onLogin(activity: Activity) {
         odnoklassniki.requestAuthorization(
             activity,
             REDIRECT_URI,
@@ -62,7 +62,7 @@ class OdnoklassnikiSN : ISocialNetwork() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { callback?.onLoggedIn(it) },
-                { it.printStackTrace(); callback?.onError() })
+                { it.printStackTrace(); callback?.onError(it.message) })
         )
     }
 

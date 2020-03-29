@@ -16,7 +16,7 @@ class Facebook : ISocialNetwork() {
         callbackManager = CallbackManager.Factory.create()
     }
 
-    override fun onLogin(activity: Activity) {
+    override suspend fun onLogin(activity: Activity) {
         val loginManager = LoginManager.getInstance()
 
         object : ProfileTracker() {
@@ -45,7 +45,7 @@ class Facebook : ISocialNetwork() {
     override fun onLoggedIn(activity: Activity, accessToken: String) {
         val currentProfile = Profile.getCurrentProfile()
         if (currentProfile == null)
-            callback?.onError()
+            callback?.onError("Facebook profile is NULL")
         else
             callback?.onLoggedIn(
                 SocialAccountData(

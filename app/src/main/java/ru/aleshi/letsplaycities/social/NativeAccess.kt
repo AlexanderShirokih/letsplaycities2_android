@@ -13,7 +13,7 @@ class NativeAccess : ISocialNetwork() {
 
     override fun onInitialize(context: Context) {}
 
-    override fun onLogin(activity: Activity) {
+    override suspend fun onLogin(activity: Activity) {
         onLoggedIn(activity, "native_access")
     }
 
