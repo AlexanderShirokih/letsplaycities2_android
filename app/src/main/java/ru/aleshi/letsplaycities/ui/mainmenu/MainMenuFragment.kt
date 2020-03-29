@@ -2,18 +2,21 @@ package ru.aleshi.letsplaycities.ui.mainmenu
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_main_menu.*
+import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.BuildConfig
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.mainmenu.MainMenuContract
+import ru.aleshi.letsplaycities.social.GoogleAccountHelper
+import ru.aleshi.letsplaycities.ui.BaseAsyncActivity
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import javax.inject.Inject
@@ -47,13 +50,18 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu), MainMenuContract
         checkRateDialog()
         setupPlayButtonListeners()
         btn_achievements.setOnClickListener {
-            Toast.makeText(
-                activity,
-                R.string.unavail_in_beta,
-                Toast.LENGTH_SHORT
-            ).show()
+            lifecycleScope.launch {
+                GoogleAccountHelper.showAchievementsIntent(requireActivity() as BaseAsyncActivity)
+            }
         }
-        btn_cities_list.setOnClickListener { findNavController().navigate(R.id.showCitiesList) }
+        btn_leaders.setOnClickListener {
+            lifecycleScope.launch {
+                GoogleAccountHelper.showLeaderboardIntent(requireActivity() as BaseAsyncActivity)
+            }
+        }
+        btn_cities_list.setOnClickListener {
+            findNavController().navigate(R.id.showCitiesList)
+        }
     }
 
     private fun checkRateDialog() {
