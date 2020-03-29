@@ -51,12 +51,16 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu), MainMenuContract
         setupPlayButtonListeners()
         btn_achievements.setOnClickListener {
             lifecycleScope.launch {
+                it.isClickable = false
                 GoogleServicesHelper.showAchievementsIntent(requireActivity() as BaseAsyncActivity)
+                it.isClickable = true
             }
         }
         btn_leaders.setOnClickListener {
             lifecycleScope.launch {
+                it.isClickable = false
                 GoogleServicesHelper.showLeaderboardIntent(requireActivity() as BaseAsyncActivity)
+                it.isClickable = true
             }
         }
         btn_cities_list.setOnClickListener {
