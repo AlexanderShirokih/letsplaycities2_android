@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
@@ -20,10 +20,11 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.service.MyFirebaseMessagingService
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
+import ru.aleshi.letsplaycities.utils.GoogleServicesExt.await
 import ru.aleshi.letsplaycities.utils.Utils
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), HasAndroidInjector {
+class MainActivity : BaseAsyncActivity(), HasAndroidInjector {
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 
@@ -50,9 +51,11 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
             findNavController(R.id.main_nav_fragment)
         )
         MobileAds.initialize(this)
-        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
         checkForFirebaseNotifications(intent)
-        buildApiClient()
+        lifecycleScope.launchWhenStarted {
+            GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this@MainActivity)
+                .await()
+        }
     }
 
     override fun onResume() {
@@ -78,11 +81,6 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
             supportActionBar?.show()
         else
             supportActionBar?.hide()
-    }
-
-    private fun buildApiClient() {
-//        val google = (ServiceType.GL.network as Google)
-//        google.signIn(this)
     }
 
     private fun checkForFirebaseNotifications(intent: Intent) {
