@@ -43,7 +43,7 @@ class VKontakte : ISocialNetwork() {
     override fun onLoggedIn(activity: Activity, accessToken: String) {
         disposable.add(Observable.fromCallable { VK.executeSync(VKUsersRequest()) }
             .subscribeOn(Schedulers.single())
-            .map { user->
+            .map { user ->
                 SocialAccountData(
                     snUID = user.id.toString(),
                     login = user.login,
@@ -56,8 +56,9 @@ class VKontakte : ISocialNetwork() {
             .subscribe({ callback?.onLoggedIn(it) }, { callback?.onError(it.message) }))
     }
 
-    override fun onLogout() {
-        super.onLogout()
+    override suspend fun onLogout(activity: Activity) {
+        super.onLogout(activity)
+        VK.logout()
         disposable.clear()
     }
 
@@ -72,7 +73,9 @@ class VKontakte : ISocialNetwork() {
                 onLoggedIn(activity, token.accessToken)
             }
 
-            override fun onLoginFailed(errorCode: Int) = onError()
+            override fun onLoginFailed(errorCode: Int) {
+                callback?.onError("VK error #$errorCode")
+            }
         })
     }
 }

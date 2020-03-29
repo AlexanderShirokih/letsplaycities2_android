@@ -1,4 +1,4 @@
-package ru.aleshi.letsplaycities.base
+package ru.aleshi.letsplaycities.social
 
 import androidx.annotation.StringRes
 import ru.aleshi.letsplaycities.R

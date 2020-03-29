@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.databinding.FragmentProfileViewBinding
@@ -33,8 +35,12 @@ class ViewProfileFragment : Fragment() {
     }
 
     fun onLogout(view: View) {
-        SocialNetworkManager.logout(gamePreferences, credentialsProvider)
-        findNavController().navigate(R.id.actionLogin)
+        lifecycleScope.launch {
+            view.isClickable = false
+            SocialNetworkManager.logout(requireActivity(), gamePreferences, credentialsProvider)
+            view.isClickable = true
+            findNavController().navigate(R.id.actionLogin)
+        }
     }
 
     override fun onResume() {

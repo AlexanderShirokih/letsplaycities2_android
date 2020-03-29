@@ -66,10 +66,10 @@ class OdnoklassnikiSN : ISocialNetwork() {
         )
     }
 
-    override fun onLogout() {
+    override suspend fun onLogout(activity: Activity) {
         odnoklassniki.clearTokens()
         disposable.clear()
-        super.onLogout()
+        super.onLogout(activity)
     }
 
     override fun onActivityResult(
@@ -85,7 +85,7 @@ class OdnoklassnikiSN : ISocialNetwork() {
                 data,
                 ContextOkListener(activity,
                     onSuccess = { _, json -> onLoggedIn(activity, json.getString("access_token")) },
-                    onError = { _, _ -> onError() },
+                    onError = { _, error -> callback?.onError(error) },
                     onCancel = { _, _ -> Unit }
                 ))
         }

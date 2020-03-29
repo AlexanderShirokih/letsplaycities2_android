@@ -8,6 +8,7 @@ import ru.aleshi.letsplaycities.R
 import ru.quandastudio.lpsclient.AuthorizationException
 import ru.quandastudio.lpsclient.LPSException
 import java.io.IOException
+import java.net.ConnectException
 
 object NetworkUtils {
 
@@ -28,6 +29,10 @@ object NetworkUtils {
             is LPSException, is GameException -> {
                 length = Snackbar.LENGTH_LONG
                 message = fragment.getString(R.string.error, exception.message!!)
+            }
+            is ConnectException -> {
+                length = Snackbar.LENGTH_LONG
+                message = fragment.getString(R.string.error_server_unavail)
             }
             else -> exception.printStackTrace()
         }

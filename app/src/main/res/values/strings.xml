@@ -370,4 +370,6 @@
     <string name="unknown_country">(Неизвестн.)</string>
     <string name="no_game_services">Для авторизации установите приложении Play Игры</string>
     <string name="not_all_requested_data_received">Не удалось получить все данные для авторизации! Попробуйте снова</string>
+    <string name="error_server_unavail">Не удалось подключиться к серверу. Проверьте подключение к интернету или попробуйте зайти позже</string>
+    <string name="error_fb_null_profile">Не удалось получить профиль, попробуйте снова</string>
 </resources>

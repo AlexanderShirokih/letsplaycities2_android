@@ -44,6 +44,11 @@ class Google : ISocialNetwork() {
     override fun onLoggedIn(activity: Activity, accessToken: String) {
     }
 
+    override suspend fun onLogout(activity: Activity) {
+        super.onLogout(activity)
+        GoogleAccountHelper.signOut(activity)
+    }
+
     override fun onActivityResult(
         activity: Activity,
         requestCode: Int,

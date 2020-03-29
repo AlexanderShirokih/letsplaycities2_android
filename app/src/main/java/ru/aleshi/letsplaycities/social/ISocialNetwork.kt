@@ -27,11 +27,7 @@ abstract class ISocialNetwork {
 
     abstract fun onLoggedIn(activity: Activity, accessToken: String)
 
-    fun onError() {
-        callback?.onError()
-    }
-
-    open fun onLogout() {
+    open suspend fun onLogout(activity: Activity) {
         isInitialized = false
     }
 

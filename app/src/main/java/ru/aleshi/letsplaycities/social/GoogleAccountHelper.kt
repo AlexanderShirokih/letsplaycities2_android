@@ -2,7 +2,6 @@ package ru.aleshi.letsplaycities.social
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -23,10 +22,8 @@ object GoogleAccountHelper {
 
     private suspend fun getAchievementsClient(activity: BaseAsyncActivity): AchievementsClient? {
         val account = signIn(activity)
-        Log.d("TAG", "Last SIGNED IN Account=$account")
 
         return if (account is Result.Success) {
-            Log.d("TAG", "Retrieving acheivements client!")
             Games.getAchievementsClient(activity, account.value)
         } else null
     }
@@ -69,10 +66,8 @@ object GoogleAccountHelper {
             .requestId().requestProfile().build()
         val account: GoogleSignInAccount =
             GoogleSignIn.getAccountForExtension(activity, Games.GamesOptions.builder().build())
-        Log.d("TAG", "account=$account")
 
         if (GoogleSignIn.hasPermissions(account, *options.scopeArray)) {
-            Log.d("TAG", "Short login!")
             return Result.success(account)
         } else {
             // Haven't been signed-in before. Try the silent sign-in first.
@@ -104,12 +99,9 @@ object GoogleAccountHelper {
     suspend fun showAchievementsIntent(context: BaseAsyncActivity) {
         val client = getAchievementsClient(context)
 
-        Log.d("TAG", "He we go")
         val result = client?.achievementsIntent?.await()
 
-        Log.d("TAG", "Awaiting result!")
         result?.apply {
-            Log.d("TAG", "Starting activity!")
             context.launchIntentAsync(this).await()
         }
     }

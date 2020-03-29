@@ -12,7 +12,12 @@ object SocialNetworkManager {
 
     private var type: ServiceType? = null
 
-    fun onActivityResult(mainActivity: MainActivity, requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    fun onActivityResult(
+        mainActivity: MainActivity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): Boolean {
         ServiceType.values().forEach {
             if (it.network.sendResult(mainActivity, requestCode, resultCode, data))
                 return true
@@ -31,13 +36,17 @@ object SocialNetworkManager {
             serviceType.network.initialize(context)
     }
 
-    fun logout(prefs: GamePreferences, credentialsProvider: CredentialsProvider) {
+    suspend fun logout(
+        activity: Activity,
+        prefs: GamePreferences,
+        credentialsProvider: CredentialsProvider
+    ) {
         prefs.logout()
         credentialsProvider.invalidate()
 
         ServiceType.values().forEach {
             if (it.network.isInitialized)
-                it.network.onLogout()
+                it.network.onLogout(activity)
         }
     }
 
