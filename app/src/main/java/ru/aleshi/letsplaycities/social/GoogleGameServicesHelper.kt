@@ -26,31 +26,29 @@ class GoogleGameServicesHelper @Inject constructor(
     /**
      * Unlocks or increments achievement on play games server only if user logged in
      * @param achievement the achievement to be unlocked
-     * @return `true` if user signed in or `false` if not
      */
-    override suspend fun unlockAchievement(achievement: Achievement): Boolean {
-        getAchievementsClient(false)?.apply {
+    override fun unlockAchievement(achievement: Achievement, incrementCount: Int) {
+        GoogleSignIn.getLastSignedInAccount(activity)?.apply {
+            val client = Games.getAchievementsClient(activity, this)
             if (achievement.isIncremental) {
-                increment(activity.getString(achievement.res), 1)
+                client.increment(
+                    activity.getString(achievement.res),
+                    incrementCount / achievement.scaleFactor
+                )
             } else {
-                unlock(activity.getString(achievement.res))
+                client.unlock(activity.getString(achievement.res))
             }
-            return true
         }
-        return false
     }
 
     /**
      * Submits score to play games server only if user logged in
      * @param score user score to be submitted
      */
-    override suspend fun submitScore(score: Int) {
-        getLeaderboardsClient(false)?.apply {
-            submitScore(
-                activity.getString(R.string.score_leaderboard),
-                score.toLong()
-            )
-        } ?: apply {
+    override fun submitScore(score: Int) {
+        GoogleSignIn.getLastSignedInAccount(activity)?.apply {
+            Games.getLeaderboardsClient(activity, this)
+                .submitScore(activity.getString(R.string.score_leaderboard), score.toLong())
         }
     }
 

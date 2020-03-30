@@ -3,8 +3,12 @@ package ru.aleshi.letsplaycities.social
 import androidx.annotation.StringRes
 import ru.aleshi.letsplaycities.R
 
-enum class Achievement constructor(@StringRes val res: Int, val isIncremental: Boolean = false) {
-    Write5Cities(R.string.ach_write_5c),
+enum class Achievement constructor(
+    @StringRes val res: Int,
+    val isIncremental: Boolean = false,
+    val scaleFactor: Int = 1
+) {
+    Write15Cities(R.string.ach_write_15c, true),
 
     Use3Tips(R.string.ach_tips_3, true),
 
@@ -12,7 +16,9 @@ enum class Achievement constructor(@StringRes val res: Int, val isIncremental: B
 
     PlayInHardMode(R.string.ach_hard_mode),
 
-    Write40Cities(R.string.ach_write_40c),
+    ReachScore1000Pts(R.string.ach_score_1000, true, 6),
+
+    Write80Cities(R.string.ach_write_80c, true),
 
     LoginViaSocial(R.string.ach_social),
 
@@ -24,7 +30,11 @@ enum class Achievement constructor(@StringRes val res: Int, val isIncremental: B
 
     Use30Tips(R.string.ach_tips_30, true),
 
-    Write500Cities(R.string.ach_write_500c),
+    ReachScore5000Pts(R.string.ach_score_5000, true, 6),
 
-    Write80CitiesInGame(R.string.ach_80c_in_game);
+    Write500Cities(R.string.ach_write_500c, true),
+
+    Write100CitiesInGame(R.string.ach_100c_in_game),
+
+    ReachScore25000Pts(R.string.ach_score_25000, true, 6);
 }

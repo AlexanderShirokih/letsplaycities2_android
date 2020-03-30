@@ -13,6 +13,7 @@ import ru.aleshi.letsplaycities.base.ThemeManager
 import ru.aleshi.letsplaycities.base.ThemeManager.test2
 import ru.aleshi.letsplaycities.billing.InAppPurchaseManager
 import ru.aleshi.letsplaycities.billing.PurchaseListener
+import ru.aleshi.letsplaycities.social.Achievement
 import ru.aleshi.letsplaycities.social.AchievementService
 import ru.aleshi.letsplaycities.utils.Utils.applyTheme
 import javax.inject.Inject
@@ -24,6 +25,9 @@ class ThemeFragment : Fragment(R.layout.fragment_theme), ThemeItemClickListener,
 
     @Inject
     lateinit var prefs: GamePreferences
+
+    @Inject
+    lateinit var achievementService: AchievementService
 
     private lateinit var mThemeListAdapter: ThemeListAdapter
     private lateinit var mInAppPurchaseManager: InAppPurchaseManager
@@ -80,6 +84,7 @@ class ThemeFragment : Fragment(R.layout.fragment_theme), ThemeItemClickListener,
     }
 
     private fun applyTheme() {
+        achievementService.unlockAchievement(Achievement.ChangeTheme)
         applyTheme(prefs, requireContext())
         requireActivity().recreate()
     }

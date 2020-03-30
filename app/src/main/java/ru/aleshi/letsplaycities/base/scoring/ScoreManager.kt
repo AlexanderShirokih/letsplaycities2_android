@@ -5,6 +5,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import ru.aleshi.letsplaycities.Localization
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.CityComboInfo
+import ru.aleshi.letsplaycities.base.dictionary.DictionaryService
 import ru.aleshi.letsplaycities.base.game.FinishEvent
 import ru.aleshi.letsplaycities.base.game.GameMode
 import ru.aleshi.letsplaycities.base.game.GameSession
@@ -20,6 +21,8 @@ import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_HISCORE
 import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_ONLINE
 import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.G_PARTS
 import ru.aleshi.letsplaycities.base.scoring.ScoringGroupsHelper.V_EMPTY_S
+import ru.aleshi.letsplaycities.social.Achievement
+import ru.aleshi.letsplaycities.social.AchievementService
 import ru.aleshi.letsplaycities.utils.StringUtils
 import javax.inject.Inject
 
@@ -73,11 +76,13 @@ class ScoreManager @Inject constructor(
 
     private val scoringType: ScoringType = ScoringType.values()[prefs.getCurrentScoringType()]
     private var lastTime: Long = 0
+    private var playerMovesInGame = 0
 
     /**
      * Sets the current session instance and loads scoring data from preferences.
      */
     fun init(session: GameSession) {
+        playerMovesInGame = 0
         gameSession = session
         allGroups = ScoringGroupsHelper.fromPreferences(prefs)
         loadStatGroups()
@@ -122,6 +127,9 @@ class ScoreManager @Inject constructor(
 
         lastTime += deltaTime
 
+        if (current is Player)
+            playerMovesInGame++
+
         return mostChecker(current, word).andThen(
             Completable.fromAction {
                 val points = when (scoringType) {
@@ -149,14 +157,14 @@ class ScoreManager @Inject constructor(
             Completable.complete()
         else
             Completable.fromAction {
-                    current.comboSystem.addCity(
-                        CityComboInfo.create(
-                            deltaTime,
-                            word,
-                            gameSession.game.getCountryCode(word)
-                        )
+                current.comboSystem.addCity(
+                    CityComboInfo.create(
+                        deltaTime,
+                        word,
+                        gameSession.game.getCountryCode(word)
                     )
-                }
+                )
+            }
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .andThen(Completable.fromAction {
                     if (current is Player) {
@@ -174,25 +182,25 @@ class ScoreManager @Inject constructor(
             Completable.complete()
         else
             Completable.fromAction {
-                    //Most biggest cities
-                    val wordLength = word.length
-                    for (i in groupMostBigCities.child.indices) {
-                        val f = groupMostBigCities.child[i]
-                        if (f.hasValue() && f.value() != V_EMPTY_S) {
-                            if (wordLength > f.value().length) {
-                                //Shift
-                                for (j in groupMostBigCities.child.size - 1 downTo i + 1)
-                                    groupMostBigCities.child[j].set(groupMostBigCities.child[j - 1].value())
-                                f.set(word)
-                                break
-                            } else if (word == f.value())
-                                break
-                        } else {
+                //Most biggest cities
+                val wordLength = word.length
+                for (i in groupMostBigCities.child.indices) {
+                    val f = groupMostBigCities.child[i]
+                    if (f.hasValue() && f.value() != V_EMPTY_S) {
+                        if (wordLength > f.value().length) {
+                            //Shift
+                            for (j in groupMostBigCities.child.size - 1 downTo i + 1)
+                                groupMostBigCities.child[j].set(groupMostBigCities.child[j - 1].value())
                             f.set(word)
                             break
-                        }
+                        } else if (word == f.value())
+                            break
+                    } else {
+                        f.set(word)
+                        break
                     }
                 }
+            }
                 .andThen(cityStatDatabaseHelper.updateFrequentWords(word, groupMostFrqCities))
                 .doOnComplete { saveStats() }
     }
@@ -200,7 +208,7 @@ class ScoreManager @Inject constructor(
     /**
      * Call when the game ends. Returns winning message.
      */
-    fun getWinner(finishEvent: FinishEvent): String {
+    fun getWinner(finishEvent: FinishEvent, achievementService: AchievementService): String {
         val mode = gameSession.gameMode
         val me = gameSession.requirePlayer()
 
@@ -211,6 +219,8 @@ class ScoreManager @Inject constructor(
         groupHighScores.child[mode.ordinal].max(me.score)
 
         saveStats()
+
+        checkAchievements(achievementService)
 
         if (finishEvent.reason == FinishEvent.Reason.Kicked) {
             return results.getValue(
@@ -258,6 +268,34 @@ class ScoreManager @Inject constructor(
         }
     }
 
+    /**
+     * Checks for achievements type when game ends
+     */
+    private fun checkAchievements(achievementService: AchievementService) {
+        val playerScore = gameSession.requirePlayer().score
+        val nonEmptyScore = playerScore > 0
+
+        if (nonEmptyScore) {
+            achievementService.unlockAchievement(Achievement.Write15Cities, playerMovesInGame)
+            achievementService.unlockAchievement(Achievement.Write80Cities, playerMovesInGame)
+            achievementService.unlockAchievement(Achievement.Write500Cities, playerMovesInGame)
+            achievementService.unlockAchievement(Achievement.ReachScore1000Pts, playerScore)
+            achievementService.unlockAchievement(Achievement.ReachScore5000Pts, playerScore)
+            achievementService.unlockAchievement(Achievement.ReachScore25000Pts, playerScore)
+
+            if (playerMovesInGame >= 30)
+                achievementService.unlockAchievement(Achievement.Write30CitiesInGame)
+            if (playerMovesInGame >= 100)
+                achievementService.unlockAchievement(Achievement.Write100CitiesInGame)
+            if (gameSession.game.difficulty == DictionaryService.HARD)
+                achievementService.unlockAchievement(Achievement.PlayInHardMode)
+            if (gameSession.gameMode == GameMode.MODE_NET)
+                achievementService.unlockAchievement(Achievement.PlayOnline3Times)
+            if (gameSession.gameMode != GameMode.MODE_PVP)
+                achievementService.submitScore(playerScore)
+        }
+    }
+
     private fun updWinsForNetMode(winner: User) {
         if (gameSession.gameMode == GameMode.MODE_NET) {
             if (gameSession.requirePlayer() == winner)
@@ -267,7 +305,5 @@ class ScoreManager @Inject constructor(
         }
         saveStats()
     }
-
-//    private fun isCurrentIsPlayer() = gameSession.currentUser is Player
 
 }

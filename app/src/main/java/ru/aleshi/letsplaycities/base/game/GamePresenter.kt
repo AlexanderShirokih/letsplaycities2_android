@@ -9,8 +9,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.PublishSubject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.rx2.rxMaybe
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryService
@@ -21,6 +19,7 @@ import ru.aleshi.letsplaycities.base.player.UserIdentity
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
 import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.aleshi.letsplaycities.base.server.ResultWithMessage
+import ru.aleshi.letsplaycities.social.Achievement
 import ru.aleshi.letsplaycities.social.AchievementService
 import ru.aleshi.letsplaycities.ui.game.CityStatus
 import ru.aleshi.letsplaycities.utils.StringUtils
@@ -116,14 +115,7 @@ class GamePresenter @Inject constructor(
                 .map { event ->
                     val playerScore = if (session.gameMode == GameMode.MODE_PVP) -1
                     else session.requirePlayer().score
-                    GameState.Finish(scoreManager.getWinner(event), playerScore)
-                }
-                .flatMap {
-                    rxMaybe(Dispatchers.Main) {
-                        if (it.playerScore > 0)
-                            achievementService.submitScore(it.playerScore)
-                        it
-                    }
+                    GameState.Finish(scoreManager.getWinner(event, achievementService), playerScore)
                 }
                 .doFinally(::dispose)
                 .subscribe(viewModel::updateState) { err ->
@@ -154,6 +146,12 @@ class GamePresenter @Inject constructor(
     }
 
     override fun onPlayerHint(): Completable = session.useHintForPlayer()
+        .andThen(
+            Completable.fromAction {
+                achievementService.unlockAchievement(Achievement.Use3Tips)
+                achievementService.unlockAchievement(Achievement.Use30Tips)
+            }
+        )
 
     override fun getCurrentSession(): GameSession = session
 
@@ -163,6 +161,9 @@ class GamePresenter @Inject constructor(
      */
     override fun sendFriendRequest(userId: Int): Completable =
         session.server.sendFriendRequest(userId)
+            .andThen(Completable.fromAction {
+                achievementService.unlockAchievement(Achievement.Add1Friend)
+            })
 
     /**
      * Sends ban message to [userId] over game server.

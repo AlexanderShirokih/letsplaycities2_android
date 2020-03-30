@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageButton
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
@@ -13,11 +14,15 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_profile_login.*
 import kotlinx.coroutines.launch
 import ru.aleshi.letsplaycities.R
+import ru.aleshi.letsplaycities.base.player.GameAuthDataFactory
 import ru.aleshi.letsplaycities.network.NetworkUtils
+import ru.aleshi.letsplaycities.social.Achievement
+import ru.aleshi.letsplaycities.social.AchievementService
 import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import ru.aleshi.letsplaycities.ui.FetchState
 import ru.aleshi.letsplaycities.ui.MainActivity
+import ru.quandastudio.lpsclient.model.AuthType
 import javax.inject.Inject
 
 class LoginProfileFragment : Fragment(R.layout.fragment_profile_login) {
@@ -25,10 +30,20 @@ class LoginProfileFragment : Fragment(R.layout.fragment_profile_login) {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
+    @Inject
+    lateinit var achievementService: AchievementService
+
+    @Inject
+    lateinit var authDataFactory: GameAuthDataFactory
+
+    private val authorizationViewModel: AuthorizationViewModel by viewModels { viewModelFactory }
+    private val profileViewModel: ProfileViewModel by viewModels({ requireActivity() })
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        ViewModelProvider(this, viewModelFactory)[AuthorizationViewModel::class.java].apply {
+
+        authorizationViewModel.apply {
             registerCallback()
             loading.observe(this@LoginProfileFragment, ::setLoading)
             state.observe(this@LoginProfileFragment) { state ->
@@ -40,13 +55,15 @@ class LoginProfileFragment : Fragment(R.layout.fragment_profile_login) {
                     is FetchState.ErrorState ->
                         NetworkUtils.showErrorSnackbar(state.error, this@LoginProfileFragment)
                     FetchState.FinishState -> {
+                        if (authDataFactory.load().snType != AuthType.Native)
+                            achievementService.unlockAchievement(Achievement.LoginViaSocial)
                         // Successfully authorized, pop back
                         findNavController().popBackStack()
                     }
                 }
             }
         }
-        ViewModelProvider(requireActivity())[ProfileViewModel::class.java].nativeEvents.observe(this) {
+        profileViewModel.nativeEvents.observe(this) {
             it.getContentIfNotHandled()?.run {
                 lifecycleScope.launch {
                     SocialNetworkManager.login(ServiceType.NV, requireActivity())
