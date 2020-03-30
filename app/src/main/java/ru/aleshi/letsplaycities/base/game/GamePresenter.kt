@@ -9,6 +9,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.rx2.rxMaybe
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.combos.ComboSystemView
 import ru.aleshi.letsplaycities.base.dictionary.DictionaryService
@@ -19,6 +21,7 @@ import ru.aleshi.letsplaycities.base.player.UserIdentity
 import ru.aleshi.letsplaycities.base.scoring.ScoreManager
 import ru.aleshi.letsplaycities.base.server.ResultWithCity
 import ru.aleshi.letsplaycities.base.server.ResultWithMessage
+import ru.aleshi.letsplaycities.social.AchievementService
 import ru.aleshi.letsplaycities.ui.game.CityStatus
 import ru.aleshi.letsplaycities.utils.StringUtils
 import java.util.concurrent.TimeUnit
@@ -38,7 +41,8 @@ class GamePresenter @Inject constructor(
     private val prefs: GamePreferences,
     private val dictionaryUpdater: DictionaryUpdater,
     private val comboSystemView: ComboSystemView,
-    private val scoreManager: ScoreManager
+    private val scoreManager: ScoreManager,
+    private val achievementService: AchievementService
 ) : GameContract.Presenter {
 
     /**
@@ -109,16 +113,23 @@ class GamePresenter @Inject constructor(
                     )
                 }
                 .firstElement()
-                .map(scoreManager::getWinner)
-                .doFinally(::dispose)
-                .subscribe({
+                .map { event ->
                     val playerScore = if (session.gameMode == GameMode.MODE_PVP) -1
                     else session.requirePlayer().score
-                    viewModel.updateState(GameState.Finish(it, playerScore))
-                }, { err ->
+                    GameState.Finish(scoreManager.getWinner(event), playerScore)
+                }
+                .flatMap {
+                    rxMaybe(Dispatchers.Main) {
+                        if (it.playerScore > 0)
+                            achievementService.submitScore(it.playerScore)
+                        it
+                    }
+                }
+                .doFinally(::dispose)
+                .subscribe(viewModel::updateState) { err ->
                     err.printStackTrace()
                     viewModel.updateState(GameState.Error(err))
-                })
+                }
     }
 
     /**
