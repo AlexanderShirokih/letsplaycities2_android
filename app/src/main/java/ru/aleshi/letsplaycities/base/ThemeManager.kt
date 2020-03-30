@@ -2,29 +2,46 @@ package ru.aleshi.letsplaycities.base
 
 import ru.aleshi.letsplaycities.R
 
+/**
+ * Manages game themes (styles)
+ */
 object ThemeManager {
 
     private const val KEY_THEME = "token"
 
-    data class ThemeWithSignature(val token: String?, val sig: String?) {
-        fun isValid() = token != null && sig != null
+    /**
+     * Wrapper data class for purchased theme
+     */
+    data class ThemeWithSignature(val purchaseToken: String?, val sig: String?) {
+        fun isValid() = purchaseToken != null && sig != null
     }
 
+    /**
+     * List of the game themes
+     */
     val themes = arrayOf(
-        Theme(1, R.style.AppTheme, null),
-        Theme(2, R.style.VkStyleTheme, null),
-        Theme(3, R.style.GrStyleTheme, null),
-        Theme(4, R.style.WhiteStyleTheme, null),
-        Theme(5, R.style.GeoStyleTheme, null),
-        Theme(6, R.style.DarkStyleTheme, null),
+        Theme(1, R.style.AppTheme),
+        Theme(2, R.style.VkStyleTheme),
+        Theme(3, R.style.GrStyleTheme),
+        Theme(4, R.style.WhiteStyleTheme),
+        Theme(5, R.style.GeoStyleTheme),
+        Theme(6, R.style.DarkStyleTheme),
         Theme(647, R.style.RusStyleTheme, "rus"),
         Theme(85444, R.style.UkrStyleTheme, "ukr"),
         Theme(5844672, R.style.FrStyleTheme, "fr"),
         Theme(45746, R.style.UsaStyleTheme, "ny"),
         Theme(328491, R.style.AutStyleTheme, "autumn")
     )
+
+    /**
+     * Theme which applies by default if
+     */
     private val DEFAULT_THEME = themes[4]
 
+    /**
+     * Returns [Theme] by [requestedStid] or [DEFAULT_THEME] if requested theme not found
+     * @param requestedStid theme id
+     */
     private fun getThemeById(requestedStid: Int, prefs: GamePreferences): Theme {
         for (theme in themes) {
             if (theme.stid == requestedStid) {
@@ -36,18 +53,27 @@ object ThemeManager {
         return DEFAULT_THEME
     }
 
+    /**
+     * Checks all game themes availability ([Theme.isAvail])
+     */
     fun checkAvailable(prefs: GamePreferences) {
         for (theme in themes) {
             checkAvailableFor(theme, prefs)
         }
     }
 
+    /**
+     * If [theme] is not free, updates [Theme.isAvail] by validating theme signature
+     */
     private fun checkAvailableFor(theme: Theme, prefs: GamePreferences) {
         if (!theme.isFree()) {
             theme.isAvail = getThemeWithSignature(prefs, theme).isValid()
         }
     }
 
+    /**
+     * Returns current theme from game preferences
+     */
     fun getCurrentTheme(prefs: GamePreferences): Theme {
         return getThemeById(
             prefs.getInt(KEY_THEME, DEFAULT_THEME.stid),
@@ -55,6 +81,10 @@ object ThemeManager {
         )
     }
 
+    /**
+     * Returns current theme name from [themeNames] array or first theme name `themeNames[0]` if
+     * current theme isn't available.
+     */
     fun getCurrentThemeName(prefs: GamePreferences, themeNames: Array<String>): String {
         val theme = getCurrentTheme(prefs)
         if (theme.isFreeOrAvailable()) {
@@ -66,6 +96,10 @@ object ThemeManager {
         return themeNames[0]
     }
 
+    /**
+     * Returns [Theme] from [productId]
+     * @throws IllegalStateException if there are no theme with [productId]
+     */
     private fun getThemeBySKU(productId: String): Theme {
         for (t in themes) {
             if (productId == t.sku)
@@ -74,10 +108,16 @@ object ThemeManager {
         throw IllegalStateException("Cannot find token by sku $productId")
     }
 
+    /**
+     * Anti-cheat method. Asserts that 8th theme isn't free. Should be inverted!
+     */
     fun test2(): Boolean {
         return themes[7].isFree()
     }
 
+    /**
+     * Returns SKU's list from all non-free themes.
+     */
     fun getSkusList(): List<String> {
         return themes.mapNotNull { it.sku }.toList()
     }
@@ -92,6 +132,9 @@ object ThemeManager {
         prefs.putInt(KEY_THEME, theme.stid)
     }
 
+    /**
+     * Saves purchased theme to game preferences and make it available
+     */
     fun putTheme(
         prefs: GamePreferences,
         productId: String,
@@ -131,7 +174,7 @@ object ThemeManager {
         themeWithSignature: ThemeWithSignature
     ) {
         prefs.edit {
-            putString("thm:${theme.sku}", themeWithSignature.token)
+            putString("thm:${theme.sku}", themeWithSignature.purchaseToken)
             putString("sig:${theme.sku}", themeWithSignature.sig)
             putInt(KEY_THEME, theme.stid)
         }

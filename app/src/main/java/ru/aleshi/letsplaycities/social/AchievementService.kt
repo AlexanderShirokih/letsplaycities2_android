@@ -8,14 +8,14 @@ interface AchievementService {
     /**
      * Unlocks or increments achievement
      * @param achievement the achievement to be unlocked
-     * @return `true` if user signed in to service or `false` if not
+     * @param incrementCount how much increment achievement, only for incremental achievements
      */
-    suspend fun unlockAchievement(achievement: Achievement): Boolean
+    fun unlockAchievement(achievement: Achievement, incrementCount: Int = 1)
 
     /**
      * Submits score to play games server only if user logged in
      * @param score user score to be submitted
      */
-    suspend fun submitScore(score: Int)
+    fun submitScore(score: Int)
 
 }

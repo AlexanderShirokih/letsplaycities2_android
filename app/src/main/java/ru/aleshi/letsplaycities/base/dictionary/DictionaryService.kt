@@ -12,7 +12,9 @@ interface DictionaryService {
 
     /**
      * Current dictionary difficulty. Used for getting random city.
+     * Value from 1 to 3, where 1 is easiest and 3 hardest
      * @return current difficulty
+     * @see Difficulty
      */
     var difficulty: Byte
 
@@ -62,5 +64,14 @@ interface DictionaryService {
      * Used to reset usage flags and other data to it's default state
      */
     fun reset()
+
+    /**
+     * Game difficulty values
+     */
+    companion object Difficulty {
+        const val EASY = 1
+        const val MEDIUM = 2
+        const val HARD = 3
+    }
 
 }

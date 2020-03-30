@@ -1,9 +1,7 @@
 package ru.aleshi.letsplaycities.ui.theme
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.android.support.AndroidSupportInjection
@@ -15,13 +13,18 @@ import ru.aleshi.letsplaycities.base.ThemeManager
 import ru.aleshi.letsplaycities.base.ThemeManager.test2
 import ru.aleshi.letsplaycities.billing.InAppPurchaseManager
 import ru.aleshi.letsplaycities.billing.PurchaseListener
+import ru.aleshi.letsplaycities.social.AchievementService
 import ru.aleshi.letsplaycities.utils.Utils.applyTheme
 import javax.inject.Inject
 
-class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
+/**
+ * Fragment that shows list of game themes and provides functions for switching and purchasing themes.
+ */
+class ThemeFragment : Fragment(R.layout.fragment_theme), ThemeItemClickListener, PurchaseListener {
 
     @Inject
     lateinit var prefs: GamePreferences
+
     private lateinit var mThemeListAdapter: ThemeListAdapter
     private lateinit var mInAppPurchaseManager: InAppPurchaseManager
 
@@ -45,14 +48,6 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
         ThemeManager.checkAvailable(prefs)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_theme, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mThemeListAdapter = ThemeListAdapter(getThemesList(), this)
         recyclerView.apply {
@@ -73,17 +68,20 @@ class ThemeFragment : Fragment(), ThemeItemClickListener, PurchaseListener {
 
     override fun onPurchased(productId: String, purchaseToken: String, signature: String) {
         ThemeManager.putTheme(prefs, productId, purchaseToken, signature)
-        applyTheme(prefs, requireContext())
-        requireActivity().recreate()
+        applyTheme()
     }
 
     override fun onSelectTheme(namedTheme: ThemeListAdapter.NamedTheme) {
         if (namedTheme.theme.isFreeOrAvailable()) {
             ThemeManager.saveCurrentTheme(prefs, namedTheme.theme)
-            applyTheme(prefs, requireContext())
-            requireActivity().recreate()
+            applyTheme()
         } else
             onUnlock(namedTheme)
+    }
+
+    private fun applyTheme() {
+        applyTheme(prefs, requireContext())
+        requireActivity().recreate()
     }
 
     private fun getThemesList(): Array<ThemeListAdapter.NamedTheme> {

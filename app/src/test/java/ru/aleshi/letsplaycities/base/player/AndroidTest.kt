@@ -11,6 +11,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
 import ru.aleshi.letsplaycities.base.combos.ComboSystem
+import ru.aleshi.letsplaycities.base.dictionary.DictionaryService
 import ru.aleshi.letsplaycities.base.game.GameFacade
 import ru.aleshi.letsplaycities.base.game.PictureSource
 import ru.aleshi.letsplaycities.base.game.SurrenderException
@@ -34,7 +35,7 @@ class AndroidTest {
     fun setUp() {
         gameFacade = mock(GameFacade::class.java)
 
-        whenever(gameFacade.difficulty).thenReturn(1)
+        whenever(gameFacade.difficulty).thenReturn(DictionaryService.EASY)
 
         doAnswer { inv ->
             when (inv.arguments[0] as Char) {
