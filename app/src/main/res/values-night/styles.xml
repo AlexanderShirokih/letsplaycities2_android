@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="DarkStyleTheme" parent="AppTheme">
+    <!-- Default app theme with night mode -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorAccent">@color/drkColorPrimary</item>
         <item name="colorPrimary">@color/drkColorPrimary</item>
         <item name="colorPrimaryDark">@android:color/background_dark</item>
@@ -23,5 +24,25 @@
         <item name="fgSpanColor">#fff</item>
         <item name="avatarBorderColor">#9C27B0</item>
     </style>
+
+    <!-- night version of AppTheme already have all properties, just inherit it -->
+
+    <style name="AutStyleTheme" parent="AppTheme" />
+
+    <style name="FrStyleTheme" parent="AppTheme" />
+
+    <style name="GeoStyleTheme" parent="AppTheme" />
+
+    <style name="GrStyleTheme" parent="AppTheme" />
+
+    <style name="RusStyleTheme" parent="AppTheme" />
+
+    <style name="UkrStyleTheme" parent="AppTheme" />
+
+    <style name="UsaStyleTheme" parent="AppTheme" />
+
+    <style name="VkStyleTheme" parent="AppTheme" />
+
+    <style name="WhiteStyleTheme" parent="AppTheme" />
 
 </resources>

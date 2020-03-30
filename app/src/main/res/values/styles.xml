@@ -12,7 +12,7 @@
     <attr name="avatarBorderColor" format="color|reference"/>
 
     <!-- Default app theme (Yellow) -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorAccent">@color/defColorPrimary</item>
         <item name="colorPrimary">@color/defColorPrimary</item>
         <item name="colorPrimaryDark">@color/defColorPrimaryDark</item>

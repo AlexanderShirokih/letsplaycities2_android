@@ -3,11 +3,11 @@ package ru.aleshi.letsplaycities.ui.citieslist
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.CheckedTextView
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.dialog_country_filter.view.*
 import ru.aleshi.letsplaycities.R
@@ -39,7 +39,7 @@ class CountryFilterDialog : DialogFragment() {
                 viewModel.countryListWithCheckboxes.observe(this@CountryFilterDialog, this)
             }
         }
-        return AlertDialog.Builder(activity)
+        return MaterialAlertDialogBuilder(activity)
             .setView(view)
             .setPositiveButton(R.string.apply) { _, _ ->
                 viewModel.dispatchSelectedCitiesTo(citiesListViewModel.countryListFilterChannel)
