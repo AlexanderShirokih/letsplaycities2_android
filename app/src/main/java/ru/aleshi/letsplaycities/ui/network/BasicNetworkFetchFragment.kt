@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import dagger.android.support.AndroidSupportInjection
@@ -22,7 +23,7 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
     @Inject
     protected lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var networkFetchViewModel: NetworkFetchViewModel
+    private val networkFetchViewModel: NetworkFetchViewModel by viewModels { viewModelFactory }
 
     private var views: ViewDataHolder<FetchDataType>? = null
 
@@ -30,8 +31,6 @@ abstract class BasicNetworkFetchFragment<FetchDataType> : Fragment() {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
         onCreate()
-        networkFetchViewModel =
-            ViewModelProvider(this, viewModelFactory)[NetworkFetchViewModel::class.java]
         networkFetchViewModel.state.observe(this@BasicNetworkFetchFragment) { state ->
             @Suppress("UNCHECKED_CAST")
             when (state) {

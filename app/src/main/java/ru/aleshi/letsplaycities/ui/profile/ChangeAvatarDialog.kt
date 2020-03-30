@@ -10,7 +10,7 @@ import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -26,12 +26,7 @@ class ChangeAvatarDialog : DialogFragment() {
     }
 
     private var disposable = CompositeDisposable()
-    private lateinit var mProfileViewModel: ProfileViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mProfileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
-    }
+    private val profileViewModel: ProfileViewModel by viewModels({ requireActivity() })
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK) {
@@ -43,7 +38,7 @@ class ChangeAvatarDialog : DialogFragment() {
         disposable.add(
             Utils.createThumbnail(requireContext().filesDir, uri)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess(mProfileViewModel.avatarUri::set)
+                .doOnSuccess(profileViewModel.avatarUri::set)
                 .subscribe({
                     lpsApplication.gamePreferences.lastAvatarUri = URI.create(it.toString())
                     findNavController().popBackStack()
@@ -69,7 +64,7 @@ class ChangeAvatarDialog : DialogFragment() {
                             0 -> pick() // Edit
                             1 -> { // Remove
                                 lpsApplication.gamePreferences.removeAvatarPath()
-                                mProfileViewModel.loadDefaultAvatar()
+                                profileViewModel.loadDefaultAvatar()
                                 requireDialog().dismiss()
                             }
                         }

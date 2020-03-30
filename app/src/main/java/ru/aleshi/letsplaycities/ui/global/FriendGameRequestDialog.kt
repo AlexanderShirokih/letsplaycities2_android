@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -23,13 +24,11 @@ class FriendGameRequestDialog : DialogFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var gameRequestViewModel: FriendGameRequestViewModel
+    private val gameRequestViewModel: FriendGameRequestViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        gameRequestViewModel =
-            ViewModelProvider(this, viewModelFactory)[FriendGameRequestViewModel::class.java]
         gameRequestViewModel.state.observe(this) { state ->
             when (state) {
                 FetchState.LoadingState -> onBegin()

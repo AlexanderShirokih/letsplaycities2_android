@@ -4,17 +4,12 @@ import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import ru.aleshi.letsplaycities.R
 
 class ConfirmationDialog : DialogFragment() {
 
-    private lateinit var confirmViewModel: ConfirmViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        confirmViewModel = ViewModelProvider(requireParentFragment())[ConfirmViewModel::class.java]
-    }
+    private val confirmViewModel: ConfirmViewModel by viewModels({ requireParentFragment() })
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val args = ConfirmationDialogArgs.fromBundle(requireArguments())

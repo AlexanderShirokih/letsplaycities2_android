@@ -34,7 +34,7 @@ class BlackListFragment : BasicNetworkFetchFragment<BlackListItem>() {
     override fun onCreate() {
         ViewModelProvider(requireParentFragment())[ConfirmViewModel::class.java].callback.observe(
             this,
-            Observer<ConfirmViewModel.Request> { request ->
+            Observer { request ->
                 if (request.resultCode == requestCodeConfirmRemoving && request.result) {
                     callback?.invoke()
                     callback = null

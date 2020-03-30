@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -45,8 +46,6 @@ import javax.inject.Inject
 
 class GameFragment : Fragment() {
 
-    private lateinit var gameViewModel: GameViewModel
-    private lateinit var correctionViewModel: CorrectionViewModel
     private lateinit var adapter: GameAdapter
     private lateinit var adManager: AdManager
 
@@ -63,8 +62,13 @@ class GameFragment : Fragment() {
     private val screenReceiver = ScreenReceiver { gameViewModel.onPlayerSurrender() }
 
     private val viewModelProvider: ViewModelProvider by lazy {
-        ViewModelProvider(requireParentFragment())
+        ViewModelProvider(
+            requireParentFragment()
+        )
     }
+
+    private val gameViewModel: GameViewModel by viewModels { viewModelFactory }
+    private val correctionViewModel: CorrectionViewModel by viewModels({ requireParentFragment() })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -92,8 +96,6 @@ class GameFragment : Fragment() {
                 addAction(Intent.ACTION_SCREEN_OFF)
                 addAction(Intent.ACTION_SCREEN_ON)
             })
-        correctionViewModel = viewModelProvider[CorrectionViewModel::class.java]
-        gameViewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
         gameViewModel.apply {
             cities.observe(this@GameFragment, adapter::updateEntities)
             state.observe(this@GameFragment, ::handleState)

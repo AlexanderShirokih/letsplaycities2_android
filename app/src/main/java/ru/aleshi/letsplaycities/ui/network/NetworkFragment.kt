@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
@@ -40,8 +41,10 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
 
     @Inject
     lateinit var mNetworkPresenter: NetworkContract.Presenter
+
     @Inject
     lateinit var prefs: GamePreferences
+
     @Inject
     lateinit var authDataFactory: GameAuthDataFactory
 
@@ -50,9 +53,7 @@ class NetworkFragment : Fragment(R.layout.fragment_network), NetworkContract.Vie
     }
 
     private val args: NetworkFragmentArgs by navArgs()
-
-    private val friendsViewModel: FriendsViewModel
-        get() = viewModelProvider[FriendsViewModel::class.java]
+    private val friendsViewModel: FriendsViewModel by viewModels({ requireParentFragment() })
 
     private var gameSound: MediaPlayer? = null
     private var lastConnectionTime: Long = 0

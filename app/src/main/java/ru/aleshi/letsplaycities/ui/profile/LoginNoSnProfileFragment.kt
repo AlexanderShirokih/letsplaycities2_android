@@ -6,10 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import dagger.android.support.AndroidSupportInjection
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_profile_login_no_sn.*
 import kotlinx.android.synthetic.main.fragment_profile_login_no_sn.view.*
 import ru.aleshi.letsplaycities.R
@@ -18,18 +17,12 @@ import ru.aleshi.letsplaycities.databinding.FragmentProfileLoginNoSnBinding
 import ru.aleshi.letsplaycities.utils.Event
 import javax.inject.Inject
 
-class LoginNoSnProfileFragment : Fragment() {
+class LoginNoSnProfileFragment : DaggerFragment() {
 
     @Inject
     lateinit var mGamePreferences: GamePreferences
 
-    private lateinit var profileViewModel: ProfileViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidSupportInjection.inject(this)
-        super.onCreate(savedInstanceState)
-        profileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
-    }
+    private val profileViewModel: ProfileViewModel by viewModels({ requireActivity() })
 
     override fun onCreateView(
         inflater: LayoutInflater,

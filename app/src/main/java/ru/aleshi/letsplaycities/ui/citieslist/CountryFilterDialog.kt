@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.CheckedTextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import dagger.android.support.AndroidSupportInjection
@@ -16,20 +17,16 @@ import javax.inject.Inject
 
 class CountryFilterDialog : DialogFragment() {
 
-    private lateinit var viewModel: CountryFilterDialogViewModel
-    private lateinit var citiesListViewModel: CitiesListViewModel
-
     @Inject
-    lateinit var viewModelProviderFactory: ViewModelProvider.Factory
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val viewModel: CountryFilterDialogViewModel by viewModels({ requireParentFragment() })
+    private val citiesListViewModel: CitiesListViewModel by viewModels({ requireParentFragment() }) { viewModelFactory }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
         super.onCreate(savedInstanceState)
-        val parent = requireParentFragment()
-        viewModel =
-            ViewModelProvider(parent)[CountryFilterDialogViewModel::class.java]
-        citiesListViewModel =
-            ViewModelProvider(parent, viewModelProviderFactory)[CitiesListViewModel::class.java]
         citiesListViewModel.countryList.observe(this) { viewModel.countryList.value = it }
     }
 

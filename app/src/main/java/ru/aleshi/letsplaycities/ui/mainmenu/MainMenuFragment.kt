@@ -16,7 +16,6 @@ import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.mainmenu.MainMenuContract
 import ru.aleshi.letsplaycities.social.GoogleGameServicesHelper
-import ru.aleshi.letsplaycities.ui.BaseAsyncActivity
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
 import javax.inject.Inject
