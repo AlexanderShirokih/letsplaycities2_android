@@ -164,7 +164,7 @@ class Player(
         currentResult: WordCheckingResult,
         game: GameFacade
     ): Flowable<WordCheckingResult> {
-        return if (currentResult is WordCheckingResult.NotFound) {
+        return if (currentResult is WordCheckingResult.NotFound && currentResult.word.length > 3) {
             game.getCorrections(currentResult.word)
                 .subscribeOn(Schedulers.computation())
                 .flatMapPublisher { correctionsList ->
