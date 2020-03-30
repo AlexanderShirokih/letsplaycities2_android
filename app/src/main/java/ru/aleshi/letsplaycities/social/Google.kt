@@ -13,7 +13,8 @@ class Google : ISocialNetwork() {
     override fun onInitialize(context: Context) = Unit
 
     override suspend fun onLogin(activity: Activity) {
-        GoogleServicesHelper.signIn(activity as BaseAsyncActivity).apply {
+        val gameServices = GoogleGameServicesHelper(activity as BaseAsyncActivity)
+        gameServices.signIn().apply {
             if (this is Result.Success) {
                 val account = value
 
@@ -32,7 +33,7 @@ class Google : ISocialNetwork() {
                     )
                 else {
                     callback?.onError(activity.getString(R.string.not_all_requested_data_received))
-                    GoogleServicesHelper.signOut(activity)
+                    gameServices.signOut()
                 }
             } else if (this is Result.Failure) {
                 callback?.onError(error.message ?: "")
@@ -46,7 +47,7 @@ class Google : ISocialNetwork() {
 
     override suspend fun onLogout(activity: Activity) {
         super.onLogout(activity)
-        GoogleServicesHelper.signOut(activity)
+        GoogleGameServicesHelper(activity as BaseAsyncActivity).signOut()
     }
 
     override fun onActivityResult(

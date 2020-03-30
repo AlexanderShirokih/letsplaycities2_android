@@ -15,7 +15,7 @@ import ru.aleshi.letsplaycities.R
 import ru.aleshi.letsplaycities.base.GamePreferences
 import ru.aleshi.letsplaycities.base.game.GameSession
 import ru.aleshi.letsplaycities.base.mainmenu.MainMenuContract
-import ru.aleshi.letsplaycities.social.GoogleServicesHelper
+import ru.aleshi.letsplaycities.social.GoogleGameServicesHelper
 import ru.aleshi.letsplaycities.ui.BaseAsyncActivity
 import ru.aleshi.letsplaycities.ui.MainActivity
 import ru.aleshi.letsplaycities.ui.game.GameSessionViewModel
@@ -28,6 +28,9 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu), MainMenuContract
 
     @Inject
     lateinit var prefs: GamePreferences
+
+    @Inject
+    lateinit var gameServices: GoogleGameServicesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidSupportInjection.inject(this)
@@ -52,14 +55,14 @@ class MainMenuFragment : Fragment(R.layout.fragment_main_menu), MainMenuContract
         btn_achievements.setOnClickListener {
             lifecycleScope.launch {
                 it.isClickable = false
-                GoogleServicesHelper.showAchievementsIntent(requireActivity() as BaseAsyncActivity)
+                gameServices.showAchievementsIntent()
                 it.isClickable = true
             }
         }
         btn_leaders.setOnClickListener {
             lifecycleScope.launch {
                 it.isClickable = false
-                GoogleServicesHelper.showLeaderboardIntent(requireActivity() as BaseAsyncActivity)
+                gameServices.showLeaderboardIntent()
                 it.isClickable = true
             }
         }
