@@ -283,8 +283,8 @@ class ScoreManager @Inject constructor(
             achievementService.unlockAchievement(Achievement.ReachScore5000Pts, playerScore)
             achievementService.unlockAchievement(Achievement.ReachScore25000Pts, playerScore)
 
-            if (playerMovesInGame >= 30)
-                achievementService.unlockAchievement(Achievement.Write30CitiesInGame)
+            if (playerMovesInGame >= 50)
+                achievementService.unlockAchievement(Achievement.Write50CitiesInGame)
             if (playerMovesInGame >= 100)
                 achievementService.unlockAchievement(Achievement.Write100CitiesInGame)
             if (gameSession.game.difficulty == DictionaryService.HARD)

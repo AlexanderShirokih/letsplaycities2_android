@@ -16,7 +16,7 @@ enum class Achievement constructor(
 
     PlayInHardMode(R.string.ach_hard_mode),
 
-    ReachScore1000Pts(R.string.ach_score_1000, true, 6),
+    ReachScore1000Pts(R.string.ach_score_1000, true),
 
     Write80Cities(R.string.ach_write_80c, true),
 
@@ -24,13 +24,13 @@ enum class Achievement constructor(
 
     ChangeTheme(R.string.ach_theme),
 
-    Write30CitiesInGame(R.string.ach_30c_in_game),
+    Write50CitiesInGame(R.string.ach_30c_in_game),
 
     PlayOnline3Times(R.string.ach_online_3_times, true),
 
     Use30Tips(R.string.ach_tips_30, true),
 
-    ReachScore5000Pts(R.string.ach_score_5000, true, 6),
+    ReachScore5000Pts(R.string.ach_score_5000, true),
 
     Write500Cities(R.string.ach_write_500c, true),
 
