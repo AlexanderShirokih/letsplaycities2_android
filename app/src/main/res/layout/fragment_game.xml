@@ -198,7 +198,8 @@
                     android:digits="АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя- "
                     android:imeOptions="actionDone"
                     android:inputType="text"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    tools:text="Hello world" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

@@ -23,6 +23,7 @@
         <item name="cityInputColor">#fff</item>
         <item name="fgSpanColor">#fff</item>
         <item name="avatarBorderColor">#9C27B0</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 
     <!-- night version of AppTheme already have all properties, just inherit it -->

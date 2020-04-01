@@ -97,10 +97,10 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
                 app:imageRequest="@{viewModel.imageLeft}"
-                tools:src="@tools:sample/avatars"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/view"
-                app:useBorder="@{viewModel.currentPosition == Position.LEFT }" />
+                app:useBorder="@{viewModel.currentPosition == Position.LEFT }"
+                tools:src="@tools:sample/avatars" />
 
         <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/avatarRight"
@@ -108,10 +108,10 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp"
                 app:imageRequest="@{viewModel.imageRight}"
-                tools:src="@tools:sample/avatars"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/view"
-                app:useBorder="@{viewModel.currentPosition == Position.RIGHT }" />
+                app:useBorder="@{viewModel.currentPosition == Position.RIGHT }"
+                tools:src="@tools:sample/avatars" />
 
         <TextView
                 android:id="@+id/scoreLeft"
@@ -196,7 +196,8 @@
                     android:digits="АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя- "
                     android:imeOptions="actionDone"
                     android:inputType="text"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    tools:text="Hello world" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
