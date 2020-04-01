@@ -1,9 +1,9 @@
 package ru.aleshi.letsplaycities
 
+import android.app.Application
 import android.content.Context
 import android.util.Base64
 import android.widget.Toast
-import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
@@ -22,8 +22,7 @@ import ru.aleshi.letsplaycities.social.ServiceType
 import ru.aleshi.letsplaycities.social.SocialNetworkManager
 import javax.inject.Inject
 
-
-class LPSApplication : MultiDexApplication(), HasAndroidInjector {
+class LPSApplication : Application(), HasAndroidInjector {
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
 

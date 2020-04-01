@@ -40,10 +40,10 @@ android {
     defaultConfig {
         applicationId "ru.aleshi.letsplaycities"
         multiDexEnabled true
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 29
-        versionCode 2803
-        versionName "2.8.1"
+        versionCode 2820
+        versionName "2.8.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
 
@@ -92,8 +92,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
 
-    implementation 'androidx.multidex:multidex:2.0.1'
-
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.material:material:1.2.0-alpha05'
     implementation 'com.mikhaellopez:circularimageview:4.0.1'
@@ -131,9 +129,6 @@ dependencies {
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'ru.aleshi.lps:lps-client:1.2.2'
-
-    //noinspection GradleDependency
-    implementation 'com.squareup.okhttp3:okhttp:3.12.10'
 
     // For JDK9+
     kapt 'javax.xml.bind:jaxb-api:2.3.1'

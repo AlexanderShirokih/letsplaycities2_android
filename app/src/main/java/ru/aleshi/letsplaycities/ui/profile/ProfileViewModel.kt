@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -67,11 +66,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun Context.getDrawableFromResource(resId: Int): Drawable {
-        @Suppress("DEPRECATION")
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            resources.getDrawable(resId, theme)
-        } else
-            resources.getDrawable(resId)
+        return resources.getDrawable(resId, theme)
     }
 
     override fun onCleared() {
