@@ -1,10 +1,12 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'androidx.navigation.safeargs'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'io.fabric'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'androidx.navigation.safeargs'
+    id 'com.google.gms.google-services'
+    id 'kotlin-kapt'
+    id 'io.fabric'
+}
 
 def lifecycle_version = '2.2.0'
 def dagger_version = '2.27'
@@ -46,7 +48,6 @@ android {
         versionName "2.8.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
-
     }
     buildTypes {
         release {
@@ -92,21 +93,27 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
 
-    implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.material:material:1.2.0-alpha05'
-    implementation 'com.mikhaellopez:circularimageview:4.0.1'
-    implementation 'com.android.billingclient:billing:2.2.0'
-
-    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    implementation 'com.google.android.gms:play-services-auth:18.0.0'
     implementation 'com.google.android.gms:play-services-ads-lite:19.0.1'
     implementation 'com.google.android.gms:play-services-games:19.0.0'
+    implementation 'com.google.firebase:firebase-core:17.3.0'
+    implementation 'com.google.firebase:firebase-messaging:20.1.4'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation "com.google.dagger:dagger:$dagger_version"
+    implementation "com.google.dagger:dagger-android:$dagger_version"
+    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.mikhaellopez:circularimageview:4.0.1'
+    implementation 'com.android.billingclient:billing:2.2.0'
 
     implementation 'com.vk:androidsdk:2.2.1'
     implementation 'com.facebook.android:facebook-login:5.15.1'
     implementation 'ru.ok:odnoklassniki-android-sdk:2.1.8'
 
-    implementation 'com.google.firebase:firebase-core:17.2.3'
-    implementation 'com.google.firebase:firebase-messaging:20.1.3'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+    implementation 'ru.aleshi.lps:lps-client:1.2.2'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
@@ -117,20 +124,10 @@ dependencies {
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 
     androidTestImplementation 'androidx.test:runner:1.2.0'
-    kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
-    implementation 'com.google.code.gson:gson:2.8.6'
-    // Dagger 2
-    implementation "com.google.dagger:dagger:$dagger_version"
-    implementation "com.google.dagger:dagger-android:$dagger_version"
-    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+    kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:${dagger_version}"
-
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-    implementation 'ru.aleshi.lps:lps-client:1.2.2'
-
-    // For JDK9+
     kapt 'javax.xml.bind:jaxb-api:2.3.1'
     kapt 'com.sun.xml.bind:jaxb-core:2.3.0.1'
     kapt 'com.sun.xml.bind:jaxb-impl:2.3.2'

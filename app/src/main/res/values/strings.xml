@@ -372,4 +372,5 @@
     <string name="not_all_requested_data_received">Не удалось получить все данные для авторизации! Попробуйте снова</string>
     <string name="error_server_unavail">Не удалось подключиться к серверу. Проверьте подключение к интернету или попробуйте зайти позже</string>
     <string name="error_fb_null_profile">Не удалось получить профиль, попробуйте снова</string>
+    <string name="no_play_services">Возможно у вас не установлены Сервисы Google Play</string>
 </resources>

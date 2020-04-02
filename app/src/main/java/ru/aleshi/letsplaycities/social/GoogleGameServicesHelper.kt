@@ -91,6 +91,8 @@ class GoogleGameServicesHelper @Inject constructor(
 
                 return if (data != null) {
                     val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data.data)
+                        ?: return Result.failure(LPSException(activity.getString(R.string.no_play_services)))
+
                     if (result.isSuccess) {
                         Result.success(result.signInAccount!!)
                     } else {
