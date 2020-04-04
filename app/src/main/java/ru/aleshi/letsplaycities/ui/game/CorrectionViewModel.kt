@@ -19,6 +19,7 @@ class CorrectionViewModel : ViewModel() {
         correctionCallback: (city: String) -> Unit
     ) {
         this.correctionCallback = correctionCallback
+        this.corrections.removeSource(wordState)
         this.corrections.addSource(wordState) {
             when (it) {
                 is WordCheckingResult.Corrections -> this.corrections.value = it.corrections

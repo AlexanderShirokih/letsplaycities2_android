@@ -13,7 +13,6 @@ import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +22,7 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
-import dagger.android.support.AndroidSupportInjection
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_game.*
 import kotlinx.coroutines.*
 import ru.aleshi.letsplaycities.R
@@ -44,7 +43,7 @@ import ru.aleshi.letsplaycities.utils.Utils.safeNavigate
 import ru.quandastudio.lpsclient.core.LPSMessage
 import javax.inject.Inject
 
-class GameFragment : Fragment() {
+class GameFragment : DaggerFragment() {
 
     private lateinit var adapter: GameAdapter
     private lateinit var adManager: AdManager
@@ -71,8 +70,6 @@ class GameFragment : Fragment() {
     private val correctionViewModel: CorrectionViewModel by viewModels({ requireParentFragment() })
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidSupportInjection.inject(this)
-
         super.onCreate(savedInstanceState)
         val activity = requireActivity()
 
