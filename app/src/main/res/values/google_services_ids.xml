@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- app_id -->
-    <string name="app_id" translatable="false">725939428380</string>
+    <string name="games_app_id" translatable="false">725939428380</string>
     <!-- package_name -->
     <string name="package_name" translatable="false">ru.aleshi.letsplaycities</string>
     <!-- achievement Все понятно 15 -->
