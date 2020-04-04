@@ -29,14 +29,16 @@ class GoogleGameServicesHelper @Inject constructor(
      */
     override fun unlockAchievement(achievement: Achievement, incrementCount: Int) {
         GoogleSignIn.getLastSignedInAccount(activity)?.apply {
-            val client = Games.getAchievementsClient(activity, this)
-            if (achievement.isIncremental) {
-                client.increment(
-                    activity.getString(achievement.res),
-                    incrementCount / achievement.scaleFactor
-                )
-            } else {
-                client.unlock(activity.getString(achievement.res))
+            if (GoogleSignIn.hasPermissions(this, Games.SCOPE_GAMES_LITE)) {
+                val client = Games.getAchievementsClient(activity, this)
+                if (achievement.isIncremental) {
+                    client.increment(
+                        activity.getString(achievement.res),
+                        incrementCount / achievement.scaleFactor
+                    )
+                } else {
+                    client.unlock(activity.getString(achievement.res))
+                }
             }
         }
     }
@@ -47,8 +49,9 @@ class GoogleGameServicesHelper @Inject constructor(
      */
     override fun submitScore(score: Int) {
         GoogleSignIn.getLastSignedInAccount(activity)?.apply {
-            Games.getLeaderboardsClient(activity, this)
-                .submitScore(activity.getString(R.string.score_leaderboard), score.toLong())
+            if (GoogleSignIn.hasPermissions(this, Games.SCOPE_GAMES_LITE))
+                Games.getLeaderboardsClient(activity, this)
+                    .submitScore(activity.getString(R.string.score_leaderboard), score.toLong())
         }
     }
 
