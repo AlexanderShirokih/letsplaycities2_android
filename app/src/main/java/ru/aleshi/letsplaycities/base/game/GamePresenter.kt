@@ -217,6 +217,7 @@ class GamePresenter @Inject constructor(
             .doOnNext {
                 if (it.isSuccessful()) {
                     _dictionary.markUsed(it.city)
+                    _exclusions.getAlternativeName(it.city)?.let { _dictionary.markUsed(it) }
                     updateUserViewAndResetTimer()
                 }
             }
