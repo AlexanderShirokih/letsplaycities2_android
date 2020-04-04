@@ -44,8 +44,8 @@ android {
         multiDexEnabled true
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 2830
-        versionName "2.8.3"
+        versionCode 2831
+        versionName "2.8.3f1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
     }
