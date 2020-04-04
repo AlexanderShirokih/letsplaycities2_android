@@ -30,16 +30,17 @@ class DictionaryServiceImpl constructor(
     /**
      * @see DictionaryService.checkCity
      */
-    override fun checkCity(city: String): Flowable<CityResult> {
+    override fun checkCity(cityProvider: () -> String): Flowable<CityResult> {
         return Flowable.fromCallable {
-                if (!dictionary.containsKey(city))
-                    CityResult.CITY_NOT_FOUND
+            val city = cityProvider()
+            if (!dictionary.containsKey(city))
+                CityResult.CITY_NOT_FOUND
+            else
+                if (dictionary[city]!!.diff < 0)
+                    CityResult.ALREADY_USED
                 else
-                    if (dictionary[city]!!.diff < 0)
-                        CityResult.ALREADY_USED
-                    else
-                        CityResult.OK
-            }.subscribeOn(Schedulers.computation())
+                    CityResult.OK
+        }.subscribeOn(Schedulers.computation())
             .onBackpressureLatest()
     }
 
@@ -64,26 +65,26 @@ class DictionaryServiceImpl constructor(
 
     override fun getCorrectionVariants(city: String): Single<List<String>> =
         Single.create<List<String>> {
-                val list = edits(city)
-                val candidates = ArrayList<String>()
-                for (s in list) {
-                    // Max 3 words
-                    if (candidates.size == 3)
-                        break
-                    if (canUse(s))
-                        candidates.add(s)
-                }
-
-                if (candidates.isNotEmpty())
-                    it.onSuccess(candidates.distinct())
-
-                for (s in list)
-                    for (w in edits(s))
-                        if (candidates.size < 4 && canUse(w) && !candidates.contains(w))
-                            candidates.add(w)
-
-                it.onSuccess(candidates.distinct())
+            val list = edits(city)
+            val candidates = ArrayList<String>()
+            for (s in list) {
+                // Max 3 words
+                if (candidates.size == 3)
+                    break
+                if (canUse(s))
+                    candidates.add(s)
             }
+
+            if (candidates.isNotEmpty())
+                it.onSuccess(candidates.distinct())
+
+            for (s in list)
+                for (w in edits(s))
+                    if (candidates.size < 4 && canUse(w) && !candidates.contains(w))
+                        candidates.add(w)
+
+            it.onSuccess(candidates.distinct())
+        }
             .subscribeOn(Schedulers.computation())
 
     /**

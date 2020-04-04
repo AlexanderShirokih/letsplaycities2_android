@@ -130,7 +130,7 @@ class Player(
      */
     private fun checkInDatabase(city: String, game: GameFacade): Flowable<WordCheckingResult> {
         var word = city
-        return game.checkCity(word)
+        return game.checkCity { word }
             .flatMap { result ->
                 when (result) {
                     CityResult.CITY_NOT_FOUND -> Flowable.error(
@@ -141,7 +141,7 @@ class Player(
                 }
             }
             .retry { c, t ->
-                word = StringUtils.replaceWhitespaces(word)
+                word = word.replace(" ", "-")
                 c < 2 && t is CityNotFoundException
             }
             .onErrorResumeNext { t: Throwable ->

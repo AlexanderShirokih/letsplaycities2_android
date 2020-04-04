@@ -20,11 +20,11 @@ interface DictionaryService {
 
     /**
      * Checks city in dictionary database.
-     * @param city to be checked
+     * @param cityProvider returns city to be checked
      * @return [Observable] with [CityResult.OK] if city not used before, [CityResult.ALREADY_USED] if
-     * [city] has already been used, [CityResult.CITY_NOT_FOUND] if [city] not found in dictionary.
+     * city has already been used, [CityResult.CITY_NOT_FOUND] if city not found in dictionary.
      */
-    fun checkCity(city: String): Flowable<CityResult>
+    fun checkCity(cityProvider: () -> String): Flowable<CityResult>
 
     /**
      * Returns random word from database starting at [firstChar].
